@@ -19,6 +19,17 @@ const typeApi = createApi({
                     };
                 },
             }),
+            fetchTrueType: builder.query({
+                providesTags: (result, error) => {
+                    return[{type: 'Type', id: 'All'}]
+                },
+                query: () => {
+                    return {
+                        url: '/v1/type/get-true-stone-types',
+                        method: 'GET'
+                    }
+                }
+            }),
             fetchTypeById: builder.query({
                 query: (typeCode) => {
                     return {
@@ -82,5 +93,5 @@ const typeApi = createApi({
     }
 });
 
-export const { useFetchTypeQuery, useFetchTypeByIdQuery, useAddTypeMutation, useUpdateTypeMutation, useRemoveTypeMutation } = typeApi;
+export const { useFetchTypeQuery, useFetchTrueTypeQuery, useFetchTypeByIdQuery, useAddTypeMutation, useUpdateTypeMutation, useRemoveTypeMutation } = typeApi;
 export { typeApi };

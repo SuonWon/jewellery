@@ -2,7 +2,7 @@
 import { Alert, Button, Card, CardBody, Dialog, DialogBody, Input, Switch, Textarea, Typography } from "@material-tailwind/react";
 import { FaCirclePlus, FaFloppyDisk, FaPencil, FaTrashCan, FaTriangleExclamation } from "react-icons/fa6";
 import { useState } from "react";
-import { useFetchCustomerQuery, useAddCustomerMutation, useUpdateCustomerMutation, useRemoveCustomerMutation } from "../store";
+import { useFetchSupplierQuery, useAddSupplierMutation, useUpdateSupplierMutation, useRemoveSupplierMutation } from "../store";
 import { useForm } from "react-hook-form";
 import { pause, currentDate } from "../const";
 import DeleteModal from "../components/delete_modal";
@@ -12,7 +12,7 @@ import ModalTitle from "../components/modal_title";
 import moment from "moment";
 import TableList from "../components/data_table";
 
-function Customer() {
+function Supplier() {
 
     const [open, setOpen] = useState(false);
 
@@ -24,12 +24,11 @@ function Customer() {
 
     const [editData, setEditData] = useState({});
 
-    const {data, error, isFetching} = useFetchCustomerQuery();
+    const {data, error, isFetching} = useFetchSupplierQuery();
 
-    const customer = {
-        customerName: "",
-        nrcNo: "",
-        companyName: "",
+    const supplier = {
+        supplierName: "",
+        contactName: "",
         contactNo: "",
         officeNo: "",
         street: "",
@@ -39,44 +38,41 @@ function Customer() {
         remark: "",
     };
 
+    const resetData = () => {
+        reset({supplierInfo: supplier})
+    }
+
     const {register, handleSubmit, setValue, formState: {errors}, reset } = useForm({
         defaultValues: {
-            customerInfo: customer
+            supplierInfo: supplier
         }
     });
 
-    const resetData = () => {
-        reset({
-            customerInfo: customer
-        })
-    };
+    const [addSupplier, addResult] = useAddSupplierMutation();
 
-    const [addCustomer, addResult] = useAddCustomerMutation();
+    const [editSupplier, editResult] = useUpdateSupplierMutation();
 
-    const [editCustomer, editResult] = useUpdateCustomerMutation();
-
-    const [removeCustomer, removeResult] = useRemoveCustomerMutation();
+    const [removeSupplier, removeResult] = useRemoveSupplierMutation();
 
     const [deleteId, setDeleteId] = useState('');
 
     const handleChange = async (e) => {
         
-        let customer = data.filter((customer) => customer.customerCode == e.target.id);
-        await editCustomer({
-            customerCode: customer[0].customerCode,
-            customerName: customer[0].customerName,
-            nrcNo: customer[0].nrcNo,
-            companyName: customer[0].companyName,
-            contactNo: customer[0].contactNo,
-            officeNo: customer[0].officeNo,
-            street: customer[0].street,
-            township: customer[0].township,
-            city: customer[0].city,
-            region: customer[0].region,
-            remark: customer[0].remark,
+        let supplier = data.filter((supplier) => supplier.supplierCode == e.target.id);
+        await editSupplier({
+            supplierCode: supplier[0].supplierCode,
+            supplierName: supplier[0].supplierName,
+            contactName: supplier[0].contactName,
+            contactNo: supplier[0].contactNo,
+            officeNo: supplier[0].officeNo,
+            street: supplier[0].street,
+            township: supplier[0].township,
+            city: supplier[0].city,
+            region: supplier[0].region,
+            remark: supplier[0].remark,
             isActive: e.target.checked ? true: false,
-            createdAt: customer[0].createdAt,
-            createdBy: customer[0].createdBy,
+            createdAt: supplier[0].createdAt,
+            createdBy: supplier[0].createdBy,
             updatedAt: currentDate,
             updatedBy: "Hello World",
         }).then((res) => {
@@ -87,19 +83,19 @@ function Customer() {
 
     const openModal = () => {
         setIsEdit(false);
-        setValue("customerInfo", customer);
+        setValue("supplierInfo", supplier);
         setOpen(!open);
     };
 
-    const onSubmit = async (customerData) => {
+    const onSubmit = async (supplierData) => {
         let subData = {
-            ...customerData.customerInfo,
+            ...supplierData.supplierInfo,
             isActive: true,
             createdAt: currentDate,
             createdBy: 'Htet Wai Aung',
             updatedAt: currentDate,
         };
-        addCustomer(subData).then((res) => {
+        addSupplier(subData).then((res) => {
             resetData();
             console.log(res);
         });
@@ -109,15 +105,15 @@ function Customer() {
         setIsAlert(false);
     };
 
-    const onSaveSubmit = (customerData) => {
+    const onSaveSubmit = (supplierData) => {
         let subData = {
-            ...customerData.customerInfo,
+            ...supplierData.supplierInfo,
             isActive: true,
             createdAt: currentDate,
             createdBy: 'Htet Wai Aung',
             updatedAt: currentDate,
         };
-        addCustomer(subData).then((res) => {
+        addSupplier(subData).then((res) => {
             resetData();
             console.log(res);
         });
@@ -125,13 +121,12 @@ function Customer() {
     };
 
     const handleEdit = async (id) => {
-        let eData = data.filter((customer) => customer.customerCode === id);
+        let eData = data.filter((supplier) => supplier.supplierCode === id);
         setEditData(eData[0]);
         setIsEdit(true);
-        setValue("customerInfo", {
-            customerName: eData[0].customerName,
-            nrcNo: eData[0].nrcNo,
-            companyName: eData[0].companyName,
+        setValue("supplierInfo", {
+            supplierName: eData[0].supplierName,
+            contactName: eData[0].contactName,
             contactNo: eData[0].contactNo,
             officeNo: eData[0].officeNo,
             street: eData[0].street,
@@ -143,19 +138,18 @@ function Customer() {
         setOpen(!open);
     };
 
-    const submitEdit = async (customerData) => {
-        editCustomer({
-            customerCode: editData.customerCode,
-            customerName: customerData.customerInfo.customerName,
-            nrcNo: customerData.customerInfo.nrcNo,
-            companyName: customerData.customerInfo.companyName,
-            contactNo: customerData.customerInfo.contactNo,
-            officeNo: customerData.customerInfo.officeNo,
-            street: customerData.customerInfo.street,
-            township: customerData.customerInfo.township,
-            city: customerData.customerInfo.city,
-            region: customerData.customerInfo.region,
-            remark: customerData.customerInfo.remark,
+    const submitEdit = async (supplierData) => {
+        editSupplier({
+            supplierCode: editData.supplierCode,
+            supplierName: supplierData.supplierInfo.supplierName,
+            contactName: supplierData.supplierInfo.contactName,
+            contactNo: supplierData.supplierInfo.contactNo,
+            officeNo: supplierData.supplierInfo.officeNo,
+            street: supplierData.supplierInfo.street,
+            township: supplierData.supplierInfo.township,
+            city: supplierData.supplierInfo.city,
+            region: supplierData.supplierInfo.region,
+            remark: supplierData.supplierInfo.remark,
             isActive: editData.isActive,
             createdAt: editData.createdAt,
             createdBy: editData.createdBy,
@@ -171,7 +165,7 @@ function Customer() {
     };
 
     const handleRemove = async (id) => {
-        removeCustomer(id).then((res) => {console.log(res)});
+        removeSupplier(id).then((res) => {console.log(res)});
         setIsAlert(true);
         setOpenDelete(!openDelete);
         await pause(2000);
@@ -204,17 +198,10 @@ function Customer() {
             
         },
         {
-            name: 'NRC No',
+            name: 'Contact Name',
             sortable: true,
             width: "200px",
-            selector: row => row.NRCNo,
-            
-        },
-        {
-            name: 'Company Name',
-            sortable: true,
-            width: "200px",
-            selector: row => row.CompanyName,
+            selector: row => row.ContactName,
             
         },
         {
@@ -292,24 +279,23 @@ function Customer() {
         },
     ];
 
-    const tbodyData = data?.map((customer) => {
+    const tbodyData = data?.map((supplier) => {
         return {
-            Code: customer.customerCode,
-            Name: customer.customerName,
-            NRCNo: customer.nrcNo,
-            CompanyName: customer.companyName,
-            ContactNo: customer.contactNo,
-            OfficeNo: customer.officeNo,
-            Street: customer.street,
-            Township: customer.township,
-            City: customer.city,
-            Region: customer.region,
-            CreatedAt: moment(customer.createdAt).format("YYYY-MM-DD hh:mm:ss a"),
-            CreatedBy: customer.createdBy,
-            UpdatedAt: moment(customer.updatedAt).format("YYYY-MM-DD hh:mm:ss a"),
-            UpdatedBy: customer.updatedBy,
-            Remark: customer.remark,
-            Status: customer.isActive,
+            Code: supplier.supplierCode,
+            Name: supplier.supplierName,
+            ContactName: supplier.contactName,
+            ContactNo: supplier.contactNo,
+            OfficeNo: supplier.officeNo,
+            Street: supplier.street,
+            Township: supplier.township,
+            City: supplier.city,
+            Region: supplier.region,
+            CreatedAt: moment(supplier.createdAt).format("YYYY-MM-DD hh:mm:ss a"),
+            CreatedBy: supplier.createdBy,
+            UpdatedAt: moment(supplier.updatedAt).format("YYYY-MM-DD hh:mm:ss a"),
+            UpdatedBy: supplier.updatedBy,
+            Remark: supplier.remark,
+            Status: supplier.isActive,
         }
     });
 
@@ -327,7 +313,7 @@ function Customer() {
                     removeResult.isSuccess && isAlert && <SuccessAlert message="Delete successful." handleAlert={() => setIsAlert(false)} />
                 }
             </div>
-            <SectionTitle title="Customers" handleModal={openModal} />
+            <SectionTitle title="Suppliers" handleModal={openModal} />
             <Card className="h-auto shadow-md max-w-screen-xxl rounded-sm p-2 border-t">
                 <CardBody className="rounded-sm overflow-auto p-0">
                     <TableList columns={column} data={tbodyData} />
@@ -335,7 +321,7 @@ function Customer() {
             </Card>
             <Dialog open={open} handler={openModal} size="lg">
                 <DialogBody>
-                    <ModalTitle titleName={isEdit ? "Edit Customer" : "Customer"} handleClick={openModal} />
+                    <ModalTitle titleName={isEdit ? "Edit Supplier" : "Create Supplier"} handleClick={openModal} />
                     {
                         addResult.isSuccess && isAlert && <SuccessAlert message="Save successful." handleAlert={() => setIsAlert(false)} />
                     }
@@ -343,23 +329,22 @@ function Customer() {
                         isEdit ? (
                             <form  className="flex flex-col items-end p-3 gap-4">
                                 <div className="grid grid-cols-3 gap-2 w-full">
-                                    <Input label="Name" {...register('customerInfo.customerName', {require: true})} />
-                                    <Input label="NRC No" {...register('customerInfo.nrcNo', {require: true})} />
-                                    <Input label="Company Name" {...register('customerInfo.companyName', {require: true})} />
+                                    <Input label="Name" {...register('supplierInfo.supplierName', {require: true})} />
+                                    <Input label="Contact Name" {...register('supplierInfo.contactName', {require: true})} />
                                 </div>
                                 <div className="grid grid-cols-4 gap-2 w-full">
-                                    <Input label="Contact No" {...register('customerInfo.contactNo', {require: true})} />
-                                    <Input label="Office No" {...register('customerInfo.officeNo', {require: true})} />
+                                    <Input label="Contact No" {...register('supplierInfo.contactNo', {require: true})} />
+                                    <Input label="Office No" {...register('supplierInfo.officeNo', {require: true})} />
                                     <div className="col-span-2">
-                                        <Input label="Street" {...register('customerInfo.street', {require: true})} />
+                                        <Input label="Street" {...register('supplierInfo.street', {require: true})} />
                                     </div>
                                 </div>
                                 <div className="grid grid-cols-3 gap-2 w-full">
-                                    <Input label="Township" {...register('customerInfo.township', {require: true})} />
-                                    <Input label="City" {...register('customerInfo.city', {require: true})} />
-                                    <Input label="Region" {...register('customerInfo.region', {require: true})} />
+                                    <Input label="Township" {...register('supplierInfo.township', {require: true})} />
+                                    <Input label="City" {...register('supplierInfo.city', {require: true})} />
+                                    <Input label="Region" {...register('supplierInfo.region', {require: true})} />
                                 </div>
-                                <Textarea label="Remark" rows={1} {...register('customerInfo.remark')} />
+                                <Textarea label="Remark" rows={1} {...register('supplierInfo.remark')} />
                                 {
                                     errors.stoneDesc && <Alert
                                     icon={<FaTriangleExclamation />}
@@ -387,23 +372,23 @@ function Customer() {
                         ) : (
                             <form  className="flex flex-col items-end p-3 gap-4">
                                 <div className="grid grid-cols-3 gap-2 w-full">
-                                    <Input label="Name" onFocus={() => setIsAlert(false)} {...register('customerInfo.customerName', {require: true})} />
-                                    <Input label="NRC No" onFocus={() => setIsAlert(false)} {...register('customerInfo.nrcNo', {require: true})} />
-                                    <Input label="Company Name" onFocus={() => setIsAlert(false)} {...register('customerInfo.companyName', {require: true})} />
+                                    <Input label="Name" onFocus={() => setIsAlert(false)} {...register('supplierInfo.supplierName', {require: true})} />
+                                    <Input label="Contact Name" onFocus={() => setIsAlert(false)} {...register('supplierInfo.contactName', {require: true})} />
+                                    <Input label="Contact No" onFocus={() => setIsAlert(false)} {...register('supplierInfo.contactNo', {require: true})} />
                                 </div>
                                 <div className="grid grid-cols-4 gap-2 w-full">
-                                    <Input label="Contact No" onFocus={() => setIsAlert(false)} {...register('customerInfo.contactNo', {require: true})} />
-                                    <Input label="Office No" onFocus={() => setIsAlert(false)} {...register('customerInfo.officeNo', {require: true})} />
+                                    
+                                    <Input label="Office No" onFocus={() => setIsAlert(false)} {...register('supplierInfo.officeNo', {require: true})} />
                                     <div className="col-span-2">
-                                        <Input label="Street" onFocus={() => setIsAlert(false)} {...register('customerInfo.street', {require: true})} />
+                                        <Input label="Street" onFocus={() => setIsAlert(false)} {...register('supplierInfo.street', {require: true})} />
                                     </div>
+                                    <Input label="Township" onFocus={() => setIsAlert(false)} {...register('supplierInfo.township', {require: true})} />
                                 </div>
                                 <div className="grid grid-cols-3 gap-2 w-full">
-                                    <Input label="Township" onFocus={() => setIsAlert(false)} {...register('customerInfo.township', {require: true})} />
-                                    <Input label="City" onFocus={() => setIsAlert(false)} {...register('customerInfo.city', {require: true})} />
-                                    <Input label="Region" onFocus={() => setIsAlert(false)} {...register('customerInfo.region', {require: true})} />
+                                    <Input label="City" onFocus={() => setIsAlert(false)} {...register('supplierInfo.city', {require: true})} />
+                                    <Input label="Region" onFocus={() => setIsAlert(false)} {...register('supplierInfo.region', {require: true})} />
                                 </div>
-                                <Textarea label="Remark" rows={1} onFocus={() => setIsAlert(false)} {...register('customerInfo.remark')} />
+                                <Textarea label="Remark" rows={1} onFocus={() => setIsAlert(false)} {...register('supplierInfo.remark')} />
                                 <div className="flex items-center justify-end mt-6 gap-2">
                                     <Button onClick={handleSubmit(onSubmit)} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2">
                                         <FaFloppyDisk className="text-base" /> 
@@ -432,4 +417,4 @@ function Customer() {
 
 }
 
-export default Customer;
+export default Supplier;

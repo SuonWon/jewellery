@@ -1,10 +1,10 @@
 /* eslint-disable eqeqeq */
-import { Alert, Button, Card, CardBody, Dialog, DialogBody, Input, Switch, Typography } from "@material-tailwind/react";
+import { Alert, Button, Card, CardBody, Dialog, DialogBody, Input, Typography } from "@material-tailwind/react";
 import { FaCirclePlus, FaFloppyDisk, FaPencil, FaTrashCan, FaTriangleExclamation } from "react-icons/fa6";
 import { useState } from "react";
 import { useFetchUOMQuery, useAddUOMMutation, useUpdateUOMMutation, useRemoveUOMMutation } from "../store";
 import { useForm } from "react-hook-form";
-import { pause } from "../const";
+import { pause, currentDate } from "../const";
 import DeleteModal from "../components/delete_modal";
 import SuccessAlert from "../components/success_alert";
 import SectionTitle from "../components/section_title";
@@ -24,7 +24,7 @@ function UOM() {
 
     const [editData, setEditData] = useState({});
 
-    const {data, result} = useFetchUOMQuery();
+    const {data, error, isFetching} = useFetchUOMQuery();
 
     const {register, handleSubmit, setValue, formState: {errors}, reset } = useForm({
         defaultValues:{
@@ -42,8 +42,6 @@ function UOM() {
     const [removeUnit, removeResult] = useRemoveUOMMutation();
 
     const [deleteId, setDeleteId] = useState('');
-
-    const currentDate = new Date().toISOString();
 
     const handleChange = async (e) => {
         
@@ -227,6 +225,9 @@ function UOM() {
                 <DialogBody>
                     <ModalTitle titleName={isEdit ? "Edit Unit" : "Unit of Measurement"} handleClick={openModal} />
                     {
+                        addResult.isSuccess && isAlert && <SuccessAlert message="Save successful." handleAlert={() => setIsAlert(false)} />
+                    }
+                    {
                         isEdit ? (
                             <form  className="flex flex-col items-end p-3">
                                 <div className="grid grid-cols-2 gap-2 w-full">
@@ -271,9 +272,6 @@ function UOM() {
                                     This field is required
                                 </Alert>
                                 
-                                }
-                                {
-                                    addResult.isSuccess && isAlert && <SuccessAlert message="Save successful." handleAlert={() => setIsAlert(false)} />
                                 }
                                 <div className="flex items-center justify-end mt-6 gap-2">
                                     <Button onClick={handleSubmit(onSubmit)} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2">

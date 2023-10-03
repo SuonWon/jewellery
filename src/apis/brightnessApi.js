@@ -19,6 +19,17 @@ const brightnessApi = createApi({
                     };
                 },
             }),
+            fetchTrueBrightness: builder.query({
+                providesTags: (result, error) => {
+                    return[{type: 'Brightness', id: 'All'}]
+                },
+                query: () => {
+                    return {
+                        url: '/v1/brightness/get-true-stone-brightnesses',
+                        method: 'GET',
+                    }
+                }
+            }),
             fetchBrightnessById: builder.query({
                 query: (brightCode) => {
                     return {
@@ -82,5 +93,5 @@ const brightnessApi = createApi({
     }
 });
 
-export const { useFetchBrightnessQuery, useFetchBrightnessByIdQuery, useAddBrightnessMutation, useUpdateBrightnessMutation, useRemoveBrightnessMutation } = brightnessApi;
+export const { useFetchBrightnessQuery, useFetchTrueBrightnessQuery, useFetchBrightnessByIdQuery, useAddBrightnessMutation, useUpdateBrightnessMutation, useRemoveBrightnessMutation } = brightnessApi;
 export { brightnessApi };

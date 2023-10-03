@@ -19,6 +19,17 @@ const stoneApi = createApi({
                     };
                 },
             }),
+            fetchTrueStone: builder.query({
+                providesTags: () => {
+                    return[{type: 'Stone', id: 'All'}]
+                },
+                query: () => {
+                    return {
+                        url: '/v1/stone/get-true-stones',
+                        method: 'GET'
+                    }
+                }
+            }),
             fetchStoneById: builder.query({
                 query: (stoneCode) => {
                     return {
@@ -83,5 +94,5 @@ const stoneApi = createApi({
     }
 });
 
-export const { useFetchStoneQuery, useFetchStoneByIdQuery, useAddStoneMutation, useUpdateStoneMutation, useRemoveStoneMutation } = stoneApi;
+export const { useFetchStoneQuery, useFetchTrueStoneQuery, useFetchStoneByIdQuery, useAddStoneMutation, useUpdateStoneMutation, useRemoveStoneMutation } = stoneApi;
 export { stoneApi };

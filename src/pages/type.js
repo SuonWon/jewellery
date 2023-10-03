@@ -4,7 +4,7 @@ import { FaCirclePlus, FaFloppyDisk, FaPencil, FaTrashCan, FaTriangleExclamation
 import { useState } from "react";
 import { useFetchTypeQuery, useAddTypeMutation, useUpdateTypeMutation, useRemoveTypeMutation } from "../store";
 import { useForm } from "react-hook-form";
-import { pause } from "../const";
+import { pause, currentDate } from "../const";
 import DeleteModal from "../components/delete_modal";
 import SuccessAlert from "../components/success_alert";
 import SectionTitle from "../components/section_title";
@@ -24,7 +24,7 @@ function StoneType() {
 
     const [editData, setEditData] = useState({});
 
-    const {data, result} = useFetchTypeQuery();
+    const {data, error, isFetching} = useFetchTypeQuery();
 
     const {register, handleSubmit, setValue, formState: {errors}, reset } = useForm();
 
@@ -35,8 +35,6 @@ function StoneType() {
     const [removeType, removeResult] = useRemoveTypeMutation();
 
     const [deleteId, setDeleteId] = useState('');
-
-    const currentDate = new Date().toISOString();
 
     const handleChange = async (e) => {
         
@@ -219,6 +217,9 @@ function StoneType() {
                 <DialogBody>
                     <ModalTitle titleName={isEdit ? "Edit Stone Type" : "Stone Type"} handleClick={openModal} />
                     {
+                        addResult.isSuccess && isAlert && <SuccessAlert message="Save successful." handleAlert={() => setIsAlert(false)} />
+                    }
+                    {
                         isEdit ? (
                             <form  className="flex flex-col items-end p-3">
                                 {/* <Switch label="Active" color="deep-purple" defaultChecked /> */}
@@ -259,9 +260,6 @@ function StoneType() {
                                     This field is required
                                 </Alert>
                                 
-                                }
-                                {
-                                    addResult.isSuccess && isAlert && <SuccessAlert message="Save successful." handleAlert={() => setIsAlert(false)} />
                                 }
                                 <div className="flex items-center justify-end mt-6 gap-2">
                                     <Button onClick={handleSubmit(onSubmit)} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2">

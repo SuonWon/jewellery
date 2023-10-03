@@ -1,5 +1,5 @@
 import { Avatar, Button, Menu, MenuHandler, MenuItem, MenuList, Typography } from "@material-tailwind/react";
-import { FaArrowRightFromBracket, FaCartShopping, FaChartPie, FaChevronDown, FaDatabase, FaMoneyBill1, FaSliders, FaUser, FaUsers } from "react-icons/fa6";
+import { FaArrowRightFromBracket, FaCartShopping, FaChartPie, FaChevronDown, FaDatabase, FaFileInvoice, FaListUl, FaMoneyBill1, FaSliders, FaUser, FaUsers } from "react-icons/fa6";
 import { GiDiamondTrophy } from "react-icons/gi";
 import Profile from '../images/wallpaper_1.jpg';
 import { NavLink } from "react-router-dom";
@@ -54,11 +54,27 @@ function Nav() {
                             <FaMoneyBill1 className='text-base' /> <span className=''>Sales</span>
                         </Typography>
                     </NavLink>
-                    <NavLink to='/purchase'>
-                        <Typography variant='small' className="flex justify-center items-center p-2 text-white space-x-2 hover:bg-white hover:text-black rounded-lg ">
-                            <FaCartShopping className='text-base' /> <span className=''>Purchase</span>
-                        </Typography>
-                    </NavLink>
+                    <Menu>
+                        <MenuHandler>
+                            <Typography variant='small' className="flex justify-center items-center p-2 text-white space-x-2 hover:bg-white hover:text-black rounded-lg cursor-pointer">
+                                <FaCartShopping className='text-base' /> 
+                                <span>Purchase</span>
+                                <FaChevronDown className='text-xs' />
+                            </Typography>
+                        </MenuHandler>
+                        <MenuList className="z-[99999] bg-main text-white">
+                            <NavLink to="/purchase_list">
+                                <MenuItem className="flex items-center gap-2">
+                                    <FaListUl /> <span>Purchase List</span>
+                                </MenuItem>
+                            </NavLink>
+                            <NavLink to="/purchase_invoice">
+                                <MenuItem className="flex items-center gap-2">
+                                    <FaFileInvoice /> <span>Purchase invoice</span>
+                                </MenuItem>
+                            </NavLink>
+                        </MenuList>
+                    </Menu>
                 </div>
                 <div className='flex justify-end'>
                     <Menu>

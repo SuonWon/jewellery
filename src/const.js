@@ -3,3 +3,5 @@ export const pause = (duration) => {
         setTimeout(resolve, duration);
     });
 };
+
+export const currentDate = new Date().toISOString();

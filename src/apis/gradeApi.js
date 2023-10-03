@@ -19,6 +19,17 @@ const gradeApi = createApi({
                     };
                 },
             }),
+            fetchTrueGrade: builder.query({
+                providesTags: (result, error) => {
+                    return[{type: 'Grade', id: 'All'}]
+                },
+                query: () => {
+                    return {
+                        url: '/v1/grade/get-true-stone-grades',
+                        method: 'GET'
+                    }
+                }
+            }),
             fetchGradeById: builder.query({
                 query: (gradeCode) => {
                     return {
@@ -82,5 +93,5 @@ const gradeApi = createApi({
     }
 });
 
-export const { useFetchGradeQuery, useFetchGradeByIdQuery, useAddGradeMutation, useUpdateGradeMutation, useRemoveGradeMutation } = gradeApi;
+export const { useFetchGradeQuery, useFetchTrueGradeQuery, useFetchGradeByIdQuery, useAddGradeMutation, useUpdateGradeMutation, useRemoveGradeMutation } = gradeApi;
 export { gradeApi };
