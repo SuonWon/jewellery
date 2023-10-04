@@ -1,6 +1,6 @@
 import { Button, Card, CardBody, IconButton, Input, Textarea, Typography } from "@material-tailwind/react";
 import SectionTitle from "../components/section_title";
-import { useAddPurchaseMutation, useFetchStoneDetailsQuery, useFetchSupplierQuery, useFetchUOMQuery } from "../store";
+import { useFetchPurchaseByIdQuery, useFetchStoneDetailsQuery, useFetchSupplierQuery, useFetchUOMQuery, useUpdatePurchaseMutation } from "../store";
 import { FaFloppyDisk, FaPencil, FaPlus, FaTrashCan } from "react-icons/fa6";
 import { useState } from "react";
 import { set, useForm } from "react-hook-form";
@@ -8,9 +8,13 @@ import DataTable from "react-data-table-component";
 import { currentDate, pause } from "../const";
 import moment from "moment";
 
-function PurchaseInvoice() {
+function PurchaseEdit() {
 
-    const [addPurchase, result] = useAddPurchaseMutation();
+    const {data} = useFetchPurchaseByIdQuery(puInvoiceNo);
+
+    console.log(data);
+
+    const [editPurchase, result] = useUpdatePurchaseMutation();
 
     const {data: supplierData} = useFetchSupplierQuery();
 
@@ -81,7 +85,7 @@ function PurchaseInvoice() {
             purchaseDetail: purchaseDetails
         };
         console.log(subData);
-        addPurchase(subData).then((res) => {
+        editPurchase(subData).then((res) => {
             console.log(res);
         });
     };
@@ -481,4 +485,4 @@ function PurchaseInvoice() {
     );
 }
 
-export default PurchaseInvoice;
+export default PurchaseEdit;

@@ -42,10 +42,22 @@ const purchaseApi = createApi({
                         }
                     }
                 }
+            }),
+            updatePurchase: builder.mutation({
+                query: (purchaseData) => {
+                    return {
+                        url: '/v1/purchase/update-purchase',
+                        method: 'PUT',
+                        body: {
+                            ...purchaseData,
+                            purchaseDetails: purchaseData.purchaseDetail
+                        }
+                    }
+                }
             })
         };
     },
 })
 
-export const { useAddPurchaseMutation } = purchaseApi; 
+export const { useAddPurchaseMutation, useFetchPurchaseQuery, useFetchPurchaseByIdQuery, useUpdatePurchaseMutation } = purchaseApi; 
 export {purchaseApi};
