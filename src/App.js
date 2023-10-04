@@ -8,16 +8,26 @@ import StoneDetails from "./pages/stone_details";
 import PurchaseInvoice from "./pages/purchase_invoice";
 import PurchaseList from "./pages/purchase_list";
 import PurchaseEdit from "./pages/purchase_edit";
+import { RequireAuth } from "react-auth-kit";
 
 
 
 function App() {
   return (
     <div className="flex flex-col justify-center">
-      <Nav />
+      {
+        window.location.pathname === "/" ? "" : <Nav />
+      }
       <div className="flex items-center justify-center">
         <Routes>
-          <Route path="master/*" element={<Setup />}></Route>
+          <Route path="/" element={
+            <RequireAuth loginPath="/login">
+
+            </RequireAuth>
+          }></Route>
+          <Route path="master/*" element={
+              <Setup />
+          }></Route>
           <Route path="customer" element={<Customer />}></Route>
           <Route path="supplier" element={<Supplier />}></Route>
           <Route path="stone_details" element={<StoneDetails />}></Route>
