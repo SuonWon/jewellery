@@ -1,4 +1,4 @@
-import { configureStore, getDefaultMiddleware } from "@reduxjs/toolkit";
+import { configureStore } from "@reduxjs/toolkit";
 import { brightnessApi } from "../apis/brightnessApi";
 import { gradeApi } from "../apis/gradeApi";
 import { typeApi } from "../apis/typeApi";
@@ -8,6 +8,7 @@ import { customerApi } from "../apis/customerApi";
 import { supplierApi } from "../apis/supplierApi";
 import { stoneDetailsApi } from "../apis/stoneDetailsApi";
 import { purchaseApi } from "../apis/purchaseApi";
+import { salesApi } from "../apis/salesApi";
 
 export const store = configureStore({
     reducer: {
@@ -20,6 +21,7 @@ export const store = configureStore({
         [supplierApi.reducerPath] : supplierApi.reducer,
         [stoneDetailsApi.reducerPath] : stoneDetailsApi.reducer,
         [purchaseApi.reducerPath] : purchaseApi.reducer,
+        [salesApi.reducerPath] : salesApi.reducer
     },
     middleware: (getDefaultMiddleware) => {
         return getDefaultMiddleware()
@@ -31,7 +33,8 @@ export const store = configureStore({
             .concat(customerApi.middleware)
             .concat(supplierApi.middleware)
             .concat(stoneDetailsApi.middleware)
-            .concat(purchaseApi.middleware);
+            .concat(purchaseApi.middleware)
+            .concat(salesApi.middleware);
     }
 });
 
@@ -44,3 +47,4 @@ export { useFetchCustomerQuery, useFetchCustomerByIdQuery, useAddCustomerMutatio
 export { useFetchSupplierQuery, useFetchSupplierByIdQuery, useAddSupplierMutation, useUpdateSupplierMutation, useRemoveSupplierMutation } from "../apis/supplierApi";
 export { useFetchStoneDetailsQuery, useFetchStoneDetailsByIdQuery, useAddStoneDetailsMutation, useUpdateStoneDetailsMutation, useRemoveStoneDetailsMutation } from "../apis/stoneDetailsApi";
 export { useFetchPurchaseQuery ,useAddPurchaseMutation, useFetchPurchaseByIdQuery, useUpdatePurchaseMutation } from "../apis/purchaseApi";
+export { useFetchSalesQuery, useFetchTrueSalesQuery, useAddSalesMutation} from "../apis/salesApi"; 

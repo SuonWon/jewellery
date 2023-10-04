@@ -1,4 +1,3 @@
-import { Alert } from "@material-tailwind/react";
 import { FaCircleCheck, FaXmark } from "react-icons/fa6";
 
 function SuccessAlert({ message, handleAlert }) {

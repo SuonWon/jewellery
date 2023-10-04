@@ -24,7 +24,7 @@ function Grade() {
 
     const [editData, setEditData] = useState({});
 
-    const {data, error, isFetching} = useFetchGradeQuery();
+    const {data} = useFetchGradeQuery();
 
     const {register, handleSubmit, setValue, formState: {errors}, reset } = useForm();
 

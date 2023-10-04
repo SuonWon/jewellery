@@ -24,7 +24,7 @@ function Customer() {
 
     const [editData, setEditData] = useState({});
 
-    const {data, error, isFetching} = useFetchCustomerQuery();
+    const {data } = useFetchCustomerQuery();
 
     const customer = {
         customerName: "",

@@ -1,5 +1,5 @@
 import { Route, Routes } from "react-router-dom";
-import Login from "./login";
+// import Login from "./login";
 import Nav from "./components/nav_component";
 import Setup from "./components/setup";
 import Customer from "./pages/customer";
@@ -8,7 +8,7 @@ import StoneDetails from "./pages/stone_details";
 import PurchaseInvoice from "./pages/purchase_invoice";
 import PurchaseList from "./pages/purchase_list";
 import PurchaseEdit from "./pages/purchase_edit";
-
+import SalesInvoice from "./pages/sales_invoice";
 
 
 function App() {
@@ -25,6 +25,8 @@ function App() {
           <Route path="purchase_invoice" element={<PurchaseInvoice />}></Route>
           <Route path="purchase_edit/:puId" element={<PurchaseEdit />}></Route>
           <Route path="login" element={<Login />}></Route>
+          <Route path="sales_invoice" element={<SalesInvoice/>}></Route>
+          {/* <Route path="login" element={<Login />}></Route> */}
         </Routes>
       </div>
     </div>

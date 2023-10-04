@@ -24,7 +24,7 @@ function StoneType() {
 
     const [editData, setEditData] = useState({});
 
-    const {data, error, isFetching} = useFetchTypeQuery();
+    const {data} = useFetchTypeQuery();
 
     const {register, handleSubmit, setValue, formState: {errors}, reset } = useForm();
 

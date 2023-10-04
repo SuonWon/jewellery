@@ -24,7 +24,7 @@ function Stone() {
 
     const [editData, setEditData] = useState({});
 
-    const {data, error, isFetching} = useFetchStoneQuery();
+    const {data} = useFetchStoneQuery();
 
     const {register, handleSubmit, setValue, formState: {errors}, reset } = useForm({
         defaultValues: {
