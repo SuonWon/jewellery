@@ -1,8 +1,8 @@
 /* eslint-disable eqeqeq */
-import { Alert, Button, Card, CardBody, Dialog, DialogBody, Input, Select, Textarea, Typography, Option } from "@material-tailwind/react";
+import { Alert, Button, Card, CardBody, Dialog, DialogBody, Textarea, Typography } from "@material-tailwind/react";
 import { FaCirclePlus, FaFloppyDisk, FaPencil, FaTrashCan, FaTriangleExclamation } from "react-icons/fa6";
-import { useEffect, useState } from "react";
-import { useFetchStoneDetailsQuery, useAddStoneDetailsMutation, useUpdateStoneDetailsMutation, useRemoveStoneDetailsMutation, useFetchStoneQuery, useFetchGradeQuery, useFetchTypeQuery, useFetchUOMQuery, useFetchBrightnessQuery, useFetchTrueBrightnessQuery, useFetchTrueStoneQuery, useFetchTrueGradeQuery, useFetchTrueTypeQuery } from "../store";
+import { useState } from "react";
+import { useFetchStoneDetailsQuery, useAddStoneDetailsMutation, useUpdateStoneDetailsMutation, useRemoveStoneDetailsMutation, useFetchUOMQuery, useFetchTrueBrightnessQuery, useFetchTrueStoneQuery, useFetchTrueGradeQuery, useFetchTrueTypeQuery } from "../store";
 import { useForm } from "react-hook-form";
 import { pause, currentDate } from "../const";
 import DeleteModal from "../components/delete_modal";
@@ -24,7 +24,7 @@ function StoneDetails() {
 
     const [editData, setEditData] = useState({});
 
-    const {data, error, isFetching} = useFetchStoneDetailsQuery();
+    const {data} = useFetchStoneDetailsQuery();
 
     const {data: stoneData} = useFetchTrueStoneQuery();
 

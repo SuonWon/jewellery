@@ -24,7 +24,7 @@ function UOM() {
 
     const [editData, setEditData] = useState({});
 
-    const {data, error, isFetching} = useFetchUOMQuery();
+    const {data} = useFetchUOMQuery();
 
     const {register, handleSubmit, setValue, formState: {errors}, reset } = useForm({
         defaultValues:{
@@ -43,22 +43,22 @@ function UOM() {
 
     const [deleteId, setDeleteId] = useState('');
 
-    const handleChange = async (e) => {
+    // const handleChange = async (e) => {
         
-        let unit = data.filter((unit) => unit.unitCode == e.target.id);
-        await editUnit({
-            unitCode: unit[0].unitCode,
-            unitDesc: unit[0].unitDesc,
-            status: e.target.checked ? true: false,
-            createdAt: unit[0].createdAt,
-            createdBy: unit[0].createdBy,
-            updatedAt: currentDate,
-            updatedBy: "Hello World",
-        }).then((res) => {
-            console.log(res);
-        });
+    //     let unit = data.filter((unit) => unit.unitCode == e.target.id);
+    //     await editUnit({
+    //         unitCode: unit[0].unitCode,
+    //         unitDesc: unit[0].unitDesc,
+    //         status: e.target.checked ? true: false,
+    //         createdAt: unit[0].createdAt,
+    //         createdBy: unit[0].createdBy,
+    //         updatedAt: currentDate,
+    //         updatedBy: "Hello World",
+    //     }).then((res) => {
+    //         console.log(res);
+    //     });
 
-    };
+    // };
 
     const openModal = () => {
         setIsEdit(false);

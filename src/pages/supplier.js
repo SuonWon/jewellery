@@ -24,7 +24,7 @@ function Supplier() {
 
     const [editData, setEditData] = useState({});
 
-    const {data, error, isFetching} = useFetchSupplierQuery();
+    const {data} = useFetchSupplierQuery();
 
     const supplier = {
         supplierName: "",
