@@ -46,5 +46,5 @@ export { useFetchUOMQuery, useFetchUOMByIdQuery, useAddUOMMutation, useUpdateUOM
 export { useFetchCustomerQuery, useFetchCustomerByIdQuery, useAddCustomerMutation, useUpdateCustomerMutation, useRemoveCustomerMutation } from "../apis/customerApi";
 export { useFetchSupplierQuery, useFetchSupplierByIdQuery, useAddSupplierMutation, useUpdateSupplierMutation, useRemoveSupplierMutation } from "../apis/supplierApi";
 export { useFetchStoneDetailsQuery, useFetchStoneDetailsByIdQuery, useAddStoneDetailsMutation, useUpdateStoneDetailsMutation, useRemoveStoneDetailsMutation } from "../apis/stoneDetailsApi";
-export { useAddPurchaseMutation } from "../apis/purchaseApi";
+export { useFetchPurchaseQuery ,useAddPurchaseMutation, useFetchPurchaseByIdQuery, useUpdatePurchaseMutation } from "../apis/purchaseApi";
 export { useFetchSalesQuery, useFetchTrueSalesQuery, useAddSalesMutation} from "../apis/salesApi"; 
