@@ -9,6 +9,7 @@ import PurchaseInvoice from "./pages/purchase_invoice";
 import PurchaseList from "./pages/purchase_list";
 import PurchaseEdit from "./pages/purchase_edit";
 import SalesInvoice from "./pages/sales_invoice";
+import SalesList from "./pages/sales_list";
 
 
 function App() {
@@ -24,8 +25,9 @@ function App() {
           <Route path="purchase_list" element={<PurchaseList />}></Route>
           <Route path="purchase_invoice" element={<PurchaseInvoice />}></Route>
           <Route path="purchase_edit/:puId" element={<PurchaseEdit />}></Route>
-          <Route path="login" element={<Login />}></Route>
+          {/* <Route path="login" element={<Login />}></Route> */}
           <Route path="sales_invoice" element={<SalesInvoice/>}></Route>
+          <Route path="sales_list" element={<SalesList/>}></Route>
           {/* <Route path="login" element={<Login />}></Route> */}
         </Routes>
       </div>

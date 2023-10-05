@@ -6,7 +6,7 @@ import { Link } from "react-router-dom";
 function Sidebar() {
 
     return (
-        <Card className="max-w-[18rem] h-[calc(100% - 54px)] px-4 py-1 shadow-xl shadow-none border rounded-none">
+        <Card className="max-w-[18rem] h-[calc(100% - 54px)] px-4 py-1 shadow-none border rounded-none">
             <div className="mb-2 px-4 py-3">
                 <Typography color="blue-gray" variant="h5">
                     Master Data

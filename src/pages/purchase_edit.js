@@ -10,7 +10,7 @@ import moment from "moment";
 
 function PurchaseEdit() {
 
-    const {data} = useFetchPurchaseByIdQuery(puInvoiceNo);
+    const {data} = useFetchPurchaseByIdQuery();
 
     console.log(data);
 

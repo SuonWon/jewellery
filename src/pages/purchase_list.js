@@ -2,14 +2,14 @@
 import { Button, Card, CardBody } from "@material-tailwind/react";
 import { FaPencil, FaTrashCan,} from "react-icons/fa6";
 import { useState } from "react";
-import { useRemoveStoneDetailsMutation, useFetchPurchaseQuery, useFetchPurchaseByIdQuery } from "../store";
-import { pause, currentDate } from "../const";
+import { useRemoveStoneDetailsMutation, useFetchPurchaseQuery } from "../store";
+import { pause } from "../const";
 import DeleteModal from "../components/delete_modal";
 import SuccessAlert from "../components/success_alert";
 import SectionTitle from "../components/section_title";
 import moment from "moment";
 import TableList from "../components/data_table";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 function PurchaseList() {
 

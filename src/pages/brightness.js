@@ -37,7 +37,7 @@ function Brightness() {
     const [deleteId, setDeleteId] = useState('');
 
     const handleChange = async (e) => {
-        
+        console.log(e.target.id);
         let bright = data.filter((bright) => bright.brightCode == e.target.id);
         await editBrightness({
             brightCode: bright[0].brightCode,
@@ -94,6 +94,7 @@ function Brightness() {
             console.log(res);
         });
         setIsAlert(true);
+       
     };
 
     const handleEdit = async (id) => {
@@ -174,7 +175,7 @@ function Brightness() {
             cell: (row) => (
                 <div className="flex items-center gap-2">
                     <div className="border-r border-gray-400 pr-2">
-                        <Switch color="deep-purple" defaultChecked={row.Status === true ? true : false} id={row.Code} onChange={handleChange} />
+                        <Switch color="deep-purple" defaultChecked={row.Status} id={row.Code} onChange={handleChange} />
                     </div>
                     <Button variant="text" color="deep-purple" className="p-2" onClick={() => handleEdit(row.Code)}><FaPencil /></Button>
                     <Button variant="text" color="red" className="p-2" onClick={() => handleDeleteBtn(row.Code)}><FaTrashCan /></Button>
