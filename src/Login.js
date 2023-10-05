@@ -22,7 +22,7 @@ function Login() {
     const handleUserNameChange = (e) => {
         setFormData({
             ...formData,
-            email: e.target.value,
+            username: e.target.value,
         })
     };
 
@@ -37,9 +37,10 @@ function Login() {
     // Form submit function and check login user
     const handleSubmit = (e) => {
         e.preventDefault();
-        axios.post('http://localhost:3005/v1/login', formData)
+        console.log(formData);
+        axios.post('http://localhost:3005/v1/auth/login', formData)
             .then((res) => {
-                if(res.status === 200) {
+                if(res.status === 201) {
                     if(signIn(
                         {
                             token : res.data.token,
@@ -60,7 +61,7 @@ function Login() {
 
     return(
 
-        <div className="flex bg-black items-center w-full h-screen justify-center">
+        <div className="flex bg-white items-center w-full h-screen justify-center">
             <div className="flex flex-col w-80 text-gray-900 bg-white rounded-md pb-12 shadow-xl">
                 <div className="h-24 flex items-center text-neutral-100 justify-start px-7 rounded-t-md" style={{backgroundColor: '#51448a'}}>
                     <h3 className="text-2xl font-bold mt-6">Jewellery Sales</h3>

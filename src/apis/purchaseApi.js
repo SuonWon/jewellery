@@ -18,7 +18,7 @@ const purchaseApi = createApi({
             fetchTruePurchase: builder.query({
                 query: () => {
                     return {
-                        url: '/v1/purchase/get-true-purchases',
+                        url: '/v1/purchase/get-true-purchases/?status=O',
                         method: 'GET'
                     }
                 }
@@ -26,7 +26,7 @@ const purchaseApi = createApi({
             fetchPurchaseById: builder.query({
                 query: (purchaseNo) => {
                     return {
-                        url: `/v1/purchase/get-purchase/${purchaseNo}`,
+                        url: `/v1/purchase/get-purchse/${purchaseNo}`,
                         method: 'GET'
                     }
                 }
@@ -48,9 +48,17 @@ const purchaseApi = createApi({
                     return {
                         url: '/v1/purchase/update-purchase',
                         method: 'PUT',
+                        body: purchaseData
+                    }
+                }
+            }),
+            removePurchase: builder.mutation({
+                query: (purchaseData) => {
+                    return {
+                        url: '/v1/purchase/delete-purchase',
+                        method: 'PUT',
                         body: {
-                            ...purchaseData,
-                            purchaseDetails: purchaseData.purchaseDetail
+                            ...purchaseData
                         }
                     }
                 }
@@ -59,5 +67,5 @@ const purchaseApi = createApi({
     },
 })
 
-export const { useAddPurchaseMutation, useFetchPurchaseQuery, useFetchPurchaseByIdQuery, useUpdatePurchaseMutation } = purchaseApi; 
+export const { useAddPurchaseMutation, useFetchTruePurchaseQuery, useFetchPurchaseQuery, useFetchPurchaseByIdQuery, useUpdatePurchaseMutation, useRemovePurchaseMutation } = purchaseApi; 
 export {purchaseApi};

@@ -198,7 +198,7 @@ function Brightness() {
     return(
         <div className="flex flex-col gap-4 px-2 relative">
             <div className="w-78 absolute top-0 right-0 z-[9999]">
-                {
+                {/* {
                     addResult.isSuccess && isAlert && <SuccessAlert message="Save successful." handleAlert={() => setIsAlert(false)} />
                 }
                 {
@@ -206,7 +206,7 @@ function Brightness() {
                 }
                 {
                     removeResult.isSuccess && isAlert && <SuccessAlert message="Delete successful." handleAlert={() => setIsAlert(false)} />
-                }
+                } */}
             </div>
             <SectionTitle title="Stone Brightness" handleModal={openModal} />
             <Card className="h-auto shadow-md w-[1000px] mx-1 rounded-sm p-2 border-t">
@@ -217,9 +217,9 @@ function Brightness() {
             <Dialog open={open} handler={openModal} size="sm">
                 <DialogBody>
                     <ModalTitle titleName={isEdit ? "Edit Stone Brightness" : "Stone Brightness"} handleClick={openModal} />
-                    {
+                    {/* {
                         addResult.isSuccess && isAlert && <SuccessAlert message="Save successful." handleAlert={() => setIsAlert(false)} />
-                    }
+                    } */}
                     {
                         isEdit ? (
                             <form  className="flex flex-col items-end p-3">
@@ -242,12 +242,12 @@ function Brightness() {
                                             Update
                                         </Typography>
                                     </Button>
-                                    <Button onClick={handleSubmit(onSaveSubmit)} color="red" size="sm" variant="gradient" className="flex items-center gap-2">
+                                    {/* <Button onClick={handleSubmit(onSaveSubmit)} color="red" size="sm" variant="gradient" className="flex items-center gap-2">
                                         <FaTrashCan className="text-base" /> 
                                         <Typography variant="small" className="capitalize">
                                             Delete
                                         </Typography>
-                                    </Button>
+                                    </Button> */}
                                 </div>
                             </form>
                         ) : (

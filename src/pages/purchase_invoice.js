@@ -7,6 +7,8 @@ import { set, useForm } from "react-hook-form";
 import DataTable from "react-data-table-component";
 import { currentDate, pause } from "../const";
 import moment from "moment";
+import SuccessAlert from "../components/success_alert";
+import { v4 as uuidv4 } from 'uuid';
 
 function PurchaseInvoice() {
 
@@ -22,31 +24,24 @@ function PurchaseInvoice() {
 
     const [no, setNo] = useState(0);
 
+    const [isAlert, setIsAlert] = useState(true);
+
     const [isEditDetail, setIsEditDetail] = useState(false);
 
     const [purchase, setPurchase] = useState({
-        purDate: "",
+        invoiceNo: uuidv4(),
+        purDate: moment().format("YYYY-MM-DD"),
         supplierCode: "Select Supplier",
         subTotal: 0,
         discAmt: 0,
         grandTotal: 0,
         remark: "",
         status: "O",
-        invoiceNo: "P-00001",
         createdBy: 'Htet Wai Aung',
         updatedBy: "",
         deletedBy: "",
         purchaseDetail: []
     })
-
-    // const purchase = {
-    //     purDate: "",
-    //     supplierCode: "Select Supplier",
-    //     subTotal: 0,
-    //     discAmt: 0,
-    //     grandTotal: 0,
-    //     remark: ""
-    // }
 
     const purchaseData = {
         lineNo: 0,
@@ -66,7 +61,7 @@ function PurchaseInvoice() {
         }
     });
 
-    const onSubmit = async (purchaseData) => {
+    const onSubmit = async () => {
         let subData = {
             ...purchase,
             purDate: moment(purchase.purDate).toISOString(),
@@ -74,7 +69,6 @@ function PurchaseInvoice() {
             discAmt: parseFloat(purchase.discAmt),
             subTotal: parseFloat(purchase.subTotal),
             grandTotal: parseFloat(purchase.grandTotal),
-            invoiceNo: "P-00002",
             createdBy: 'Htet Wai Aung',
             updatedBy: "",
             deletedBy: "",
@@ -84,6 +78,21 @@ function PurchaseInvoice() {
         addPurchase(subData).then((res) => {
             console.log(res);
         });
+        setPurchase({
+            purDate: "",
+            supplierCode: "Select Supplier",
+            subTotal: 0,
+            discAmt: 0,
+            grandTotal: 0,
+            remark: "",
+            status: "O",
+            createdBy: 'Htet Wai Aung',
+            updatedBy: "",
+            deletedBy: "",
+            purchaseDetail: []
+        });
+        setPurchaseDetails([]);
+
     };
 
     const submitDetail = (puData) => {
@@ -152,12 +161,33 @@ function PurchaseInvoice() {
     }
 
     const SaveDetail = (submitData) => {
-
+        let subTotal = parseFloat(0);
         let tempData = purchaseDetails.filter((e) => e.lineNo != submitData.details.lineNo);
-        tempData.push(submitData.details);
+        tempData.push({
+            ...submitData.details,
+            stoneDetailCode: Number(submitData.details.stoneDetailCode),
+            qty: Number(submitData.details.qty),
+            weight: parseFloat(submitData.details.weight),
+            unitPrice: parseFloat(submitData.details.unitPrice),
+            totalPrice: parseFloat(submitData.details.totalPrice),
+            serviceCharge: parseFloat(submitData.details.serviceCharge),
+            totalAmt: parseFloat(submitData.details.totalAmt)
+        });
+        tempData.forEach(e => {
+            subTotal += e.totalAmt;
+        });
+        console.log(subTotal);
+        setPurchase({
+            ...purchase,
+            subTotal: subTotal,
+            grandTotal: subTotal - purchase.discAmt
+        });
         setPurchaseDetails(tempData);
         console.log(submitData);
         setIsEditDetail(false);
+        reset({
+            details: purchaseData,
+        });
 
     };
 
@@ -299,6 +329,11 @@ function PurchaseInvoice() {
                 }
             </style>
         <div className="flex flex-col gap-2 min-w-[85%] max-w-[85%]">
+            <div className="w-78 absolute top-0 right-0 z-[9999]">
+            {
+                result.isSuccess && isAlert && <SuccessAlert message="Save successful." handleAlert={() => setIsAlert(false)} />
+            }
+            </div>
             <div className="flex justify-between items-center py-3 bg-white gap-4 sticky top-0 z-10">
                 <Typography variant="h5">Purchase Invoice</Typography>
                 <Button color="deep-purple" variant="gradient" className="py-2" onClick={handleSubmit(onSubmit)}>Save</Button>
@@ -313,6 +348,7 @@ function PurchaseInvoice() {
                             containerProps={{ className: "min-w-[100px]" }}
                             label="Purchase Date"
                             type="date"
+                            defaultValue={purchase.purDate}
                             onChange={(e) => setPurchase({
                                 ...purchase,
                                 purDate: e.target.value

@@ -2,17 +2,19 @@ import { Button, Card, CardBody, IconButton, Input, Textarea, Typography } from 
 import SectionTitle from "../components/section_title";
 import { useFetchPurchaseByIdQuery, useFetchStoneDetailsQuery, useFetchSupplierQuery, useFetchUOMQuery, useUpdatePurchaseMutation } from "../store";
 import { FaFloppyDisk, FaPencil, FaPlus, FaTrashCan } from "react-icons/fa6";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { set, useForm } from "react-hook-form";
 import DataTable from "react-data-table-component";
 import { currentDate, pause } from "../const";
 import moment from "moment";
+import { json, useParams } from "react-router-dom";
+import axios from "axios";
 
 function PurchaseEdit() {
 
-    const {data} = useFetchPurchaseByIdQuery(puInvoiceNo);
+    const params = useParams();
 
-    console.log(data);
+    // const {data, isFetching} = useFetchPurchaseByIdQuery(params.puId);
 
     const [editPurchase, result] = useUpdatePurchaseMutation();
 
@@ -22,26 +24,28 @@ function PurchaseEdit() {
 
     const {data: unitData} = useFetchUOMQuery();
 
-    const [purchaseDetails, setPurchaseDetails] = useState([]); 
-
-    const [no, setNo] = useState(0);
+    const [purchaseDetail, setPurchaseDetail] = useState([]); 
 
     const [isEditDetail, setIsEditDetail] = useState(false);
 
-    const [purchase, setPurchase] = useState({
-        purDate: "",
-        supplierCode: "Select Supplier",
-        subTotal: 0,
-        discAmt: 0,
-        grandTotal: 0,
-        remark: "",
-        status: "O",
-        invoiceNo: "P-00001",
-        createdBy: 'Htet Wai Aung',
-        updatedBy: "",
-        deletedBy: "",
-        purchaseDetail: []
-    })
+    const [purchase, setPurchase] = useState({});
+
+    const [no, setNo] = useState(0);
+
+    useEffect(() => {
+        fetch(`http://localhost:3005/v1/purchase/get-purchse/${params.puId}`)
+        .then(res => res.json())
+        .then(json => {
+            setPurchase({
+                ...json,
+                purDate: moment(json.purDate).format("YYYY-MM-DD")
+            });
+            setPurchaseDetail(json.purchaseDetails);
+            setNo(json.purchaseDetails.length);
+        })
+    }, [params.puId]);
+
+    
 
     // const purchase = {
     //     purDate: "",
@@ -53,7 +57,7 @@ function PurchaseEdit() {
     // }
 
     const purchaseData = {
-        lineNo: 0,
+        lineNo: "",
         stoneDetailCode: "stoneDetail",
         qty: 0,
         weight: 0,
@@ -70,7 +74,7 @@ function PurchaseEdit() {
         }
     });
 
-    const onSubmit = async (purchaseData) => {
+    const onSubmit = async () => {
         let subData = {
             ...purchase,
             purDate: moment(purchase.purDate).toISOString(),
@@ -78,11 +82,9 @@ function PurchaseEdit() {
             discAmt: parseFloat(purchase.discAmt),
             subTotal: parseFloat(purchase.subTotal),
             grandTotal: parseFloat(purchase.grandTotal),
-            invoiceNo: "P-00002",
-            createdBy: 'Htet Wai Aung',
-            updatedBy: "",
-            deletedBy: "",
-            purchaseDetail: purchaseDetails
+            updatedBy: "Hello",
+            updatedAt: moment().toISOString(),
+            purchaseDetails: purchaseDetail
         };
         console.log(subData);
         editPurchase(subData).then((res) => {
@@ -96,8 +98,8 @@ function PurchaseEdit() {
             subTotal: purchase.subTotal + parseFloat(puData.details.totalAmt),
             grandTotal: (purchase.subTotal + parseFloat(puData.details.totalAmt)) - purchase.discAmt
         })
-        setPurchaseDetails([
-            ...purchaseDetails,
+        setPurchaseDetail([
+            ...purchaseDetail,
             {
                 ...puData.details,
                 lineNo: no + 1,
@@ -117,24 +119,9 @@ function PurchaseEdit() {
         });
     };
 
-    const sTotal = () => {
-        let sTotal = 0;
-        if (purchaseDetails.length !== 0) {
-            purchaseDetails.forEach((el) => {
-                sTotal += el.totalAmt;
-            })
-        }
-        return sTotal;
-    }
-
-    const gTotal = () => {
-        let gTotal = parseFloat(getValues("puData.subTotal")) - parseFloat(getValues("puData.discAmt"));
-        return gTotal;
-    }
-
     const handleEdit = (id) => {
 
-        let tempData = purchaseDetails.filter((detail)=> detail.lineNo === id);
+        let tempData = purchaseDetail.filter((detail)=> detail.lineNo === id);
         setValue("details", {
             lineNo: tempData[0].lineNo,
             stoneDetailCode: tempData[0].stoneDetailCode,
@@ -151,17 +138,38 @@ function PurchaseEdit() {
     }
 
     const handleDeleteBtn = (id) => {
-        let tempData = purchaseDetails.filter((detail) => detail.lineNo !== id);
-        setPurchaseDetails(tempData);
+        let tempData = purchaseDetail.filter((detail) => detail.lineNo !== id);
+        setPurchaseDetail(tempData);
     }
 
     const SaveDetail = (submitData) => {
-
-        let tempData = purchaseDetails.filter((e) => e.lineNo != submitData.details.lineNo);
-        tempData.push(submitData.details);
-        setPurchaseDetails(tempData);
+        let subTotal = parseFloat(0);
+        let tempData = purchaseDetail.filter((e) => e.lineNo != submitData.details.lineNo);
+        tempData.push({
+            ...submitData.details,
+            stoneDetailCode: Number(submitData.details.stoneDetailCode),
+            qty: Number(submitData.details.qty),
+            weight: parseFloat(submitData.details.weight),
+            unitPrice: parseFloat(submitData.details.unitPrice),
+            totalPrice: parseFloat(submitData.details.totalPrice),
+            serviceCharge: parseFloat(submitData.details.serviceCharge),
+            totalAmt: parseFloat(submitData.details.totalAmt)
+        });
+        tempData.forEach(e => {
+            subTotal += e.totalAmt;
+        });
+        console.log(subTotal);
+        setPurchase({
+            ...purchase,
+            subTotal: subTotal,
+            grandTotal: subTotal - purchase.discAmt
+        });
+        setPurchaseDetail(tempData);
         console.log(submitData);
         setIsEditDetail(false);
+        reset({
+            details: purchaseData,
+        });
 
     };
 
@@ -275,7 +283,7 @@ function PurchaseEdit() {
         },
     ];
 
-    const tbodyData = purchaseDetails?.map((details) => {
+    const tbodyData = purchaseDetail?.map((details) => {
         return {
             Code: details.lineNo,
             Description: details.stoneDetailCode,
@@ -317,16 +325,17 @@ function PurchaseEdit() {
                             containerProps={{ className: "min-w-[100px]" }}
                             label="Purchase Date"
                             type="date"
+                            defaultValue={purchase?.purDate}
                             onChange={(e) => setPurchase({
                                 ...purchase,
                                 purDate: e.target.value
                             })}
                         />
                         <select 
-                            className="block w-full p-2.5 border border-blue-gray-200 max-h-[2.5rem] rounded-md focus:border-black" defaultValue="Select Supplier" 
+                            className="block w-full p-2.5 border border-blue-gray-200 max-h-[2.5rem] rounded-md focus:border-black" defaultValue={purchase?.supplierCode} 
                             onChange={(e) => setPurchase({
                                 ...purchase,
-                                supplierCode: e.target.value
+                                supplierCode: Number(e.target.value)
                             })}
                         >
                             <option value="Select Supplier" disabled>Select Supplier</option>
@@ -341,6 +350,7 @@ function PurchaseEdit() {
                                 containerProps={{ className: "min-w-[100px]" }}
                                 label="Remark"
                                 type="text"
+                                defaultValue={purchase?.remark}
                                 onChange={(e) => setPurchase({
                                     ...purchase,
                                     remark: e.target.value
@@ -468,15 +478,16 @@ function PurchaseEdit() {
                     </Card>
                     <div className="grid grid-cols-4 gap-2 mt-4 items-center text-sm">
                         <label className="col-span-3 text-end">Sub Total :</label>
-                        <input className="rounded-md text-right p-2" value={purchase.subTotal} disabled type="number"  />
+                        <input className="rounded-md text-right p-2" value={purchase?.subTotal} disabled type="number"  />
                     </div>
                     <div className="grid grid-cols-4 gap-2 mt-4 items-center text-sm">
                         <label className="col-span-3 text-end">Discount Amount :</label>
-                        <input className="rounded-md text-right p-2 border border-blue-gray-500" defaultValue="0" type="number"  onBlur={(e) => addDiscAmt(e)} />
+                        <input className="rounded-md text-right p-2 border border-blue-gray-500" defaultValue={purchase?.discAmt} type="number"  onBlur={(e) => addDiscAmt(e)} />
                     </div>
                     <div className="grid grid-cols-4 gap-2 mt-4 items-center text-sm">
                         <label className="col-span-3 text-end">Grand Total :</label>
-                        <input className="rounded-md text-right p-2" type="number" value={purchase.grandTotal}  disabled/>
+                        <input className="rounded-md text-right p-2" type="number" value={
+                            purchase?.grandTotal}  disabled/>
                     </div>
                 </div>
             </div>
