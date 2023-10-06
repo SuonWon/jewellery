@@ -1,12 +1,9 @@
 /* eslint-disable eqeqeq */
-import { Alert, Button, Card, CardBody, Dialog, DialogBody, Input, Textarea, Typography } from "@material-tailwind/react";
-import { FaCirclePlus, FaFloppyDisk, FaPencil, FaTrashCan, FaTriangleExclamation } from "react-icons/fa6";
+import { Button, Card, CardBody, Dialog, DialogBody, Textarea, Typography } from "@material-tailwind/react";
+import { FaCirclePlus, FaFloppyDisk, FaPencil, FaTrashCan, } from "react-icons/fa6";
 import { useEffect, useState } from "react";
 import { useFetchStoneDetailsQuery, useAddStoneDetailsMutation, useUpdateStoneDetailsMutation, useRemoveStoneDetailsMutation, useFetchUOMQuery, useFetchTrueBrightnessQuery, useFetchTrueStoneQuery, useFetchTrueGradeQuery, useFetchTrueTypeQuery } from "../store";
-import { useForm } from "react-hook-form";
-import { pause, currentDate } from "../const";
 import DeleteModal from "../components/delete_modal";
-import SuccessAlert from "../components/success_alert";
 import SectionTitle from "../components/section_title";
 import ModalTitle from "../components/modal_title";
 import moment from "moment";
@@ -23,11 +20,8 @@ function StoneDetails() {
 
     const [openDelete, setOpenDelete] = useState(false);
 
-    const [isAlert, setIsAlert] = useState(true);
-
     const [isEdit, setIsEdit] = useState(false);
 
-    const [editData, setEditData] = useState({});
 
     const {data} = useFetchStoneDetailsQuery();
 
@@ -66,12 +60,6 @@ function StoneDetails() {
         brightDesc: "",
         typeDesc: ""
     });
-
-    const [stoneDesc, setStoneDesc] = useState("");
-
-    const [brightDesc, setBrightDesc] = useState("");
-
-    const [typeDesc, setTypeDesc] = useState("");
 
     const [addStoneDetail, addResult] = useAddStoneDetailsMutation();
 
@@ -180,7 +168,6 @@ function StoneDetails() {
 
     const handleEdit = async (id) => {
         let eData = data.filter((stoneDetail) => stoneDetail.stoneDetailCode === id);
-        setEditData(eData[0]);
         setIsEdit(true);
         setFormData({
             ...formData,
@@ -225,10 +212,7 @@ function StoneDetails() {
 
     const handleRemove = async (id) => {
         removeStoneDetail(id).then((res) => {console.log(res)});
-        setIsAlert(true);
         setOpenDelete(!openDelete);
-        await pause(2000);
-        setIsAlert(false);
     };
 
     const handleDeleteBtn = (id) => {

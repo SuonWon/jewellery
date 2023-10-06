@@ -406,7 +406,7 @@ function PurchaseInvoice() {
                                     {
                                         stoneDetails?.length === 0 ? <option value="" disabled>There is no Data</option> :
                                         stoneDetails?.map((stoneDetail) => {
-                                            return <option value={stoneDetail.stoneDetailCode} key={stoneDetail.stoneDetailCode} >{stoneDetail.stoneDetailCode}</option>
+                                            return <option value={stoneDetail.stoneDetailCode} key={stoneDetail.stoneDetailCode} >{stoneDetail.stoneDesc}</option>
                                         })
                                     }
                                 </select>

@@ -1,10 +1,11 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { apiUrl } from "../const";
 
 
 const typeApi = createApi({
     reducerPath: "stoneType",
     baseQuery: fetchBaseQuery({
-        baseUrl: "http://localhost:3005/",
+        baseUrl: apiUrl,
     }),
     endpoints(builder) {
         return {
