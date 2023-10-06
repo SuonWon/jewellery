@@ -18,22 +18,18 @@ function Stone() {
 
     const [openDelete, setOpenDelete] = useState(false);
 
-    const [isAlert, setIsAlert] = useState(true);
-
     const [isEdit, setIsEdit] = useState(false);
 
-    const [editData, setEditData] = useState({});
+    const {data} = useFetchStoneQuery();
 
-    const {data, error, isFetching} = useFetchStoneQuery();
-
-    const {register, handleSubmit, setValue, formState: {errors}, reset } = useForm({
-        defaultValues: {
-            stone: {
-                stoneDesc: "",
-                remark: ""
-            }
-        }
-    });
+    const [ stone, setStone ] = useState({
+        stoneCode: 0,
+        stoneDesc: '',
+        remark: '',
+        status: true,
+        createdAt: currentDate,
+        createdBy: 'admin',
+    })
 
     const [addStone, addResult] = useAddStoneMutation();
 
@@ -43,113 +39,68 @@ function Stone() {
 
     const [deleteId, setDeleteId] = useState('');
 
-    const handleChange = async (e) => {
-        
-        let stone = data.filter((stone) => stone.stoneCode == e.target.id);
-        await editStone({
-            stoneCode: stone[0].stoneCode,
-            stoneDesc: stone[0].stoneDesc,
-            remark: stone[0].remark,
-            status: e.target.checked ? true: false,
-            createdAt: stone[0].createdAt,
-            createdBy: stone[0].createdBy,
-            updatedAt: currentDate,
-            updatedBy: "Hello World",
-        }).then((res) => {
-            console.log(res);
-        });
-
-    };
-
     const openModal = () => {
         setIsEdit(false);
-        setValue("stone", {
+        setStone({
+            stoneCode: 0,
             stoneDesc: "",
-            remark: ""
+            remark: "",
+            status: true,
+            createdAt: currentDate,
+            createdBy: 'admin',
         })
-        // setValue("stoneDesc", "");
-        // setValue("remark", "");
         setOpen(!open);
     };
 
-    const onSubmit = async (stoneData) => {
-        let subData = {
-            ...stoneData.stone,
+    async function handleSubmit(isNew = true) {
+        const saveData = {
+            stoneDesc: stone.stoneDesc,
+            status: stone.status,
+            remark: stone.remark,
+            createdAt: stone.createdAt,
+            createdBy: stone.createdBy,
+            updatedAt: currentDate,
+            updatedBy: isEdit ? "admin" : "",
+        }
+
+        if(isEdit) {
+            saveData.stoneCode = stone.stoneCode
+        }
+
+        isEdit ? await editStone(saveData) : await addStone(saveData);
+
+        setOpen(isNew);
+
+        setStone({
+            stoneCode: 0,
+            stoneDesc: "",
+            remark: "",
             status: true,
             createdAt: currentDate,
-            createdBy: 'Htet Wai Aung',
-            updatedAt: currentDate,
-        }
-        addStone(subData).then((res) => {
-            reset({
-                stoneDesc: "",
-                remark: "",
-            });
-            console.log(res);
-        });
-        setIsAlert(true);
-        setOpen(!open);
-        await pause(2000);
-        setIsAlert(false);
-    };
+            createdBy: 'admin',
+        })
+    }
 
-    const onSaveSubmit = (stoneData) => {
-        let subData = {
-            ...stoneData.stone,
-            status: true,
-            createdAt: currentDate,
-            createdBy: 'Htet Wai Aung',
+    async function changeStatus(isChecked, id) {
+        const focusData = data.find(rec => rec.stoneCode === id);
+        const saveData= {
+            ...focusData,
+            status: isChecked, 
             updatedAt: currentDate,
+            updatedBy: "admin"
         }
-        addStone(subData).then((res) => {
-            reset({
-                stoneDesc: "",
-            });
-            console.log(res);
-        });
-        setIsAlert(true);
-    };
+        await editStone(saveData);
+    }
 
-    const handleEdit = async (id) => {
-        let eData = data.filter((stone) => stone.stoneCode === id);
-        setEditData(eData[0]);
+    function handleEdit(id) {
+        const focusData = data.find(rec => rec.stoneCode == id);
+        setStone(focusData);
+        setOpen(true);
         setIsEdit(true);
-        setValue('stone', {
-            stoneDesc: eData[0].stoneDesc,
-            remark: eData[0].remark
-        });
-        setOpen(!open);
-    };
+    }
 
-    const submitEdit = async (stoneData) => {
-        editStone({
-            stoneCode: editData.stoneCode,
-            stoneDesc: stoneData.stone.stoneDesc,
-            remark: stoneData.stone.remark,
-            status: editData.status,
-            createdAt: editData.createdAt,
-            createdBy: editData.createdBy,
-            updatedAt: currentDate,
-            updatedBy: "Hello World",
-        }).then((res) => {
-            console.log(res);
-        });
-        setIsAlert(true);
-        setOpen(!open);
-        await pause(2000);
-        setIsAlert(false);
-    };
-
-    const handleRemove = async (id) => {
-        removeStone(id).then((res) => {console.log(res)});
-        setIsAlert(true);
-        setOpenDelete(!openDelete);
-        await pause(2000);
-        setIsAlert(false);
-    };
-
-    const handleDeleteBtn = (id) => {
-        setDeleteId(id);
+    async function handleDelete() {
+        await removeStone(deleteId);
         setOpenDelete(!openDelete);
     }
 
@@ -198,10 +149,13 @@ function Stone() {
             cell: (row) => (
                 <div className="flex items-center gap-2">
                     <div className="border-r border-gray-400 pr-2">
-                        <Switch color="deep-purple" defaultChecked={row.Status === true ? true : false} id={row.Code} onChange={handleChange} />
+                        <Switch color="deep-purple" defaultChecked={row.Status} id={row.Code} onChange={(e) => changeStatus(e.target.checked, row.Code)} />
                     </div>
                     <Button variant="text" color="deep-purple" className="p-2" onClick={() => handleEdit(row.Code)}><FaPencil /></Button>
-                    <Button variant="text" color="red" className="p-2" onClick={() => handleDeleteBtn(row.Code)}><FaTrashCan /></Button>
+                    <Button variant="text" color="red" className="p-2" onClick={() => {
+                        setDeleteId(row.Code);
+                        setOpenDelete(true);
+                    }}><FaTrashCan /></Button>
                 </div>
             )
         },
@@ -222,17 +176,6 @@ function Stone() {
 
     return(
         <div className="flex flex-col gap-4 px-2 relative">
-            <div className="w-78 absolute top-0 right-0 z-[9999]">
-                {/* {
-                    addResult.isSuccess && isAlert && <SuccessAlert message="Save successful." handleAlert={() => setIsAlert(false)} />
-                }
-                {
-                    editResult.isSuccess && isAlert && <SuccessAlert message="Update successful." handleAlert={() => setIsAlert(false)} />
-                }
-                {
-                    removeResult.isSuccess && isAlert && <SuccessAlert message="Delete successful." handleAlert={() => setIsAlert(false)} />
-                } */}
-            </div>
             <SectionTitle title="Stone" handleModal={openModal} />
             <Card className="h-auto shadow-md w-[1000px] mx-1 rounded-sm p-2 border-t">
                 <CardBody className="rounded-sm overflow-auto p-0">
@@ -242,74 +185,55 @@ function Stone() {
             <Dialog open={open} handler={openModal} size="sm">
                 <DialogBody>
                     <ModalTitle titleName={isEdit ? "Edit Stone" : "Stone"} handleClick={openModal} />
-                    {/* {
-                        addResult.isSuccess && isAlert && <SuccessAlert message="Save successful." handleAlert={() => setIsAlert(false)} />
-                    } */}
-                    {
-                        isEdit ? (
-                            <form  className="flex flex-col items-end p-3 gap-4">
-                                {/* <Switch label="Active" color="deep-purple" defaultChecked /> */}
-                                <Input label="Description" {...register('stone.stoneDesc', {require: true})} />
-                                <Textarea label="Remark" rows={2} {...register('stone.remark')} />
-                                {
-                                    errors.stoneDesc && <Alert
-                                    icon={<FaTriangleExclamation />}
-                                    className="rounded-none border-l-4 border-red-800 bg-red-500/10 font-medium text-red-900"
-                                >
-                                    This field is required
-                                </Alert>
-                                
-                                }
-                                <div className="flex items-center justify-end mt-6 gap-2">
-                                    <Button onClick={handleSubmit(submitEdit)} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2">
-                                        <FaFloppyDisk className="text-base" /> 
-                                        <Typography variant="small" className="capitalize">
-                                            Update
-                                        </Typography>
-                                    </Button>
-                                    {/* <Button onClick={handleSubmit(onSaveSubmit)} color="red" size="sm" variant="gradient" className="flex items-center gap-2">
-                                        <FaTrashCan className="text-base" /> 
-                                        <Typography variant="small" className="capitalize">
-                                            Delete
-                                        </Typography>
-                                    </Button> */}
-                                </div>
-                            </form>
-                        ) : (
-                            <form  className="flex flex-col items-end p-3 gap-4">
-                                {/* <Switch label="Active" color="deep-purple" defaultChecked /> */}
-                                <Input label="Description" onFocus={() => setIsAlert(false)} {...register('stone.stoneDesc', {require: true})} />
-                                <Textarea label="Remark" rows={1} onFocus={() => setIsAlert(false)} {...register('stone.remark')} />
-                                {
-                                    errors.stoneDesc && <Alert
-                                    icon={<FaTriangleExclamation />}
-                                    className="rounded-none border-l-4 border-red-800 bg-red-500/10 font-medium text-red-900"
-                                >
-                                    This field is required
-                                </Alert>
-                                
-                                }
-                                <div className="flex items-center justify-end mt-6 gap-2">
-                                    <Button onClick={handleSubmit(onSubmit)} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2">
-                                        <FaFloppyDisk className="text-base" /> 
-                                        <Typography variant="small" className="capitalize">
-                                            Save
-                                        </Typography>
-                                    </Button>
-                                    <Button onClick={handleSubmit(onSaveSubmit)} color="green" size="sm" variant="gradient" className="flex items-center gap-2">
+
+                    <div  className="flex flex-col items-end p-3 gap-4">
+                        {/* <Switch label="Active" color="deep-purple" defaultChecked /> */}
+                        <Input 
+                            label="Description" 
+                            value={stone.stoneDesc}
+                            onChange={(e) => {
+                                setStone({
+                                    ...stone,
+                                    stoneDesc: e.target.value
+                                })
+                            }} 
+                        />
+                        <Textarea 
+                            label="Remark" rows={2} 
+                            value={stone.remark}
+                            onChange={(e) => {
+                                setStone({
+                                    ...stone,
+                                    remark: e.target.value
+                                })
+                            }} 
+                        />
+                       
+                        <div className="flex items-center justify-end mt-6 gap-2">
+                            <Button onClick={() => handleSubmit(false)} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2">
+                                <FaFloppyDisk className="text-base" /> 
+                                <Typography variant="small" className="capitalize">
+                                    { isEdit ? 'Update' : 'Save'}
+                                </Typography>
+                            </Button>
+                            {
+                                !isEdit ? (
+                                    <Button onClick={handleSubmit} color="green" size="sm" variant="gradient" className="flex items-center gap-2">
                                         <FaCirclePlus className="text-base" /> 
                                         <Typography variant="small" className="capitalize">
                                             Save & New
                                         </Typography>
                                     </Button>
-                                </div>
-                            </form>
-                        )
-                    }
+                                ) : null
+                            }
+                            
+                        </div>
+                    </div>
+                        
                      
                 </DialogBody>                      
             </Dialog>
-            <DeleteModal deleteId={deleteId} open={openDelete} handleDelete={handleRemove} closeModal={() => setOpenDelete(!openDelete)} />
+            <DeleteModal deleteId={deleteId} open={openDelete} handleDelete={handleDelete} closeModal={() => setOpenDelete(!openDelete)} />
         </div>
     );
 

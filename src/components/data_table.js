@@ -32,8 +32,6 @@ function TableList(props) {
             <DataTable
                 {...props}
                 striped={true}
-                defaultSortFieldId={2}
-                pagination
                 subHeader
                 subHeaderComponent={searchBox}
                 subHeaderAlign="right"

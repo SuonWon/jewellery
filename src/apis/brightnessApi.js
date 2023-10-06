@@ -1,10 +1,11 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { apiUrl } from "../const";
 
 
 const brightnessApi = createApi({
     reducerPath: "brightness",
     baseQuery: fetchBaseQuery({
-        baseUrl: "http://localhost:3005/",
+        baseUrl: apiUrl,
     }),
     endpoints(builder) {
         return {
@@ -16,6 +17,10 @@ const brightnessApi = createApi({
                     return {
                         url:'/v1/brightness/get-all-stone-brightnesses',
                         method: 'GET',
+                        params: {
+                            _sort: 'brightCode',
+                            _order: 'desc',
+                        }
                     };
                 },
             }),

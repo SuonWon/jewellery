@@ -1,10 +1,13 @@
 import { Avatar, Button, Menu, MenuHandler, MenuItem, MenuList, Typography } from "@material-tailwind/react";
-import { FaArrowRightFromBracket, FaCartShopping, FaChartPie, FaChevronDown, FaDatabase, FaFileInvoice, FaListUl, FaMoneyBill1, FaSliders, FaUser, FaUsers } from "react-icons/fa6";
+import { FaArrowRightFromBracket, FaCartShopping, FaChartPie, FaChevronDown, FaDatabase, FaFileInvoice, FaListUl, FaMoneyBill1, FaSliders, FaUsers } from "react-icons/fa6";
 import { GiDiamondTrophy } from "react-icons/gi";
 import Profile from '../images/wallpaper_1.jpg';
 import { NavLink } from "react-router-dom";
+import { useAuthUser, useSignOut } from "react-auth-kit";
 
 function Nav() {
+
+    const auth = useAuthUser();
 
     return(
         <div className='flex flex-col sticky top-0 z-[9999]'>
@@ -49,11 +52,26 @@ function Nav() {
                             </NavLink>
                         </MenuList>
                     </Menu>  
-                    <NavLink to='/sales'>
-                        <Typography variant='small' className="flex justify-center items-center p-2 text-white space-x-2 hover:bg-white hover:text-black rounded-lg ">
-                            <FaMoneyBill1 className='text-base' /> <span className=''>Sales</span>
-                        </Typography>
-                    </NavLink>
+                    <Menu>
+                        <MenuHandler>
+                            <Typography variant='small' className="flex justify-center items-center p-2 text-white space-x-2 hover:bg-white hover:text-black rounded-lg cursor-pointer">
+                                <FaMoneyBill1 className='text-base' /> <span className=''>Sales</span>
+                                <FaChevronDown className='text-xs' />
+                            </Typography>
+                        </MenuHandler>
+                        <MenuList className="z-[99999] bg-main text-white">
+                            <NavLink to="/sales_list">
+                                <MenuItem className="flex items-center gap-2">
+                                    <FaListUl /> <span>Sales List</span>
+                                </MenuItem>
+                            </NavLink>
+                            <NavLink to="/sales_invoice">
+                                <MenuItem className="flex items-center gap-2">
+                                    <FaFileInvoice /> <span>Sales invoice</span>
+                                </MenuItem>
+                            </NavLink>
+                        </MenuList>
+                    </Menu>
                     <Menu>
                         <MenuHandler>
                             <Typography variant='small' className="flex justify-center items-center p-2 text-white space-x-2 hover:bg-white hover:text-black rounded-lg cursor-pointer">
@@ -84,12 +102,12 @@ function Nav() {
                                     src={Profile}
                                     size='sm'
                                 />
-                                <Typography variant='small' className='capitalize'>Htet Wai Aung</Typography>
+                                <Typography variant='small' className='capitalize'>{auth().fullName}</Typography>
                                 <FaChevronDown className='text-sm cursor-pointer' />
                             </Button>
                         </MenuHandler>
-                        <MenuList className='text-black'>
-                            <MenuItem className='flex items-center gap-2'>
+                        <MenuList  className="z-[99999] bg-main text-white">
+                            <MenuItem className='flex items-center gap-2 cursor-pointer'>
                                 <FaArrowRightFromBracket /> <span>Logout</span>
                             </MenuItem>
                         </MenuList>

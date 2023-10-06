@@ -1,6 +1,6 @@
 import { Card, List, ListItem, ListItemPrefix, Typography } from "@material-tailwind/react";
-import { FaBoxesPacking, FaCube, FaRulerVertical, FaUserGroup } from "react-icons/fa6";
-import { GiBigDiamondRing, GiCheckeredDiamond, GiCutDiamond, GiDiamondHard, GiDiamonds } from "react-icons/gi";
+import { FaRulerVertical } from "react-icons/fa6";
+import { GiCheckeredDiamond, GiCutDiamond, GiDiamondHard, GiDiamonds } from "react-icons/gi";
 import { Link } from "react-router-dom";
 
 function Sidebar() {

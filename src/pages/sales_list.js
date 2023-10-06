@@ -2,8 +2,8 @@
 import { Button, Card, CardBody } from "@material-tailwind/react";
 import { FaPencil, FaTrashCan,} from "react-icons/fa6";
 import { useState } from "react";
-import { pause, currentDate } from "../const";
-import { useFetchTruePurchaseQuery, useRemovePurchaseMutation } from "../store";
+import { useRemoveStoneDetailsMutation, useFetchSalesQuery } from "../store";
+import { pause } from "../const";
 import DeleteModal from "../components/delete_modal";
 import SuccessAlert from "../components/success_alert";
 import SectionTitle from "../components/section_title";
@@ -11,7 +11,7 @@ import moment from "moment";
 import TableList from "../components/data_table";
 import { useNavigate } from "react-router-dom";
 
-function PurchaseList() {
+function SalesList() {
 
     const [openDelete, setOpenDelete] = useState(false);
 
@@ -19,19 +19,14 @@ function PurchaseList() {
 
     const [isAlert, setIsAlert] = useState(true);
 
-    const {data} = useFetchTruePurchaseQuery();
+    const {data} = useFetchSalesQuery();
 
-    const [removePurchase, removeResult] = useRemovePurchaseMutation();
+    const [removeStoneDetail, removeResult] = useRemoveStoneDetailsMutation();
 
     const [deleteId, setDeleteId] = useState('');
 
     const handleRemove = async (id) => {
-        let removeData = data.filter((el) => el.invoiceNo === id);
-        removePurchase({
-            id: removeData[0].invoiceNo,
-            deletedAt: moment().toISOString(),
-            deletedBy: "Htet Wai Aung"
-        }).then((res) => {console.log(res)});
+        removeStoneDetail(id).then((res) => {console.log(res)});
         setIsAlert(true);
         setOpenDelete(!openDelete);
         await pause(2000);
@@ -43,28 +38,28 @@ function PurchaseList() {
         setOpenDelete(!openDelete);
     };
 
-    const editPurchase = async (id) => {
+    const editSales = async (id) => {
         let editPuData = data.filter((e) => e.invoiceNo === id);
-        console.log(editPuData[0]);
-        navigate(`/purchase_edit/${editPuData[0].invoiceNo}`);
+        console.log(editPuData);
+        navigate(`/sales_edit/${editPuData}`);
     }
 
     const column = [
-        {
-            name: 'Invoice No',
-            sortable: true,
-            width: '200px',
-            selector: row => row.Code,
-        },
+        // {
+        //     name: 'Invoice No',
+        //     sortable: true,
+        //     width: '200px',
+        //     selector: row => row.Code,
+        // },
         {
             name: 'Date',
             sortable: true,
-            width: "200px",
+            width: "150px",
             selector: row => row.PurDate,
 
         },
         {
-            name: 'Supplier',
+            name: 'Customer',
             sortable: true,
             width: "200px",
             selector: row => row.Supplier,
@@ -114,29 +109,27 @@ function PurchaseList() {
             width: "100px",
             cell: (row) => (
                 <div className="flex items-center gap-2">
-                    <Link to={`/purchase_edit/${row.Code}`}>
-                        <Button variant="text" color="deep-purple" className="p-2"><FaPencil /></Button>
-                    </Link>
+                    <Button variant="text" color="deep-purple" className="p-2" onClick={() => editSales(row.Code)}><FaPencil /></Button>
                     <Button variant="text" color="red" className="p-2" onClick={() => handleDeleteBtn(row.Code)}><FaTrashCan /></Button>
                 </div>
             )
         },
     ];
 
-    const tbodyData = data?.map((purchaseData) => {
+    const tbodyData = data?.map((salesData) => {
         return {
-            Code: purchaseData.invoiceNo,
-            PurDate: moment(purchaseData.purDate).format("YYYY-MM-DD hh:mm:ss a"),
-            Supplier: purchaseData.supplier.supplierName,
-            SubTotal: purchaseData.subTotal,
-            DiscAmt: purchaseData.discAmt,
-            GrandTotal: purchaseData.grandTotal,
-            Remark: purchaseData.remark,
-            CreatedAt: moment(purchaseData.createdAt).format("YYYY-MM-DD hh:mm:ss a"),
-            CreatedBy: purchaseData.createdBy,
-            UpdatedAt: moment(purchaseData.updatedAt).format("YYYY-MM-DD hh:mm:ss a"),
-            UpdatedBy: purchaseData.updatedBy,
-            Status: purchaseData.status,
+            Code: salesData.invoiceNo,
+            PurDate: moment(salesData.salesDate).format("YYYY-MM-DD"),
+            Supplier: salesData.customer.customerName,
+            SubTotal: salesData.subTotal,
+            DiscAmt: salesData.discAmt,
+            GrandTotal: salesData.grandTotal,
+            Remark: salesData.remark,
+            CreatedAt: moment(salesData.createdAt).format("YYYY-MM-DD hh:mm:ss a"),
+            CreatedBy: salesData.createdBy,
+            UpdatedAt: moment(salesData.updatedAt).format("YYYY-MM-DD hh:mm:ss a"),
+            UpdatedBy: salesData.updatedBy,
+            Status: salesData.status,
         }
     });
 
@@ -148,7 +141,7 @@ function PurchaseList() {
                     removeResult.isSuccess && isAlert && <SuccessAlert message="Delete successful." handleAlert={() => setIsAlert(false)} />
                 }
             </div>
-            <SectionTitle title="Purchase List" />
+            <SectionTitle title="Sales List" />
             <Card className="h-auto shadow-md max-w-screen-xxl rounded-sm p-2 border-t">
                 <CardBody className="rounded-sm overflow-auto p-0">
                     <TableList columns={column} data={tbodyData} />
@@ -162,4 +155,4 @@ function PurchaseList() {
 
 }
 
-export default PurchaseList;
+export default SalesList;

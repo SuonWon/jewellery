@@ -10,6 +10,8 @@ import PurchaseList from "./pages/purchase_list";
 import PurchaseEdit from "./pages/purchase_edit";
 import { RequireAuth } from "react-auth-kit";
 
+import SalesInvoice from "./pages/sales_invoice";
+import SalesList from "./pages/sales_list";
 
 
 function App() {

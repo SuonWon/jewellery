@@ -24,7 +24,7 @@ function Grade() {
 
     const [editData, setEditData] = useState({});
 
-    const {data, error, isFetching} = useFetchGradeQuery();
+    const {data} = useFetchGradeQuery();
 
     const {register, handleSubmit, setValue, formState: {errors}, reset } = useForm();
 
@@ -174,7 +174,7 @@ function Grade() {
             cell: (row) => (
                 <div className="flex items-center gap-2">
                     <div className="border-r border-gray-400 pr-2">
-                        <Switch color="deep-purple" defaultChecked={row.Status === true ? true : false} id={row.Code} onChange={handleChange} />
+                        <Switch color="deep-purple" defaultChecked={row.Status} id={row.Code} onChange={handleChange} />
                     </div>
                     <Button variant="text" color="deep-purple" className="p-2" onClick={() => handleEdit(row.Code)}><FaPencil /></Button>
                     <Button variant="text" color="red" className="p-2" onClick={() => handleDeleteBtn(row.Code)}><FaTrashCan /></Button>
