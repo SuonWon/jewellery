@@ -1,7 +1,7 @@
 /* eslint-disable eqeqeq */
 import { Alert, Button, Card, CardBody, Dialog, DialogBody, Input, Switch, Typography } from "@material-tailwind/react";
 import { FaCirclePlus, FaFloppyDisk, FaPencil, FaTrashCan, FaTriangleExclamation } from "react-icons/fa6";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAddBrightnessMutation, useFetchBrightnessQuery, useRemoveBrightnessMutation, useUpdateBrightnessMutation } from "../store";
 import { useForm } from "react-hook-form";
 import { pause, currentDate } from "../const";
@@ -11,8 +11,13 @@ import SectionTitle from "../components/section_title";
 import ModalTitle from "../components/modal_title";
 import moment from "moment";
 import TableList from "../components/data_table";
+import { useAuthUser } from "react-auth-kit";
+
+const validator = require("validator");
 
 function Brightness() {
+
+    const auth = useAuthUser();
 
     const [open, setOpen] = useState(false);
 
@@ -24,15 +29,41 @@ function Brightness() {
 
     const [editData, setEditData] = useState({});
 
+    const [ validationText, setValidationText ] = useState({});
+
     const {data} = useFetchBrightnessQuery();
 
-    const {register, handleSubmit, setValue, formState: {errors}, reset } = useForm();
+    const [formData, setFormData] = useState({
+        brightDesc: "",
+        status: true,
+        createdAt: moment().toISOString(),
+        createdBy: auth().username,
+        updatedAt: moment().toISOString(),
+        updatedBy: "",
+    });
+
+    const {register, handleSubmit, setValue, formState: {errors}, reset, getValues } = useForm({
+        defaultValues: {
+            brightDesc: "",
+        }
+    });
 
     const [addBrightness, addResult] = useAddBrightnessMutation();
 
     const [editBrightness, editResult] = useUpdateBrightnessMutation();
 
     const [removeBrightness, removeResult] = useRemoveBrightnessMutation();
+
+    useEffect(() => {
+        setFormData({
+            brightDesc: "",
+            status: true,
+            createdAt: moment().toISOString(),
+            createdBy: auth().username,
+            updatedAt: moment().toISOString(),
+            updatedBy: "",
+        })
+    }, [addResult.isSuccess]);
 
     const [deleteId, setDeleteId] = useState('');
 
@@ -55,65 +86,50 @@ function Brightness() {
 
     const openModal = () => {
         setIsEdit(false);
-        setValue("brightDesc", "");
         setOpen(!open);
     };
 
-    const onSubmit = async (brightData) => {
-        let subData = {
-            ...brightData,
-            status: true,
-            createdAt: currentDate,
-            createdBy: 'Htet Wai Aung',
-            updatedAt: currentDate,
+    function validateForm() {
+        const newErrors = {};
+        if(validator.isEmpty(formData.brightDesc.toString())) {
+            newErrors.brightDesc = 'Description is required.'
         }
-        addBrightness(subData).then((res) => {
-            reset({
-                brightDesc: "",
-            });
-            console.log(res);
-        });
-        setIsAlert(true);
-        setOpen(!open);
-        await pause(2000);
-        setIsAlert(false);
+
+        setValidationText(newErrors);
+
+        return Object.keys(newErrors).length === 0;
     };
 
-    const onSaveSubmit = (brightData) => {
-        let subData = {
-            ...brightData,
-            status: true,
-            createdAt: currentDate,
-            createdBy: 'Htet Wai Aung',
-            updatedAt: currentDate,
-        }
-        addBrightness(subData).then((res) => {
-            reset({
-                brightDesc: "",
+    const onSubmit = async () => {
+        if(validateForm()) {
+            addBrightness(formData).then((res) => {
+                console.log(res);
             });
-            console.log(res);
-        });
-        setIsAlert(true);
-       
+            setOpen(!open);
+        }
+    };
+
+    const onSaveSubmit = () => {
+        if (validateForm()) {
+            addBrightness(formData).then((res) => {
+                console.log(res);
+            });
+        }
     };
 
     const handleEdit = async (id) => {
         let eData = data.filter((bright) => bright.brightCode === id);
         setEditData(eData[0]);
         setIsEdit(true);
-        setValue("brightDesc", eData[0].brightDesc);
+        setFormData(eData[0]);
         setOpen(!open);
     };
 
     const submitEdit = async (brightData) => {
         editBrightness({
-            brightCode: editData.brightCode,
-            brightDesc: brightData.brightDesc,
-            status: editData.status,
-            createdAt: editData.createdAt,
-            createdBy: editData.createdBy,
-            updatedAt: currentDate,
-            updatedBy: "Hello World",
+            ...formData,
+            updatedAt: moment().toISOString(),
+            updatedBy: auth().username,
         }).then((res) => {
             console.log(res);
         });
@@ -152,7 +168,6 @@ function Brightness() {
         },
         {
             name: 'Description',
-            sortable: true,
             selector: row => row.Description,
             
         },
@@ -160,13 +175,11 @@ function Brightness() {
             name: 'Created At',
             width: "200px",
             selector: row => row.CreatedAt,
-            sortable: true
         },
         {
             name: 'Updated At',
             width: "200px",
             selector: row => row.UpdatedAt,
-            sortable: true
         },
         {
             name: 'Action',
@@ -199,7 +212,7 @@ function Brightness() {
     return(
         <div className="flex flex-col gap-4 px-2 relative">
             <div className="w-78 absolute top-0 right-0 z-[9999]">
-                {
+                {/* {
                     addResult.isSuccess && isAlert && <SuccessAlert message="Save successful." handleAlert={() => setIsAlert(false)} />
                 }
                 {
@@ -207,7 +220,7 @@ function Brightness() {
                 }
                 {
                     removeResult.isSuccess && isAlert && <SuccessAlert message="Delete successful." handleAlert={() => setIsAlert(false)} />
-                }
+                } */}
             </div>
             <SectionTitle title="Stone Brightness" handleModal={openModal} />
             <Card className="h-auto shadow-md w-[1000px] mx-1 rounded-sm p-2 border-t">
@@ -218,35 +231,23 @@ function Brightness() {
             <Dialog open={open} handler={openModal} size="sm">
                 <DialogBody>
                     <ModalTitle titleName={isEdit ? "Edit Stone Brightness" : "Stone Brightness"} handleClick={openModal} />
-                    {
+                    {/* {
                         addResult.isSuccess && isAlert && <SuccessAlert message="Save successful." handleAlert={() => setIsAlert(false)} />
-                    }
+                    } */}
                     {
                         isEdit ? (
                             <form  className="flex flex-col items-end p-3">
                                 {/* <Switch label="Active" color="deep-purple" defaultChecked /> */}
-                                <Input label="Description" {...register('brightDesc', {require: true})} />
+                                <Input label="Description" value={formData.brightDesc} onChange={(e) => setFormData({...formData, brightDesc: e.target.value})} />
                                 {
-                                    errors.brightDesc && <Alert
-                                    icon={<FaTriangleExclamation />}
-                                    className="rounded-none border-l-4 border-red-800 bg-red-500/10 font-medium text-red-900"
-                                >
-                                    This field is required
-                                </Alert>
-                                
+                                    validationText.brightDesc && <p className="block text-[12px] text-red-500 font-sans mb-2">{validationText.brightDesc}</p>
                                 }
 
                                 <div className="flex items-center justify-end mt-6 gap-2">
-                                    <Button onClick={handleSubmit(submitEdit)} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2">
+                                    <Button onClick={submitEdit} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2">
                                         <FaFloppyDisk className="text-base" /> 
                                         <Typography variant="small" className="capitalize">
                                             Update
-                                        </Typography>
-                                    </Button>
-                                    <Button onClick={handleSubmit(onSaveSubmit)} color="red" size="sm" variant="gradient" className="flex items-center gap-2">
-                                        <FaTrashCan className="text-base" /> 
-                                        <Typography variant="small" className="capitalize">
-                                            Delete
                                         </Typography>
                                     </Button>
                                 </div>
@@ -254,24 +255,18 @@ function Brightness() {
                         ) : (
                             <form  className="flex flex-col items-end p-3">
                                 {/* <Switch label="Active" color="deep-purple" defaultChecked /> */}
-                                <Input label="Description" onFocus={() => setIsAlert(false)} {...register('brightDesc', {require: true})} />
+                                <Input label="Description" value={formData.brightDesc} onChange={(e) => setFormData({...formData, brightDesc: e.target.value})} />
                                 {
-                                    errors.brightDesc && <Alert
-                                    icon={<FaTriangleExclamation />}
-                                    className="rounded-none border-l-4 border-red-800 bg-red-500/10 font-medium text-red-900"
-                                >
-                                    This field is required
-                                </Alert>
-                                
+                                    validationText.brightDesc && <p className="block text-[12px] text-red-500 font-sans mb-2">{validationText.brightDesc}</p>
                                 }
                                 <div className="flex items-center justify-end mt-6 gap-2">
-                                    <Button onClick={handleSubmit(onSubmit)} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2">
+                                    <Button onClick={onSubmit} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2">
                                         <FaFloppyDisk className="text-base" /> 
                                         <Typography variant="small" className="capitalize">
                                             Save
                                         </Typography>
                                     </Button>
-                                    <Button onClick={handleSubmit(onSaveSubmit)} color="green" size="sm" variant="gradient" className="flex items-center gap-2">
+                                    <Button onClick={onSaveSubmit} color="green" size="sm" variant="gradient" className="flex items-center gap-2">
                                         <FaCirclePlus className="text-base" /> 
                                         <Typography variant="small" className="capitalize">
                                             Save & New

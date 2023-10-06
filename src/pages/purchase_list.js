@@ -2,31 +2,34 @@
 import { Button, Card, CardBody } from "@material-tailwind/react";
 import { FaPencil, FaTrashCan,} from "react-icons/fa6";
 import { useState } from "react";
-import { useRemoveStoneDetailsMutation, useFetchPurchaseQuery } from "../store";
 import { pause } from "../const";
+import { useFetchTruePurchaseQuery, useRemovePurchaseMutation } from "../store";
 import DeleteModal from "../components/delete_modal";
 import SuccessAlert from "../components/success_alert";
 import SectionTitle from "../components/section_title";
 import moment from "moment";
 import TableList from "../components/data_table";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 function PurchaseList() {
 
     const [openDelete, setOpenDelete] = useState(false);
 
-    const navigate = useNavigate();
-
     const [isAlert, setIsAlert] = useState(true);
 
-    const {data} = useFetchPurchaseQuery();
+    const {data} = useFetchTruePurchaseQuery();
 
-    const [removeStoneDetail, removeResult] = useRemoveStoneDetailsMutation();
+    const [removePurchase, removeResult] = useRemovePurchaseMutation();
 
     const [deleteId, setDeleteId] = useState('');
 
     const handleRemove = async (id) => {
-        removeStoneDetail(id).then((res) => {console.log(res)});
+        let removeData = data.filter((el) => el.invoiceNo === id);
+        removePurchase({
+            id: removeData[0].invoiceNo,
+            deletedAt: moment().toISOString(),
+            deletedBy: "Htet Wai Aung"
+        }).then((res) => {console.log(res)});
         setIsAlert(true);
         setOpenDelete(!openDelete);
         await pause(2000);
@@ -37,12 +40,6 @@ function PurchaseList() {
         setDeleteId(id);
         setOpenDelete(!openDelete);
     };
-
-    const editPurchase = async (id) => {
-        let editPuData = data.filter((e) => e.invoiceNo === id);
-        console.log(editPuData);
-        navigate(`/purchase_edit/${editPuData}`);
-    }
 
     const column = [
         {
@@ -109,7 +106,9 @@ function PurchaseList() {
             width: "100px",
             cell: (row) => (
                 <div className="flex items-center gap-2">
-                    <Button variant="text" color="deep-purple" className="p-2" onClick={() => editPurchase(row.Code)}><FaPencil /></Button>
+                    <Link to={`/purchase_edit/${row.Code}`}>
+                        <Button variant="text" color="deep-purple" className="p-2"><FaPencil /></Button>
+                    </Link>
                     <Button variant="text" color="red" className="p-2" onClick={() => handleDeleteBtn(row.Code)}><FaTrashCan /></Button>
                 </div>
             )

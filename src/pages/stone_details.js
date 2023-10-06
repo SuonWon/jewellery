@@ -1,7 +1,7 @@
 /* eslint-disable eqeqeq */
-import { Alert, Button, Card, CardBody, Dialog, DialogBody, Textarea, Typography } from "@material-tailwind/react";
+import { Alert, Button, Card, CardBody, Dialog, DialogBody, Input, Option, Select, Textarea, Typography } from "@material-tailwind/react";
 import { FaCirclePlus, FaFloppyDisk, FaPencil, FaTrashCan, FaTriangleExclamation } from "react-icons/fa6";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useFetchStoneDetailsQuery, useAddStoneDetailsMutation, useUpdateStoneDetailsMutation, useRemoveStoneDetailsMutation, useFetchUOMQuery, useFetchTrueBrightnessQuery, useFetchTrueStoneQuery, useFetchTrueGradeQuery, useFetchTrueTypeQuery } from "../store";
 import { useForm } from "react-hook-form";
 import { pause, currentDate } from "../const";
@@ -11,8 +11,12 @@ import SectionTitle from "../components/section_title";
 import ModalTitle from "../components/modal_title";
 import moment from "moment";
 import TableList from "../components/data_table";
+import { useAuthUser } from "react-auth-kit";
+const validator = require("validator");
 
 function StoneDetails() {
+
+    const auth = useAuthUser();
 
     const [open, setOpen] = useState(false);
 
@@ -36,11 +40,65 @@ function StoneDetails() {
 
     const {data: brightData} = useFetchTrueBrightnessQuery();
 
+    const [description, setDescription] = useState({
+        stoneDesc: "",
+        brightDesc: "",
+        typeDesc: ""
+    });
+
     const [stoneDesc, setStoneDesc] = useState("");
 
     const [brightDesc, setBrightDesc] = useState("");
 
     const [typeDesc, setTypeDesc] = useState("");
+
+    const [addStoneDetail, addResult] = useAddStoneDetailsMutation();
+
+    const [editStoneDetail] = useUpdateStoneDetailsMutation();
+
+    const [removeStoneDetail] = useRemoveStoneDetailsMutation();
+
+    const [deleteId, setDeleteId] = useState('');
+
+    const [ validationText, setValidationText ] = useState({});
+
+    useEffect(() => {
+        setFormData({
+            stoneDesc: "",
+            stoneCode: 0,
+            typeCode: 0,
+            brightCode: 0,
+            gradeCode: 0,
+            size: "",
+            qty: 0,
+            weight: 0,
+            unitCode: "",
+            remark: "",
+            isActive: true,
+            createdAt: moment().toISOString(),
+            createdBy: auth().username,
+            updatedAt: moment().toISOString(),
+            updatedBy: "",
+        });
+    }, [addResult.isSuccess]);
+
+    const [formData, setFormData] = useState({
+        stoneDesc: "",
+        stoneCode: 0,
+        typeCode: 0,
+        brightCode: 0,
+        gradeCode: 0,
+        size: "",
+        qty: 0,
+        weight: 0,
+        unitCode: "",
+        remark: "",
+        isActive: true,
+        createdAt: moment().toISOString(),
+        createdBy: auth().username,
+        updatedAt: moment().toISOString(),
+        updatedBy: "",
+    });
 
     const stoneDetail = {
         stoneDesc: "",
@@ -53,6 +111,11 @@ function StoneDetails() {
         weight: "",
         unitCode: "",
         remark: "",
+        isActive: true,
+        createdAt: moment().toISOString(),
+        createdBy: auth().username,
+        updatedAt: moment().toISOString(),
+        updatedBy: "",
     };
 
     const {register, handleSubmit, setValue, formState: {errors}, reset } = useForm({
@@ -67,101 +130,73 @@ function StoneDetails() {
         });
     };
 
-    const [addStoneDetail, addResult] = useAddStoneDetailsMutation();
-
-    const [editStoneDetail, editResult] = useUpdateStoneDetailsMutation();
-
-    const [removeStoneDetail, removeResult] = useRemoveStoneDetailsMutation();
-
-    const [deleteId, setDeleteId] = useState('');
-
     const openModal = () => {
         setIsEdit(false);
-        setValue("detailsInfo", stoneDetail);
+        setFormData({
+            stoneDesc: "",
+            stoneCode: 0,
+            typeCode: 0,
+            brightCode: 0,
+            gradeCode: 0,
+            size: "",
+            qty: 0,
+            weight: 0,
+            unitCode: "",
+            remark: "",
+            isActive: true,
+            createdAt: moment().toISOString(),
+            createdBy: auth().username,
+            updatedAt: moment().toISOString(),
+            updatedBy: "",
+        })
         setOpen(!open);
     };
 
-    const onSubmit = async (stoneDetailData) => {
-        let subData = {
-            ...stoneDetailData.detailsInfo,
-            stoneDesc: `${stoneDesc} ${brightDesc} ${typeDesc}`,
-            createdAt: currentDate,
-            createdBy: 'Htet Wai Aung',
-            updatedAt: currentDate,
-        };
-        console.log(subData);
-        addStoneDetail(subData).then((res) => {
-            resetData();
-            console.log(res);
-        });
-        setIsAlert(true);
-        setOpen(!open);
-        await pause(2000);
-        setIsAlert(false);
+    function validateForm() {
+        const newErrors = {};
+        if(validator.isEmpty(formData.customerName.toString())) {
+            newErrors.customerName = 'Customer name is required.'
+        }
+
+        setValidationText(newErrors);
+
+        return Object.keys(newErrors).length === 0;
     };
 
-    const onSaveSubmit = (stoneDetailData) => {
-        let subData = {
-            ...stoneDetailData.detailsInfo,
-            stoneDesc: `${stoneDesc} ${brightDesc} ${typeDesc}`,
-            createdAt: currentDate,
-            createdBy: 'Htet Wai Aung',
-            updatedAt: currentDate,
-        };
-        addStoneDetail(subData).then((res) => {
-            resetData();
-            console.log(res);
-        });
-        setIsAlert(true);
+    const onSubmit = async () => {
+        if(validateForm()) {
+            addStoneDetail(formData).then((res) => {
+                console.log(res);
+            });
+            setOpen(!open);
+        }
+    };
+
+    const onSaveSubmit = () => {
+        if (validateForm()) {
+            addStoneDetail(formData).then((res) => {
+                console.log(res);
+            });
+        }
     };
 
     const handleEdit = async (id) => {
-        let eData = data.filter((stoneDetails) => stoneDetails.stoneDetailCode === id);
+        let eData = data.filter((stoneDetail) => stoneDetail.stoneDetailCode === id);
         setEditData(eData[0]);
         setIsEdit(true);
-        setValue("detailsInfo", {
-            stoneDesc: eData[0].stoneDesc,
-            stoneCode: eData[0].stoneCode,
-            typeCode: eData[0].typeCode,
-            gradeCode: eData[0].gradeCode,
-            brightCode: eData[0].brightCode,
-            qty: eData[0].qty,
-            size: eData[0].size,
-            weight: eData[0].weight,
-            unitCode: eData[0].unitCode,
-            remark: eData[0].remark
-        });
-        setStoneDesc(eData[0].stoneCode);
-        setBrightDesc(eData[0].brightCode);
-        setTypeDesc(eData[0].typeCode);
+        setFormData(eData[0]);
         setOpen(!open);
     };
 
-    const submitEdit = async (stoneDetailsData) => {
+    const submitEdit = async () => {
         editStoneDetail({
-            stoneDetailCode: editData.stoneDetailCode,
-            stoneDesc: `${stoneDesc} ${brightDesc} ${typeDesc}`,
-            stoneCode: stoneDetailsData.detailsInfo.stoneCode,
-            typeCode: stoneDetailsData.detailsInfo.typeCode,
-            brightCode: stoneDetailsData.detailsInfo.brightCode,
-            gradeCode: stoneDetailsData.detailsInfo.gradeCode,
-            qty: stoneDetailsData.detailsInfo.qty,
-            size: stoneDetailsData.detailsInfo.size,
-            weight: stoneDetailsData.detailsInfo.weight,
-            unitCode: stoneDetailsData.detailsInfo.unitCode,
-            remark: stoneDetailsData.detailsInfo.remark,
-            isActive: editData.isActive,
-            createdAt: editData.createdAt,
-            createdBy: editData.createdBy,
-            updatedAt: currentDate,
-            updatedBy: "Hello World",
+            ...formData,
+            updatedAt: moment().toISOString(),
+            updatedBy: auth().username,
         }).then((res) => {
             console.log(res);
         });
-        setIsAlert(true);
         setOpen(!open);
-        await pause(2000);
-        setIsAlert(false);
     };
 
     const handleRemove = async (id) => {
@@ -180,62 +215,53 @@ function StoneDetails() {
     const column = [
         {
             name: 'Description',
-            sortable: true,
             width: '200px',
             selector: row => row.Description,
         },
         {
             name: 'Stone Description',
-            sortable: true,
             width: "200px",
             selector: row => row.StoneDesc,
 
         },
         {
             name: 'Brightness',
-            sortable: true,
             width: "200px",
             selector: row => row.BrightnessDesc,
 
         },
         {
             name: 'Grade',
-            sortable: true,
             width: "150px",
             selector: row => row.GradeDesc,
 
         },
         {
             name: 'Type',
-            sortable: true,
             width: "150px",
             selector: row => row.TypeDesc,
 
         },
         {
             name: 'Size',
-            sortable: true,
             width: "200px",
             selector: row => row.Size,
 
         },
         {
             name: 'Quantity',
-            sortable: true,
             width: "200px",
             selector: row => row.Qty,
 
         },
         {
             name: 'Weight',
-            sortable: true,
             width: "200px",
             selector: row => row.Weight,
 
         },
         {
             name: 'Unit',
-            sortable: true,
             width: "200px",
             selector: row => row.UnitDesc,
 
@@ -249,13 +275,11 @@ function StoneDetails() {
             name: 'Created At',
             width: "200px",
             selector: row => row.CreatedAt,
-            sortable: true
         },
         {
             name: 'Updated At',
             width: "200px",
             selector: row => row.UpdatedAt,
-            sortable: true
         },
         {
             name: 'Action',
@@ -294,17 +318,6 @@ function StoneDetails() {
     return(
         <>
         <div className="flex flex-col gap-4 relative max-w-[85%] min-w-[85%]">
-            <div className="w-78 absolute top-0 right-0 z-[9999]">
-                {
-                    addResult.isSuccess && isAlert && <SuccessAlert message="Save successful." handleAlert={() => setIsAlert(false)} />
-                }
-                {
-                    editResult.isSuccess && isAlert && <SuccessAlert message="Update successful." handleAlert={() => setIsAlert(false)} />
-                }
-                {
-                    removeResult.isSuccess && isAlert && <SuccessAlert message="Delete successful." handleAlert={() => setIsAlert(false)} />
-                }
-            </div>
             <SectionTitle title="Stone Details" handleModal={openModal} />
             <Card className="h-auto shadow-md max-w-screen-xxl rounded-sm p-2 border-t">
                 <CardBody className="rounded-sm overflow-auto p-0">
@@ -318,19 +331,39 @@ function StoneDetails() {
                         isEdit ? (
                             <form  className="flex flex-col p-3 gap-4">
                                 <div className="grid grid-cols-4">
-                                    <div className="w-full col-span-2">
-                                        <input placeholder="Stone Description" className="border border-blue-gray-200 w-full h-full p-2.5 rounded-md placeholder:text-blue-gray-500" {...register('detailsInfo.stoneDesc')} value={`${stoneDesc} ${brightDesc} ${typeDesc}`} onFocus={() => setIsAlert(false)} disabled />
+                                    <div>
+                                        <Input label="Name" value={`${description.stoneDesc} ${description.brightDesc} ${description.typeDesc}`} readOnly/>
+                                        {
+                                            validationText.customerName && <p className="block text-[12px] text-red-500 font-sans mb-2">{validationText.customerName}</p>
+                                        }
                                     </div>
+                                    {/* <div className="w-full col-span-2">
+                                        <input placeholder="Stone Description" className="border border-blue-gray-200 w-full h-full p-2.5 rounded-md placeholder:text-blue-gray-500" {...register('detailsInfo.stoneDesc')} value={`${stoneDesc} ${brightDesc} ${typeDesc}`} onFocus={() => setIsAlert(false)} disabled />
+                                    </div> */}
                                 </div>
                                 <div className="grid grid-cols-3 gap-2 w-full">
-                                    <select {...register('detailsInfo.stoneCode')} className="block w-full p-2.5 border border-blue-gray-200 rounded-md focus:border-black" onChange={(e) => setStoneDesc(e.target.selectedOptions[0].text)}>
+                                    <Select 
+                                        value={formData.stoneCode} 
+                                        onChange={(e) => {
+                                            setStoneDesc(e.target.selectedOptions[0].text); 
+                                            setFormData({...formData, stoneCode: e.target.value});
+                                        }}
+                                    >
                                         <option value={editData.stoneCode} selected={true} disabled>{editData.stoneCode}</option>
                                         {
                                             stoneData?.map((stone) => {
                                                 return <option value={stone.stoneCode} key={stone.stoneCode} >{stone.stoneDesc}</option>
                                             })
                                         }
-                                    </select>
+                                    </Select>
+                                    {/* <select {...register('detailsInfo.stoneCode')} className="block w-full p-2.5 border border-blue-gray-200 rounded-md focus:border-black" onChange={(e) => setStoneDesc(e.target.selectedOptions[0].text)}>
+                                        <option value={editData.stoneCode} selected={true} disabled>{editData.stoneCode}</option>
+                                        {
+                                            stoneData?.map((stone) => {
+                                                return <option value={stone.stoneCode} key={stone.stoneCode} >{stone.stoneDesc}</option>
+                                            })
+                                        }
+                                    </select> */}
                                     <select {...register('detailsInfo.brightCode')} className="block w-full p-2.5 border border-blue-gray-200 rounded-md focus:border-black" onChange={(e) => setBrightDesc(e.target.selectedOptions[0].text)}>
                                         <option value={editData.brightCode} selected={true} disabled>{editData.brightCode}</option>
                                         {
@@ -406,30 +439,40 @@ function StoneDetails() {
                                             Update
                                         </Typography>
                                     </Button>
-                                    <Button onClick={handleSubmit(onSaveSubmit)} color="red" size="sm" variant="gradient" className="flex items-center gap-2">
+                                    {/* <Button onClick={handleSubmit(onSaveSubmit)} color="red" size="sm" variant="gradient" className="flex items-center gap-2">
                                         <FaTrashCan className="text-base" />
                                         <Typography variant="small" className="capitalize">
                                             Delete
                                         </Typography>
-                                    </Button>
+                                    </Button> */}
                                 </div>
                             </form>
                         ) : (
                             <form  className="flex flex-col p-3 gap-4">
                                 <div className="grid grid-cols-4">
                                     <div className="w-full col-span-2">
-                                        <input placeholder="Stone Description" className="border border-blue-gray-200 w-full h-full p-2.5 rounded-md placeholder:text-blue-gray-500" {...register('detailsInfo.stoneDesc')} value={`${stoneDesc} ${brightDesc} ${typeDesc}`} disabled />
+                                        <Input label="Name" value={`${description.stoneDesc} ${description.brightDesc} ${description.typeDesc}`} readOnly/>
+                                        {
+                                            validationText.customerName && <p className="block text-[12px] text-red-500 font-sans mb-2">{validationText.customerName}</p>
+                                        }
                                     </div>
                                 </div>
                                 <div className="grid grid-cols-3 gap-2 w-full">
-                                    <select {...register('detailsInfo.stoneCode')} className="block w-full p-2.5 border border-blue-gray-200 rounded-md focus:border-black" onFocus={() => setIsAlert(false)} onChange={(e) => setStoneDesc(e.target.selectedOptions[0].text)}>
-                                        <option value="" selected={true} disabled>Select Stone</option>
+                                    <Select 
+                                        label="Stone Description"
+                                        value={formData.stoneCode} 
+                                        onChange={(e) => {
+                                            //setStoneDesc(e.target.value); 
+                                            setFormData({...formData, stoneCode: e.target.value});
+                                        }}
+                                    >
+                                        <Option value={0} selected={true} disabled>Select Stone</Option>
                                         {
                                             stoneData?.map((stone) => {
-                                                return <option value={stone.stoneCode} key={stone.stoneCode} >{stone.stoneDesc}</option>
+                                                return <Option value={stone.Code} key={stone.stoneCode} >{stone.stoneDesc}</Option>
                                             })
                                         }
-                                    </select>
+                                    </Select>
                                     <select {...register('detailsInfo.brightCode')} className="block w-full p-2.5 border border-blue-gray-200 rounded-md focus:border-black" onFocus={() => setIsAlert(false)} onChange={(e) => setBrightDesc(e.target.selectedOptions[0].text)}>
                                         <option value="" selected={true} disabled>Select Brightness</option>
                                         {

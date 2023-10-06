@@ -3,8 +3,11 @@ import { FaArrowRightFromBracket, FaCartShopping, FaChartPie, FaChevronDown, FaD
 import { GiDiamondTrophy } from "react-icons/gi";
 import Profile from '../images/wallpaper_1.jpg';
 import { NavLink } from "react-router-dom";
+import { useAuthUser, useSignOut } from "react-auth-kit";
 
 function Nav() {
+
+    const auth = useAuthUser();
 
     return(
         <div className='flex flex-col sticky top-0 z-[9999]'>
@@ -99,12 +102,12 @@ function Nav() {
                                     src={Profile}
                                     size='sm'
                                 />
-                                <Typography variant='small' className='capitalize'>Htet Wai Aung</Typography>
+                                <Typography variant='small' className='capitalize'>{auth()?.fullName}</Typography>
                                 <FaChevronDown className='text-sm cursor-pointer' />
                             </Button>
                         </MenuHandler>
                         <MenuList  className="z-[99999] bg-main text-white">
-                            <MenuItem className='flex items-center gap-2'>
+                            <MenuItem className='flex items-center gap-2 cursor-pointer'>
                                 <FaArrowRightFromBracket /> <span>Logout</span>
                             </MenuItem>
                         </MenuList>

@@ -6,17 +6,25 @@ import { BrowserRouter } from 'react-router-dom';
 import { ThemeProvider } from '@material-tailwind/react';
 import { Provider } from 'react-redux';
 import { store } from './store';
+import { AuthProvider } from 'react-auth-kit';
+
+
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
     <ThemeProvider>
-      <BrowserRouter>
-
-        <Provider store={store}>
-          <App />
-        </Provider>
-      </BrowserRouter>
+      <AuthProvider 
+        authType = {'cookie'}
+        authName={'_auth'}
+        cookieDomain={window.location.hostname}
+      >
+        <BrowserRouter>
+          <Provider store={store}>
+            <App />
+          </Provider>
+        </BrowserRouter>
+      </AuthProvider>
     </ThemeProvider>
   </React.StrictMode>
 );
