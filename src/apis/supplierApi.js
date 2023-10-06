@@ -21,9 +21,23 @@ const supplierApi = createApi({
                 },
             }),
             fetchSupplierById: builder.query({
+                providesTags: () => {
+                    return[{type: 'Supplier', id: 'All'}]
+                },
                 query: (supplierCode) => {
                     return {
                         url: `/supplier/get-supplier/${supplierCode}`,
+                        method: 'GET'
+                    };
+                },
+            }),
+            fetchTrueSupplier: builder.query({
+                providesTags: () => {
+                    return[{type: 'Supplier', id: 'All'}]
+                },
+                query: () => {
+                    return {
+                        url: '/supplier/get-true-suppliers',
                         method: 'GET'
                     };
                 },
@@ -98,5 +112,5 @@ const supplierApi = createApi({
     }
 });
 
-export const { useFetchSupplierQuery, useFetchSupplierByIdQuery, useAddSupplierMutation, useUpdateSupplierMutation, useRemoveSupplierMutation } = supplierApi;
+export const { useFetchSupplierQuery, useFetchTrueSupplierQuery, useFetchSupplierByIdQuery, useAddSupplierMutation, useUpdateSupplierMutation, useRemoveSupplierMutation } = supplierApi;
 export { supplierApi };

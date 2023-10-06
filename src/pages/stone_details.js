@@ -22,8 +22,7 @@ function StoneDetails() {
 
     const [isEdit, setIsEdit] = useState(false);
 
-
-    const {data} = useFetchStoneDetailsQuery();
+    const {data, refetch} = useFetchStoneDetailsQuery();
 
     const {data: stoneData} = useFetchTrueStoneQuery();
 
@@ -34,6 +33,10 @@ function StoneDetails() {
     const {data: unitData} = useFetchUOMQuery();
 
     const {data: brightData} = useFetchTrueBrightnessQuery();
+
+    useEffect(() => {
+        refetch();
+    }, []);
 
     const stoneOption = stoneData?.map((stone) => {
         return {value: stone.stoneCode, label: stone.stoneDesc}
@@ -52,7 +55,7 @@ function StoneDetails() {
     });
 
     const unitOption = unitData?.map((unit) => {
-        return {value: unit.unitCode, label: unit.unitDesc}
+        return {value: unit.unitCode, label: unit.unitCode}
     });
 
     const [description, setDescription] = useState({
@@ -93,10 +96,6 @@ function StoneDetails() {
         updatedBy: "",
     };
 
-    useEffect(() => {
-        setFormData(stoneDetail);
-    }, [addResult.isSuccess]);
-
     const [formData, setFormData] = useState(stoneDetail);
 
     const openModal = () => {
@@ -106,7 +105,7 @@ function StoneDetails() {
             stoneDesc: "",
             brightDesc: "",
             typeDesc: ""
-        })
+        });
         setOpen(!open);
     };
 
@@ -151,6 +150,7 @@ function StoneDetails() {
             }).then((res) => {
                 console.log(res);
             });
+            setFormData(stoneDetail);
             setOpen(!open);
         }
     };
@@ -162,6 +162,12 @@ function StoneDetails() {
                 stoneDesc: `${description.stoneDesc} ${description.brightDesc} ${description.typeDesc}`,
             }).then((res) => {
                 console.log(res);
+            });
+            setFormData(stoneDetail);
+            setDescription({
+                stoneDesc: "",
+                brightDesc: "",
+                typeDesc: ""
             });
         }
     };
@@ -354,7 +360,22 @@ function StoneDetails() {
                         <div className="grid grid-cols-3 gap-2 w-full">
                             <div>
                                 <label className="text-black">Stone Description</label>
-                                <Select 
+                                <select 
+                                    className="block w-full text-black p-2.5 border border-blue-gray-200 max-h-[2.5rem] rounded-md focus:border-black"
+                                    value={formData.stoneCode}
+                                    onChange={(e) => {
+                                        setDescription({...description, stoneDesc: e.target.selectedOptions[0].text}); 
+                                        setFormData({...formData, stoneCode: Number(e.target.value)});
+                                    }}
+                                >
+                                    <option value="" disabled>Select...</option>
+                                    {
+                                        stoneData?.map((stone) => {
+                                            return <option value={stone.stoneCode} key={stone.stoneCode}>{stone.stoneDesc}</option>
+                                        })
+                                    }
+                                </select>
+                                {/* <Select 
                                     options={stoneOption} 
                                     isSearchable
                                     defaultValue={{value: formData.stoneCode, label: formData.stone === ""? "Select..." : formData.stone}}
@@ -362,14 +383,29 @@ function StoneDetails() {
                                         setDescription({...description, stoneDesc: e.label}); 
                                         setFormData({...formData, stoneCode: Number(e.value)});
                                     }}
-                                />
+                                /> */}
                                 {
                                     validationText.stoneDesc && <p className="block text-[12px] text-red-500 font-sans">{validationText.stoneDesc}</p>
                                 }
                             </div>
                             <div>
                                 <label className="text-black">Brightness</label>
-                                <Select 
+                                <select 
+                                    className="block w-full text-black p-2.5 border border-blue-gray-200 max-h-[2.5rem] rounded-md focus:border-black"
+                                    value={formData.brightCode}
+                                    onChange={(e) => {
+                                        setDescription({...description, brightDesc: e.target.selectedOptions[0].text}); 
+                                        setFormData({...formData, brightCode: Number(e.target.value)});
+                                    }}
+                                >
+                                    <option value="" disabled>Select...</option>
+                                    {
+                                        brightData?.map((bright) => {
+                                            return <option value={bright.brightCode} key={bright.brightCode}>{bright.brightDesc}</option>
+                                        })
+                                    }
+                                </select>
+                                {/* <Select 
                                     options={brightOption} 
                                     isSearchable
                                     defaultValue={{value: formData.brightCode, label: formData.stone === ""? "Select..." : formData.bright}}
@@ -377,14 +413,29 @@ function StoneDetails() {
                                         setDescription({...description, brightDesc: e.label}); 
                                         setFormData({...formData, brightCode: Number(e.value)});
                                     }}
-                                />
+                                /> */}
                                 {
                                     validationText.brightDesc && <p className="block text-[12px] text-red-500 font-sans">{validationText.brightDesc}</p>
                                 }
                             </div>
                             <div>
                                 <label className="text-black">Type</label>
-                                <Select 
+                                <select 
+                                    className="block w-full text-black p-2.5 border border-blue-gray-200 max-h-[2.5rem] rounded-md focus:border-black"
+                                    value={formData.typeCode}
+                                    onChange={(e) => {
+                                        setDescription({...description, typeDesc: e.target.selectedOptions[0].text}); 
+                                        setFormData({...formData, typeCode: Number(e.target.value)});
+                                    }}
+                                >
+                                    <option value="" disabled>Select...</option>
+                                    {
+                                        typeData?.map((type) => {
+                                            return <option value={type.typeCode} key={type.typeCode}>{type.typeDesc}</option>
+                                        })
+                                    }
+                                </select>
+                                {/* <Select 
                                     options={typeOption} 
                                     isSearchable
                                     defaultValue={{value: formData.typeCode, label: formData.type === ""? "Select..." : formData.type}}
@@ -392,7 +443,7 @@ function StoneDetails() {
                                         setDescription({...description, typeDesc: e.label}); 
                                         setFormData({...formData, typeCode: Number(e.value)});
                                     }}
-                                />
+                                /> */}
                                 {
                                     validationText.typeDesc && <p className="block text-[12px] text-red-500 font-sans">{validationText.typeDesc}</p>
                                 }
@@ -401,14 +452,28 @@ function StoneDetails() {
                         <div className="grid grid-cols-3 gap-2 w-full">
                             <div>
                                 <label className="text-black">Grade</label>
-                                <Select 
+                                <select 
+                                    className="block w-full text-black p-2.5 border border-blue-gray-200 max-h-[2.5rem] rounded-md focus:border-black"
+                                    value={formData.gradeCode}
+                                    onChange={(e) => {
+                                        setFormData({...formData, gradeCode: Number(e.target.value)});
+                                    }}
+                                >
+                                    <option value="" disabled>Select...</option>
+                                    {
+                                        gradeData?.map((grade) => {
+                                            return <option value={grade.gradeCode} key={grade.gradeCode}>{grade.gradeDesc}</option>
+                                        })
+                                    }
+                                </select>
+                                {/* <Select 
                                     options={gradeOption} 
                                     isSearchable
                                     defaultValue={{value: formData.gradeCode, label: formData.grade === ""? "Select..." : formData.grade}}
                                     onChange={(e) => {
                                         setFormData({...formData, gradeCode: Number(e.value)});
                                     }}
-                                />
+                                /> */}
                                 {
                                     validationText.gradeDesc && <p className="block text-[12px] text-red-500 font-sans">{validationText.gradeDesc}</p>
                                 }
@@ -424,7 +489,7 @@ function StoneDetails() {
                                     </div>
                                     <div>
                                         <label className="text-black">Qty</label>
-                                        <input type="number" className="border border-blue-gray-200 w-full h-[40px] p-2.5 rounded-md text-black" value={formData.qty} onChange={(e) => setFormData({...formData, qty: e.target.value})} />
+                                        <input type="number" className="border border-blue-gray-200 w-full h-[40px] p-2.5 rounded-md text-black" value={formData.qty} onChange={(e) => setFormData({...formData, qty: e.target.value})} readOnly={isEdit}/>
                                         {
                                             validationText.qty && <p className="block text-[12px] text-red-500 font-sans">{validationText.qty}</p>
                                         }
@@ -442,25 +507,36 @@ function StoneDetails() {
                         <div className="grid grid-cols-3 gap-2 w-full">
                             <div>
                                 <label className="text-black">Unit</label>
-                                <Select 
+                                <select 
+                                    className="block w-full text-black p-2.5 border border-blue-gray-200 max-h-[2.5rem] rounded-md focus:border-black"
+                                    value={formData.unitCode}
+                                    onChange={(e) => {
+                                        setFormData({...formData, unitCode: e.target.value});
+                                    }}
+                                >
+                                    <option value="" disabled>Select...</option>
+                                    {
+                                        unitData?.map((unit) => {
+                                            return <option value={unit.unitCode} key={unit.unitCode}>{unit.unitDesc}</option>
+                                        })
+                                    }
+                                </select>
+                                {/* <Select 
                                     options={unitOption} 
                                     isSearchable
                                     defaultValue={{value: formData.unitCode, label: formData.unitCode}}
                                     onChange={(e) => {
                                         setFormData({...formData, unitCode: e.value});
                                     }}
-                                />
+                                /> */}
                                 {
                                     validationText.unitDesc && <p className="block text-[12px] text-red-500 font-sans mb-2">{validationText.unitDesc}</p>
                                 }
                             </div>
                             <div className="col-span-2">
                                 <label className="text-black">Remark</label>
-                                <Textarea 
-                                    labelProps={{
-                                        className: "hidden"
-                                    }}
-                                    className="min-h-full !border !border-blue-gray-200 focus:border-2 focus:!border-gray-900 focus:!border-t-gray-900" 
+                                <textarea
+                                    className="border border-blue-gray-200 w-full px-2.5 py-1.5 rounded-md text-black"
                                     rows={1} 
                                     value={formData.remark} onChange={(e) => setFormData({...formData, remark: e.target.value})}
                                 />

@@ -1,6 +1,6 @@
 /* eslint-disable eqeqeq */
-import { Button, Card, CardBody } from "@material-tailwind/react";
-import { FaPencil, FaTrashCan,} from "react-icons/fa6";
+import { Button, Card, CardBody, Typography } from "@material-tailwind/react";
+import { FaPencil, FaPlus, FaTrashCan,} from "react-icons/fa6";
 import { useState } from "react";
 import { pause } from "../const";
 import { useFetchTruePurchaseQuery, useRemovePurchaseMutation } from "../store";
@@ -140,7 +140,16 @@ function PurchaseList() {
                     removeResult.isSuccess && isAlert && <SuccessAlert message="Delete successful." handleAlert={() => setIsAlert(false)} />
                 }
             </div>
-            <SectionTitle title="Purchase List" />
+            <div className="flex items-center py-3 bg-white gap-4 sticky top-0 z-10">
+                <Typography variant="h5">
+                    Purchase List
+                </Typography>
+                <Link to='/purchase_invoice'>
+                    <Button variant="gradient" size="sm" color="deep-purple" className="flex items-center gap-2">
+                        <FaPlus /> Create New
+                    </Button>
+                </Link>
+            </div>
             <Card className="h-auto shadow-md max-w-screen-xxl rounded-sm p-2 border-t">
                 <CardBody className="rounded-sm overflow-auto p-0">
                     <TableList columns={column} data={tbodyData} />

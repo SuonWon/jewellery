@@ -21,9 +21,23 @@ const customerApi = createApi({
                 },
             }),
             fetchCustomerById: builder.query({
+                providesTags: () => {
+                    return[{type: 'Customer', id: 'All'}]
+                },
                 query: (customerCode) => {
                     return {
                         url: `/customer/get-customer/${customerCode}`,
+                        method: 'GET'
+                    };
+                },
+            }),
+            fetchTrueCustomer: builder.query({
+                providesTags: () => {
+                    return[{type: 'Customer', id: 'All'}]
+                },
+                query: () => {
+                    return {
+                        url: `/customer/get-true-customers`,
                         method: 'GET'
                     };
                 },
@@ -100,5 +114,5 @@ const customerApi = createApi({
     }
 });
 
-export const { useFetchCustomerQuery, useFetchCustomerByIdQuery, useAddCustomerMutation, useUpdateCustomerMutation, useRemoveCustomerMutation } = customerApi;
+export const { useFetchCustomerQuery, useFetchTrueCustomerQuery, useFetchCustomerByIdQuery, useAddCustomerMutation, useUpdateCustomerMutation, useRemoveCustomerMutation } = customerApi;
 export { customerApi };

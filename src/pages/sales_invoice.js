@@ -2,7 +2,7 @@ import { Button, Card, CardBody, Input, Typography } from "@material-tailwind/re
 import { FaFloppyDisk, FaPencil, FaPlus, FaTrashCan } from "react-icons/fa6";
 import { useState } from "react";
 import DataTable from "react-data-table-component";
-import { useAddSalesMutation, useFetchCustomerQuery, useFetchStoneDetailsQuery, useFetchUOMQuery } from "../store";
+import { useAddSalesMutation, useFetchCustomerQuery, useFetchStoneDetailsQuery, useFetchTrueCustomerQuery, useFetchUOMQuery } from "../store";
 import moment from "moment";
 import SuccessAlert from "../components/success_alert";
 import { v4 as uuidv4 } from 'uuid';
@@ -141,7 +141,7 @@ function SalesInvoice() {
         },
     ]
 
-    const {data: customers} = useFetchCustomerQuery();
+    const {data: customers} = useFetchTrueCustomerQuery();
 
     const {data: stoneDetails} = useFetchStoneDetailsQuery();
 

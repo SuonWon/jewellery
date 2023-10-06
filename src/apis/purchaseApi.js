@@ -9,6 +9,9 @@ const purchaseApi = createApi({
     endpoints(builder) {
         return {
             fetchPurchase: builder.query({
+                providesTags: () => {
+                    return [{type: 'Purchase', id: 'All'}]
+                },
                 query: () => {
                     return {
                         url: '/purchase/get-all-purchases',
@@ -17,6 +20,9 @@ const purchaseApi = createApi({
                 },
             }),
             fetchTruePurchase: builder.query({
+                providesTags: () => {
+                    return [{type: 'Purchase', id: 'All'}]
+                },
                 query: () => {
                     return {
                         url: '/purchase/get-true-purchases/?status=O',
@@ -25,6 +31,9 @@ const purchaseApi = createApi({
                 }
             }),
             fetchPurchaseById: builder.query({
+                providesTags: () => {
+                    return [{type: 'Purchase', id: 'All'}]
+                },
                 query: (purchaseNo) => {
                     return {
                         url: `/purchase/get-purchse/${purchaseNo}`,
@@ -33,6 +42,9 @@ const purchaseApi = createApi({
                 }
             }),
             addPurchase: builder.mutation({
+                invalidatesTags: () => {
+                    return [{type: "Purchase", id: "All"}]
+                },
                 query: (purchaseData) => {
                     return {
                         url: '/purchase/create-purchase',
@@ -45,6 +57,9 @@ const purchaseApi = createApi({
                 }
             }),
             updatePurchase: builder.mutation({
+                invalidatesTags: () => {
+                    return [{type: "Purchase", id: "All"}]
+                },
                 query: (purchaseData) => {
                     return {
                         url: '/purchase/update-purchase',
@@ -54,6 +69,9 @@ const purchaseApi = createApi({
                 }
             }),
             removePurchase: builder.mutation({
+                invalidatesTags: () => {
+                    return [{type: "Purchase", id: "All"}]
+                },
                 query: (purchaseData) => {
                     return {
                         url: '/purchase/delete-purchase',
