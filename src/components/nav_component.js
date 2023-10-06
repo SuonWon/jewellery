@@ -102,7 +102,7 @@ function Nav() {
                                     src={Profile}
                                     size='sm'
                                 />
-                                <Typography variant='small' className='capitalize'>{auth().fullName}</Typography>
+                                <Typography variant='small' className='capitalize'>{auth()?.fullName}</Typography>
                                 <FaChevronDown className='text-sm cursor-pointer' />
                             </Button>
                         </MenuHandler>

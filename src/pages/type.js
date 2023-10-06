@@ -22,6 +22,8 @@ function StoneType() {
 
     const {data} = useFetchTypeQuery();
 
+    console.log(data);
+
     const [ stoneType, setStoneType ] = useState({
         typeCode: 0,
         typeDesc: '',

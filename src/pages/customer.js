@@ -1,12 +1,10 @@
 /* eslint-disable eqeqeq */
-import { Alert, Button, Card, CardBody, Dialog, DialogBody, Input, Switch, Textarea, Typography } from "@material-tailwind/react";
-import { FaCirclePlus, FaFloppyDisk, FaPencil, FaTrashCan, FaTriangleExclamation } from "react-icons/fa6";
+import {  Button, Card, CardBody, Dialog, DialogBody, Input, Switch, Textarea, Typography } from "@material-tailwind/react";
+import { FaCirclePlus, FaFloppyDisk, FaPencil, FaTrashCan } from "react-icons/fa6";
 import { useEffect, useState } from "react";
 import { useFetchCustomerQuery, useAddCustomerMutation, useUpdateCustomerMutation, useRemoveCustomerMutation } from "../store";
-import { useForm } from "react-hook-form";
-import { pause, currentDate } from "../const";
+import { currentDate } from "../const";
 import DeleteModal from "../components/delete_modal";
-import SuccessAlert from "../components/success_alert";
 import SectionTitle from "../components/section_title";
 import ModalTitle from "../components/modal_title";
 import moment from "moment";
@@ -21,8 +19,6 @@ function Customer() {
     const [open, setOpen] = useState(false);
 
     const [openDelete, setOpenDelete] = useState(false);
-
-    const [isAlert, setIsAlert] = useState(true);
 
     const [isEdit, setIsEdit] = useState(false);
 
@@ -175,10 +171,7 @@ function Customer() {
 
     const handleRemove = async (id) => {
         removeCustomer(id).then((res) => {console.log(res)});
-        setIsAlert(true);
         setOpenDelete(!openDelete);
-        await pause(2000);
-        setIsAlert(false);
     };
 
     const handleDeleteBtn = (id) => {

@@ -98,5 +98,7 @@ const brightnessApi = createApi({
     }
 });
 
+
+
 export const { useFetchBrightnessQuery, useFetchTrueBrightnessQuery, useFetchBrightnessByIdQuery, useAddBrightnessMutation, useUpdateBrightnessMutation, useRemoveBrightnessMutation } = brightnessApi;
 export { brightnessApi };

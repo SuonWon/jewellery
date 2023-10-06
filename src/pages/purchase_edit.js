@@ -1,14 +1,12 @@
-import { Button, Card, CardBody, IconButton, Input, Textarea, Typography } from "@material-tailwind/react";
-import SectionTitle from "../components/section_title";
-import { useFetchPurchaseByIdQuery, useFetchStoneDetailsQuery, useFetchSupplierQuery, useFetchUOMQuery, useUpdatePurchaseMutation } from "../store";
+/* eslint-disable eqeqeq */
+import { Button, Card, CardBody, Input, Typography } from "@material-tailwind/react";
+import { useFetchStoneDetailsQuery, useFetchSupplierQuery, useFetchUOMQuery, useUpdatePurchaseMutation } from "../store";
 import { FaFloppyDisk, FaPencil, FaPlus, FaTrashCan } from "react-icons/fa6";
 import { useEffect, useState } from "react";
-import { set, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import DataTable from "react-data-table-component";
-import { currentDate, pause } from "../const";
 import moment from "moment";
-import { json, useParams } from "react-router-dom";
-import axios from "axios";
+import { useParams } from "react-router-dom";
 
 function PurchaseEdit() {
 
@@ -16,7 +14,7 @@ function PurchaseEdit() {
 
     // const {data, isFetching} = useFetchPurchaseByIdQuery(params.puId);
 
-    const [editPurchase, result] = useUpdatePurchaseMutation();
+    const [editPurchase] = useUpdatePurchaseMutation();
 
     const {data: supplierData} = useFetchSupplierQuery();
 

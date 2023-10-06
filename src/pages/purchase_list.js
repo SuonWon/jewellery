@@ -2,20 +2,18 @@
 import { Button, Card, CardBody } from "@material-tailwind/react";
 import { FaPencil, FaTrashCan,} from "react-icons/fa6";
 import { useState } from "react";
-import { pause, currentDate } from "../const";
+import { pause } from "../const";
 import { useFetchTruePurchaseQuery, useRemovePurchaseMutation } from "../store";
 import DeleteModal from "../components/delete_modal";
 import SuccessAlert from "../components/success_alert";
 import SectionTitle from "../components/section_title";
 import moment from "moment";
 import TableList from "../components/data_table";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 function PurchaseList() {
 
     const [openDelete, setOpenDelete] = useState(false);
-
-    const navigate = useNavigate();
 
     const [isAlert, setIsAlert] = useState(true);
 
@@ -42,12 +40,6 @@ function PurchaseList() {
         setDeleteId(id);
         setOpenDelete(!openDelete);
     };
-
-    const editPurchase = async (id) => {
-        let editPuData = data.filter((e) => e.invoiceNo === id);
-        console.log(editPuData[0]);
-        navigate(`/purchase_edit/${editPuData[0].invoiceNo}`);
-    }
 
     const column = [
         {
