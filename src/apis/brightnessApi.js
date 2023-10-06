@@ -15,7 +15,7 @@ const brightnessApi = createApi({
                 },
                 query: () => {
                     return {
-                        url:'/v1/brightness/get-all-stone-brightnesses',
+                        url:'/brightness/get-all-stone-brightnesses',
                         method: 'GET',
                     };
                 },
@@ -26,7 +26,7 @@ const brightnessApi = createApi({
                 },
                 query: () => {
                     return {
-                        url: '/v1/brightness/get-true-stone-brightnesses',
+                        url: '/brightness/get-true-stone-brightnesses',
                         method: 'GET',
                     }
                 }
@@ -34,7 +34,7 @@ const brightnessApi = createApi({
             fetchBrightnessById: builder.query({
                 query: (brightCode) => {
                     return {
-                        url: `/v1/brightness/get-stone-brightness/${brightCode}`,
+                        url: `/brightness/get-stone-brightness/${brightCode}`,
                         method: 'GET'
                     };
                 },
@@ -45,7 +45,7 @@ const brightnessApi = createApi({
                 },
                 query: (brightData) => {
                     return {
-                        url: 'v1/brightness/create-stone-brightness',
+                        url: '/brightness/create-stone-brightness',
                         method: 'POST',
                         body: {
                             brightCode: brightData.brightCode,
@@ -65,7 +65,7 @@ const brightnessApi = createApi({
                 },
                 query: (brightData) => {
                     return {
-                        url: `v1/brightness/update-stone-brightness`,
+                        url: `/brightness/update-stone-brightness`,
                         body: {
                             brightCode: brightData.brightCode,
                             brightDesc: brightData.brightDesc,
@@ -85,7 +85,7 @@ const brightnessApi = createApi({
                 },
                 query: (brightCode) => {
                     return {
-                        url: `v1/brightness/delete-stone-brightness/${brightCode}`,
+                        url: `/brightness/delete-stone-brightness/${brightCode}`,
                         method: 'DELETE'
                     };
                 },

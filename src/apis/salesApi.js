@@ -13,7 +13,7 @@ const salesApi = createApi({
             fetchSales: builder.query({
                 query: () => {
                     return {
-                        url: '/v1/sales/get-all-sales',
+                        url: '/sales/get-all-sales',
                         method: 'GET'
                     }
                 }
@@ -21,7 +21,7 @@ const salesApi = createApi({
             fetchTrueSales: builder.query({
                 query: () => {
                     return {
-                        url: '/v1/sales/get-true-sales',
+                        url: '/sales/get-true-sales',
                         method: 'GET'
                     }
                 }
@@ -29,7 +29,7 @@ const salesApi = createApi({
             addSales: builder.mutation({
                 query: (salesData) => {
                     return {
-                        url: "/v1/sales/create-sales",
+                        url: "/sales/create-sales",
                         method: 'POST',
                         body: salesData
                     }

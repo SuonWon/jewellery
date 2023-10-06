@@ -15,7 +15,7 @@ const gradeApi = createApi({
                 },
                 query: () => {
                     return {
-                        url:'/v1/grade/get-all-stone-grades',
+                        url:'/grade/get-all-stone-grades',
                         method: 'GET',
                     };
                 },
@@ -26,7 +26,7 @@ const gradeApi = createApi({
                 },
                 query: () => {
                     return {
-                        url: '/v1/grade/get-true-stone-grades',
+                        url: '/grade/get-true-stone-grades',
                         method: 'GET'
                     }
                 }
@@ -34,7 +34,7 @@ const gradeApi = createApi({
             fetchGradeById: builder.query({
                 query: (gradeCode) => {
                     return {
-                        url: `/v1/grade/get-stone-grade/${gradeCode}`,
+                        url: `/grade/get-stone-grade/${gradeCode}`,
                         method: 'GET'
                     };
                 },
@@ -45,7 +45,7 @@ const gradeApi = createApi({
                 },
                 query: (gradeData) => {
                     return {
-                        url: '/v1/grade/create-stone-grade',
+                        url: '/grade/create-stone-grade',
                         method: 'POST',
                         body: {
                             gradeCode: gradeData.gradeCode,
@@ -65,7 +65,7 @@ const gradeApi = createApi({
                 },
                 query: (gradeData) => {
                     return {
-                        url: `/v1/grade/update-stone-grade`,
+                        url: `/grade/update-stone-grade`,
                         body: {
                             gradeCode: gradeData.gradeCode,
                             gradeDesc: gradeData.gradeDesc,
@@ -85,7 +85,7 @@ const gradeApi = createApi({
                 },
                 query: (gradeCode) => {
                     return {
-                        url: `/v1/grade/delete-stone-grade/${gradeCode}`,
+                        url: `/grade/delete-stone-grade/${gradeCode}`,
                         method: 'DELETE'
                     };
                 },

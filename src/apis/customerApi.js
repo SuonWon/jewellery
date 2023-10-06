@@ -15,7 +15,7 @@ const customerApi = createApi({
                 },
                 query: () => {
                     return {
-                        url:'/v1/customer/get-all-customers',
+                        url:'/customer/get-all-customers',
                         method: 'GET',
                     };
                 },
@@ -23,7 +23,7 @@ const customerApi = createApi({
             fetchCustomerById: builder.query({
                 query: (customerCode) => {
                     return {
-                        url: `/v1/customer/get-customer/${customerCode}`,
+                        url: `/customer/get-customer/${customerCode}`,
                         method: 'GET'
                     };
                 },
@@ -34,7 +34,7 @@ const customerApi = createApi({
                 },
                 query: (customerData) => {
                     return {
-                        url: '/v1/customer/create-customer',
+                        url: '/customer/create-customer',
                         method: 'POST',
                         body: {
                             customerName: customerData.customerName,
@@ -62,7 +62,7 @@ const customerApi = createApi({
                 },
                 query: (customerData) => {
                     return {
-                        url: `/v1/customer/update-customer`,
+                        url: `/customer/update-customer`,
                         body: {
                             customerCode: customerData.customerCode,
                             customerName: customerData.customerName,
@@ -91,7 +91,7 @@ const customerApi = createApi({
                 },
                 query: (customerCode) => {
                     return {
-                        url: `/v1/customer/delete-customer/${customerCode}`,
+                        url: `/customer/delete-customer/${customerCode}`,
                         method: 'DELETE'
                     };
                 },

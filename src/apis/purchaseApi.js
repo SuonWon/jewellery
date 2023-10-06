@@ -11,7 +11,7 @@ const purchaseApi = createApi({
             fetchPurchase: builder.query({
                 query: () => {
                     return {
-                        url: '/v1/purchase/get-all-purchases',
+                        url: '/purchase/get-all-purchases',
                         method: 'GET'
                     };
                 },
@@ -19,7 +19,7 @@ const purchaseApi = createApi({
             fetchTruePurchase: builder.query({
                 query: () => {
                     return {
-                        url: '/v1/purchase/get-true-purchases/?status=O',
+                        url: '/purchase/get-true-purchases/?status=O',
                         method: 'GET'
                     }
                 }
@@ -27,7 +27,7 @@ const purchaseApi = createApi({
             fetchPurchaseById: builder.query({
                 query: (purchaseNo) => {
                     return {
-                        url: `/v1/purchase/get-purchse/${purchaseNo}`,
+                        url: `/purchase/get-purchse/${purchaseNo}`,
                         method: 'GET'
                     }
                 }
@@ -35,7 +35,7 @@ const purchaseApi = createApi({
             addPurchase: builder.mutation({
                 query: (purchaseData) => {
                     return {
-                        url: '/v1/purchase/create-purchase',
+                        url: '/purchase/create-purchase',
                         method: 'POST',
                         body: {
                             ...purchaseData,
@@ -47,7 +47,7 @@ const purchaseApi = createApi({
             updatePurchase: builder.mutation({
                 query: (purchaseData) => {
                     return {
-                        url: '/v1/purchase/update-purchase',
+                        url: '/purchase/update-purchase',
                         method: 'PUT',
                         body: purchaseData
                     }
@@ -56,7 +56,7 @@ const purchaseApi = createApi({
             removePurchase: builder.mutation({
                 query: (purchaseData) => {
                     return {
-                        url: '/v1/purchase/delete-purchase',
+                        url: '/purchase/delete-purchase',
                         method: 'PUT',
                         body: {
                             ...purchaseData

@@ -12,126 +12,110 @@ import ModalTitle from "../components/modal_title";
 import moment from "moment/moment";
 import TableList from "../components/data_table";
 
+const validator = require('validator');
+
 function Grade() {
 
     const [open, setOpen] = useState(false);
 
     const [openDelete, setOpenDelete] = useState(false);
 
-    const [isAlert, setIsAlert] = useState(true);
-
     const [isEdit, setIsEdit] = useState(false);
-
-    const [editData, setEditData] = useState({});
 
     const {data} = useFetchGradeQuery();
 
-    const {register, handleSubmit, setValue, formState: {errors}, reset } = useForm();
+    const [ grade, setGrade ] = useState({
+        gradeCode: 0,
+        gradeDesc: '',
+        status: true,
+        createdAt: moment().toISOString(),
+        createdBy: 'admin'
+    })
 
-    const [addGrade, addResult] = useAddGradeMutation();
+    const [addGrade] = useAddGradeMutation();
 
-    const [editGrade, editResult] = useUpdateGradeMutation();
+    const [editGrade] = useUpdateGradeMutation();
 
-    const [removeGrade, removeResult] = useRemoveGradeMutation();
+    const [removeGrade] = useRemoveGradeMutation();
 
     const [deleteId, setDeleteId] = useState('');
 
-    const handleChange = async (e) => {
-        
-        let grade = data.filter((grade) => grade.gradeCode == e.target.id);
-        await editGrade({
-            gradeCode: grade[0].gradeCode,
-            gradeDesc: grade[0].gradeDesc,
-            status: e.target.checked ? true: false,
-            createdAt: grade[0].createdAt,
-            createdBy: grade[0].createdBy,
-            updatedAt: currentDate,
-            updatedBy: "Hello World",
-        }).then((res) => {
-            console.log(res);
-        });
-
-    };
+    const [validationText, setValidationText] = useState({});
 
     const openModal = () => {
         setIsEdit(false);
-        setValue("gradeDesc", "");
+        setGrade({ 
+            gradeCode: 0,
+            gradeDesc: '',
+            status: true,
+            createdAt: moment().toISOString(),
+            createdBy: 'admin'
+        })
         setOpen(!open);
     };
 
-    const onSubmit = async (gradeData) => {
-        let subData = {
-            ...gradeData,
-            status: true,
-            createdAt: currentDate,
-            createdBy: 'Htet Wai Aung',
-            updatedAt: currentDate,
-        }
-        addGrade(subData).then((res) => {
-            reset({
-                gradeDesc: "",
-            });
-            console.log(res);
-        });
-        setIsAlert(true);
-        setOpen(!open);
-        await pause(2000);
-        setIsAlert(false);
-    };
+    function validateForm() {
+        const newErrors = {};
 
-    const onSaveSubmit = (gradeData) => {
-        let subData = {
-            ...gradeData,
-            status: true,
-            createdAt: currentDate,
-            createdBy: 'Htet Wai Aung',
-            updatedAt: currentDate,
+        if(validator.isEmpty(grade.gradeDesc)) {
+            newErrors.desc = 'Description is required.'
         }
-        addGrade(subData).then((res) => {
-            reset({
-                gradeDesc: "",
-            });
-            console.log(res);
-        });
-        setIsAlert(true);
-    };
 
-    const handleEdit = async (id) => {
-        let eData = data.filter((grade) => grade.gradeCode === id);
-        setEditData(eData[0]);
+        setValidationText(newErrors);
+
+        return Object.keys(newErrors).length === 0;
+    }
+
+    async function handleSubmit(isNew = true) {
+        if(validateForm()) {
+            const saveData = {
+                gradeDesc: grade.gradeDesc,
+                status: grade.status,
+                createdAt: grade.createdAt,
+                createdBy: grade.createdBy,
+                updatedAt: moment().toISOString(),
+                updatedBy: isEdit ? "admin" : "",
+
+            }
+
+            if(isEdit) {
+                saveData.gradeCode = grade.gradeCode
+            }
+
+            isEdit ? await editGrade(saveData) : await addGrade(saveData);
+
+            setOpen(isNew);
+
+            setGrade({ 
+                gradeCode: 0,
+                gradeDesc: '',
+                status: true,
+                createdAt: moment().toISOString(),
+                createdBy: 'admin'
+            })
+        }
+    }
+
+    async function changeStatus(isChecked, id) {
+        const focusData = data.find(rec => rec.gradeCode == id);
+        const saveData = {
+            ...focusData,
+            status: isChecked,
+            updatedAt: moment().toISOString(),
+            updatedBy: 'admin'
+        }
+        await editGrade(saveData);
+    }
+
+    function handleEdit(id) {
+        const focusData = data.find(rec => rec.gradeCode == id);
+        setGrade(focusData);
+        setOpen(true);
         setIsEdit(true);
-        setValue("gradeDesc", eData[0].gradeDesc);
-        setOpen(!open);
-    };
+    }
 
-    const submitEdit = async (gradeData) => {
-        editGrade({
-            gradeCode: editData.gradeCode,
-            gradeDesc: gradeData.gradeDesc,
-            status: editData.status,
-            createdAt: editData.createdAt,
-            createdBy: editData.createdBy,
-            updatedAt: currentDate,
-            updatedBy: "Hello World",
-        }).then((res) => {
-            console.log(res);
-        });
-        setIsAlert(true);
-        setOpen(!open);
-        await pause(2000);
-        setIsAlert(false);
-    };
-
-    const handleRemove = async (id) => {
-        removeGrade(id).then((res) => {console.log(res)});
-        setIsAlert(true);
-        setOpenDelete(!openDelete);
-        await pause(2000);
-        setIsAlert(false);
-    };
-
-    const handleDeleteBtn = (id) => {
-        setDeleteId(id);
+    const handleDelete = async () => {
+        await removeGrade(deleteId);
         setOpenDelete(!openDelete);
     }
 
@@ -174,10 +158,13 @@ function Grade() {
             cell: (row) => (
                 <div className="flex items-center gap-2">
                     <div className="border-r border-gray-400 pr-2">
-                        <Switch color="deep-purple" defaultChecked={row.Status} id={row.Code} onChange={handleChange} />
+                        <Switch color="deep-purple" defaultChecked={row.Status} id={row.Code} onChange={(e) => changeStatus(e.target.checked, row.Code)} />
                     </div>
                     <Button variant="text" color="deep-purple" className="p-2" onClick={() => handleEdit(row.Code)}><FaPencil /></Button>
-                    <Button variant="text" color="red" className="p-2" onClick={() => handleDeleteBtn(row.Code)}><FaTrashCan /></Button>
+                    <Button variant="text" color="red" className="p-2" onClick={() => {
+                        setDeleteId(row.Code);
+                        setOpenDelete(true);
+                    }}><FaTrashCan /></Button>
                 </div>
             )
         },
@@ -198,15 +185,6 @@ function Grade() {
     return(
         <div className="flex flex-col gap-4 px-2 relative">
             <div className="w-78 absolute top-0 right-0 z-[9999]">
-                {/* {
-                    addResult.isSuccess && isAlert && <SuccessAlert message="Save successful." handleAlert={() => setIsAlert(false)} />
-                }
-                {
-                    editResult.isSuccess && isAlert && <SuccessAlert message="Update successful." handleAlert={() => setIsAlert(false)} />
-                }
-                {
-                    removeResult.isSuccess && isAlert && <SuccessAlert message="Delete successful." handleAlert={() => setIsAlert(false)} />
-                } */}
             </div>
             <SectionTitle title="Stone Grade" handleModal={openModal} />
             <Card className="h-auto shadow-md w-[1000px] mx-1 rounded-sm p-2 border-t">
@@ -217,72 +195,48 @@ function Grade() {
             <Dialog open={open} handler={openModal} size="sm">
                 <DialogBody>
                     <ModalTitle titleName={isEdit ? "Edit Stone Grade" : "Stone Grade"} handleClick={openModal} />
-                    {/* {
-                        addResult.isSuccess && isAlert && <SuccessAlert message="Save successful." handleAlert={() => setIsAlert(false)} />
-                    } */}
-                    {
-                        isEdit ? (
-                            <form  className="flex flex-col items-end p-3">
-                                {/* <Switch label="Active" color="deep-purple" defaultChecked /> */}
-                                <Input label="Description" {...register('gradeDesc', {require: true})} />
+                
+                            <div  className="flex flex-col items-end p-3">
+                                <Input 
+                                    label="Description" 
+                                    value={grade.gradeDesc}
+                                    onChange={(e) => {
+                                        setGrade({
+                                            ...grade,
+                                            gradeDesc: e.target.value
+                                        })
+                                    }}
+                                />
                                 {
-                                    errors.gradeDesc && <Alert
-                                    icon={<FaTriangleExclamation />}
-                                    className="rounded-none border-l-4 border-red-800 bg-red-500/10 font-medium text-red-900"
-                                >
-                                    This field is required
-                                </Alert>
-                                
+                                    validationText.desc && <p className="block text-[12px] text-red-500 font-sans mb-2">{validationText.desc}</p>
                                 }
-                                <div className="flex items-center justify-end mt-6 gap-2">
-                                    <Button onClick={handleSubmit(submitEdit)} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2">
+                                
+                                
+                               <div className="flex items-center justify-end mt-6 gap-2">
+                                    <Button onClick={() => handleSubmit(false)} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2">
                                         <FaFloppyDisk className="text-base" /> 
                                         <Typography variant="small" className="capitalize">
-                                            Update
+                                            {isEdit ? 'Update' : 'Save'}
                                         </Typography>
                                     </Button>
-                                    {/* <Button onClick={handleSubmit(onSaveSubmit)} color="red" size="sm" variant="gradient" className="flex items-center gap-2">
-                                        <FaTrashCan className="text-base" /> 
-                                        <Typography variant="small" className="capitalize">
-                                            Delete
-                                        </Typography>
-                                    </Button> */}
+                                    {
+                                        !isEdit ? (
+                                            <Button onClick={handleSubmit} color="green" size="sm" variant="gradient" className="flex items-center gap-2">
+                                                <FaCirclePlus className="text-base" /> 
+                                                <Typography variant="small" className="capitalize">
+                                                    Save & New
+                                                </Typography>
+                                            </Button>
+                                        ) : null
+                                    }
+                                    
                                 </div>
-                            </form>
-                        ) : (
-                            <form  className="flex flex-col items-end p-3">
-                                {/* <Switch label="Active" color="deep-purple" defaultChecked /> */}
-                                <Input label="Description" onFocus={() => setIsAlert(false)} {...register('gradeDesc', {require: true})} />
-                                {
-                                    errors.gradeDesc && <Alert
-                                    icon={<FaTriangleExclamation />}
-                                    className="rounded-none border-l-4 border-red-800 bg-red-500/10 font-medium text-red-900"
-                                >
-                                    This field is required
-                                </Alert>
-                                
-                                }
-                                <div className="flex items-center justify-end mt-6 gap-2">
-                                    <Button onClick={handleSubmit(onSubmit)} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2">
-                                        <FaFloppyDisk className="text-base" /> 
-                                        <Typography variant="small" className="capitalize">
-                                            Save
-                                        </Typography>
-                                    </Button>
-                                    <Button onClick={handleSubmit(onSaveSubmit)} color="green" size="sm" variant="gradient" className="flex items-center gap-2">
-                                        <FaCirclePlus className="text-base" /> 
-                                        <Typography variant="small" className="capitalize">
-                                            Save & New
-                                        </Typography>
-                                    </Button>
-                                </div>
-                            </form>
-                        )
-                    }
+                            </div>
+                   
                      
                 </DialogBody>                      
             </Dialog>
-            <DeleteModal deleteId={deleteId} open={openDelete} handleDelete={handleRemove} closeModal={() => setOpenDelete(!openDelete)} />
+            <DeleteModal deleteId={deleteId} open={openDelete} handleDelete={handleDelete} closeModal={() => setOpenDelete(!openDelete)} />
         </div>
     );
 

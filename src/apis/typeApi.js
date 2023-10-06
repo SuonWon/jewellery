@@ -15,7 +15,7 @@ const typeApi = createApi({
                 },
                 query: () => {
                     return {
-                        url:'/v1/type/get-all-stone-types',
+                        url:'/type/get-all-stone-types',
                         method: 'GET',
                     };
                 },
@@ -26,7 +26,7 @@ const typeApi = createApi({
                 },
                 query: () => {
                     return {
-                        url: '/v1/type/get-true-stone-types',
+                        url: '/type/get-true-stone-types',
                         method: 'GET'
                     }
                 }
@@ -34,7 +34,7 @@ const typeApi = createApi({
             fetchTypeById: builder.query({
                 query: (typeCode) => {
                     return {
-                        url: `/v1/type/get-stone-type/${typeCode}`,
+                        url: `/type/get-stone-type/${typeCode}`,
                         method: 'GET'
                     };
                 },
@@ -45,7 +45,7 @@ const typeApi = createApi({
                 },
                 query: (typeData) => {
                     return {
-                        url: '/v1/type/create-stone-type',
+                        url: '/type/create-stone-type',
                         method: 'POST',
                         body: {
                             typeCode: typeData.typeCode,
@@ -65,7 +65,7 @@ const typeApi = createApi({
                 },
                 query: (typeData) => {
                     return {
-                        url: `/v1/type/update-stone-type`,
+                        url: `/type/update-stone-type`,
                         body: {
                             typeCode: typeData.typeCode,
                             typeDesc: typeData.typeDesc,
@@ -85,7 +85,7 @@ const typeApi = createApi({
                 },
                 query: (typeCode) => {
                     return {
-                        url: `/v1/type/delete-stone-type/${typeCode}`,
+                        url: `/type/delete-stone-type/${typeCode}`,
                         method: 'DELETE'
                     };
                 },

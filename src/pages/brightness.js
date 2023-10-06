@@ -4,7 +4,7 @@ import { FaCirclePlus, FaFloppyDisk, FaPencil, FaTrashCan, FaTriangleExclamation
 import { useEffect, useState } from "react";
 import { useAddBrightnessMutation, useFetchBrightnessQuery, useRemoveBrightnessMutation, useUpdateBrightnessMutation } from "../store";
 import { useForm } from "react-hook-form";
-import { pause, currentDate } from "../const";
+import { pause } from "../const";
 import DeleteModal from "../components/delete_modal";
 import SuccessAlert from "../components/success_alert";
 import SectionTitle from "../components/section_title";
@@ -18,6 +18,7 @@ const validator = require("validator");
 function Brightness() {
 
     const auth = useAuthUser();
+
 
     const [open, setOpen] = useState(false);
 
@@ -76,11 +77,13 @@ function Brightness() {
             status: e.target.checked ? true: false,
             createdAt: bright[0].createdAt,
             createdBy: bright[0].createdBy,
-            updatedAt: currentDate,
+            updatedAt: moment().toISOString(),
             updatedBy: "Hello World",
         }).then((res) => {
             console.log(res);
         });
+
+        console.log(data);
 
     };
 
@@ -169,7 +172,6 @@ function Brightness() {
         {
             name: 'Description',
             selector: row => row.Description,
-            
         },
         {
             name: 'Created At',

@@ -6,4 +6,4 @@ export const pause = (duration) => {
 
 export const currentDate = new Date().toISOString();
 
-export const apiUrl = "http://localhost:3005/";
+export const apiUrl = "http://localhost:3005/v1";

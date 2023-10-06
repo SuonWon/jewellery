@@ -15,7 +15,7 @@ const supplierApi = createApi({
                 },
                 query: () => {
                     return {
-                        url:'/v1/supplier/get-all-suppliers',
+                        url:'/supplier/get-all-suppliers',
                         method: 'GET',
                     };
                 },
@@ -23,7 +23,7 @@ const supplierApi = createApi({
             fetchSupplierById: builder.query({
                 query: (supplierCode) => {
                     return {
-                        url: `/v1/supplier/get-supplier/${supplierCode}`,
+                        url: `/supplier/get-supplier/${supplierCode}`,
                         method: 'GET'
                     };
                 },
@@ -34,7 +34,7 @@ const supplierApi = createApi({
                 },
                 query: (supplierData) => {
                     return {
-                        url: '/v1/supplier/create-supplier',
+                        url: '/supplier/create-supplier',
                         method: 'POST',
                         body: {
                             supplierName: supplierData.supplierName,
@@ -61,7 +61,7 @@ const supplierApi = createApi({
                 },
                 query: (supplierData) => {
                     return {
-                        url: `/v1/supplier/update-supplier`,
+                        url: `/supplier/update-supplier`,
                         body: {
                             supplierCode: supplierData.supplierCode,
                             supplierName: supplierData.supplierName,
@@ -89,7 +89,7 @@ const supplierApi = createApi({
                 },
                 query: (supplierCode) => {
                     return {
-                        url: `/v1/supplier/delete-supplier/${supplierCode}`,
+                        url: `/supplier/delete-supplier/${supplierCode}`,
                         method: 'DELETE'
                     };
                 },

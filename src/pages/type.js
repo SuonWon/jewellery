@@ -3,11 +3,14 @@ import { Button, Card, CardBody, Dialog, DialogBody, Input, Switch, Typography }
 import { FaCirclePlus, FaFloppyDisk, FaPencil, FaTrashCan, } from "react-icons/fa6";
 import { useState } from "react";
 import { useFetchTypeQuery, useAddTypeMutation, useUpdateTypeMutation, useRemoveTypeMutation } from "../store";
+import { useForm } from "react-hook-form";
 import DeleteModal from "../components/delete_modal";
 import SectionTitle from "../components/section_title";
 import ModalTitle from "../components/modal_title";
 import moment from "moment";
 import TableList from "../components/data_table";
+
+const validator = require('validator');
 
 function StoneType() {
 
@@ -18,8 +21,6 @@ function StoneType() {
     const [isEdit, setIsEdit] = useState(false);
 
     const {data} = useFetchTypeQuery();
-
-    console.log(data);
 
     const [ stoneType, setStoneType ] = useState({
         typeCode: 0,
@@ -39,6 +40,8 @@ function StoneType() {
 
     const [deleteId, setDeleteId] = useState('');
 
+    const [validationText, setValidationText] = useState({});
+
     const openModal = () => {
         setIsEdit(false);
         setStoneType({
@@ -48,34 +51,49 @@ function StoneType() {
             createdAt: moment().toISOString(),
             createdBy: 'admin',
         })
+        setValidationText({});
         setOpen(!open);
     };
 
+    function validateForm() {
+        const newErrors = {};
+
+        if(validator.isEmpty(stoneType.typeDesc)) {
+            newErrors.desc = 'Description is required.'
+        }
+
+        setValidationText(newErrors);
+
+        return Object.keys(newErrors).length === 0;
+    }
+
     async function handleSubmit(isNew = true) {
-        const saveData = {
-            typeDesc: stoneType.typeDesc,
-            status: stoneType.status,
-            createdAt: stoneType.createdAt,
-            createdBy: stoneType.createdBy,
-            updatedAt: moment().toISOString(),
-            updatedBy: isEdit ? "admin" : "",
+        if(validateForm()) {            
+            const saveData = {
+                typeDesc: stoneType.typeDesc,
+                status: stoneType.status,
+                createdAt: stoneType.createdAt,
+                createdBy: stoneType.createdBy,
+                updatedAt: moment().toISOString(),
+                updatedBy: isEdit ? "admin" : "",
+            }
+
+            if(isEdit) {
+                saveData.typeCode= stoneType.typeCode
+            }
+
+            isEdit ? await editType(saveData) : await addType(saveData);
+
+            setOpen(isNew);
+
+            setStoneType({
+                typeCode: 0,
+                typeDesc: '',
+                status: true,
+                createdAt: moment().toISOString(),
+                createdBy: 'admin',
+            })
         }
-
-        if(isEdit) {
-            saveData.typeCode= stoneType.typeCode
-        }
-
-        isEdit ? await editType(saveData) : await addType(saveData);
-
-        setOpen(isNew);
-
-        setStoneType({
-            typeCode: 0,
-            typeDesc: '',
-            status: true,
-            createdAt: moment().toISOString(),
-            createdBy: 'admin',
-        })
     }
 
     async function changeStatus(isChecked, id) {
@@ -187,6 +205,9 @@ function StoneType() {
                                     })
                                 }}
                             />
+                            {
+                                validationText.desc && <p className="block text-[12px] text-red-500 font-sans mb-2">{validationText.desc}</p>
+                            }
                             
                             <div className="flex items-center justify-end mt-6 gap-2">
                                 <Button onClick={() => handleSubmit(false)} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2">

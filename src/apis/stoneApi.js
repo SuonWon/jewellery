@@ -15,7 +15,7 @@ const stoneApi = createApi({
                 },
                 query: () => {
                     return {
-                        url:'/v1/stone/get-all-stones',
+                        url:'/stone/get-all-stones',
                         method: 'GET',
                     };
                 },
@@ -26,7 +26,7 @@ const stoneApi = createApi({
                 },
                 query: () => {
                     return {
-                        url: '/v1/stone/get-true-stones',
+                        url: '/stone/get-true-stones',
                         method: 'GET'
                     }
                 }
@@ -34,7 +34,7 @@ const stoneApi = createApi({
             fetchStoneById: builder.query({
                 query: (stoneCode) => {
                     return {
-                        url: `/v1/stone/get-stone/${stoneCode}`,
+                        url: `/stone/get-stone/${stoneCode}`,
                         method: 'GET'
                     };
                 },
@@ -45,7 +45,7 @@ const stoneApi = createApi({
                 },
                 query: (stoneData) => {
                     return {
-                        url: '/v1/stone/create-stone',
+                        url: '/stone/create-stone',
                         method: 'POST',
                         body: {
                             stoneDesc: stoneData.stoneDesc,
@@ -65,7 +65,7 @@ const stoneApi = createApi({
                 },
                 query: (stoneData) => {
                     return {
-                        url: `/v1/stone/update-stone`,
+                        url: `/stone/update-stone`,
                         body: {
                             stoneCode: stoneData.stoneCode,
                             stoneDesc: stoneData.stoneDesc,
@@ -86,7 +86,7 @@ const stoneApi = createApi({
                 },
                 query: (stoneCode) => {
                     return {
-                        url: `/v1/stone/delete-stone/${stoneCode}`,
+                        url: `/stone/delete-stone/${stoneCode}`,
                         method: 'DELETE'
                     };
                 },

@@ -1,8 +1,10 @@
-import { Button, Menu, MenuHandler, MenuItem, MenuList, Typography } from "@material-tailwind/react";
+import { Button, Menu, MenuHandler, MenuItem, MenuList, Typography, Avatar } from "@material-tailwind/react";
 import { FaArrowRightFromBracket, FaCartShopping, FaChartPie, FaChevronDown, FaDatabase, FaFileInvoice, FaListUl, FaMoneyBill1, FaSliders, FaUsers } from "react-icons/fa6";
-import { GiDiamondTrophy } from "react-icons/gi";
+import { GiDiamondTrophy, BiSolidUserCircle } from "react-icons/gi";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useAuthUser, useSignOut } from "react-auth-kit";
+import profile from '../images/default-avatar.png'
+
 
 function Nav() {
 
@@ -107,10 +109,7 @@ function Nav() {
                     <Menu>
                         <MenuHandler>
                             <Button size='sm' variant='text' className='flex items-center text-white gap-2 rounded-full py-0.5 pr-1 pl-0 '>
-                                {/* <Avatar
-                                    src={Profile}
-                                    size='sm'
-                                /> */}
+                                {/* <BiSolidUserCircle /> */}
                                 <Typography variant='small' className='capitalize'>{auth()?.fullName}</Typography>
                                 <FaChevronDown className='text-sm cursor-pointer' />
                             </Button>

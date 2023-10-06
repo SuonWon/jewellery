@@ -15,7 +15,7 @@ const stoneDetailsApi = createApi({
                 },
                 query: () => {
                     return {
-                        url:'/v1/stone-detail/get-all-stone-details',
+                        url:'/stone-detail/get-all-stone-details',
                         method: 'GET',
                     };
                 },
@@ -23,7 +23,7 @@ const stoneDetailsApi = createApi({
             fetchStoneDetailsById: builder.query({
                 query: (stoneDetailCode) => {
                     return {
-                        url: `/v1/stone-detail/get-stone-detail/${stoneDetailCode}`,
+                        url: `/stone-detail/get-stone-detail/${stoneDetailCode}`,
                         method: 'GET'
                     };
                 },
@@ -35,7 +35,7 @@ const stoneDetailsApi = createApi({
                 query: (stoneDetailsData) => {
                     console.log(stoneDetailsData);
                     return {
-                        url: '/v1/stone-detail/create-stone-detail',
+                        url: '/stone-detail/create-stone-detail',
                         method: 'POST',
                         body: {
                             stoneDesc: stoneDetailsData.stoneDesc,
@@ -62,7 +62,7 @@ const stoneDetailsApi = createApi({
                 },
                 query: (stoneDetailsData) => {
                     return {
-                        url: `/v1/stone-detail/update-stone-detail`,
+                        url: `/stone-detail/update-stone-detail`,
                         body: {
                             stoneDetailCode: stoneDetailsData.stoneDetailCode,
                             stoneDesc: stoneDetailsData.stoneDesc,
@@ -91,7 +91,7 @@ const stoneDetailsApi = createApi({
                 query: (stoneDetailCode) => {
                     console.log(stoneDetailCode);
                     return {
-                        url: `/v1/stone-detail/delete-stone-detail/${stoneDetailCode}`,
+                        url: `/stone-detail/delete-stone-detail/${stoneDetailCode}`,
                         method: 'DELETE'
                     };
                 },

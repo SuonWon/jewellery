@@ -43,6 +43,7 @@ function SalesInvoice() {
         message: ''
     });
     const [ validationText, setValidationText ] = useState({});
+    const [ selectedId, setSelectedId ] = useState('');
     const [addSales] = useAddSalesMutation();
 
     const column = [
@@ -66,14 +67,14 @@ function SalesInvoice() {
         {
             name: 'Qty',
             width: "120px",
-            right: "true",
+            center: "true",
             selector: row => row.qty,
 
         },
         {
             name: 'Weight',
             width: "120px",
-            right: "true",
+            center: "true",
             selector: row => row.weight,
 
         },
@@ -117,8 +118,24 @@ function SalesInvoice() {
             width: "100px",
             cell: (row) => (
                 <div className="flex items-center gap-2">
-                    <Button variant="text" color="deep-purple" className="p-2" onClick={() => handleEdit(row.id)}><FaPencil /></Button>
-                    <Button variant="text" color="red" className="p-2" onClick={() => handleDeleteBtn(row.id)}><FaTrashCan /></Button>
+                    <Button 
+                        variant="text" 
+                        color="deep-purple" 
+                        className="p-2" 
+                        onClick={() => handleEdit(row.id)}
+                        disabled={selectedId == row.id}
+                    >
+                        <FaPencil />
+                    </Button>
+                    <Button 
+                        variant="text" 
+                        color="red" 
+                        className="p-2" 
+                        onClick={() => handleDeleteBtn(row.id)}
+                        disabled={selectedId == row.id}
+                    >
+                        <FaTrashCan />
+                    </Button>
                 </div>
             )
         },
@@ -133,7 +150,7 @@ function SalesInvoice() {
     function validateForm() {
         const newErrors = {};
     
-        if(validator.isEmpty(salesData.customerCode.toString())) {
+        if(salesData.customerCode == 0) {
             newErrors.customer = 'Customer is required.'
         }
 
@@ -149,7 +166,7 @@ function SalesInvoice() {
     function validateDetail() {
         const newErrors = {};
 
-        if(validator.isEmpty(salesDetails.stoneDetailCode.toString())) {
+        if(salesDetails.stoneDetailCode == 0) {
             newErrors.stoneDetail = 'Stone detail is required.'
         }
 
@@ -284,6 +301,7 @@ function SalesInvoice() {
                 totalAmt: 0
             })
             setIsEditDetail(false);
+            setSelectedId('');
         }
     }
 
@@ -304,6 +322,7 @@ function SalesInvoice() {
 
     function handleEdit(rowId) {
 
+        setSelectedId(rowId);
         const curRow = tBodyData.find(rec => rec.id === rowId);
         console.log(curRow);
         setSalesDetails({
