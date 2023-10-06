@@ -9,7 +9,7 @@ import SuccessAlert from "../components/success_alert";
 import SectionTitle from "../components/section_title";
 import moment from "moment";
 import TableList from "../components/data_table";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 function PurchaseList() {
 

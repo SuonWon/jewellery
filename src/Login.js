@@ -1,4 +1,4 @@
-import { GoPerson, GoLock, GoEye } from "react-icons/go";
+import { GoPerson, GoLock } from "react-icons/go";
 import { useSignIn } from 'react-auth-kit';
 import { useState } from "react";
 import axios from "axios";

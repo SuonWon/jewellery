@@ -1,12 +1,9 @@
 /* eslint-disable eqeqeq */
-import { Alert, Button, Card, CardBody, Dialog, DialogBody, Input, Switch, Textarea, Typography } from "@material-tailwind/react";
-import { FaCirclePlus, FaFloppyDisk, FaPencil, FaTrashCan, FaTriangleExclamation } from "react-icons/fa6";
+import { Button, Card, CardBody, Dialog, DialogBody, Input, Switch, Textarea, Typography } from "@material-tailwind/react";
+import { FaCirclePlus, FaFloppyDisk, FaPencil, FaTrashCan, } from "react-icons/fa6";
 import { useState } from "react";
 import { useFetchStoneQuery, useAddStoneMutation, useUpdateStoneMutation, useRemoveStoneMutation } from "../store";
-import { useForm } from "react-hook-form";
-import { pause, currentDate } from "../const";
 import DeleteModal from "../components/delete_modal";
-import SuccessAlert from "../components/success_alert";
 import SectionTitle from "../components/section_title";
 import ModalTitle from "../components/modal_title";
 import moment from "moment";
@@ -27,15 +24,15 @@ function Stone() {
         stoneDesc: '',
         remark: '',
         status: true,
-        createdAt: currentDate,
+        createdAt: moment().toISOString(),
         createdBy: 'admin',
     })
 
-    const [addStone, addResult] = useAddStoneMutation();
+    const [addStone] = useAddStoneMutation();
 
-    const [editStone, editResult] = useUpdateStoneMutation();
+    const [editStone] = useUpdateStoneMutation();
 
-    const [removeStone, removeResult] = useRemoveStoneMutation();
+    const [removeStone] = useRemoveStoneMutation();
 
     const [deleteId, setDeleteId] = useState('');
 
@@ -46,7 +43,7 @@ function Stone() {
             stoneDesc: "",
             remark: "",
             status: true,
-            createdAt: currentDate,
+            createdAt: moment().toISOString(),
             createdBy: 'admin',
         })
         setOpen(!open);
@@ -59,7 +56,7 @@ function Stone() {
             remark: stone.remark,
             createdAt: stone.createdAt,
             createdBy: stone.createdBy,
-            updatedAt: currentDate,
+            updatedAt: moment().toISOString(),
             updatedBy: isEdit ? "admin" : "",
         }
 
@@ -76,7 +73,7 @@ function Stone() {
             stoneDesc: "",
             remark: "",
             status: true,
-            createdAt: currentDate,
+            createdAt: moment().toISOString(),
             createdBy: 'admin',
         })
     }
@@ -86,7 +83,7 @@ function Stone() {
         const saveData= {
             ...focusData,
             status: isChecked, 
-            updatedAt: currentDate,
+            updatedAt: moment().toISOString(),
             updatedBy: "admin"
         }
         await editStone(saveData);

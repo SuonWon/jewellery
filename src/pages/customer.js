@@ -3,7 +3,6 @@ import {  Button, Card, CardBody, Dialog, DialogBody, Input, Switch, Textarea, T
 import { FaCirclePlus, FaFloppyDisk, FaPencil, FaTrashCan } from "react-icons/fa6";
 import { useEffect, useState } from "react";
 import { useFetchCustomerQuery, useAddCustomerMutation, useUpdateCustomerMutation, useRemoveCustomerMutation } from "../store";
-import { currentDate } from "../const";
 import DeleteModal from "../components/delete_modal";
 import SectionTitle from "../components/section_title";
 import ModalTitle from "../components/modal_title";
@@ -22,15 +21,13 @@ function Customer() {
 
     const [isEdit, setIsEdit] = useState(false);
 
-    const [editData, setEditData] = useState({});
-
     const {data } = useFetchCustomerQuery();
 
     const [addCustomer, addResult] = useAddCustomerMutation();
 
-    const [editCustomer, editResult] = useUpdateCustomerMutation();
+    const [editCustomer] = useUpdateCustomerMutation();
 
-    const [removeCustomer, removeResult] = useRemoveCustomerMutation();
+    const [removeCustomer] = useRemoveCustomerMutation();
 
     const [deleteId, setDeleteId] = useState('');
 
@@ -92,7 +89,7 @@ function Customer() {
             isActive: e.target.checked ? true: false,
             createdAt: customer[0].createdAt,
             createdBy: customer[0].createdBy,
-            updatedAt: currentDate,
+            updatedAt: moment().toISOString(),
             updatedBy: "Hello World",
         }).then((res) => {
             console.log(res);
@@ -152,7 +149,6 @@ function Customer() {
 
     const handleEdit = async (id) => {
         let eData = data.filter((customer) => customer.customerCode === id);
-        setEditData(eData[0]);
         setIsEdit(true);
         setFormData(eData[0]);
         setOpen(!open);
