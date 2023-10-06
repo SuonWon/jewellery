@@ -1,12 +1,9 @@
 /* eslint-disable eqeqeq */
-import { Alert, Button, Card, CardBody, Dialog, DialogBody, Input, Switch, Typography } from "@material-tailwind/react";
-import { FaCirclePlus, FaFloppyDisk, FaPencil, FaTrashCan, FaTriangleExclamation } from "react-icons/fa6";
+import { Button, Card, CardBody, Dialog, DialogBody, Input, Switch, Typography } from "@material-tailwind/react";
+import { FaCirclePlus, FaFloppyDisk, FaPencil, FaTrashCan, } from "react-icons/fa6";
 import { useState } from "react";
 import { useFetchTypeQuery, useAddTypeMutation, useUpdateTypeMutation, useRemoveTypeMutation } from "../store";
-import { useForm } from "react-hook-form";
-import { pause, currentDate } from "../const";
 import DeleteModal from "../components/delete_modal";
-import SuccessAlert from "../components/success_alert";
 import SectionTitle from "../components/section_title";
 import ModalTitle from "../components/modal_title";
 import moment from "moment";
@@ -28,17 +25,17 @@ function StoneType() {
         typeCode: 0,
         typeDesc: '',
         status: true,
-        createdAt: currentDate,
+        createdAt: moment().toISOString(),
         createdBy: 'admin',
     })
 
     // const {register, handleSubmit, setValue, formState: {errors}, reset } = useForm();
 
-    const [addType, addResult] = useAddTypeMutation();
+    const [addType] = useAddTypeMutation();
 
-    const [editType, editResult] = useUpdateTypeMutation();
+    const [editType] = useUpdateTypeMutation();
 
-    const [removeType, removeResult] = useRemoveTypeMutation();
+    const [removeType] = useRemoveTypeMutation();
 
     const [deleteId, setDeleteId] = useState('');
 
@@ -48,7 +45,7 @@ function StoneType() {
             typeCode: 0,
             typeDesc: '',
             status: true,
-            createdAt: currentDate,
+            createdAt: moment().toISOString(),
             createdBy: 'admin',
         })
         setOpen(!open);
@@ -60,7 +57,7 @@ function StoneType() {
             status: stoneType.status,
             createdAt: stoneType.createdAt,
             createdBy: stoneType.createdBy,
-            updatedAt: currentDate,
+            updatedAt: moment().toISOString(),
             updatedBy: isEdit ? "admin" : "",
         }
 
@@ -76,7 +73,7 @@ function StoneType() {
             typeCode: 0,
             typeDesc: '',
             status: true,
-            createdAt: currentDate,
+            createdAt: moment().toISOString(),
             createdBy: 'admin',
         })
     }
@@ -86,7 +83,7 @@ function StoneType() {
         const saveData = {
             ...focusData,
             status: isChecked,
-            updatedAt: currentDate,
+            updatedAt: moment().toISOString(),
             updatedBy: "admin"
         }
         await editType(saveData);

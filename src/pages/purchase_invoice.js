@@ -1,11 +1,9 @@
-import { Button, Card, CardBody, IconButton, Input, Textarea, Typography } from "@material-tailwind/react";
-import SectionTitle from "../components/section_title";
+import { Button, Card, CardBody, Input, Typography } from "@material-tailwind/react";
 import { useAddPurchaseMutation, useFetchStoneDetailsQuery, useFetchSupplierQuery, useFetchUOMQuery } from "../store";
 import { FaFloppyDisk, FaPencil, FaPlus, FaTrashCan } from "react-icons/fa6";
 import { useState } from "react";
-import { set, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import DataTable from "react-data-table-component";
-import { currentDate, pause } from "../const";
 import moment from "moment";
 import SuccessAlert from "../components/success_alert";
 import { v4 as uuidv4 } from 'uuid';
@@ -121,21 +119,6 @@ function PurchaseInvoice() {
             details: purchaseData,
         });
     };
-
-    const sTotal = () => {
-        let sTotal = 0;
-        if (purchaseDetails.length !== 0) {
-            purchaseDetails.forEach((el) => {
-                sTotal += el.totalAmt;
-            })
-        }
-        return sTotal;
-    }
-
-    const gTotal = () => {
-        let gTotal = parseFloat(getValues("puData.subTotal")) - parseFloat(getValues("puData.discAmt"));
-        return gTotal;
-    }
 
     const handleEdit = (id) => {
 

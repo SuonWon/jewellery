@@ -3,7 +3,6 @@ import { Button, Card, CardBody, Dialog, DialogBody, Input, Switch, Textarea, Ty
 import { FaCirclePlus, FaFloppyDisk, FaPencil, FaTrashCan } from "react-icons/fa6";
 import { useEffect, useState } from "react";
 import { useFetchSupplierQuery, useAddSupplierMutation, useUpdateSupplierMutation, useRemoveSupplierMutation } from "../store";
-import { pause, currentDate } from "../const";
 import DeleteModal from "../components/delete_modal";
 import SectionTitle from "../components/section_title";
 import ModalTitle from "../components/modal_title";
@@ -19,8 +18,6 @@ function Supplier() {
     const [openDelete, setOpenDelete] = useState(false);
 
     const [isEdit, setIsEdit] = useState(false);
-
-    const [editData, setEditData] = useState({});
 
     const {data} = useFetchSupplierQuery();
 
@@ -89,7 +86,7 @@ function Supplier() {
             isActive: e.target.checked ? true: false,
             createdAt: supplier[0].createdAt,
             createdBy: supplier[0].createdBy,
-            updatedAt: currentDate,
+            updatedAt: moment().toISOString(),
             updatedBy: "Hello World",
         }).then((res) => {
             console.log(res);
@@ -148,7 +145,6 @@ function Supplier() {
 
     const handleEdit = async (id) => {
         let eData = data.filter((supplier) => supplier.supplierCode === id);
-        setEditData(eData[0]);
         setIsEdit(true);
         setFormData(eData[0]);
         setOpen(!open);

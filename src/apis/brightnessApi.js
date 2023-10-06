@@ -17,10 +17,6 @@ const brightnessApi = createApi({
                     return {
                         url:'/v1/brightness/get-all-stone-brightnesses',
                         method: 'GET',
-                        params: {
-                            _sort: 'brightCode',
-                            _order: 'desc',
-                        }
                     };
                 },
             }),

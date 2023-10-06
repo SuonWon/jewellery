@@ -1,12 +1,9 @@
 /* eslint-disable eqeqeq */
-import { Alert, Button, Card, CardBody, Dialog, DialogBody, Input, Typography, Switch } from "@material-tailwind/react";
-import { FaCirclePlus, FaFloppyDisk, FaPencil, FaTrashCan, FaTriangleExclamation } from "react-icons/fa6";
+import { Button, Card, CardBody, Dialog, DialogBody, Input, Typography, } from "@material-tailwind/react";
+import { FaCirclePlus, FaFloppyDisk, FaPencil, FaTrashCan, } from "react-icons/fa6";
 import { useState } from "react";
 import { useFetchUOMQuery, useAddUOMMutation, useUpdateUOMMutation, useRemoveUOMMutation } from "../store";
-import { useForm } from "react-hook-form";
-import { pause, currentDate } from "../const";
 import DeleteModal from "../components/delete_modal";
-import SuccessAlert from "../components/success_alert";
 import SectionTitle from "../components/section_title";
 import ModalTitle from "../components/modal_title";
 import moment from "moment";
@@ -49,9 +46,9 @@ function UOM() {
         const saveData = {
             unitCode: unitData.unitCode,
             unitDesc: unitData.unitDesc,
-            createdAt: currentDate,
+            createdAt: moment().toISOString(),
             createdBy: 'admin',
-            updatedAt: currentDate,
+            updatedAt: moment().toISOString(),
             updatedBy: isEdit ? "admin" : "",
         }
 
