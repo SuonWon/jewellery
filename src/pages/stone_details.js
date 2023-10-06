@@ -1,5 +1,5 @@
 /* eslint-disable eqeqeq */
-import { Alert, Button, Card, CardBody, Dialog, DialogBody, Input, Option, Select, Textarea, Typography } from "@material-tailwind/react";
+import { Alert, Button, Card, CardBody, Dialog, DialogBody, Input, Textarea, Typography } from "@material-tailwind/react";
 import { FaCirclePlus, FaFloppyDisk, FaPencil, FaTrashCan, FaTriangleExclamation } from "react-icons/fa6";
 import { useEffect, useState } from "react";
 import { useFetchStoneDetailsQuery, useAddStoneDetailsMutation, useUpdateStoneDetailsMutation, useRemoveStoneDetailsMutation, useFetchUOMQuery, useFetchTrueBrightnessQuery, useFetchTrueStoneQuery, useFetchTrueGradeQuery, useFetchTrueTypeQuery } from "../store";
@@ -12,6 +12,7 @@ import ModalTitle from "../components/modal_title";
 import moment from "moment";
 import TableList from "../components/data_table";
 import { useAuthUser } from "react-auth-kit";
+import Select from "react-select";
 const validator = require("validator");
 
 function StoneDetails() {
@@ -40,6 +41,26 @@ function StoneDetails() {
 
     const {data: brightData} = useFetchTrueBrightnessQuery();
 
+    const stoneOption = stoneData?.map((stone) => {
+        return {value: stone.stoneCode, label: stone.stoneDesc}
+    });
+
+    const typeOption = typeData?.map((type) => {
+        return {value: type.typeCode, label: type.typeDesc}
+    });
+
+    const gradeOption = gradeData?.map((grade) => {
+        return {value: grade.gradeCode, label: grade.gradeDesc}
+    });
+
+    const brightOption = brightData?.map((bright) => {
+        return {value: bright.brightCode, label: bright.brightDesc}
+    });
+
+    const unitOption = unitData?.map((unit) => {
+        return {value: unit.unitCode, label: unit.unitDesc}
+    });
+
     const [description, setDescription] = useState({
         stoneDesc: "",
         brightDesc: "",
@@ -62,32 +83,16 @@ function StoneDetails() {
 
     const [ validationText, setValidationText ] = useState({});
 
-    useEffect(() => {
-        setFormData({
-            stoneDesc: "",
-            stoneCode: 0,
-            typeCode: 0,
-            brightCode: 0,
-            gradeCode: 0,
-            size: "",
-            qty: 0,
-            weight: 0,
-            unitCode: "",
-            remark: "",
-            isActive: true,
-            createdAt: moment().toISOString(),
-            createdBy: auth().username,
-            updatedAt: moment().toISOString(),
-            updatedBy: "",
-        });
-    }, [addResult.isSuccess]);
-
-    const [formData, setFormData] = useState({
+    const stoneDetail = {
         stoneDesc: "",
-        stoneCode: 0,
-        typeCode: 0,
-        brightCode: 0,
-        gradeCode: 0,
+        stone: "",
+        stoneCode: "",
+        type: "",
+        typeCode: "",
+        bright: "",
+        brightCode: "",
+        grade: "",
+        gradeCode: "",
         size: "",
         qty: 0,
         weight: 0,
@@ -98,64 +103,51 @@ function StoneDetails() {
         createdBy: auth().username,
         updatedAt: moment().toISOString(),
         updatedBy: "",
-    });
-
-    const stoneDetail = {
-        stoneDesc: "",
-        stoneCode: "",
-        typeCode: "",
-        brightCode: "",
-        gradeCode: "",
-        size: "",
-        qty: "",
-        weight: "",
-        unitCode: "",
-        remark: "",
-        isActive: true,
-        createdAt: moment().toISOString(),
-        createdBy: auth().username,
-        updatedAt: moment().toISOString(),
-        updatedBy: "",
     };
 
-    const {register, handleSubmit, setValue, formState: {errors}, reset } = useForm({
-        defaultValues: {
-            detailsInfo: stoneDetail
-        }
-    });
+    useEffect(() => {
+        setFormData(stoneDetail);
+    }, [addResult.isSuccess]);
 
-    const resetData = () => {
-        reset({
-            detailsInfo: stoneDetail
-        });
-    };
+    const [formData, setFormData] = useState(stoneDetail);
 
     const openModal = () => {
         setIsEdit(false);
-        setFormData({
+        setFormData(stoneDetail);
+        setDescription({
             stoneDesc: "",
-            stoneCode: 0,
-            typeCode: 0,
-            brightCode: 0,
-            gradeCode: 0,
-            size: "",
-            qty: 0,
-            weight: 0,
-            unitCode: "",
-            remark: "",
-            isActive: true,
-            createdAt: moment().toISOString(),
-            createdBy: auth().username,
-            updatedAt: moment().toISOString(),
-            updatedBy: "",
+            brightDesc: "",
+            typeDesc: ""
         })
         setOpen(!open);
     };
 
     function validateForm() {
         const newErrors = {};
-        if(validator.isEmpty(formData.customerName.toString())) {
-            newErrors.customerName = 'Customer name is required.'
+
+        if(validator.isEmpty(formData.stoneCode.toString())) {
+            newErrors.stoneDesc = 'Stone Description is required.'
+        } 
+        if(validator.isEmpty(formData.brightCode.toString())) {
+            newErrors.brightDesc = 'Bright Description is required.'
+        }
+        if(validator.isEmpty(formData.gradeCode.toString())) {
+            newErrors.gradeDesc = 'Grade Description is required.'
+        }
+        if(validator.isEmpty(formData.typeCode.toString())) {
+            newErrors.typeDesc = 'Type Description is required.'
+        }
+        if(validator.isEmpty(formData.unitCode.toString())) {
+            newErrors.unitDesc = 'Unit is required.'
+        }
+        if(validator.isEmpty(formData.size.toString())) {
+            newErrors.size = 'Size is required.'
+        }
+        if(formData.qty === 0) {
+            newErrors.qty = 'Quantity is required.'
+        }
+        if(formData.weight === 0) {
+            newErrors.weight = 'Weight is required.'
         }
 
         setValidationText(newErrors);
@@ -165,7 +157,10 @@ function StoneDetails() {
 
     const onSubmit = async () => {
         if(validateForm()) {
-            addStoneDetail(formData).then((res) => {
+            addStoneDetail({
+                ...formData,
+                stoneDesc: `${description.stoneDesc} ${description.brightDesc} ${description.typeDesc}`,
+            }).then((res) => {
                 console.log(res);
             });
             setOpen(!open);
@@ -174,7 +169,10 @@ function StoneDetails() {
 
     const onSaveSubmit = () => {
         if (validateForm()) {
-            addStoneDetail(formData).then((res) => {
+            addStoneDetail({
+                ...formData,
+                stoneDesc: `${description.stoneDesc} ${description.brightDesc} ${description.typeDesc}`,
+            }).then((res) => {
                 console.log(res);
             });
         }
@@ -184,13 +182,39 @@ function StoneDetails() {
         let eData = data.filter((stoneDetail) => stoneDetail.stoneDetailCode === id);
         setEditData(eData[0]);
         setIsEdit(true);
-        setFormData(eData[0]);
+        setFormData({
+            ...formData,
+            stoneDetailCode: eData[0].stoneDetailCode,
+            stoneDesc: eData[0].stoneDesc,
+            stone: eData[0].stone.stoneDesc,
+            stoneCode: eData[0].stone.stoneCode,
+            type: eData[0].stoneType.typeDesc,
+            typeCode: eData[0].stoneType.typeCode,
+            bright: eData[0].stoneBrightness.brightDesc,
+            brightCode: eData[0].stoneBrightness.brightCode,
+            grade: eData[0].stoneGrade.gradeDesc,
+            gradeCode: eData[0].stoneGrade.gradeCode,
+            size: eData[0].size,
+            qty: eData[0].qty,
+            weight: eData[0].weight,
+            unitCode: eData[0].unitCode,
+            remark: eData[0].remark,
+            isActive: eData[0].isActive,
+            createdAt: eData[0].createdAt,
+            createdBy: eData[0].createdBy,
+        });
+        setDescription({
+            stoneDesc: eData[0].stone.stoneDesc,
+            brightDesc: eData[0].stoneBrightness.brightDesc,
+            typeDesc: eData[0].stoneType.typeDesc
+        });
         setOpen(!open);
     };
 
     const submitEdit = async () => {
         editStoneDetail({
             ...formData,
+            stoneDesc: `${description.stoneDesc} ${description.brightDesc} ${description.typeDesc}`,
             updatedAt: moment().toISOString(),
             updatedBy: auth().username,
         }).then((res) => {
@@ -215,7 +239,7 @@ function StoneDetails() {
     const column = [
         {
             name: 'Description',
-            width: '200px',
+            width: '250px',
             selector: row => row.Description,
         },
         {
@@ -298,10 +322,10 @@ function StoneDetails() {
         return {
             Code: stoneDetail.stoneDetailCode,
             Description: stoneDetail.stoneDesc,
-            StoneDesc: stoneDetail.stoneCode,
-            BrightnessDesc: stoneDetail.brightCode,
-            GradeDesc: stoneDetail.gradeCode,
-            TypeDesc: stoneDetail.typeCode,
+            StoneDesc: stoneDetail.stone.stoneDesc,
+            BrightnessDesc: stoneDetail.stoneBrightness.brightDesc,
+            GradeDesc: stoneDetail.stoneGrade.gradeDesc,
+            TypeDesc: stoneDetail.stoneType.typeDesc,
             Size: stoneDetail.size,
             Qty: stoneDetail.qty,
             Weight: stoneDetail.weight,
@@ -327,235 +351,164 @@ function StoneDetails() {
             <Dialog open={open} handler={openModal} size="lg">
                 <DialogBody>
                     <ModalTitle titleName={isEdit ? "Edit Stone Detail" : "Create Stone Detail"} handleClick={openModal} />
-                    {
-                        isEdit ? (
-                            <form  className="flex flex-col p-3 gap-4">
-                                <div className="grid grid-cols-4">
+                    <form  className="flex flex-col p-3 gap-4">
+                        <div className="grid grid-cols-4">
+                            <div className="w-full col-span-2">
+                                <label className="text-black">Description</label>
+                                <input className="border border-blue-gray-200 text-black w-full h-[40px] p-2.5 rounded-md" value={`${description.stoneDesc} ${description.brightDesc} ${description.typeDesc}`} disabled />
+                                {
+                                    validationText.description && <p className="block text-[12px] text-red-500 font-sans mb-2">{validationText.description}</p>
+                                }
+                            </div>
+                            {/* <div className="w-full col-span-2">
+                                <Input label="Name" value={`${description.stoneDesc} ${description.brightDesc} ${description.typeDesc}`} readOnly/>
+                                {
+                                    validationText.customerName && <p className="block text-[12px] text-red-500 font-sans mb-2">{validationText.customerName}</p>
+                                }
+                            </div> */}
+                        </div>
+                        <div className="grid grid-cols-3 gap-2 w-full">
+                            <div>
+                                <label className="text-black">Stone Description</label>
+                                <Select 
+                                    options={stoneOption} 
+                                    isSearchable
+                                    defaultValue={{value: formData.stoneCode, label: formData.stone === ""? "Select..." : formData.stone}}
+                                    onChange={(e) => {
+                                        setDescription({...description, stoneDesc: e.label}); 
+                                        setFormData({...formData, stoneCode: Number(e.value)});
+                                    }}
+                                />
+                                {
+                                    validationText.stoneDesc && <p className="block text-[12px] text-red-500 font-sans">{validationText.stoneDesc}</p>
+                                }
+                            </div>
+                            <div>
+                                <label className="text-black">Brightness</label>
+                                <Select 
+                                    options={brightOption} 
+                                    isSearchable
+                                    defaultValue={{value: formData.brightCode, label: formData.stone === ""? "Select..." : formData.bright}}
+                                    onChange={(e) => {
+                                        setDescription({...description, brightDesc: e.label}); 
+                                        setFormData({...formData, brightCode: Number(e.value)});
+                                    }}
+                                />
+                                {
+                                    validationText.brightDesc && <p className="block text-[12px] text-red-500 font-sans">{validationText.brightDesc}</p>
+                                }
+                            </div>
+                            <div>
+                                <label className="text-black">Type</label>
+                                <Select 
+                                    options={typeOption} 
+                                    isSearchable
+                                    defaultValue={{value: formData.typeCode, label: formData.type === ""? "Select..." : formData.type}}
+                                    onChange={(e) => {
+                                        setDescription({...description, typeDesc: e.label}); 
+                                        setFormData({...formData, typeCode: Number(e.value)});
+                                    }}
+                                />
+                                {
+                                    validationText.typeDesc && <p className="block text-[12px] text-red-500 font-sans">{validationText.typeDesc}</p>
+                                }
+                            </div>
+                        </div>
+                        <div className="grid grid-cols-3 gap-2 w-full">
+                            <div>
+                                <label className="text-black">Grade</label>
+                                <Select 
+                                    options={gradeOption} 
+                                    isSearchable
+                                    defaultValue={{value: formData.gradeCode, label: formData.grade === ""? "Select..." : formData.grade}}
+                                    onChange={(e) => {
+                                        setFormData({...formData, gradeCode: Number(e.value)});
+                                    }}
+                                />
+                                {
+                                    validationText.gradeDesc && <p className="block text-[12px] text-red-500 font-sans">{validationText.gradeDesc}</p>
+                                }
+                            </div>
+                            <div className="col-span-2">
+                                <div className="grid grid-cols-3 gap-2">
+                                    <div className="w-full">
+                                        <label className="text-black">Size</label>
+                                        <input type="text" className="border border-blue-gray-200 w-full h-[40px] p-2.5 rounded-md text-black" value={formData.size} onChange={(e) => setFormData({...formData, size: e.target.value})} />
+                                        {
+                                            validationText.size && <p className="block text-[12px] text-red-500 font-sans">{validationText.size}</p>
+                                        }
+                                    </div>
                                     <div>
-                                        <Input label="Name" value={`${description.stoneDesc} ${description.brightDesc} ${description.typeDesc}`} readOnly/>
+                                        <label className="text-black">Qty</label>
+                                        <input type="number" className="border border-blue-gray-200 w-full h-[40px] p-2.5 rounded-md text-black" value={formData.qty} onChange={(e) => setFormData({...formData, qty: e.target.value})} />
                                         {
-                                            validationText.customerName && <p className="block text-[12px] text-red-500 font-sans mb-2">{validationText.customerName}</p>
+                                            validationText.qty && <p className="block text-[12px] text-red-500 font-sans">{validationText.qty}</p>
                                         }
                                     </div>
-                                    {/* <div className="w-full col-span-2">
-                                        <input placeholder="Stone Description" className="border border-blue-gray-200 w-full h-full p-2.5 rounded-md placeholder:text-blue-gray-500" {...register('detailsInfo.stoneDesc')} value={`${stoneDesc} ${brightDesc} ${typeDesc}`} onFocus={() => setIsAlert(false)} disabled />
-                                    </div> */}
-                                </div>
-                                <div className="grid grid-cols-3 gap-2 w-full">
-                                    <Select 
-                                        value={formData.stoneCode} 
-                                        onChange={(e) => {
-                                            setStoneDesc(e.target.selectedOptions[0].text); 
-                                            setFormData({...formData, stoneCode: e.target.value});
-                                        }}
-                                    >
-                                        <option value={editData.stoneCode} selected={true} disabled>{editData.stoneCode}</option>
+                                    <div>
+                                        <label className="text-black">Weight</label>
+                                        <input type="number" className="border border-blue-gray-200 w-full h-[40px] p-2.5 rounded-md text-black" value={formData.weight} onChange={(e) => setFormData({...formData, weight: e.target.value})} />
                                         {
-                                            stoneData?.map((stone) => {
-                                                return <option value={stone.stoneCode} key={stone.stoneCode} >{stone.stoneDesc}</option>
-                                            })
+                                            validationText.weight && <p className="block text-[12px] text-red-500 font-sans">{validationText.weight}</p>
                                         }
-                                    </Select>
-                                    {/* <select {...register('detailsInfo.stoneCode')} className="block w-full p-2.5 border border-blue-gray-200 rounded-md focus:border-black" onChange={(e) => setStoneDesc(e.target.selectedOptions[0].text)}>
-                                        <option value={editData.stoneCode} selected={true} disabled>{editData.stoneCode}</option>
-                                        {
-                                            stoneData?.map((stone) => {
-                                                return <option value={stone.stoneCode} key={stone.stoneCode} >{stone.stoneDesc}</option>
-                                            })
-                                        }
-                                    </select> */}
-                                    <select {...register('detailsInfo.brightCode')} className="block w-full p-2.5 border border-blue-gray-200 rounded-md focus:border-black" onChange={(e) => setBrightDesc(e.target.selectedOptions[0].text)}>
-                                        <option value={editData.brightCode} selected={true} disabled>{editData.brightCode}</option>
-                                        {
-                                            brightData?.map((bright) => {
-                                                return <option value={bright.brightCode} key={bright.brightCode} >{bright.brightDesc}</option>
-                                            })
-                                        }
-                                    </select>
-                                    <select {...register('detailsInfo.typeCode')} className="block w-full p-2.5 border border-blue-gray-200 rounded-md focus:border-black" onChange={(e) => setTypeDesc(e.target.selectedOptions[0].text)}>
-                                        <option value={editData.typeCode} selected={true} disabled>{editData.typeCode}</option>
-                                        {
-                                            typeData?.map((type) => {
-                                                return <option value={type.typeCode} key={type.typeCode} >{type.typeDesc}</option>
-                                            })
-                                        }
-                                    </select>
-                                </div>
-                                <div className="grid grid-cols-3 gap-2 w-full">
-                                    <select {...register('detailsInfo.gradeCode')} className="block w-full p-2.5 border border-blue-gray-200 rounded-md focus:border-black">
-                                        <option value={editData.gradeCode} selected disabled>{editData.gradeCode}</option>
-                                        {
-                                            gradeData?.map((grade) => {
-                                                return <option value={grade.gradeCode} key={grade.gradeCode} >{grade.gradeDesc}</option>
-                                            })
-                                        }
-                                    </select>
-                                    <div className="col-span-2">
-                                        <div className="grid grid-cols-3 gap-2">
-                                            <div className="w-full">
-                                                <input placeholder="size" className="border border-blue-gray-200 w-full h-full p-2.5 rounded-md placeholder:text-blue-gray-500" {...register('detailsInfo.size')} onFocus={() => setIsAlert(false)} />
-                                            </div>
-                                            <div>
-                                                <input placeholder="Qty" className="border border-blue-gray-200 w-full h-full p-2.5 rounded-md placeholder:text-blue-gray-500" {...register('detailsInfo.qty')} onFocus={() => setIsAlert(false)} />
-                                                
-                                            </div>
-                                            <div>
-                                                <input placeholder="Weight" className="border border-blue-gray-200 w-full h-full p-2.5 rounded-md placeholder:text-blue-gray-500" {...register('detailsInfo.weight')} onFocus={() => setIsAlert(false)} />
-                                            </div>
-                                        </div>
                                     </div>
                                 </div>
-                                <div className="grid grid-cols-3 gap-2 w-full">
-                                    <select {...register('detailsInfo.unitCode')} className="block w-full max-h-[2.5rem] p-2.5 border border-blue-gray-200 rounded-md focus:border-black">
-                                        <option value={editData.unitCode} selected={true} disabled>{editData.unitCode}</option>
-                                        {
-                                            unitData?.map((unit) => {
-                                                return <option value={unit.unitCode} key={unit.unitCode} >{unit.unitDesc}</option>
-                                            })
-                                        }
-                                    </select>
-                                    <div className="col-span-2">
-                                        <Textarea 
-                                            label="Remark" 
-                                            className="min-h-full" 
-                                            rows={1}
-                                            {...register('detailsInfo.remark')} 
-                                        />
-                                    </div>
-                                </div>
+                            </div>
+                        </div>
+                        <div className="grid grid-cols-3 gap-2 w-full">
+                            <div>
+                                <label className="text-black">Unit</label>
+                                <Select 
+                                    options={unitOption} 
+                                    isSearchable
+                                    defaultValue={{value: formData.unitCode, label: formData.unitCode}}
+                                    onChange={(e) => {
+                                        setFormData({...formData, unitCode: e.value});
+                                    }}
+                                />
                                 {
-                                    errors.stoneDesc && <Alert
-                                    icon={<FaTriangleExclamation />}
-                                    className="rounded-none border-l-4 border-red-800 bg-red-500/10 font-medium text-red-900"
-                                >
-                                    This field is required
-                                </Alert>
-
+                                    validationText.unitDesc && <p className="block text-[12px] text-red-500 font-sans mb-2">{validationText.unitDesc}</p>
                                 }
-                                <div className="flex items-center justify-end mt-6 gap-2">
-                                    <Button onClick={handleSubmit(submitEdit)} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2">
-                                        <FaFloppyDisk className="text-base" />
-                                        <Typography variant="small" className="capitalize">
-                                            Update
-                                        </Typography>
-                                    </Button>
-                                    {/* <Button onClick={handleSubmit(onSaveSubmit)} color="red" size="sm" variant="gradient" className="flex items-center gap-2">
-                                        <FaTrashCan className="text-base" />
-                                        <Typography variant="small" className="capitalize">
-                                            Delete
-                                        </Typography>
-                                    </Button> */}
-                                </div>
-                            </form>
-                        ) : (
-                            <form  className="flex flex-col p-3 gap-4">
-                                <div className="grid grid-cols-4">
-                                    <div className="w-full col-span-2">
-                                        <Input label="Name" value={`${description.stoneDesc} ${description.brightDesc} ${description.typeDesc}`} readOnly/>
-                                        {
-                                            validationText.customerName && <p className="block text-[12px] text-red-500 font-sans mb-2">{validationText.customerName}</p>
-                                        }
-                                    </div>
-                                </div>
-                                <div className="grid grid-cols-3 gap-2 w-full">
-                                    <Select 
-                                        label="Stone Description"
-                                        value={formData.stoneCode} 
-                                        onChange={(e) => {
-                                            //setStoneDesc(e.target.value); 
-                                            setFormData({...formData, stoneCode: e.target.value});
-                                        }}
-                                    >
-                                        <Option value={0} selected={true} disabled>Select Stone</Option>
-                                        {
-                                            stoneData?.map((stone) => {
-                                                return <Option value={stone.Code} key={stone.stoneCode} >{stone.stoneDesc}</Option>
-                                            })
-                                        }
-                                    </Select>
-                                    <select {...register('detailsInfo.brightCode')} className="block w-full p-2.5 border border-blue-gray-200 rounded-md focus:border-black" onFocus={() => setIsAlert(false)} onChange={(e) => setBrightDesc(e.target.selectedOptions[0].text)}>
-                                        <option value="" selected={true} disabled>Select Brightness</option>
-                                        {
-                                            brightData?.map((bright) => {
-                                                return <option value={bright.brightCode} key={bright.brightCode} >{bright.brightDesc}</option>
-                                            })
-                                        }
-                                    </select>
-                                    <select {...register('detailsInfo.typeCode')} className="block w-full p-2.5 border border-blue-gray-200 rounded-md focus:border-black" onFocus={() => setIsAlert(false)} onChange={(e) => setTypeDesc(e.target.selectedOptions[0].text)}>
-                                        <option value="" selected={true} disabled>Select Type</option>
-                                        {
-                                            typeData?.map((type) => {
-                                                return <option value={type.typeCode} key={type.typeCode} >{type.typeDesc}</option>
-                                            })
-                                        }
-                                    </select>
-                                    
-                                </div>
-                                <div className="grid grid-cols-3 gap-2 w-full">
-                                    <select {...register('detailsInfo.gradeCode')} className="block w-full p-2.5 border border-blue-gray-200 rounded-md focus:border-black" onFocus={() => setIsAlert(false)}>
-                                        <option value="" selected={true} disabled>Select Grade</option>
-                                        {
-                                            gradeData?.map((grade) => {
-                                                return <option value={grade.gradeCode} key={grade.gradeCode} >{grade.gradeDesc}</option>
-                                            })
-                                        }
-                                    </select>
-                                    <div className="col-span-2">
-                                        <div className="grid grid-cols-3 gap-2">
-                                            <div className="w-full">
-                                                <input placeholder="size" className="border border-blue-gray-200 w-full h-full p-2.5 rounded-md placeholder:text-blue-gray-500" {...register('detailsInfo.size')} onFocus={() => setIsAlert(false)} />
-                                            </div>
-                                            <div>
-                                                <input placeholder="Qty" className="border border-blue-gray-200 w-full h-full p-2.5 rounded-md placeholder:text-blue-gray-500" {...register('detailsInfo.qty')} onFocus={() => setIsAlert(false)} />
-                                                
-                                            </div>
-                                            <div>
-                                                <input placeholder="Weight" className="border border-blue-gray-200 w-full h-full p-2.5 rounded-md placeholder:text-blue-gray-500" {...register('detailsInfo.weight')} onFocus={() => setIsAlert(false)} />
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="grid grid-cols-3 gap-2 w-full">
-                                    <select {...register('detailsInfo.unitCode')} className="block w-full max-h-[2.5rem] p-2.5 border border-blue-gray-200 rounded-md focus:border-black" onFocus={() => setIsAlert(false)}>
-                                        <option value="" selected={true} disabled>Select Unit</option>
-                                        {
-                                            unitData?.map((unit) => {
-                                                return <option value={unit.unitCode} key={unit.unitCode} >{unit.unitDesc}</option>
-                                            })
-                                        }
-                                    </select>
-                                    <div className="col-span-2">
-                                        <Textarea 
-                                            label="Remark" 
-                                            className="min-h-full" 
-                                            rows={1} 
-                                            onFocus={() => setIsAlert(false)} 
-                                            {...register('detailsInfo.remark')} 
-                                        />
-                                    </div>
-                                </div>
-                                
-                                {
-                                    addResult.isSuccess && isAlert && <SuccessAlert message="Save successful." handleAlert={() => setIsAlert(false)} />
-                                }
-                                <div className="flex items-center justify-end mt-6 gap-2">
-                                    <Button onClick={handleSubmit(onSubmit)} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2">
+                            </div>
+                            <div className="col-span-2">
+                                <label className="text-black">Remark</label>
+                                <Textarea 
+                                    labelProps={{
+                                        className: "hidden"
+                                    }}
+                                    className="min-h-full !border !border-blue-gray-200 focus:border-2 focus:!border-gray-900 focus:!border-t-gray-900" 
+                                    rows={1} 
+                                    value={formData.remark} onChange={(e) => setFormData({...formData, remark: e.target.value})}
+                                />
+                            </div>
+                        </div>
+                        <div className="flex items-center justify-end mt-6 gap-2">
+                            {
+                                isEdit ? 
+                                <Button onClick={submitEdit} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2">
+                                    <FaFloppyDisk className="text-base" />
+                                    <Typography variant="small" className="capitalize">
+                                        Update
+                                    </Typography>
+                                </Button> : 
+                                <>
+                                    <Button onClick={onSubmit} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2">
                                         <FaFloppyDisk className="text-base" />
                                         <Typography variant="small" className="capitalize">
                                             Save
                                         </Typography>
                                     </Button>
-                                    <Button onClick={handleSubmit(onSaveSubmit)} color="green" size="sm" variant="gradient" className="flex items-center gap-2">
+                                    <Button onClick={onSaveSubmit} color="green" size="sm" variant="gradient" className="flex items-center gap-2">
                                         <FaCirclePlus className="text-base" />
                                         <Typography variant="small" className="capitalize">
                                             Save & New
                                         </Typography>
                                     </Button>
-                                </div>
-                            </form>
-                        )
-                    }
-
+                                </>
+                            }
+                            
+                        </div>
+                    </form>
                 </DialogBody>
             </Dialog>
             <DeleteModal deleteId={deleteId} open={openDelete} handleDelete={handleRemove} closeModal={() => setOpenDelete(!openDelete)} />

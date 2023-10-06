@@ -3,7 +3,7 @@ import { FaArrowRightFromBracket, FaCartShopping, FaChartPie, FaChevronDown, FaD
 import { GiDiamondTrophy } from "react-icons/gi";
 import Profile from '../images/wallpaper_1.jpg';
 import { NavLink } from "react-router-dom";
-import { useAuthUser, useSignOut } from "react-auth-kit";
+import { useAuthUser } from "react-auth-kit";
 
 function Nav() {
 
