@@ -1,9 +1,8 @@
-import { Button, Menu, MenuHandler, MenuItem, MenuList, Typography, Avatar } from "@material-tailwind/react";
+import { Button, Menu, MenuHandler, MenuItem, MenuList, Typography } from "@material-tailwind/react";
 import { FaArrowRightFromBracket, FaCartShopping, FaChartPie, FaChevronDown, FaDatabase, FaFileInvoice, FaListUl, FaMoneyBill1, FaSliders, FaUsers } from "react-icons/fa6";
-import { GiDiamondTrophy, BiSolidUserCircle } from "react-icons/gi";
+import { GiDiamondTrophy } from "react-icons/gi";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useAuthUser, useSignOut } from "react-auth-kit";
-import profile from '../images/default-avatar.png'
 
 
 function Nav() {

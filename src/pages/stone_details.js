@@ -232,19 +232,31 @@ function StoneDetails() {
 
     const column = [
         {
-            name: 'Description',
-            width: '250px',
-            selector: row => row.Description,
-        },
-        {
-            name: 'Stone Description',
-            width: "200px",
-            selector: row => row.StoneDesc,
+            name: 'Quantity',
+            width: "100px",
+            selector: row => row.Qty,
 
         },
         {
+            name: 'Description',
+            width: '280px',
+            selector: row => row.Description,
+        },
+        {
+            name: 'Size',
+            width: "150",
+            selector: row => row.Size,
+
+        },
+        // {
+        //     name: 'Stone Description',
+        //     width: "200px",
+        //     selector: row => row.StoneDesc,
+
+        // },
+        {
             name: 'Brightness',
-            width: "200px",
+            width: "150px",
             selector: row => row.BrightnessDesc,
 
         },
@@ -258,31 +270,16 @@ function StoneDetails() {
             name: 'Type',
             width: "150px",
             selector: row => row.TypeDesc,
-
-        },
-        {
-            name: 'Size',
-            width: "200px",
-            selector: row => row.Size,
-
-        },
-        {
-            name: 'Quantity',
-            width: "200px",
-            selector: row => row.Qty,
-
         },
         {
             name: 'Weight',
-            width: "200px",
+            width: "150px",
             selector: row => row.Weight,
-
         },
         {
             name: 'Unit',
-            width: "200px",
+            width: "150px",
             selector: row => row.UnitDesc,
-
         },
         {
             name: 'Remark',

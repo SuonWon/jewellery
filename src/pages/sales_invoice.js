@@ -6,10 +6,13 @@ import { useAddSalesMutation, useFetchCustomerQuery, useFetchStoneDetailsQuery, 
 import moment from "moment";
 import SuccessAlert from "../components/success_alert";
 import { v4 as uuidv4 } from 'uuid';
+import { useAuthUser } from "react-auth-kit";
 
 const validator = require('validator');
 
 function SalesInvoice() {
+
+    const auth = useAuthUser();
 
     const [ salesData, setSalesData ] = useState({
         invoiceNo: uuidv4(),
@@ -20,7 +23,7 @@ function SalesInvoice() {
         grandTotal: 0,
         status: 'O',
         remark: '',
-        createdBy: 'user-1',
+        createdBy: auth().username,
         salesDetails: []
     })
     const [ tBodyData, setTBodyData ] = useState([]); 
@@ -123,7 +126,7 @@ function SalesInvoice() {
                         color="deep-purple" 
                         className="p-2" 
                         onClick={() => handleEdit(row.id)}
-                        disabled={selectedId == row.id}
+                        disabled={isEditDetail}
                     >
                         <FaPencil />
                     </Button>
@@ -132,7 +135,7 @@ function SalesInvoice() {
                         color="red" 
                         className="p-2" 
                         onClick={() => handleDeleteBtn(row.id)}
-                        disabled={selectedId == row.id}
+                        disabled={isEditDetail}
                     >
                         <FaTrashCan />
                     </Button>
@@ -150,7 +153,7 @@ function SalesInvoice() {
     function validateForm() {
         const newErrors = {};
     
-        if(salesData.customerCode == 0) {
+        if(salesData.customerCode === 0) {
             newErrors.customer = 'Customer is required.'
         }
 
@@ -166,7 +169,7 @@ function SalesInvoice() {
     function validateDetail() {
         const newErrors = {};
 
-        if(salesDetails.stoneDetailCode == 0) {
+        if(salesDetails.stoneDetailCode === 0) {
             newErrors.stoneDetail = 'Stone detail is required.'
         }
 
@@ -192,7 +195,7 @@ function SalesInvoice() {
                 grandTotal: salesData.grandTotal,
                 status: 'O',
                 remark: salesData.remark,
-                createdBy: 'user-1',
+                createdBy: salesData.createdBy,
                 salesDetails: salesData.salesDetails
             }
             await addSales(saveData)
@@ -211,7 +214,7 @@ function SalesInvoice() {
                 grandTotal: 0,
                 status: 'O',
                 remark: '',
-                createdBy: 'user-1',
+                createdBy: auth().username,
                 salesDetails: []
             })
             setTBodyData([])
@@ -342,7 +345,16 @@ function SalesInvoice() {
     }
 
     function handleDeleteBtn(rowId) {
-        setTBodyData(tBodyData.filter(rec => rec.id !== rowId))
+        const leftData = tBodyData.filter(rec => rec.id !== rowId);
+        let newData = []
+        leftData.map((rec, index) => {
+            newData.push({
+                ...rec,
+                lineNo: index + 1
+            })
+        })
+        // setTBodyData(tBodyData.filter(rec => rec.id !== rowId))
+        setTBodyData(newData)
         setSalesData({
             ...salesData,
             salesDetails: salesData.salesDetails.filter(rec => rec.id !== rowId)

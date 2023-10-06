@@ -3,16 +3,18 @@ import { Button, Card, CardBody, Dialog, DialogBody, Input, Switch, Typography }
 import { FaCirclePlus, FaFloppyDisk, FaPencil, FaTrashCan, } from "react-icons/fa6";
 import { useState } from "react";
 import { useFetchTypeQuery, useAddTypeMutation, useUpdateTypeMutation, useRemoveTypeMutation } from "../store";
-import { useForm } from "react-hook-form";
 import DeleteModal from "../components/delete_modal";
 import SectionTitle from "../components/section_title";
 import ModalTitle from "../components/modal_title";
 import moment from "moment";
 import TableList from "../components/data_table";
+import { useAuthUser } from "react-auth-kit";
 
 const validator = require('validator');
 
 function StoneType() {
+
+    const auth = useAuthUser();
 
     const [open, setOpen] = useState(false);
 
@@ -27,10 +29,8 @@ function StoneType() {
         typeDesc: '',
         status: true,
         createdAt: moment().toISOString(),
-        createdBy: 'admin',
+        createdBy: auth().username,
     })
-
-    // const {register, handleSubmit, setValue, formState: {errors}, reset } = useForm();
 
     const [addType] = useAddTypeMutation();
 
@@ -49,7 +49,7 @@ function StoneType() {
             typeDesc: '',
             status: true,
             createdAt: moment().toISOString(),
-            createdBy: 'admin',
+            createdBy: auth().username,
         })
         setValidationText({});
         setOpen(!open);
@@ -75,7 +75,7 @@ function StoneType() {
                 createdAt: stoneType.createdAt,
                 createdBy: stoneType.createdBy,
                 updatedAt: moment().toISOString(),
-                updatedBy: isEdit ? "admin" : "",
+                updatedBy: isEdit ? auth().username : "",
             }
 
             if(isEdit) {
@@ -91,7 +91,7 @@ function StoneType() {
                 typeDesc: '',
                 status: true,
                 createdAt: moment().toISOString(),
-                createdBy: 'admin',
+                createdBy: auth().username,
             })
         }
     }
@@ -102,7 +102,7 @@ function StoneType() {
             ...focusData,
             status: isChecked,
             updatedAt: moment().toISOString(),
-            updatedBy: "admin"
+            updatedBy: auth().username
         }
         await editType(saveData);
     }

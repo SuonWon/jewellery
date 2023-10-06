@@ -8,10 +8,13 @@ import SectionTitle from "../components/section_title";
 import ModalTitle from "../components/modal_title";
 import moment from "moment";
 import TableList from "../components/data_table";
+import { useAuthUser } from "react-auth-kit";
 
 const validator = require('validator');
 
 function UOM() {
+
+    const auth = useAuthUser();
 
     const [open, setOpen] = useState(false);
 
@@ -25,7 +28,7 @@ function UOM() {
         unitCode: '',
         unitDesc: '',
         createdAt: moment().toISOString(),
-        createdBy: 'admin',
+        createdBy: auth().username,
     })
 
     const [addUnit] = useAddUOMMutation();
@@ -46,7 +49,7 @@ function UOM() {
             unitCode: '',
             unitDesc: '',
             createdAt: moment().toISOString(),
-            createdBy: 'admin',
+            createdBy: auth().username,
         })
         setValidationText({});
     };
@@ -75,9 +78,9 @@ function UOM() {
                 unitCode: unitData.unitCode,
                 unitDesc: unitData.unitDesc,
                 createdAt: unitData.createdAt,
-                createdBy: 'admin',
+                createdBy: unitData.createdBy,
                 updatedAt: moment().toISOString(),
-                updatedBy: isEdit ? "admin" : "",
+                updatedBy: isEdit ? auth().username : "",
             }
     
             isEdit ?  await editUnit(saveData) : await addUnit(saveData);
@@ -88,7 +91,7 @@ function UOM() {
                 unitCode: '',
                 unitDesc: '',
                 createdAt: moment().toISOString(),
-                createdBy: 'admin',
+                createdBy: auth().username,
             })
         }
     }

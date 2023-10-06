@@ -8,10 +8,13 @@ import SectionTitle from "../components/section_title";
 import ModalTitle from "../components/modal_title";
 import moment from "moment";
 import TableList from "../components/data_table";
+import { useAuthUser } from "react-auth-kit";
 
 const validator = require('validator');
 
 function Stone() {
+
+    const auth = useAuthUser();
 
     const [open, setOpen] = useState(false);
 
@@ -27,7 +30,7 @@ function Stone() {
         remark: '',
         status: true,
         createdAt: moment().toISOString(),
-        createdBy: 'admin',
+        createdBy: auth().username,
     })
 
     const [addStone] = useAddStoneMutation();
@@ -48,7 +51,7 @@ function Stone() {
             remark: "",
             status: true,
             createdAt: moment().toISOString(),
-            createdBy: 'admin',
+            createdBy: auth().username,
         })
         setOpen(!open);
         setValidationText({});
@@ -77,7 +80,7 @@ function Stone() {
                 createdAt: stone.createdAt,
                 createdBy: stone.createdBy,
                 updatedAt: moment().toISOString(),
-                updatedBy: isEdit ? "admin" : "",
+                updatedBy: isEdit ? auth().username : "",
             }
 
             if(isEdit) {
@@ -94,7 +97,7 @@ function Stone() {
                 remark: "",
                 status: true,
                 createdAt: moment().toISOString(),
-                createdBy: 'admin',
+                createdBy: auth().username,
             })
 
         }
@@ -106,7 +109,7 @@ function Stone() {
             ...focusData,
             status: isChecked, 
             updatedAt: moment().toISOString(),
-            updatedBy: "admin"
+            updatedBy: auth().username
         }
         await editStone(saveData);
     }

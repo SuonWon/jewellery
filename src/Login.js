@@ -10,9 +10,6 @@ function Login() {
 
     const signIn = useSignIn();
 
-    //Error Message
-    const [isError, setIsError] = useState(false);
-
     const navigate = useNavigate();
 
     const [formData, setFormData] = useState({
@@ -58,7 +55,7 @@ function Login() {
             axios.post('http://localhost:3005/v1/auth/login', formData)
             .then((res) => {
                 const newErrors = {}
-                if(res.data != '') {
+                if(res.data !== '') {
                     console.log(res.data);
                     if(signIn(
                         {
@@ -77,7 +74,7 @@ function Login() {
                     setValidationText(newErrors);
                 }
             }).catch((error) => {
-                setIsError(true);
+                console.log(error);
             });
         }
     };
