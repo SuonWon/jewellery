@@ -2,12 +2,22 @@ import { Avatar, Button, Menu, MenuHandler, MenuItem, MenuList, Typography } fro
 import { FaArrowRightFromBracket, FaCartShopping, FaChartPie, FaChevronDown, FaDatabase, FaFileInvoice, FaListUl, FaMoneyBill1, FaSliders, FaUsers } from "react-icons/fa6";
 import { GiDiamondTrophy } from "react-icons/gi";
 import Profile from '../images/wallpaper_1.jpg';
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { useAuthUser, useSignOut } from "react-auth-kit";
 
 function Nav() {
 
     const auth = useAuthUser();
+
+    const logOut = useSignOut();
+
+    const navigate = useNavigate();
+
+    const handleLogout = () => {
+        logOut();
+        navigate('/login');
+
+    }
 
     return(
         <div className='flex flex-col sticky top-0 z-[9999]'>
@@ -98,16 +108,16 @@ function Nav() {
                     <Menu>
                         <MenuHandler>
                             <Button size='sm' variant='text' className='flex items-center text-white gap-2 rounded-full py-0.5 pr-1 pl-0 '>
-                                <Avatar
+                                {/* <Avatar
                                     src={Profile}
                                     size='sm'
-                                />
+                                /> */}
                                 <Typography variant='small' className='capitalize'>{auth()?.fullName}</Typography>
                                 <FaChevronDown className='text-sm cursor-pointer' />
                             </Button>
                         </MenuHandler>
                         <MenuList  className="z-[99999] bg-main text-white">
-                            <MenuItem className='flex items-center gap-2 cursor-pointer'>
+                            <MenuItem className='flex items-center gap-2 cursor-pointer' onClick={handleLogout}>
                                 <FaArrowRightFromBracket /> <span>Logout</span>
                             </MenuItem>
                         </MenuList>
