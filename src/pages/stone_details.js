@@ -61,7 +61,8 @@ function StoneDetails() {
     const [description, setDescription] = useState({
         stoneDesc: "",
         brightDesc: "",
-        typeDesc: ""
+        gradeDesc: "",
+        size: "",
     });
 
     const [addStoneDetail, addResult] = useAddStoneDetailsMutation();
@@ -104,7 +105,8 @@ function StoneDetails() {
         setDescription({
             stoneDesc: "",
             brightDesc: "",
-            typeDesc: ""
+            gradeDesc: "",
+            size: ""
         });
         setOpen(!open);
     };
@@ -146,7 +148,7 @@ function StoneDetails() {
         if(validateForm()) {
             addStoneDetail({
                 ...formData,
-                stoneDesc: `${description.stoneDesc} ${description.brightDesc} ${description.typeDesc}`,
+                stoneDesc: `${description.stoneDesc} ${description.size} ${description.gradeDesc} ${description.brightDesc}`,
             }).then((res) => {
                 console.log(res);
             });
@@ -159,7 +161,7 @@ function StoneDetails() {
         if (validateForm()) {
             addStoneDetail({
                 ...formData,
-                stoneDesc: `${description.stoneDesc} ${description.brightDesc} ${description.typeDesc}`,
+                stoneDesc: `${description.stoneDesc} ${description.size} ${description.gradeDesc} ${description.brightDesc}`,
             }).then((res) => {
                 console.log(res);
             });
@@ -167,7 +169,8 @@ function StoneDetails() {
             setDescription({
                 stoneDesc: "",
                 brightDesc: "",
-                typeDesc: ""
+                gradeDesc: "",
+                size: ""
             });
         }
     };
@@ -199,7 +202,8 @@ function StoneDetails() {
         setDescription({
             stoneDesc: eData[0].stone.stoneDesc,
             brightDesc: eData[0].stoneBrightness.brightDesc,
-            typeDesc: eData[0].stoneType.typeDesc
+            gradeDesc: eData[0].stoneGrade.gradeDesc,
+            size: eData[0].size
         });
         setOpen(!open);
     };
@@ -207,7 +211,7 @@ function StoneDetails() {
     const submitEdit = async () => {
         editStoneDetail({
             ...formData,
-            stoneDesc: `${description.stoneDesc} ${description.brightDesc} ${description.typeDesc}`,
+            stoneDesc: `${description.stoneDesc} ${description.size} ${description.gradeDesc} ${description.brightDesc}`,
             updatedAt: moment().toISOString(),
             updatedBy: auth().username,
         }).then((res) => {
@@ -345,7 +349,7 @@ function StoneDetails() {
                         <div className="grid grid-cols-4">
                             <div className="w-full col-span-2">
                                 <label className="text-black">Description</label>
-                                <input className="border border-blue-gray-200 text-black w-full h-[40px] p-2.5 rounded-md" value={`${description.stoneDesc} ${description.brightDesc} ${description.typeDesc}`} disabled />
+                                <input className="border border-blue-gray-200 text-black w-full h-[40px] p-2.5 rounded-md" value={`${description.stoneDesc} ${description.size} ${description.gradeDesc} ${description.brightDesc}`} disabled />
                                 {
                                     validationText.description && <p className="block text-[12px] text-red-500 font-sans mb-2">{validationText.description}</p>
                                 }
@@ -424,7 +428,6 @@ function StoneDetails() {
                                     className="block w-full text-black p-2.5 border border-blue-gray-200 max-h-[2.5rem] rounded-md focus:border-black"
                                     value={formData.typeCode}
                                     onChange={(e) => {
-                                        setDescription({...description, typeDesc: e.target.selectedOptions[0].text}); 
                                         setFormData({...formData, typeCode: Number(e.target.value)});
                                     }}
                                 >
@@ -456,6 +459,7 @@ function StoneDetails() {
                                     className="block w-full text-black p-2.5 border border-blue-gray-200 max-h-[2.5rem] rounded-md focus:border-black"
                                     value={formData.gradeCode}
                                     onChange={(e) => {
+                                        setDescription({...description, gradeDesc: e.target.selectedOptions[0].text}); 
                                         setFormData({...formData, gradeCode: Number(e.target.value)});
                                     }}
                                 >
@@ -482,7 +486,15 @@ function StoneDetails() {
                                 <div className="grid grid-cols-3 gap-2">
                                     <div className="w-full">
                                         <label className="text-black">Size</label>
-                                        <input type="text" className="border border-blue-gray-200 w-full h-[40px] p-2.5 rounded-md text-black" value={formData.size} onChange={(e) => setFormData({...formData, size: e.target.value})} />
+                                        <input 
+                                            type="text" 
+                                            className="border border-blue-gray-200 w-full h-[40px] p-2.5 rounded-md text-black" 
+                                            value={formData.size} 
+                                            onChange={(e) => {
+                                                setDescription({...description, size: e.target.value}); 
+                                                setFormData({...formData, size: e.target.value})
+                                            }} 
+                                        />
                                         {
                                             validationText.size && <p className="block text-[12px] text-red-500 font-sans">{validationText.size}</p>
                                         }
