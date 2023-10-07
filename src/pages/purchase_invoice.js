@@ -8,6 +8,7 @@ import moment from "moment";
 import SuccessAlert from "../components/success_alert";
 import { v4 as uuidv4 } from 'uuid';
 import { pause } from "../const";
+const validator = require('validator');
 
 function PurchaseInvoice() {
 
@@ -29,7 +30,19 @@ function PurchaseInvoice() {
 
     const [purchaseDetails, setPurchaseDetails] = useState([]); 
 
-    const [no, setNo] = useState(0);
+    const [subPuDetail, setSubPuDetail] = useState({
+        id: '',
+        lineNo: 0,
+        stoneDetailCode: 0,
+        stoneDetailName: '',
+        qty: 0,
+        weight: 0,
+        unitCode: '',
+        unitPrice: 0,
+        totalPrice: 0,
+        serviceCharge: 0,
+        totalAmt: 0
+    })
 
     const [isAlert, setIsAlert] = useState(true);
 
@@ -53,11 +66,13 @@ function PurchaseInvoice() {
     })
 
     const purchaseData = {
+        id: '',
         lineNo: 0,
-        stoneDetailCode: "",
+        stoneDetailCode: 0,
+        stoneDetailName: '',
         qty: 0,
         weight: 0,
-        unitCode: 'ct',
+        unitCode: '',
         unitPrice: 0,
         totalPrice: 0,
         serviceCharge: 0,
@@ -86,6 +101,22 @@ function PurchaseInvoice() {
         return Object.keys(newErrors).length === 0;
     }
 
+    function validateDetail() {
+        const newErrors = {};
+
+        if(subPuDetail.stoneDetailCode === 0) {
+            newErrors.stoneDetail = 'Stone detail is required.'
+        }
+
+        if(validator.isEmpty(subPuDetail.unitCode)) {
+            newErrors.unitCode = 'Unit is required.'
+        }
+
+        setValidationText(newErrors);
+
+        return Object.keys(newErrors).length === 0;
+    }
+
     const onSubmit = async () => {
         if (validateForm()) {
             console.log(purchase.purDate);
@@ -98,8 +129,7 @@ function PurchaseInvoice() {
                 grandTotal: parseFloat(purchase.grandTotal),
                 createdBy: 'Htet Wai Aung',
                 updatedBy: "",
-                deletedBy: "",
-                purchaseDetail: purchaseDetails
+                deletedBy: ""
             };
             console.log(subData);
             addPurchase(subData).then((res) => {
@@ -126,37 +156,50 @@ function PurchaseInvoice() {
         }
     };
 
-    const submitDetail = (puData) => {
-        setPurchase({
-            ...purchase,
-            subTotal: purchase.subTotal + parseFloat(puData.details.totalAmt),
-            grandTotal: (purchase.subTotal + parseFloat(puData.details.totalAmt)) - purchase.discAmt
-        })
-        setPurchaseDetails([
-            ...purchaseDetails,
-            {
-                ...puData.details,
-                lineNo: no + 1,
-                stoneDetailCode: Number(puData.details.stoneDetailCode),
-                qty: Number(puData.details.qty),
-                weight: parseFloat(puData.details.weight),
-                unitPrice: parseFloat(puData.details.unitPrice),
-                totalPrice: parseFloat(puData.details.totalPrice),
-                serviceCharge: parseFloat(puData.details.serviceCharge),
-                totalAmt: parseFloat(puData.details.totalAmt)
-                
-            }
-        ]);
-        setNo(no + 1);
-        reset({
-            details: purchaseData,
-        });
+    const submitDetail = () => {
+        if(validateDetail()) {
+            setPurchase({
+                ...purchase,
+                subTotal: purchase.subTotal + parseFloat(subPuDetail.totalAmt),
+                grandTotal: (purchase.subTotal + parseFloat(subPuDetail.totalAmt)) - purchase.discAmt,
+                purchaseDetail: [
+                    ...purchase.purchaseDetail,
+                    {
+                        id: subPuDetail.id,
+                        lineNo: subPuDetail.lineNo,
+                        stoneDetailCode: subPuDetail.stoneDetailCode,
+                        qty: subPuDetail.qty,
+                        weight: subPuDetail.weight,
+                        unitCode: subPuDetail.unitCode,
+                        unitPrice: subPuDetail.unitPrice,
+                        totalPrice: subPuDetail.totalPrice,
+                        serviceCharge: subPuDetail.serviceCharge,
+                        totalAmt: subPuDetail.totalAmt
+                    }
+                ]
+            });
+            setPurchaseDetails([
+                ...purchaseDetails,
+                {
+                    ...subPuDetail,
+                    id: uuidv4(),
+                    lineNo: purchaseDetails.length + 1,
+                    
+                }
+            ]);
+            setSubPuDetail(purchaseData);
+
+        }
     };
+
+    console.log(purchaseDetails);
 
     const handleEdit = (id) => {
 
-        let tempData = purchaseDetails.filter((detail)=> detail.lineNo === id);
-        setValue("details", {
+        let tempData = purchaseDetails.filter((detail)=> detail.id === id);
+        setSubPuDetail({
+            ...subPuDetail,
+            id: tempData[0].id,
             lineNo: tempData[0].lineNo,
             stoneDetailCode: tempData[0].stoneDetailCode,
             qty: tempData[0].qty,
@@ -172,23 +215,43 @@ function PurchaseInvoice() {
     }
 
     const handleDeleteBtn = (id) => {
-        let tempData = purchaseDetails.filter((detail) => detail.lineNo !== id);
-        setPurchaseDetails(tempData);
+        console.log(id);
+        const currentData = purchaseDetails.find(rec => rec.id === id);
+        console.log(currentData);
+        const leftData = purchaseDetails.filter(rec => rec.id !== id);
+        let newData = [];
+        leftData.map((rec, index) => {
+            newData.push({
+                ...rec,
+                lineNo: index + 1
+            })
+        });
+        setPurchaseDetails(newData);
+        setPurchase({
+            ...purchase,
+            subTotal: purchase.subTotal - currentData.totalAmt,
+            grandTotal: purchase.grandTotal - currentData.totalAmt
+        })
     }
 
-    const SaveDetail = (submitData) => {
+    const SaveDetail = () => {
+        let leftObj = purchase.purchaseDetail.filter(rec => rec.id === subPuDetail.id);
+        const obj = {
+            id: subPuDetail.id,
+            lineNo: subPuDetail.lineNo,
+            stoneDetailCode: subPuDetail.stoneDetailCode,
+            qty: subPuDetail.qty,
+            weight: subPuDetail.weight,
+            unitCode: subPuDetail.unitCode,
+            unitPrice: subPuDetail.unitPrice,
+            totalPrice: subPuDetail.totalPrice,
+            serviceCharge: subPuDetail.serviceCharge,
+            totalAmt: subPuDetail.totalAmt
+        };
+        leftObj.push(obj);
         let subTotal = parseFloat(0);
-        let tempData = purchaseDetails.filter((e) => e.lineNo !== submitData.details.lineNo);
-        tempData.push({
-            ...submitData.details,
-            stoneDetailCode: Number(submitData.details.stoneDetailCode),
-            qty: Number(submitData.details.qty),
-            weight: parseFloat(submitData.details.weight),
-            unitPrice: parseFloat(submitData.details.unitPrice),
-            totalPrice: parseFloat(submitData.details.totalPrice),
-            serviceCharge: parseFloat(submitData.details.serviceCharge),
-            totalAmt: parseFloat(submitData.details.totalAmt)
-        });
+        let tempData = purchaseDetails.filter((e) => e.id !== subPuDetail.id);
+        tempData.push(subPuDetail);
         tempData.forEach(e => {
             subTotal += e.totalAmt;
         });
@@ -196,43 +259,13 @@ function PurchaseInvoice() {
         setPurchase({
             ...purchase,
             subTotal: subTotal,
-            grandTotal: subTotal - purchase.discAmt
+            grandTotal: subTotal - purchase.discAmt,
+            purchaseDetail: leftObj
         });
         setPurchaseDetails(tempData);
-        console.log(submitData);
         setIsEditDetail(false);
-        reset({
-            details: purchaseData,
-        });
+        setSubPuDetail(purchaseData);
 
-    };
-
-    const addQty = (e) => {
-
-        let totalP = parseFloat(getValues("details.unitPrice")) * parseFloat(e.target.value);
-        let totalA = parseFloat(getValues("details.serviceCharge")) + totalP;
-
-        console.log(totalP);
-        setValue("details.totalPrice", totalP)
-        setValue("details.totalAmt", totalA);
-
-    };
-
-    const addUnitPrice = (e) => {
-
-        let totalP = parseFloat(getValues("details.qty")) * parseFloat(e.target.value);
-        let totalA = parseFloat(getValues("details.serviceCharge")) + totalP;
-
-        setValue("details.totalPrice", totalP);
-        setValue("details.totalAmt", totalA);
-
-    };
-
-    const addServiceCharge = (e) => {
-
-        let totalA = parseFloat(getValues("details.totalPrice")) + parseFloat(e.target.value);
-
-        setValue("details.totalAmt", totalA);
     };
 
     const addDiscAmt = (e) => {
@@ -317,8 +350,8 @@ function PurchaseInvoice() {
             width: "100px",
             cell: (row) => (
                 <div className="flex items-center gap-2">
-                    <Button variant="text" color="deep-purple" className="p-2" onClick={() => handleEdit(row.Code)} disabled={isEditDetail}><FaPencil /></Button>
-                    <Button variant="text" color="red" className="p-2" onClick={() => handleDeleteBtn(row.Code)} disabled={isEditDetail}><FaTrashCan /></Button>
+                    <Button variant="text" color="deep-purple" className="p-2" onClick={() => handleEdit(row.Id)} disabled={isEditDetail}><FaPencil /></Button>
+                    <Button variant="text" color="red" className="p-2" onClick={() => handleDeleteBtn(row.Id)} disabled={isEditDetail}><FaTrashCan /></Button>
                 </div>
             )
         },
@@ -326,8 +359,9 @@ function PurchaseInvoice() {
 
     const tbodyData = purchaseDetails?.map((details) => {
         return {
+            Id: details.id,
             Code: details.lineNo,
-            Description: details.stoneDetailCode,
+            Description: details.stoneDetailName,
             Qty: details.qty,
             Weight: details.weight,
             UnitCode: details.unitCode,
@@ -431,10 +465,10 @@ function PurchaseInvoice() {
                                 <Typography variant="small" className="bg-main py-1 px-4 w-fit h-fit text-white rounded-md">Details Info</Typography>
                                 {
                                     isEditDetail ? 
-                                    <Button variant="outlined" color="deep-purple" className="flex items-center gap-2 mt-2 p-2 mr-2" onClick={handleSubmit(SaveDetail)}>
+                                    <Button variant="outlined" color="deep-purple" className="flex items-center gap-2 mt-2 p-2 mr-2" onClick={SaveDetail}>
                                         <FaFloppyDisk/> <span>Save</span>
                                     </Button> : 
-                                    <Button variant="outlined" color="deep-purple" className="flex items-center gap-2 mt-2 p-2 mr-2" onClick={handleSubmit(submitDetail)}>
+                                    <Button variant="outlined" color="deep-purple" className="flex items-center gap-2 mt-2 p-2 mr-2" onClick={submitDetail}>
                                         <FaPlus/> <span>Add</span>
                                     </Button>
                                 }
@@ -443,9 +477,19 @@ function PurchaseInvoice() {
                             <div className="flex px-3 mb-4 text-sm">
                                 <input hidden {...register("details.lineNo")} />
                                 <div className="w-full">
-                                    <label className="text-black mb-2 text-sm">Weight</label>
-                                    <select className="block w-full p-2.5 border border-blue-gray-200 max-h-[2.5rem] rounded-md focus:border-black" {...register("details.stoneDetailCode")} defaultValue="">
-                                        <option value="" disabled>Select stone detail</option>
+                                    <label className="text-black mb-2 text-sm">Stone Details</label>
+                                    <select 
+                                        className="block w-full p-2.5 border border-blue-gray-200 max-h-[2.5rem] rounded-md focus:border-black" 
+                                        value={subPuDetail.stoneDetailCode} 
+                                        onChange={(e) => 
+                                            setSubPuDetail({
+                                                ...subPuDetail, 
+                                                stoneDetailCode: Number(e.target.value),
+                                                stoneDetailName: e.target.selectedOptions[0].text,
+                                            })
+                                        }
+                                        >
+                                        <option value="0" disabled>Select stone detail</option>
                                         {
                                             stoneDetails?.length === 0 ? <option value="" disabled>There is no Data</option> :
                                             stoneDetails?.map((stoneDetail) => {
@@ -453,6 +497,9 @@ function PurchaseInvoice() {
                                             })
                                         }
                                     </select>
+                                    {
+                                        validationText.stoneDetail && <p className="block text-[12px] text-red-500 font-sans mb-2">{validationText.stoneDetail}</p>
+                                    }
                                 </div>
                                 
                             </div>
@@ -460,31 +507,45 @@ function PurchaseInvoice() {
                                 <div>
                                     <label className="text-black text-sm mb-2">Qty</label>
                                     <Input
-                                        {...register("details.qty")}
+                                        value={subPuDetail.qty}
                                         containerProps={{ className: "min-w-[50px]" }}
                                         type="number"
-                                        onChange={(e) => addQty(e)}
                                         labelProps={{
                                             className: "hidden"
                                         }}
                                         className="min-h-full !border !border-blue-gray-200 focus:border-2 focus:!border-gray-900 focus:!border-t-gray-900" 
+                                        onChange={(e) => {
+                                            let qty = parseFloat(e.target.value);
+                                            let totalP = subPuDetail.unitPrice * qty
+                                            setSubPuDetail({
+                                                ...subPuDetail, 
+                                                qty: qty,
+                                                totalPrice: totalP,
+                                                totalAmt: totalP + subPuDetail.serviceCharge,
+                                            });
+                                        }}
                                     />
                                 </div>
                                 <div>
                                     <label className="text-black text-sm mb-2">Weight</label>
                                     <Input
-                                        {...register("details.weight")}
+                                        value={subPuDetail.weight}
                                         containerProps={{ className: "min-w-[50px]" }}
                                         type="number"
                                         labelProps={{
                                             className: "hidden"
                                         }}
-                                        className="min-h-full !border !border-blue-gray-200 focus:border-2 focus:!border-gray-900 focus:!border-t-gray-900" 
+                                        className="min-h-full !border !border-blue-gray-200 focus:border-2 focus:!border-gray-900 focus:!border-t-gray-900"
+                                        onChange={(e) => setSubPuDetail({...subPuDetail, weight: parseFloat(e.target.value)})}
                                     />
                                 </div>
                                 <div>
                                     <label className="text-black text-sm mb-2">Unit</label>
-                                    <select className="block w-full p-2.5 border border-blue-gray-200 max-h-[2.5rem] rounded-md focus:border-black" {...register("details.unitCode")} defaultValue="">
+                                    <select 
+                                        className="block w-full p-2.5 border border-blue-gray-200 max-h-[2.5rem] rounded-md focus:border-black" 
+                                        value={subPuDetail.unitCode}
+                                        onChange={(e) => setSubPuDetail({...subPuDetail, unitCode: e.target.value})}
+                                    >
                                         <option value=""  disabled>Select Unit</option>
                                         {
                                             unitData?.map((unit) => {
@@ -492,61 +553,72 @@ function PurchaseInvoice() {
                                             })
                                         }
                                     </select>
+                                    {
+                                        validationText.unitCode && <p className="block text-[12px] text-red-500 font-sans mb-2">{validationText.unitCode}</p>
+                                    }
                                 </div>
                             </div>
                             <div className="grid grid-cols-2 gap-2 px-3 mb-4 text-sm">
                                 <div>
                                     <label className="text-black text-sm mb-2">Unit Price</label>
                                     <Input
-                                        {...register("details.unitPrice")}
-                                        containerProps={{ className: "min-w-[95px]" }}
+                                        value={subPuDetail.unitPrice}
+                                        containerProps={{ className: "min-w-[100px]" }}
                                         type="number"
-                                        onChange={(e) => addUnitPrice(e)}
                                         labelProps={{
                                             className: "hidden"
                                         }}
                                         className="min-h-full !border !border-blue-gray-200 focus:border-2 focus:!border-gray-900 focus:!border-t-gray-900" 
+                                        onChange={(e) => {
+                                            let price = parseFloat(e.target.value);
+                                            let totalP = price * subPuDetail.qty;
+                                            setSubPuDetail({
+                                                ...subPuDetail,
+                                                unitPrice: price,
+                                                totalPrice: totalP,
+                                                totalAmt: totalP + subPuDetail.serviceCharge
+                                            });
+                                        }}
                                     />
                                 </div>
                                 <div>
                                     <label className="text-black text-sm mb-2">Total Price</label>
-                                    <Input
-                                        containerProps={{ className: "min-w-[95px]" }}
-                                        {...register("details.totalPrice")}
+                                    <input
+                                        value={subPuDetail.totalPrice}
+                                        className="rounded-md text-right p-2 placeholder:text-blue-gray-500" 
                                         type="number"
                                         placeholder="Total Price"
-                                        readOnly
-                                        labelProps={{
-                                            className: "hidden"
-                                        }}
-                                        className="min-h-full !border !border-blue-gray-200 focus:border-2 focus:!border-gray-900 focus:!border-t-gray-900" 
+                                        disabled
                                     />
                                 </div>
                                 <div>
                                     <label className="text-black text-sm mb-2">Service Charge</label>
                                     <Input
-                                        {...register("details.serviceCharge")}
-                                        containerProps={{ className: "min-w-[95px]" }}
+                                        value={subPuDetail.serviceCharge}
+                                        containerProps={{ className: "min-w-[100px]" }}
                                         type="number"
-                                        onChange={(e) => addServiceCharge(e)}
                                         labelProps={{
                                             className: "hidden"
                                         }}
                                         className="min-h-full !border !border-blue-gray-200 focus:border-2 focus:!border-gray-900 focus:!border-t-gray-900" 
+                                        onChange={(e) => {
+                                            let charge = parseFloat(e.target.value);
+                                            setSubPuDetail({
+                                                ...subPuDetail,
+                                                serviceCharge: charge,
+                                                totalAmt: charge + subPuDetail.totalPrice
+                                            });
+                                        }}
                                     />
                                 </div>
                                 <div>
                                     <label className="text-black text-sm mb-2">Total Amt</label>
-                                    <Input
-                                        containerProps={{ className: "min-w-[95px]" }}
-                                        {...register("details.totalAmt")}
+                                    <input
+                                        value={subPuDetail.totalAmt}
+                                        className="rounded-md text-right p-2 placeholder:text-blue-gray-500" 
                                         type="number"
                                         placeholder="Total Amount"
-                                        readOnly
-                                        labelProps={{
-                                            className: "hidden"
-                                        }}
-                                        className="min-h-full !border !border-blue-gray-200 focus:border-2 focus:!border-gray-900 focus:!border-t-gray-900" 
+                                        disabled
                                     />
                                 </div>
                                 
