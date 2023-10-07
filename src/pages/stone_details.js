@@ -1,5 +1,5 @@
 /* eslint-disable eqeqeq */
-import { Button, Card, CardBody, Dialog, DialogBody, Textarea, Typography } from "@material-tailwind/react";
+import { Button, Card, CardBody, Dialog, DialogBody, Typography } from "@material-tailwind/react";
 import { FaCirclePlus, FaFloppyDisk, FaPencil, FaTrashCan, } from "react-icons/fa6";
 import { useEffect, useState } from "react";
 import { useFetchStoneDetailsQuery, useAddStoneDetailsMutation, useUpdateStoneDetailsMutation, useRemoveStoneDetailsMutation, useFetchUOMQuery, useFetchTrueBrightnessQuery, useFetchTrueStoneQuery, useFetchTrueGradeQuery, useFetchTrueTypeQuery } from "../store";
@@ -9,7 +9,7 @@ import ModalTitle from "../components/modal_title";
 import moment from "moment";
 import TableList from "../components/data_table";
 import { useAuthUser } from "react-auth-kit";
-import Select from "react-select";
+
 const validator = require("validator");
 
 function StoneDetails() {
@@ -38,25 +38,25 @@ function StoneDetails() {
         refetch();
     }, []);
 
-    const stoneOption = stoneData?.map((stone) => {
-        return {value: stone.stoneCode, label: stone.stoneDesc}
-    });
+    // const stoneOption = stoneData?.map((stone) => {
+    //     return {value: stone.stoneCode, label: stone.stoneDesc}
+    // });
 
-    const typeOption = typeData?.map((type) => {
-        return {value: type.typeCode, label: type.typeDesc}
-    });
+    // const typeOption = typeData?.map((type) => {
+    //     return {value: type.typeCode, label: type.typeDesc}
+    // });
 
-    const gradeOption = gradeData?.map((grade) => {
-        return {value: grade.gradeCode, label: grade.gradeDesc}
-    });
+    // const gradeOption = gradeData?.map((grade) => {
+    //     return {value: grade.gradeCode, label: grade.gradeDesc}
+    // });
 
-    const brightOption = brightData?.map((bright) => {
-        return {value: bright.brightCode, label: bright.brightDesc}
-    });
+    // const brightOption = brightData?.map((bright) => {
+    //     return {value: bright.brightCode, label: bright.brightDesc}
+    // });
 
-    const unitOption = unitData?.map((unit) => {
-        return {value: unit.unitCode, label: unit.unitCode}
-    });
+    // const unitOption = unitData?.map((unit) => {
+    //     return {value: unit.unitCode, label: unit.unitCode}
+    // });
 
     const [description, setDescription] = useState({
         stoneDesc: "",
@@ -65,7 +65,7 @@ function StoneDetails() {
         size: "",
     });
 
-    const [addStoneDetail, addResult] = useAddStoneDetailsMutation();
+    const [addStoneDetail] = useAddStoneDetailsMutation();
 
     const [editStoneDetail] = useUpdateStoneDetailsMutation();
 
@@ -88,7 +88,7 @@ function StoneDetails() {
         size: "",
         qty: 0,
         weight: 0,
-        unitCode: "",
+        unitCode: "ct",
         remark: "",
         isActive: true,
         createdAt: moment().toISOString(),
@@ -135,9 +135,9 @@ function StoneDetails() {
         if(formData.qty === 0) {
             newErrors.qty = 'Quantity is required.'
         }
-        if(formData.weight === 0) {
-            newErrors.weight = 'Weight is required.'
-        }
+        // if(formData.weight === 0) {
+        //     newErrors.weight = 'Weight is required.'
+        // }
 
         setValidationText(newErrors);
 
@@ -345,7 +345,7 @@ function StoneDetails() {
                     <form  className="flex flex-col p-3 gap-4">
                         <div className="grid grid-cols-4">
                             <div className="w-full col-span-2">
-                                <label className="text-black">Description</label>
+                                <label className="text-black text-sm mb-2">Description</label>
                                 <input className="border border-blue-gray-200 text-black w-full h-[40px] p-2.5 rounded-md" value={`${description.stoneDesc} ${description.size} ${description.gradeDesc} ${description.brightDesc}`} disabled />
                                 {
                                     validationText.description && <p className="block text-[12px] text-red-500 font-sans mb-2">{validationText.description}</p>
@@ -360,7 +360,7 @@ function StoneDetails() {
                         </div>
                         <div className="grid grid-cols-3 gap-2 w-full">
                             <div>
-                                <label className="text-black">Stone Description</label>
+                                <label className="text-black text-sm mb-2">Stone Description</label>
                                 <select 
                                     className="block w-full text-black p-2.5 border border-blue-gray-200 max-h-[2.5rem] rounded-md focus:border-black"
                                     value={formData.stoneCode}
@@ -390,7 +390,7 @@ function StoneDetails() {
                                 }
                             </div>
                             <div>
-                                <label className="text-black">Brightness</label>
+                                <label className="text-black text-sm mb-2">Brightness</label>
                                 <select 
                                     className="block w-full text-black p-2.5 border border-blue-gray-200 max-h-[2.5rem] rounded-md focus:border-black"
                                     value={formData.brightCode}
@@ -420,7 +420,7 @@ function StoneDetails() {
                                 }
                             </div>
                             <div>
-                                <label className="text-black">Type</label>
+                                <label className="text-black text-sm mb-2">Type</label>
                                 <select 
                                     className="block w-full text-black p-2.5 border border-blue-gray-200 max-h-[2.5rem] rounded-md focus:border-black"
                                     value={formData.typeCode}
@@ -451,7 +451,7 @@ function StoneDetails() {
                         </div>
                         <div className="grid grid-cols-3 gap-2 w-full">
                             <div>
-                                <label className="text-black">Grade</label>
+                                <label className="text-black text-sm mb-2">Grade</label>
                                 <select 
                                     className="block w-full text-black p-2.5 border border-blue-gray-200 max-h-[2.5rem] rounded-md focus:border-black"
                                     value={formData.gradeCode}
@@ -482,7 +482,7 @@ function StoneDetails() {
                             <div className="col-span-2">
                                 <div className="grid grid-cols-3 gap-2">
                                     <div className="w-full">
-                                        <label className="text-black">Size</label>
+                                        <label className="text-black text-sm mb-2">Size</label>
                                         <input 
                                             type="text" 
                                             className="border border-blue-gray-200 w-full h-[40px] p-2.5 rounded-md text-black" 
@@ -497,14 +497,14 @@ function StoneDetails() {
                                         }
                                     </div>
                                     <div>
-                                        <label className="text-black">Qty</label>
+                                        <label className="text-black text-sm mb-2">Qty</label>
                                         <input type="number" className="border border-blue-gray-200 w-full h-[40px] p-2.5 rounded-md text-black" value={formData.qty} onChange={(e) => setFormData({...formData, qty: e.target.value})} readOnly={isEdit}/>
                                         {
                                             validationText.qty && <p className="block text-[12px] text-red-500 font-sans">{validationText.qty}</p>
                                         }
                                     </div>
                                     <div>
-                                        <label className="text-black">Weight</label>
+                                        <label className="text-black text-sm mb-2">Weight</label>
                                         <input type="number" className="border border-blue-gray-200 w-full h-[40px] p-2.5 rounded-md text-black" value={formData.weight} onChange={(e) => setFormData({...formData, weight: e.target.value})} />
                                         {
                                             validationText.weight && <p className="block text-[12px] text-red-500 font-sans">{validationText.weight}</p>
@@ -515,7 +515,7 @@ function StoneDetails() {
                         </div>
                         <div className="grid grid-cols-3 gap-2 w-full">
                             <div>
-                                <label className="text-black">Unit</label>
+                                <label className="text-black text-sm mb-2">Unit</label>
                                 <select 
                                     className="block w-full text-black p-2.5 border border-blue-gray-200 max-h-[2.5rem] rounded-md focus:border-black"
                                     value={formData.unitCode}
@@ -526,7 +526,7 @@ function StoneDetails() {
                                     <option value="" disabled>Select...</option>
                                     {
                                         unitData?.map((unit) => {
-                                            return <option value={unit.unitCode} key={unit.unitCode}>{unit.unitDesc}</option>
+                                            return <option value={unit.unitCode} key={unit.unitCode}>{unit.unitCode}</option>
                                         })
                                     }
                                 </select>
@@ -543,7 +543,7 @@ function StoneDetails() {
                                 }
                             </div>
                             <div className="col-span-2">
-                                <label className="text-black">Remark</label>
+                                <label className="text-black text-sm mb-2">Remark</label>
                                 <textarea
                                     className="border border-blue-gray-200 w-full px-2.5 py-1.5 rounded-md text-black"
                                     rows={1} 

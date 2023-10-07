@@ -6,7 +6,6 @@ import { pause } from "../const";
 import { useFetchTruePurchaseQuery, useRemovePurchaseMutation } from "../store";
 import DeleteModal from "../components/delete_modal";
 import SuccessAlert from "../components/success_alert";
-import SectionTitle from "../components/section_title";
 import moment from "moment";
 import TableList from "../components/data_table";
 import { Link } from "react-router-dom";
@@ -44,41 +43,36 @@ function PurchaseList() {
     const column = [
         {
             name: 'Invoice No',
-            sortable: true,
             width: '200px',
             selector: row => row.Code,
+            omit: true
         },
         {
             name: 'Date',
-            sortable: true,
-            width: "200px",
+            width: "150px",
             selector: row => row.PurDate,
 
         },
         {
             name: 'Supplier',
-            sortable: true,
             width: "200px",
             selector: row => row.Supplier,
 
         },
         {
             name: 'Sub Total',
-            sortable: true,
             width: "150px",
             selector: row => row.SubTotal,
 
         },
         {
             name: 'Discount Amt',
-            sortable: true,
             width: "150px",
             selector: row => row.DiscAmt,
 
         },
         {
             name: 'Grand Total',
-            sortable: true,
             width: "150px",
             selector: row => row.GrandTotal,
 
@@ -92,13 +86,11 @@ function PurchaseList() {
             name: 'Created At',
             width: "200px",
             selector: row => row.CreatedAt,
-            sortable: true
         },
         {
             name: 'Updated At',
             width: "200px",
             selector: row => row.UpdatedAt,
-            sortable: true
         },
         {
             name: 'Action',
@@ -106,9 +98,9 @@ function PurchaseList() {
             width: "100px",
             cell: (row) => (
                 <div className="flex items-center gap-2">
-                    <Link to={`/purchase_edit/${row.Code}`}>
+                    {/* <Link to={`/purchase_edit/${row.Code}`}>
                         <Button variant="text" color="deep-purple" className="p-2"><FaPencil /></Button>
-                    </Link>
+                    </Link> */}
                     <Button variant="text" color="red" className="p-2" onClick={() => handleDeleteBtn(row.Code)}><FaTrashCan /></Button>
                 </div>
             )
@@ -118,11 +110,11 @@ function PurchaseList() {
     const tbodyData = data?.map((purchaseData) => {
         return {
             Code: purchaseData.invoiceNo,
-            PurDate: moment(purchaseData.purDate).format("YYYY-MM-DD hh:mm:ss a"),
+            PurDate: moment(purchaseData.purDate).format("YYYY-MM-DD"),
             Supplier: purchaseData.supplier.supplierName,
-            SubTotal: purchaseData.subTotal,
-            DiscAmt: purchaseData.discAmt,
-            GrandTotal: purchaseData.grandTotal,
+            SubTotal: purchaseData.subTotal.toLocaleString('en-US'),
+            DiscAmt: purchaseData.discAmt.toLocaleString('en-US'),
+            GrandTotal: purchaseData.grandTotal.toLocaleString('en-US'),
             Remark: purchaseData.remark,
             CreatedAt: moment(purchaseData.createdAt).format("YYYY-MM-DD hh:mm:ss a"),
             CreatedBy: purchaseData.createdBy,

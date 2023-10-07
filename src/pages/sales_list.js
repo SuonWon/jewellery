@@ -6,7 +6,6 @@ import { useRemoveStoneDetailsMutation, useFetchSalesQuery } from "../store";
 import { pause } from "../const";
 import DeleteModal from "../components/delete_modal";
 import SuccessAlert from "../components/success_alert";
-import SectionTitle from "../components/section_title";
 import moment from "moment";
 import TableList from "../components/data_table";
 import { Link, useNavigate } from "react-router-dom";
@@ -45,43 +44,38 @@ function SalesList() {
     }
 
     const column = [
-        // {
-        //     name: 'Invoice No',
-        //     sortable: true,
-        //     width: '200px',
-        //     selector: row => row.Code,
-        // },
+        {
+            name: 'Invoice No',
+            width: '200px',
+            selector: row => row.Code,
+            omit: true
+        },
         {
             name: 'Date',
-            sortable: true,
             width: "150px",
             selector: row => row.PurDate,
 
         },
         {
             name: 'Customer',
-            sortable: true,
             width: "200px",
             selector: row => row.Supplier,
 
         },
         {
             name: 'Sub Total',
-            sortable: true,
             width: "150px",
             selector: row => row.SubTotal,
 
         },
         {
             name: 'Discount Amt',
-            sortable: true,
             width: "150px",
             selector: row => row.DiscAmt,
 
         },
         {
             name: 'Grand Total',
-            sortable: true,
             width: "150px",
             selector: row => row.GrandTotal,
 
@@ -95,13 +89,11 @@ function SalesList() {
             name: 'Created At',
             width: "200px",
             selector: row => row.CreatedAt,
-            sortable: true
         },
         {
             name: 'Updated At',
             width: "200px",
             selector: row => row.UpdatedAt,
-            sortable: true
         },
         {
             name: 'Action',
@@ -109,7 +101,7 @@ function SalesList() {
             width: "100px",
             cell: (row) => (
                 <div className="flex items-center gap-2">
-                    <Button variant="text" color="deep-purple" className="p-2" onClick={() => editSales(row.Code)}><FaPencil /></Button>
+                    {/* <Button variant="text" color="deep-purple" className="p-2" onClick={() => editSales(row.Code)}><FaPencil /></Button> */}
                     <Button variant="text" color="red" className="p-2" onClick={() => handleDeleteBtn(row.Code)}><FaTrashCan /></Button>
                 </div>
             )
@@ -121,9 +113,9 @@ function SalesList() {
             Code: salesData.invoiceNo,
             PurDate: moment(salesData.salesDate).format("YYYY-MM-DD"),
             Supplier: salesData.customer.customerName,
-            SubTotal: salesData.subTotal,
-            DiscAmt: salesData.discAmt,
-            GrandTotal: salesData.grandTotal,
+            SubTotal: salesData.subTotal.toLocaleString('en-US'),
+            DiscAmt: salesData.discAmt.toLocaleString('en-US'),
+            GrandTotal: salesData.grandTotal.toLocaleString('en-US'),
             Remark: salesData.remark,
             CreatedAt: moment(salesData.createdAt).format("YYYY-MM-DD hh:mm:ss a"),
             CreatedBy: salesData.createdBy,

@@ -8,7 +8,6 @@ import moment from "moment";
 import SuccessAlert from "../components/success_alert";
 import { v4 as uuidv4 } from 'uuid';
 import { pause } from "../const";
-const validator = require('validator');
 
 function PurchaseInvoice() {
 
@@ -16,15 +15,15 @@ function PurchaseInvoice() {
 
     const {data: supplierData} = useFetchTrueSupplierQuery();
 
-    const supplierOption = supplierData?.map((supplier) => {
-        return {value: supplier.supplierCode, label: supplier.supplierName}
-    });
+    // const supplierOption = supplierData?.map((supplier) => {
+    //     return {value: supplier.supplierCode, label: supplier.supplierName}
+    // });
 
     const {data: stoneDetails} = useFetchStoneDetailsQuery();
 
-    const stoneDetailOption = stoneDetails?.map((stoneDetail) => {
-        return {value: stoneDetail.stoneDetailCode, label: stoneDetail.stoneDesc}
-    });
+    // const stoneDetailOption = stoneDetails?.map((stoneDetail) => {
+    //     return {value: stoneDetail.stoneDetailCode, label: stoneDetail.stoneDesc}
+    // });
 
     const {data: unitData} = useFetchUOMQuery();
 
@@ -58,7 +57,7 @@ function PurchaseInvoice() {
         stoneDetailCode: "",
         qty: 0,
         weight: 0,
-        unitCode: "",
+        unitCode: 'ct',
         unitPrice: 0,
         totalPrice: 0,
         serviceCharge: 0,
@@ -179,7 +178,7 @@ function PurchaseInvoice() {
 
     const SaveDetail = (submitData) => {
         let subTotal = parseFloat(0);
-        let tempData = purchaseDetails.filter((e) => e.lineNo != submitData.details.lineNo);
+        let tempData = purchaseDetails.filter((e) => e.lineNo !== submitData.details.lineNo);
         tempData.push({
             ...submitData.details,
             stoneDetailCode: Number(submitData.details.stoneDetailCode),
@@ -249,7 +248,6 @@ function PurchaseInvoice() {
             name: 'No',
             width: "80px",
             selector: row => row.Code,
-
         },
         {
             name: 'Description',
@@ -457,7 +455,7 @@ function PurchaseInvoice() {
                                         {...register("details.qty")}
                                         containerProps={{ className: "min-w-[50px]" }}
                                         type="number"
-                                        onBlur={(e) => addQty(e)}
+                                        onChange={(e) => addQty(e)}
                                         labelProps={{
                                             className: "hidden"
                                         }}
@@ -482,7 +480,7 @@ function PurchaseInvoice() {
                                         <option value=""  disabled>Select Unit</option>
                                         {
                                             unitData?.map((unit) => {
-                                                return <option value={unit.unitCode} key={unit.unitCode} >{unit.unitDesc}</option>
+                                                return <option value={unit.unitCode} key={unit.unitCode} >{unit.unitCode}</option>
                                             })
                                         }
                                     </select>
@@ -493,9 +491,9 @@ function PurchaseInvoice() {
                                     <label className="text-black text-sm mb-2">Unit Price</label>
                                     <Input
                                         {...register("details.unitPrice")}
-                                        containerProps={{ className: "min-w-[100px]" }}
+                                        containerProps={{ className: "min-w-[95px]" }}
                                         type="number"
-                                        onBlur={(e) => addUnitPrice(e)}
+                                        onChange={(e) => addUnitPrice(e)}
                                         labelProps={{
                                             className: "hidden"
                                         }}
@@ -504,21 +502,25 @@ function PurchaseInvoice() {
                                 </div>
                                 <div>
                                     <label className="text-black text-sm mb-2">Total Price</label>
-                                    <input
+                                    <Input
+                                        containerProps={{ className: "min-w-[95px]" }}
                                         {...register("details.totalPrice")}
-                                        className="rounded-md text-right p-2 placeholder:text-blue-gray-500" 
                                         type="number"
                                         placeholder="Total Price"
-                                        disabled
+                                        readOnly
+                                        labelProps={{
+                                            className: "hidden"
+                                        }}
+                                        className="min-h-full !border !border-blue-gray-200 focus:border-2 focus:!border-gray-900 focus:!border-t-gray-900" 
                                     />
                                 </div>
                                 <div>
                                     <label className="text-black text-sm mb-2">Service Charge</label>
                                     <Input
                                         {...register("details.serviceCharge")}
-                                        containerProps={{ className: "min-w-[100px]" }}
+                                        containerProps={{ className: "min-w-[95px]" }}
                                         type="number"
-                                        onBlur={(e) => addServiceCharge(e)}
+                                        onChange={(e) => addServiceCharge(e)}
                                         labelProps={{
                                             className: "hidden"
                                         }}
@@ -527,12 +529,16 @@ function PurchaseInvoice() {
                                 </div>
                                 <div>
                                     <label className="text-black text-sm mb-2">Total Amt</label>
-                                    <input
+                                    <Input
+                                        containerProps={{ className: "min-w-[95px]" }}
                                         {...register("details.totalAmt")}
-                                        className="rounded-md text-right p-2 placeholder:text-blue-gray-500" 
                                         type="number"
                                         placeholder="Total Amount"
-                                        disabled
+                                        readOnly
+                                        labelProps={{
+                                            className: "hidden"
+                                        }}
+                                        className="min-h-full !border !border-blue-gray-200 focus:border-2 focus:!border-gray-900 focus:!border-t-gray-900" 
                                     />
                                 </div>
                                 
@@ -569,15 +575,35 @@ function PurchaseInvoice() {
                     </Card>
                     <div className="grid grid-cols-4 gap-2 mt-4 items-center text-sm">
                         <label className="col-span-3 text-end">Sub Total :</label>
-                        <input className="rounded-md text-right p-2" value={purchase.subTotal} disabled type="number"  />
+                        <Input 
+                            labelProps={{
+                                className: "hidden"
+                            }}
+                            className="min-h-full !border !border-blue-gray-200 focus:border-2 focus:!border-gray-900 focus:!border-t-gray-900" 
+                            value={purchase.subTotal} 
+                            readOnly 
+                            type="number"  
+                        />
                     </div>
                     <div className="grid grid-cols-4 gap-2 mt-4 items-center text-sm">
                         <label className="col-span-3 text-end">Discount Amount :</label>
-                        <input className="rounded-md text-right p-2 border border-blue-gray-500" value={purchase.discAmt} type="number"  onChange={(e) => addDiscAmt(e)} />
+                        <Input 
+                        labelProps={{
+                            className: "hidden"
+                        }}
+                        className="min-h-full !border !border-blue-gray-200 focus:border-2 focus:!border-gray-900 focus:!border-t-gray-900" 
+                        value={purchase.discAmt} type="number"  onChange={(e) => addDiscAmt(e)} />
                     </div>
                     <div className="grid grid-cols-4 gap-2 mt-4 items-center text-sm">
                         <label className="col-span-3 text-end">Grand Total :</label>
-                        <input className="rounded-md text-right p-2" type="number" value={purchase.grandTotal}  disabled/>
+                        <Input 
+                        labelProps={{
+                            className: "hidden"
+                        }}
+                        className="min-h-full !border !border-blue-gray-200 focus:border-2 focus:!border-gray-900 focus:!border-t-gray-900" 
+                        type="number" 
+                        value={purchase.grandTotal} 
+                        readOnly/>
                     </div>
                 </div>
             </div>

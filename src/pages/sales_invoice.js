@@ -34,7 +34,7 @@ function SalesInvoice() {
         stoneDetailName: '',
         qty: 0,
         weight: 0,
-        unitCode: '',
+        unitCode: 'ct',
         unitPrice: 0,
         totalPrice: 0,
         serviceCharge: 0,
@@ -390,19 +390,28 @@ function SalesInvoice() {
                             <Typography variant="small">Basic Info</Typography>
                         </div>
                         <div className="grid grid-cols-4 gap-2 px-3">
-                            <Input
-                                containerProps={{ className: "min-w-[100px]" }}
-                                label="Sales Date"
-                                type="date"
-                                value={salesData.salesDate}
-                                onChange={(e) => {
-                                    setSalesData({
-                                        ...salesData,
-                                        salesDate: e.target.value
-                                    })
-                                }}
-                            />
                             <div>
+                                <label className="text-black mb-2 text-sm">Purchase Date</label>
+                                <Input
+                                    containerProps={{ className: "min-w-[100px]" }}
+                                    label="Sales Date"
+                                    type="date"
+                                    value={salesData.salesDate}
+                                    onChange={(e) => {
+                                        setSalesData({
+                                            ...salesData,
+                                            salesDate: e.target.value
+                                        })
+                                    }}
+                                    labelProps={{
+                                        className: "hidden"
+                                    }}
+                                    className="min-h-full !border !border-blue-gray-200 focus:border-2 focus:!border-gray-900 focus:!border-t-gray-900" 
+
+                                />
+                            </div>
+                            <div>
+                                <label className="text-black mb-2 text-sm">Supplier</label>
                                 <select className="block w-full p-2.5 border border-blue-gray-200 max-h-[2.5rem] rounded-md focus:border-black" value={salesData.customerCode} placeholder="Select Customer"
                                     onChange={(e) => {
                                         setSalesData({
@@ -424,9 +433,10 @@ function SalesInvoice() {
                             </div>
                             
                             <div className="col-span-2">
+                                <label className="text-black mb-2 text-sm">Remarks</label>
                                 <Input
                                     containerProps={{ className: "min-w-[100px]" }}
-                                    label="Remark"
+                                    placeholder="Remark"
                                     type="text"
                                     value={salesData.remark}
                                     onChange={(e) => {
@@ -435,6 +445,10 @@ function SalesInvoice() {
                                             remark: e.target.value
                                         })
                                     }}
+                                    labelProps={{
+                                        className: "hidden"
+                                    }}
+                                    className="min-h-full !border !border-blue-gray-200 focus:border-2 focus:!border-gray-900 focus:!border-t-gray-900" 
                                 />
                             </div>
                         </div>
@@ -460,6 +474,7 @@ function SalesInvoice() {
                                 <div className="flex px-3 mb-4 text-sm">
                                     <input hidden />
                                     <div className="w-full ">
+                                        <label className="text-black mb-2 text-sm">Weight</label>
                                         <select className="border-blue-gray-200 max-h-[2.5rem] p-2.5 border w-full rounded-md block focus:border-black" value={salesDetails.stoneDetailCode}
                                             onChange={(e) => {
                                                 console.log(e.target.options[e.target.selectedIndex].text);
@@ -485,35 +500,51 @@ function SalesInvoice() {
                                     
                                 </div>
                                 <div className="grid grid-cols-3 gap-2 px-3 mb-4 text-sm">
-                                    <Input
-                                        containerProps={{ className: "min-w-[50px]" }}
-                                        label="Quantity"
-                                        type="number"
-                                        value={salesDetails.qty}
-                                        onChange={(e) => {
-                                            const qty = parseFloat(e.target.value);
-                                            const totalPrice = qty * parseFloat(salesDetails.unitPrice);
-                                            setSalesDetails({
-                                                ...salesDetails,
-                                                qty: qty,
-                                                totalPrice: totalPrice,
-                                                totalAmt: totalPrice - salesDetails.serviceCharge
-                                            })
-                                        }}
-                                    />
-                                    <Input
-                                        containerProps={{ className: "min-w-[50px]" }}
-                                        label="Weight"
-                                        type="number"
-                                        value={salesDetails.weight}
-                                        onChange={(e) => {
-                                            setSalesDetails({
-                                                ...salesDetails,
-                                                weight: parseFloat(e.target.value)
-                                            })
-                                        }}
-                                    />
                                     <div>
+                                        <label className="text-black text-sm mb-2">Qty</label>
+                                        <Input
+                                            containerProps={{ className: "min-w-[50px]" }}
+                                            label="Quantity"
+                                            type="number"
+                                            value={salesDetails.qty}
+                                            onChange={(e) => {
+                                                const qty = parseFloat(e.target.value);
+                                                const totalPrice = qty * parseFloat(salesDetails.unitPrice);
+                                                setSalesDetails({
+                                                    ...salesDetails,
+                                                    qty: qty,
+                                                    totalPrice: totalPrice,
+                                                    totalAmt: totalPrice - salesDetails.serviceCharge
+                                                })
+                                            }}
+                                            labelProps={{
+                                                className: "hidden"
+                                            }}
+                                            className="min-h-full !border !border-blue-gray-200 focus:border-2 focus:!border-gray-900 focus:!border-t-gray-900" 
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="text-black text-sm mb-2">Weight</label>
+                                        <Input
+                                            containerProps={{ className: "min-w-[50px]" }}
+                                            label="Weight"
+                                            type="number"
+                                            value={salesDetails.weight}
+                                            onChange={(e) => {
+                                                setSalesDetails({
+                                                    ...salesDetails,
+                                                    weight: parseFloat(e.target.value)
+                                                })
+                                            }}
+                                            labelProps={{
+                                                className: "hidden"
+                                            }}
+                                            className="min-h-full !border !border-blue-gray-200 focus:border-2 focus:!border-gray-900 focus:!border-t-gray-900" 
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="text-black text-sm mb-2">Unit</label>
                                         <select className="block w-full p-2.5  border border-blue-gray-200 max-h-[2.5rem] rounded-md focus:border-black"  value={salesDetails.unitCode}
                                             onChange={(e) => {
                                                 setSalesDetails({
@@ -525,7 +556,7 @@ function SalesInvoice() {
                                             <option value=""  disabled>Select Unit</option>
                                             {
                                                 unitData?.map((unit) => {
-                                                    return <option value={unit.unitCode} key={unit.unitCode} >{unit.unitDesc}</option>
+                                                    return <option value={unit.unitCode} key={unit.unitCode} >{unit.unitCode}</option>
                                                 })
                                             }
                                         </select>
@@ -536,62 +567,90 @@ function SalesInvoice() {
                                     
                                 </div>
                                 <div className="grid grid-cols-2 gap-2 px-3 mb-4 text-sm">
-                                    <Input
-                                        containerProps={{ className: "min-w-[95px]" }}
-                                        label="Unit Price"
-                                        type="number"
-                                        value={salesDetails.unitPrice}
-                                        onChange={(e) => {
-                                            const price = parseFloat(e.target.value);
-                                            const totalPrice = price * parseFloat(salesDetails.qty);
-                                            setSalesDetails({
-                                                ...salesDetails,
-                                                unitPrice: price,
-                                                totalPrice: totalPrice,
-                                                totalAmt: totalPrice - salesDetails.serviceCharge
-                                            })
-                                        }}
-                                    />
-                                    <Input
-                                        containerProps={{ className: "min-w-[95px]"}}
-                                        label="Total Price"
-                                        type="number"
-                                        value={salesDetails.totalPrice}
-                                        onChange={(e) => {
-                                            setSalesDetails({
-                                                ...salesDetails,
-                                                totalPrice: parseFloat(e.target.value)
-                                            })
-                                        }}
-                                        readOnly
-                                    />
-                                    <Input
-                                        containerProps={{ className: "min-w-[95px]" }}
-                                        label="Service Charge"
-                                        type="number"
-                                        value={salesDetails.serviceCharge}
-                                        onChange={(e) => {
-                                            const service = parseFloat(e.target.value);
-                                            setSalesDetails({
-                                                ...salesDetails,
-                                                serviceCharge: parseFloat(e.target.value),
-                                                totalAmt: salesDetails.totalPrice - service
-                                            })
-                                        }}
-                                    />
-                                    <Input
-                                        containerProps={{ className: "min-w-[95px]" }}
-                                        label="Total Amount"
-                                        type="number"
-                                        value={salesDetails.totalAmt}
-                                        onChange={(e) => {
-                                            setSalesDetails({
-                                                ...salesDetails,
-                                                totalAmt: parseFloat(e.target.value)
-                                            })
-                                        }}
-                                        readOnly
-                                    />
+                                    <div>
+                                        <label className="text-black text-sm mb-2">Unit Price</label>
+                                        <Input
+                                            containerProps={{ className: "min-w-[95px]" }}
+                                            label="Unit Price"
+                                            type="number"
+                                            value={salesDetails.unitPrice}
+                                            onChange={(e) => {
+                                                const price = parseFloat(e.target.value);
+                                                const totalPrice = price * parseFloat(salesDetails.qty);
+                                                setSalesDetails({
+                                                    ...salesDetails,
+                                                    unitPrice: price,
+                                                    totalPrice: totalPrice,
+                                                    totalAmt: totalPrice - salesDetails.serviceCharge
+                                                })
+                                            }}
+                                            labelProps={{
+                                                className: "hidden"
+                                            }}
+                                            className="min-h-full !border !border-blue-gray-200 focus:border-2 focus:!border-gray-900 focus:!border-t-gray-900" 
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="text-black text-sm mb-2">Total Price</label>
+                                        <Input
+                                            containerProps={{ className: "min-w-[95px]"}}
+                                            label="Total Price"
+                                            type="number"
+                                            value={salesDetails.totalPrice}
+                                            onChange={(e) => {
+                                                setSalesDetails({
+                                                    ...salesDetails,
+                                                    totalPrice: parseFloat(e.target.value)
+                                                })
+                                            }}
+                                            labelProps={{
+                                                className: "hidden"
+                                            }}
+                                            className="min-h-full !border !border-blue-gray-200 focus:border-2 focus:!border-gray-900 focus:!border-t-gray-900" 
+                                            readOnly
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="text-black text-sm mb-2">Service Charge</label>
+                                        <Input
+                                            containerProps={{ className: "min-w-[95px]" }}
+                                            label="Service Charge"
+                                            type="number"
+                                            value={salesDetails.serviceCharge}
+                                            onChange={(e) => {
+                                                const service = parseFloat(e.target.value);
+                                                setSalesDetails({
+                                                    ...salesDetails,
+                                                    serviceCharge: parseFloat(e.target.value),
+                                                    totalAmt: salesDetails.totalPrice - service
+                                                })
+                                            }}
+                                            labelProps={{
+                                                className: "hidden"
+                                            }}
+                                            className="min-h-full !border !border-blue-gray-200 focus:border-2 focus:!border-gray-900 focus:!border-t-gray-900" 
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="text-black text-sm mb-2">Total Amt</label>
+                                        <Input
+                                            containerProps={{ className: "min-w-[95px]" }}
+                                            label="Total Amount"
+                                            type="number"
+                                            value={salesDetails.totalAmt}
+                                            onChange={(e) => {
+                                                setSalesDetails({
+                                                    ...salesDetails,
+                                                    totalAmt: parseFloat(e.target.value)
+                                                })
+                                            }}
+                                            labelProps={{
+                                                className: "hidden"
+                                            }}
+                                            className="min-h-full !border !border-blue-gray-200 focus:border-2 focus:!border-gray-900 focus:!border-t-gray-900" 
+                                            readOnly
+                                        />
+                                    </div>
                                 </div>
                             </form>
                         </CardBody>
@@ -618,11 +677,9 @@ function SalesInvoice() {
                         </Card>
                         <div className="grid grid-cols-4 gap-2 mt-4 items-center text-sm">
                             <label className="col-span-3 text-end">Sub Total :</label>
-                            <input 
-                                className="rounded-md text-right p-2 border border-blue-gray-500" 
+                            <Input
                                 type="number"
-                                value={salesData.subTotal} 
-                                disabled
+                                value={salesData.subTotal}
                                 onChange={(e) => {
                                     const subTotal = parseFloat(e.target.value);
                                     setSalesData({
@@ -631,12 +688,16 @@ function SalesInvoice() {
                                         grandTotal: subTotal - salesData.discAmt
                                     })
                                 }}
+                                labelProps={{
+                                    className: "hidden"
+                                }}
+                                className="min-h-full !border !border-blue-gray-200 focus:border-2 focus:!border-gray-900 focus:!border-t-gray-900" 
+                                readOnly
                             />
                         </div>
                         <div className="grid grid-cols-4 gap-2 mt-4 items-center text-sm">
                             <label className="col-span-3 text-end">Discount Amount :</label>
-                            <input 
-                                className="rounded-md text-right p-2 border border-blue-gray-500" 
+                            <Input 
                                 type="number"
                                 value={salesData.discAmt} 
                                 onChange={(e) => {
@@ -647,21 +708,28 @@ function SalesInvoice() {
                                         grandTotal: salesData.subTotal - discAmt
                                     })
                                 }}
+                                labelProps={{
+                                    className: "hidden"
+                                }}
+                                className="min-h-full !border !border-blue-gray-200 focus:border-2 focus:!border-gray-900 focus:!border-t-gray-900" 
                             />
                         </div>
                         <div className="grid grid-cols-4 gap-2 mt-4 items-center text-sm">
                             <label className="col-span-3 text-end">Grand Total :</label>
-                            <input 
-                                className="rounded-md text-right p-2 border border-blue-gray-500" 
+                            <Input 
                                 type="number"
                                 value={salesData.grandTotal}
-                                disabled
                                 onChange={(e) => {
                                     setSalesData({
                                         ...salesData,
                                         grandTotal: e.target.value
                                     })
                                 }}
+                                labelProps={{
+                                    className: "hidden"
+                                }}
+                                className="min-h-full !border !border-blue-gray-200 focus:border-2 focus:!border-gray-900 focus:!border-t-gray-900" 
+                                readOnly
                             />
                         </div>
                     </div>
