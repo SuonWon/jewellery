@@ -9,6 +9,8 @@ import ModalTitle from "../components/modal_title";
 import moment from "moment";
 import TableList from "../components/data_table";
 import { useAuthUser } from "react-auth-kit";
+import SuccessAlert from "../components/success_alert";
+import { pause } from "../const";
 
 const validator = require("validator");
 
@@ -33,6 +35,11 @@ function StoneDetails() {
     const {data: unitData} = useFetchUOMQuery();
 
     const {data: brightData} = useFetchTrueBrightnessQuery();
+
+    const [ alert, setAlert] = useState({
+        isAlert: false,
+        message: ''
+    });
 
     useEffect(() => {
         refetch();
@@ -146,32 +153,85 @@ function StoneDetails() {
 
     const onSubmit = async () => {
         if(validateForm()) {
-            addStoneDetail({
-                ...formData,
-                stoneDesc: `${description.stoneDesc} ${description.size} ${description.gradeDesc} ${description.brightDesc}`,
-            }).then((res) => {
-                console.log(res);
-            });
-            setFormData(stoneDetail);
-            setOpen(!open);
+            try {
+                addStoneDetail({
+                    ...formData,
+                    stoneDesc: `${description.stoneDesc} ${description.size} ${description.gradeDesc} ${description.brightDesc}`,
+                }).then((res) => {
+                    if(res.error != null) {
+                        let message = '';
+                        if(res.error.data.statusCode == 409) {
+                            message = "Duplicate data found."
+                        }
+                        else {
+                            message = res.error.data.message
+                        }
+                        setAlert({
+                            isAlert: true,
+                            message: message
+                        })
+                        setTimeout(() => {
+                            setAlert({
+                                isAlert: false,
+                                message: ''
+                            })
+                        }, 2000);
+                    }
+                    
+                });
+                setFormData(stoneDetail);
+                setOpen(!open);
+                
+            }
+            catch(err) {
+                console.log(err.statusCode);
+                
+            }
         }
     };
 
     const onSaveSubmit = () => {
         if (validateForm()) {
-            addStoneDetail({
-                ...formData,
-                stoneDesc: `${description.stoneDesc} ${description.size} ${description.gradeDesc} ${description.brightDesc}`,
-            }).then((res) => {
-                console.log(res);
-            });
-            setFormData(stoneDetail);
-            setDescription({
-                stoneDesc: "",
-                brightDesc: "",
-                gradeDesc: "",
-                size: ""
-            });
+            try {
+                addStoneDetail({
+                    ...formData,
+                    stoneDesc: `${description.stoneDesc} ${description.size} ${description.gradeDesc} ${description.brightDesc}`,
+                }).then((res) => {
+                    
+                    if(res.error != null) {
+                        setOpen(!open);
+                        let message = '';
+                        if(res.error.data.statusCode == 409) {
+                            message = "Duplicate data found."
+                        }
+                        else {
+                            message = res.error.data.message
+                        }
+                        setAlert({
+                            isAlert: true,
+                            message: message
+                        })
+                        
+                        setTimeout(() => {
+                            setAlert({
+                                isAlert: false,
+                                message: ''
+                            })
+                        }, 2000);
+                    }
+                });
+                setFormData(stoneDetail);
+                setDescription({
+                    stoneDesc: "",
+                    brightDesc: "",
+                    gradeDesc: "",
+                    size: ""
+                });
+            }
+            catch(err) {
+                console.log(err.statusCode);
+            }
+            
         }
     };
 
@@ -334,6 +394,11 @@ function StoneDetails() {
         <>
         <div className="flex flex-col gap-4 relative max-w-[85%] min-w-[85%]">
             <SectionTitle title="Stone Details" handleModal={openModal} />
+            <div className="w-78 absolute top-0 right-0 z-[9999]">
+                {
+                    alert.isAlert && <SuccessAlert title="Stone Details" message={alert.message} isError={true} />
+                }
+            </div>
             <Card className="h-auto shadow-md max-w-screen-xxl rounded-sm p-2 border-t">
                 <CardBody className="rounded-sm overflow-auto p-0">
                     <TableList columns={column} data={tbodyData} />

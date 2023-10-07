@@ -252,7 +252,15 @@ function PurchaseInvoice() {
         {
             name: 'Description',
             width: "200px",
-            selector: row => row.Description,
+            selector: row => <select className="block w-[200px]" defaultValue={row.Description} disabled>
+            <option value="" disabled>Select stone detail</option>
+            {
+                stoneDetails?.length === 0 ? <option value="" disabled>There is no Data</option> :
+                stoneDetails?.map((stoneDetail) => {
+                    return <option value={stoneDetail.stoneDetailCode} key={stoneDetail.stoneDetailCode} >{stoneDetail.stoneDesc}</option>
+                })
+            }
+        </select>//row.Description,
 
         },
         {
@@ -346,7 +354,7 @@ function PurchaseInvoice() {
         <div className="flex flex-col gap-2 min-w-[85%] max-w-[85%]">
             <div className="w-78 absolute top-0 right-0 z-[9999]">
             {
-                result.isSuccess && isAlert && <SuccessAlert title="Purchase" message="Save successful." isError={false} />
+                result.isSuccess && isAlert && <SuccessAlert title="Purchase" message="Data is saved successfully." isError={false} />
             }
             </div>
             <div className="flex justify-between items-center py-3 bg-white gap-4 sticky top-0 z-10">

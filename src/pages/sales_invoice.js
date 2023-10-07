@@ -224,7 +224,7 @@ function SalesInvoice() {
                     ...alert,
                     isAlert: false,
                 });
-            }, 3000)
+            }, 2000)
         }
     }
 
@@ -377,7 +377,7 @@ function SalesInvoice() {
             <div className="flex flex-col gap-2 min-w-[85%] max-w-[85%]"> 
             <div className="w-78 absolute top-0 right-0 z-[9999]">
                 {
-                    alert.isAlert && <SuccessAlert message={alert.message} handleAlert={() => setAlert({...alert, isAlert: false})} />
+                    alert.isAlert && <SuccessAlert title="Purchase" message="Data is saved successfully." isError={false} />
                 }
             </div>
                 <div className="flex justify-between items-center py-3 bg-white gap-4 sticky top-0 z-10">
