@@ -37,7 +37,7 @@ function PurchaseInvoice() {
         stoneDetailName: '',
         qty: 0,
         weight: 0,
-        unitCode: '',
+        unitCode: 'ct',
         unitPrice: 0,
         totalPrice: 0,
         serviceCharge: 0,
@@ -563,7 +563,7 @@ function PurchaseInvoice() {
                                     <label className="text-black text-sm mb-2">Unit Price</label>
                                     <Input
                                         value={subPuDetail.unitPrice}
-                                        containerProps={{ className: "min-w-[100px]" }}
+                                        containerProps={{ className: "min-w-[95px]" }}
                                         type="number"
                                         labelProps={{
                                             className: "hidden"
@@ -583,19 +583,23 @@ function PurchaseInvoice() {
                                 </div>
                                 <div>
                                     <label className="text-black text-sm mb-2">Total Price</label>
-                                    <input
+                                    <Input
                                         value={subPuDetail.totalPrice}
-                                        className="rounded-md text-right p-2 placeholder:text-blue-gray-500" 
+                                        containerProps={{ className: "min-w-[95px]" }}
+                                        className="min-h-full !border !border-blue-gray-200 focus:border-2 focus:!border-gray-900 focus:!border-t-gray-900" 
                                         type="number"
                                         placeholder="Total Price"
-                                        disabled
+                                        labelProps={{
+                                            className: "hidden"
+                                        }}
+                                        readOnly
                                     />
                                 </div>
                                 <div>
                                     <label className="text-black text-sm mb-2">Service Charge</label>
                                     <Input
                                         value={subPuDetail.serviceCharge}
-                                        containerProps={{ className: "min-w-[100px]" }}
+                                        containerProps={{ className: "min-w-[95px]" }}
                                         type="number"
                                         labelProps={{
                                             className: "hidden"
@@ -613,12 +617,16 @@ function PurchaseInvoice() {
                                 </div>
                                 <div>
                                     <label className="text-black text-sm mb-2">Total Amt</label>
-                                    <input
+                                    <Input
+                                        containerProps={{ className: "min-w-[95px]" }}
                                         value={subPuDetail.totalAmt}
-                                        className="rounded-md text-right p-2 placeholder:text-blue-gray-500" 
+                                        className="min-h-full !border !border-blue-gray-200 focus:border-2 focus:!border-gray-900 focus:!border-t-gray-900" 
                                         type="number"
                                         placeholder="Total Amount"
-                                        disabled
+                                        labelProps={{
+                                            className: "hidden"
+                                        }}
+                                        readOnly
                                     />
                                 </div>
                                 
