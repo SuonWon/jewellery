@@ -139,9 +139,9 @@ function StoneDetails() {
         if(validator.isEmpty(formData.size.toString())) {
             newErrors.size = 'Size is required.'
         }
-        if(formData.qty === 0) {
-            newErrors.qty = 'Quantity is required.'
-        }
+        // if(formData.qty === 0) {
+        //     newErrors.qty = 'Quantity is required.'
+        // }
         // if(formData.weight === 0) {
         //     newErrors.weight = 'Weight is required.'
         // }
@@ -197,7 +197,7 @@ function StoneDetails() {
                     ...formData,
                     stoneDesc: `${description.stoneDesc} ${description.size} ${description.gradeDesc} ${description.brightDesc}`,
                 }).then((res) => {
-                    
+
                     if(res.error != null) {
                         setOpen(!open);
                         let message = '';
