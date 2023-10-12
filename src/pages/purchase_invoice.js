@@ -192,8 +192,6 @@ function PurchaseInvoice() {
         }
     };
 
-    console.log(purchaseDetails);
-
     const handleEdit = (id) => {
 
         let tempData = purchaseDetails.filter((detail)=> detail.id === id);
@@ -230,8 +228,9 @@ function PurchaseInvoice() {
         setPurchase({
             ...purchase,
             subTotal: purchase.subTotal - currentData.totalAmt,
-            grandTotal: purchase.grandTotal - currentData.totalAmt
-        })
+            grandTotal: purchase.grandTotal - currentData.totalAmt,
+            purchaseDetail: purchase.purchaseDetail.filter(rec => rec.id !== id)
+        });
     }
 
     const SaveDetail = () => {

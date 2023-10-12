@@ -11,6 +11,9 @@ const salesApi = createApi({
     endpoints(builder) {
         return {
             fetchSales: builder.query({
+                providesTags: () => {
+                    return [{type: 'Sales', id: "All"}]
+                },
                 query: () => {
                     return {
                         url: '/sales/get-all-sales',
@@ -19,18 +22,36 @@ const salesApi = createApi({
                 }
             }),
             fetchTrueSales: builder.query({
+                providesTags: () => {
+                    return [{type: 'Sales', id: "All"}]
+                },
                 query: () => {
                     return {
-                        url: '/sales/get-true-sales',
+                        url: '/sales/get-true-sales/?status=O',
                         method: 'GET'
                     }
                 }
             }),
             addSales: builder.mutation({
+                invalidatesTags: () => {
+                    return [{type: "Sales", id:"All"}]
+                },
                 query: (salesData) => {
                     return {
                         url: "/sales/create-sales",
                         method: 'POST',
+                        body: salesData
+                    }
+                }
+            }),
+            removeSales: builder.mutation({
+                invalidatesTags: () => {
+                    return [{type: "Sales", id:"All"}]
+                },
+                query: (salesData) => {
+                    return {
+                        url: "/sales/delete-sales",
+                        method: 'PUT',
                         body: salesData
                     }
                 }
@@ -39,6 +60,6 @@ const salesApi = createApi({
     }
 });
 
-export const { useAddSalesMutation, useFetchSalesQuery, useFetchTrueSalesQuery } = salesApi;
+export const { useAddSalesMutation, useFetchSalesQuery, useFetchTrueSalesQuery, useRemoveSalesMutation } = salesApi;
 
 export { salesApi }

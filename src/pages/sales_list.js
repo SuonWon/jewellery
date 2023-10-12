@@ -1,16 +1,19 @@
 /* eslint-disable eqeqeq */
 import { Button, Card, CardBody, Typography } from "@material-tailwind/react";
-import { FaPencil, FaPlus, FaTrashCan,} from "react-icons/fa6";
+import { FaPlus, FaTrashCan,} from "react-icons/fa6";
 import { useState } from "react";
-import { useRemoveStoneDetailsMutation, useFetchSalesQuery } from "../store";
+import { useFetchTrueSalesQuery, useRemoveSalesMutation } from "../store";
 import { pause } from "../const";
 import DeleteModal from "../components/delete_modal";
 import SuccessAlert from "../components/success_alert";
 import moment from "moment";
 import TableList from "../components/data_table";
 import { Link, useNavigate } from "react-router-dom";
+import { useAuthUser } from "react-auth-kit";
 
 function SalesList() {
+
+    const auth = useAuthUser();
 
     const [openDelete, setOpenDelete] = useState(false);
 
@@ -18,14 +21,19 @@ function SalesList() {
 
     const [isAlert, setIsAlert] = useState(true);
 
-    const {data} = useFetchSalesQuery();
+    const {data} = useFetchTrueSalesQuery();
 
-    const [removeStoneDetail, removeResult] = useRemoveStoneDetailsMutation();
+    const [removeSales, removeResult] = useRemoveSalesMutation();
 
     const [deleteId, setDeleteId] = useState('');
 
     const handleRemove = async (id) => {
-        removeStoneDetail(id).then((res) => {console.log(res)});
+        let removeData = data.filter((el) => el.invoiceNo === id);
+        removeSales({
+            id: removeData[0].invoiceNo,
+            deletedAt: moment().toISOString(),
+            deletedBy: auth().username
+        }).then((res) => {console.log(res)});
         setIsAlert(true);
         setOpenDelete(!openDelete);
         await pause(2000);
@@ -130,7 +138,7 @@ function SalesList() {
         <div className="flex flex-col gap-4 relative max-w-[85%] min-w-[85%]">
             <div className="w-78 absolute top-0 right-0 z-[9999]">
                 {
-                    removeResult.isSuccess && isAlert && <SuccessAlert message="Delete successful." handleAlert={() => setIsAlert(false)} />
+                    removeResult.isSuccess && isAlert && <SuccessAlert title="Sales" message="Delete successful." handleAlert={() => setIsAlert(false)} />
                 }
             </div>
             <div className="flex items-center py-3 bg-white gap-4 sticky top-0 z-10">
