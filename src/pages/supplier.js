@@ -178,61 +178,25 @@ function Supplier() {
             
         },
         {
-            name: 'Contact Name',
-            width: "200px",
-            selector: row => row.ContactName,
-            
-        },
-        {
             name: 'Contact No',
             width: "150px",
             selector: row => row.ContactNo,
             
         },
         {
-            name: 'Office No',
-            width: "150px",
-            selector: row => row.OfficeNo,
-            
-        },
-        {
-            name: 'Street',
-            width: "200px",
-            selector: row => row.Street,
-            
-        },
-        {
-            name: 'Township',
-            width: "200px",
-            selector: row => row.Township,
-            
-        },
-        {
-            name: 'City',
-            width: "200px",
-            selector: row => row.City,
-            
-        },
-        {
-            name: 'Region',
-            width: "200px",
-            selector: row => row.Region,
-            
+            name: 'Remark',
+            width: "230px",
+            selector: row => row.Remark,
         },
         {
             name: 'Created At',
-            width: "200px",
+            width: "210px",
             selector: row => row.CreatedAt,
         },
         {
             name: 'Updated At',
-            width: "200px",
+            width: "210px",
             selector: row => row.UpdatedAt,
-        },
-        {
-            name: 'Remark',
-            width: "200px",
-            selector: row => row.Remark,
         },
         {
             name: 'Action',
