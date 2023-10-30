@@ -53,11 +53,11 @@ const salesApi = createApi({
                         url: "/sales/delete-sales",
                         method: 'PUT',
                         body: salesData
-                    }
-                }
-            })
-        }
-    }
+                    };
+                },
+            }),
+        };
+    },
 });
 
 export const { useAddSalesMutation, useFetchSalesQuery, useFetchTrueSalesQuery, useRemoveSalesMutation } = salesApi;

@@ -16,6 +16,7 @@ function Brightness() {
 
     const auth = useAuthUser();
 
+    console.log(auth().username)
 
     const [open, setOpen] = useState(false);
 

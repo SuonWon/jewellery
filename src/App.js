@@ -12,6 +12,10 @@ import { RequireAuth } from "react-auth-kit";
 
 import SalesInvoice from "./pages/sales_invoice";
 import SalesList from "./pages/sales_list";
+import ReturnList from "./pages/return_list";
+import StoneSelection from "./pages/stone_selection";
+import IssueList from "./pages/issue_list";
+import Issue from "./pages/issue";
 
 
 function App() {
@@ -74,6 +78,26 @@ function App() {
           <Route path="sales_list" element={
             <RequireAuth loginPath="/login">
               <SalesList />
+            </RequireAuth>
+          }></Route>
+          <Route path="return_list" element={
+            <RequireAuth loginPath="/login">
+              <ReturnList />
+            </RequireAuth>
+          }></Route>
+          <Route path="stone_selection" element={
+            <RequireAuth loginPath="/login">
+              <StoneSelection />
+            </RequireAuth>
+          }></Route>
+          <Route path="issue_list" element={
+            <RequireAuth loginPath="/login">
+              <IssueList />
+            </RequireAuth>
+          }></Route>
+          <Route path="issue" element={
+            <RequireAuth loginPath="/login">
+              <Issue />
             </RequireAuth>
           }></Route>
           <Route path="/login" element={<Login />}></Route>

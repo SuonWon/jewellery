@@ -9,6 +9,9 @@ import { supplierApi } from "../apis/supplierApi";
 import { stoneDetailsApi } from "../apis/stoneDetailsApi";
 import { purchaseApi } from "../apis/purchaseApi";
 import { salesApi } from "../apis/salesApi";
+import { stoneSelectionApi } from "../apis/stoneSelectionApi";
+import { returnApi } from "../apis/returnApi";
+import { issueApi } from "../apis/issueApi";
 
 export const store = configureStore({
     reducer: {
@@ -21,7 +24,10 @@ export const store = configureStore({
         [supplierApi.reducerPath] : supplierApi.reducer,
         [stoneDetailsApi.reducerPath] : stoneDetailsApi.reducer,
         [purchaseApi.reducerPath] : purchaseApi.reducer,
-        [salesApi.reducerPath] : salesApi.reducer
+        [salesApi.reducerPath] : salesApi.reducer,
+        [stoneSelectionApi.reducerPath] : stoneSelectionApi.reducer,
+        [returnApi.reducerPath] : returnApi.reducer,
+        [issueApi.reducerPath] : issueApi.reducer,
     },
     middleware: (getDefaultMiddleware) => {
         return getDefaultMiddleware()
@@ -34,7 +40,10 @@ export const store = configureStore({
             .concat(supplierApi.middleware)
             .concat(stoneDetailsApi.middleware)
             .concat(purchaseApi.middleware)
-            .concat(salesApi.middleware);
+            .concat(salesApi.middleware)
+            .concat(stoneSelectionApi.middleware)
+            .concat(returnApi.middleware)
+            .concat(issueApi.middleware);
     }
 });
 
@@ -47,4 +56,7 @@ export { useFetchCustomerQuery, useFetchTrueCustomerQuery, useFetchCustomerByIdQ
 export { useFetchSupplierQuery, useFetchTrueSupplierQuery, useFetchSupplierByIdQuery, useAddSupplierMutation, useUpdateSupplierMutation, useRemoveSupplierMutation } from "../apis/supplierApi";
 export { useFetchStoneDetailsQuery, useFetchStoneDetailsByIdQuery, useAddStoneDetailsMutation, useUpdateStoneDetailsMutation, useRemoveStoneDetailsMutation } from "../apis/stoneDetailsApi";
 export { useFetchPurchaseQuery, useFetchTruePurchaseQuery, useAddPurchaseMutation, useFetchPurchaseByIdQuery, useUpdatePurchaseMutation, useRemovePurchaseMutation } from "../apis/purchaseApi";
-export { useFetchSalesQuery, useFetchTrueSalesQuery, useAddSalesMutation, useRemoveSalesMutation} from "../apis/salesApi"; 
+export { useFetchSalesQuery, useFetchTrueSalesQuery, useAddSalesMutation, useRemoveSalesMutation} from "../apis/salesApi";
+export { useFetchStoneSelectionQuery, useAddStoneSelectionMutation, useUpdateStoneSelectionMutation } from "../apis/stoneSelectionApi";
+export { useFetchReturnQuery, useAddReturnMutation, useUpdateReturnMutation } from "../apis/returnApi";
+export { useFetchIssueQuery, useAddIssueMutation, useUpdateIssueMutation } from "../apis/issueApi";
