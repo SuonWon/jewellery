@@ -305,64 +305,63 @@ function IssueList() {
             name: 'Date',
             width: "150px",
             selector: row => row.issueDate,
-
         },
         {
             name: 'Stone Detail',
             width: "200px",
             selector: row => row.stoneDetailCode,
-
         },
         {
             name: 'Quantity',
-            width: "150px",
+            width: "100px",
             selector: row => row.qty,
-
+            center: "true"
         },
         {
             name: 'Weight',
-            width: "150px",
+            width: "100px",
             selector: row => row.weight,
+            center: "true"
 
         },
         {
             name: 'Unit',
             width: "150px",
             selector: row => row.unitCode,
-
+            center: "true"
         },
         {
             name: 'Unit Price',
             width: "150px",
             selector: row => row.unitPrice,
-
+            right: "true",
         },
         {
             name: 'Total Price',
             width: "150px",
             selector: row => row.totalPrice,
-
+            right: "true",
         },
         {
             name: 'Remark',
-            width: "200px",
+            width: "300px",
             selector: row => row.remark,
         },
-        {
-            name: 'Created At',
-            width: "200px",
-            selector: row => row.createdAt,
-        },
-        {
-            name: 'Updated At',
-            width: "200px",
-            selector: row => row.updatedAt,
-        },
-        {
-            name: 'Deleted At',
-            width: "200px",
-            selector: row => row.deletedAt,
-        },
+        // {
+        //     name: 'Created At',
+        //     width: "200px",
+        //     selector: row => row.createdAt,
+        // },
+        // {
+        //     name: 'Updated At',
+        //     width: "200px",
+        //     selector: row => row.updatedAt,
+        // },
+        // {
+        //     name: 'Deleted At',
+        //     width: "200px",
+        //     selector: row => row.deletedAt,
+        // },
         {
             name: 'Action',
             center: true,
@@ -585,9 +584,9 @@ function IssueList() {
                                 <div>
                                     <label className="text-black text-sm mb-2">Total Price</label>
                                     <input
-                                        type="number"
+                                        type="text"
                                         className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
-                                        value={formData.totalPrice}
+                                        value={formData.totalPrice.toLocaleString()}
                                         readOnly={isView}
                                     />
                                 </div>

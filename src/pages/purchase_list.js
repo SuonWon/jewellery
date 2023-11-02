@@ -123,7 +123,7 @@ function PurchaseList() {
         if (formData.stoneCode === 0) {
             newErrors.stoneCode = "Stone Detail is required."
         }
-        
+
         if (validator.isEmpty(formData.unitCode)) {
             newErrors.unitCode = "Unit is required."
         }
@@ -163,15 +163,15 @@ function PurchaseList() {
                             })
                         }, 2000);
                     }
-                    
+
                 });
                 setFormData(purchaseData);
                 setOpen(!open);
-                
+
             }
             catch(err) {
                 console.log(err.statusCode);
-                
+
             }
             setFormData(purchaseData);
             setOpen(!open);
@@ -244,67 +244,70 @@ function PurchaseList() {
         },
         {
             name: "Quantity",
-            width: "150px",
-            selector: row => row.Qty
+            width: "100px",
+            selector: row => row.Qty,
+            center: "true"
         },
         {
             name: "Weight",
-            width: "150px",
-            selector: row => row.Weight
+            width: "100px",
+            selector: row => row.Weight,
+            center: "true"
         },
         {
             name: "Unit Price",
             width: "150px",
             selector: row => row.UnitPrice,
-            right: true,
+            right: "true",
         },
         {
             name: 'Sub Total',
             width: "150px",
             selector: row => row.SubTotal,
-            right: true,
+            right: "true",
         },
         {
-            name: "Service Per",
+            name: "Service (%)",
             width: "150px",
-            selector: row => row.ServicePer
+            selector: row => row.ServicePer,
+            center: "true"
         },
         {
             name: "Service Amt",
             width: "150px",
             selector: row => row.ServiceCharge,
-            right: true,
+            right: "true",
         },
         {
             name: 'Discount Amt',
             width: "150px",
             selector: row => row.DiscAmt,
-            right: true,
+            right: "true",
         },
         {
             name: 'Grand Total',
             width: "150px",
             selector: row => row.GrandTotal,
-            right: true,
+            right: "true",
         },
         {
             name: 'Remark',
-            width: "200px",
+            width: "300px",
             selector: row => row.Remark,
         },
-        {
-            name: 'Created At',
-            width: "200px",
-            selector: row => row.CreatedAt,
-        },
-        {
-            name: 'Updated At',
-            width: "200px",
-            selector: row => row.UpdatedAt,
-        },
+        // {
+        //     name: 'Created At',
+        //     width: "200px",
+        //     selector: row => row.CreatedAt,
+        // },
+        // {
+        //     name: 'Updated At',
+        //     width: "200px",
+        //     selector: row => row.UpdatedAt,
+        // },
         {
             name: 'Action',
-            center: true,
+            center: "true",
             width: "100px",
             cell: (row) => (
                 <div className="flex items-center gap-2">
@@ -376,10 +379,10 @@ function PurchaseList() {
                                         className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
                                         value={formData.supplier.supplierName}
                                         readOnly={isView}
-                                    /> : 
-                                    <select 
+                                    /> :
+                                    <select
                                     className="block w-full px-2.5 py-1.5 border border-blue-gray-200 h-[35px] rounded-md focus:border-black text-black"
-                                    value={formData.supplierCode} 
+                                    value={formData.supplierCode}
                                     onChange={(e) => {
                                         console.log(e.target.value)
                                         setFormData({
@@ -429,17 +432,17 @@ function PurchaseList() {
                                         value={formData.stone.stoneDesc}
                                         readOnly={isView}
                                     /> :
-                                    <select 
-                                        className="block w-full px-2.5 py-1.5 border border-blue-gray-200 h-[35px] rounded-md focus:border-black text-black" 
-                                        value={formData.stoneCode} 
-                                        onChange={(e) => 
+                                    <select
+                                        className="block w-full px-2.5 py-1.5 border border-blue-gray-200 h-[35px] rounded-md focus:border-black text-black"
+                                        value={formData.stoneCode}
+                                        onChange={(e) =>
                                             setFormData({
-                                                ...formData, 
+                                                ...formData,
                                                 stoneCode: Number(e.target.value),
                                             })
                                         }
                                         >
-                                        <option value="" disabled>Select stone</option>
+                                        <option value="0" disabled>Select stone</option>
                                         {
                                             stoneData?.length === 0 ? <option value="" disabled>There is no Data</option> :
                                             stoneData?.map((stone) => {
@@ -450,9 +453,9 @@ function PurchaseList() {
                                 }
                                 {
                                     validationText.stoneCode && <p className="block text-[12px] text-red-500 font-sans mb-2">{validationText.stoneCode}</p>
-                                } 
+                                }
                             </div>
-                            
+
                         </div>
                         <div className="grid grid-cols-6 gap-2 mb-3">
                             <div className="col-span-3 gap-2 grid grid-cols-3">
@@ -466,7 +469,7 @@ function PurchaseList() {
                                         readOnly={isView}
                                         onChange={(e) => {
                                             setFormData({
-                                                ...formData, 
+                                                ...formData,
                                                 qty: parseFloat(e.target.value),
                                             });
                                         }}
@@ -486,7 +489,7 @@ function PurchaseList() {
                                             let totalP = formData.unitPrice * weight;
                                             let totalA = (totalP + formData.serviceCharge) - formData.discAmt;
                                             setFormData({
-                                                ...formData, 
+                                                ...formData,
                                                 totalWeight: weight,
                                                 subTotal: totalP,
                                                 grandTotal: totalA,
@@ -505,12 +508,12 @@ function PurchaseList() {
                                             value={formData.unitCode}
                                             readOnly={isView}
                                         /> :
-                                        <select 
-                                            className="block w-full px-2.5 py-1.5 border border-blue-gray-200 h-[35px] rounded-md focus:border-black text-black" 
+                                        <select
+                                            className="block w-full px-2.5 py-1.5 border border-blue-gray-200 h-[35px] rounded-md focus:border-black text-black"
                                             value={formData.unitCode}
                                             onChange={(e) => {
                                                 setFormData({
-                                                    ...formData, 
+                                                    ...formData,
                                                     unitCode: e.target.value,
                                                 });
                                             }}
@@ -542,7 +545,7 @@ function PurchaseList() {
                                             let totalP = formData.totalWeight * price;
                                             let totalA = (totalP + formData.serviceCharge) - formData.discAmt;
                                             setFormData({
-                                                ...formData, 
+                                                ...formData,
                                                 unitPrice: price,
                                                 subTotal: totalP,
                                                 grandTotal: totalA,
@@ -556,9 +559,9 @@ function PurchaseList() {
                                 <div>
                                     <label className="text-black text-sm mb-2">Sub Total</label>
                                     <input
-                                        type="number"
-                                        className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
-                                        value={formData.subTotal}
+                                        type="text"
+                                        className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black text-right"
+                                        value={formData.subTotal.toLocaleString('en-US')}
                                         readOnly
                                     />
                                 </div>
@@ -570,12 +573,12 @@ function PurchaseList() {
                                 <label className="text-black mb-2 text-sm">Remark</label>
                                 <textarea
                                     className="border border-blue-gray-200 w-full px-2.5 py-1.5 rounded-md text-black"
-                                    value={formData.remark}
+                                    value={formData.remark == null ? "" : formData.remark}
                                     readOnly={isView}
                                     rows="2"
                                     onChange={(e) => {
                                         setFormData({
-                                            ...formData, 
+                                            ...formData,
                                             remark: e.target.value
                                         });
                                     }}
@@ -622,7 +625,7 @@ function PurchaseList() {
                                                 let charge = parseFloat(e.target.value);
                                                 let totalA = charge + formData.subTotal;
                                                 setFormData({
-                                                    ...formData, 
+                                                    ...formData,
                                                     serviceCharge: charge,
                                                     servicePer: charge > 0 ? 0 : formData.servicePer,
                                                     grandTotal: totalA - formData.discAmt,
@@ -642,7 +645,7 @@ function PurchaseList() {
                                             onChange={(e) => {
                                                 let discAmt = parseFloat(e.target.value);
                                                 setFormData({
-                                                    ...formData, 
+                                                    ...formData,
                                                     discAmt: discAmt,
                                                     grandTotal: (formData.subTotal + formData.serviceCharge) - discAmt
                                                 });
@@ -654,9 +657,9 @@ function PurchaseList() {
                                     <div>
                                         <label className="text-black text-sm mb-2">Grand Total</label>
                                         <input
-                                            type="number"
-                                            className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
-                                            value={formData.grandTotal}
+                                            type="text"
+                                            className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black text-right"
+                                            value={formData.grandTotal.toLocaleString('en-US')}
                                             readOnly
                                         />
                                     </div>

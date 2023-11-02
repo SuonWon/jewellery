@@ -63,11 +63,6 @@ function App() {
               <PurchaseList />
             </RequireAuth>
           }></Route>
-          <Route path="purchase_edit/:puId" element={
-            <RequireAuth loginPath="/login">
-              <PurchaseEdit />
-            </RequireAuth>
-          }></Route>
           <Route path="sales_list" element={
             <RequireAuth loginPath="/login">
               <SalesList />

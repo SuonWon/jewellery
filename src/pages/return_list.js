@@ -514,9 +514,9 @@ function ReturnList() {
                                 <div>
                                     <label className="text-black text-sm mb-2">Total Price</label>
                                     <input
-                                        type="number"
-                                        className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
-                                        value={formData.totalPrice}
+                                        type="text"
+                                        className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black text-right"
+                                        value={formData.totalPrice.toLocaleString()}
                                         readOnly
                                     />
                                 </div>
