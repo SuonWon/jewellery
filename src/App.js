@@ -5,13 +5,13 @@ import Setup from "./components/setup";
 import Customer from "./pages/customer";
 import Supplier from "./pages/supplier";
 import StoneDetails from "./pages/stone_details";
-import PurchaseInvoice from "./pages/purchase_invoice";
 import PurchaseList from "./pages/purchase_list";
 import PurchaseEdit from "./pages/purchase_edit";
 import { RequireAuth } from "react-auth-kit";
-
-import SalesInvoice from "./pages/sales_invoice";
 import SalesList from "./pages/sales_list";
+import ReturnList from "./pages/return_list";
+import StoneSelection from "./pages/stone_selection";
+import IssueList from "./pages/issue_list";
 
 
 function App() {
@@ -56,24 +56,24 @@ function App() {
               <PurchaseList />
             </RequireAuth>
           }></Route>
-          <Route path="purchase_invoice" element={
-            <RequireAuth loginPath="/login">
-              <PurchaseInvoice />
-            </RequireAuth>
-          }></Route>
-          <Route path="purchase_edit/:puId" element={
-            <RequireAuth loginPath="/login">
-              <PurchaseEdit />
-            </RequireAuth>
-          }></Route>
-          <Route path="sales_invoice" element={
-            <RequireAuth loginPath="/login">
-              <SalesInvoice />
-            </RequireAuth>
-          }></Route>
           <Route path="sales_list" element={
             <RequireAuth loginPath="/login">
               <SalesList />
+            </RequireAuth>
+          }></Route>
+          <Route path="return_list" element={
+            <RequireAuth loginPath="/login">
+              <ReturnList />
+            </RequireAuth>
+          }></Route>
+          <Route path="stone_selection" element={
+            <RequireAuth loginPath="/login">
+              <StoneSelection />
+            </RequireAuth>
+          }></Route>
+          <Route path="issue_list" element={
+            <RequireAuth loginPath="/login">
+              <IssueList />
             </RequireAuth>
           }></Route>
           <Route path="/login" element={<Login />}></Route>

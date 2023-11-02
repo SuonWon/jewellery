@@ -8,8 +8,13 @@ import SectionTitle from "../components/section_title";
 import ModalTitle from "../components/modal_title";
 import moment from "moment";
 import TableList from "../components/data_table";
+import { useAuthUser } from "react-auth-kit";
+
+const validator = require('validator');
 
 function StoneType() {
+
+    const auth = useAuthUser();
 
     const [open, setOpen] = useState(false);
 
@@ -19,17 +24,13 @@ function StoneType() {
 
     const {data} = useFetchTypeQuery();
 
-    console.log(data);
-
     const [ stoneType, setStoneType ] = useState({
         typeCode: 0,
         typeDesc: '',
         status: true,
         createdAt: moment().toISOString(),
-        createdBy: 'admin',
+        createdBy: auth().username,
     })
-
-    // const {register, handleSubmit, setValue, formState: {errors}, reset } = useForm();
 
     const [addType] = useAddTypeMutation();
 
@@ -39,6 +40,8 @@ function StoneType() {
 
     const [deleteId, setDeleteId] = useState('');
 
+    const [validationText, setValidationText] = useState({});
+
     const openModal = () => {
         setIsEdit(false);
         setStoneType({
@@ -46,36 +49,51 @@ function StoneType() {
             typeDesc: '',
             status: true,
             createdAt: moment().toISOString(),
-            createdBy: 'admin',
+            createdBy: auth().username,
         })
+        setValidationText({});
         setOpen(!open);
     };
 
+    function validateForm() {
+        const newErrors = {};
+
+        if(validator.isEmpty(stoneType.typeDesc)) {
+            newErrors.desc = 'Description is required.'
+        }
+
+        setValidationText(newErrors);
+
+        return Object.keys(newErrors).length === 0;
+    }
+
     async function handleSubmit(isNew = true) {
-        const saveData = {
-            typeDesc: stoneType.typeDesc,
-            status: stoneType.status,
-            createdAt: stoneType.createdAt,
-            createdBy: stoneType.createdBy,
-            updatedAt: moment().toISOString(),
-            updatedBy: isEdit ? "admin" : "",
+        if(validateForm()) {            
+            const saveData = {
+                typeDesc: stoneType.typeDesc,
+                status: stoneType.status,
+                createdAt: stoneType.createdAt,
+                createdBy: stoneType.createdBy,
+                updatedAt: moment().toISOString(),
+                updatedBy: isEdit ? auth().username : "",
+            }
+
+            if(isEdit) {
+                saveData.typeCode= stoneType.typeCode
+            }
+
+            isEdit ? await editType(saveData) : await addType(saveData);
+
+            setOpen(isNew);
+
+            setStoneType({
+                typeCode: 0,
+                typeDesc: '',
+                status: true,
+                createdAt: moment().toISOString(),
+                createdBy: auth().username,
+            })
         }
-
-        if(isEdit) {
-            saveData.typeCode= stoneType.typeCode
-        }
-
-        isEdit ? await editType(saveData) : await addType(saveData);
-
-        setOpen(isNew);
-
-        setStoneType({
-            typeCode: 0,
-            typeDesc: '',
-            status: true,
-            createdAt: moment().toISOString(),
-            createdBy: 'admin',
-        })
     }
 
     async function changeStatus(isChecked, id) {
@@ -84,7 +102,7 @@ function StoneType() {
             ...focusData,
             status: isChecked,
             updatedAt: moment().toISOString(),
-            updatedBy: "admin"
+            updatedBy: auth().username
         }
         await editType(saveData);
     }
@@ -187,6 +205,9 @@ function StoneType() {
                                     })
                                 }}
                             />
+                            {
+                                validationText.desc && <p className="block text-[12px] text-red-500 font-sans mb-2">{validationText.desc}</p>
+                            }
                             
                             <div className="flex items-center justify-end mt-6 gap-2">
                                 <Button onClick={() => handleSubmit(false)} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2">

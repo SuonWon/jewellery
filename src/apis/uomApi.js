@@ -15,7 +15,7 @@ const uomApi = createApi({
                 },
                 query: () => {
                     return {
-                        url:'/v1/unit/get-all-units',
+                        url:'/unit/get-all-units',
                         method: 'GET',
                     };
                 },
@@ -23,7 +23,7 @@ const uomApi = createApi({
             fetchUOMById: builder.query({
                 query: (unitCode) => {
                     return {
-                        url: `/v1/unit/get-unit/${unitCode}`,
+                        url: `/unit/get-unit/${unitCode}`,
                         method: 'GET'
                     };
                 },
@@ -35,7 +35,7 @@ const uomApi = createApi({
                 query: (unitData) => {
                     console.log(unitData);
                     return {
-                        url: '/v1/unit/create-unit',
+                        url: '/unit/create-unit',
                         method: 'POST',
                         body: {
                             unitCode: unitData.unitCode,
@@ -54,7 +54,7 @@ const uomApi = createApi({
                 },
                 query: (unitData) => {
                     return {
-                        url: `/v1/unit/update-unit`,
+                        url: `/unit/update-unit`,
                         body: {
                             unitCode: unitData.unitCode,
                             unitDesc: unitData.unitDesc,
@@ -73,7 +73,7 @@ const uomApi = createApi({
                 },
                 query: (unitCode) => {
                     return {
-                        url: `/v1/unit/delete-unit/${unitCode}`,
+                        url: `/unit/delete-unit/${unitCode}`,
                         method: 'DELETE'
                     };
                 },

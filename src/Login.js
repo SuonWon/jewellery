@@ -4,12 +4,11 @@ import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
+const validator = require('validator');
+
 function Login() {
 
     const signIn = useSignIn();
-
-    //Error Message
-    const [isError, setIsError] = useState(false);
 
     const navigate = useNavigate();
 
@@ -17,6 +16,9 @@ function Login() {
         username: "", 
         password: ""
     });
+    const [ showPassword, setShowPassword ] = useState(false);
+
+    const [validationText, setValidationText] = useState({});
 
     // Email data entry
     const handleUserNameChange = (e) => {
@@ -34,13 +36,27 @@ function Login() {
         })
     };
 
+    function validateForm() {
+        const newErrors = {};
+
+        if(validator.isEmpty(formData.username) || validator.isEmpty(formData.password)) {
+            newErrors.err = "Username and password is empty."
+        }
+
+        setValidationText(newErrors);
+
+        return Object.keys(newErrors).length === 0;
+    }
+
     // Form submit function and check login user
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log(formData);
-        axios.post('http://localhost:3005/v1/auth/login', formData)
+        if(validateForm()) {
+            axios.post('http://localhost:3005/v1/auth/login', formData)
             .then((res) => {
-                if(res.status === 201) {
+                const newErrors = {}
+                if(res.data !== '') {
+                    console.log(res.data);
                     if(signIn(
                         {
                             token : res.data.token,
@@ -49,14 +65,18 @@ function Login() {
                             expiresIn : 3200,
                         }
                     )) {
-
                         navigate("/master");
-
                     }
                 }
+                else {
+                    console.log("reach");
+                    newErrors.err = "Username or password is wrong.";
+                    setValidationText(newErrors);
+                }
             }).catch((error) => {
-                setIsError(true);
+                console.log(error);
             });
+        }
     };
 
     return(
@@ -76,19 +96,40 @@ function Login() {
                         <span className="absolute inset-y-0 left-0 flex items-center">
                             <GoPerson />
                         </span>
-                        <input className="placeholder:italic placeholder:text-gray-500 block bg-transparent text-sm w-full border-b-2 border-b-gray-500 pl-7 py-1 focus:outline-none" placeholder="Enter username" onChange={handleUserNameChange}/>
+                        <input 
+                            className="placeholder:italic placeholder:text-gray-500 block bg-transparent text-sm w-full border-b-2 border-b-gray-500 pl-7 py-1 focus:outline-none" 
+                            placeholder="Enter username" 
+                            onChange={handleUserNameChange}
+                        />
                     </div>
                     <div className="relative block mt-6">
                         <span className="absolute inset-y-0 left-0 flex items-center">
                             <GoLock />
                         </span>
-                        <input type="password" className="placeholder:italic placeholder:text-gray-500 block bg-transparent text-sm w-full border-b-2 border-b-gray-500 pl-7 py-1 focus:outline-none" onChange={handlePasswordChange} placeholder="Enter password"/>
+                        <input 
+                            type={showPassword ? "text" : "password"} 
+                            className="placeholder:italic placeholder:text-gray-500 block bg-transparent text-sm w-full border-b-2 border-b-gray-500 pl-7 py-1 focus:outline-none" 
+                            onChange={handlePasswordChange} 
+                            placeholder="Enter password"
+                        />
                         {/* <span className="absolute inset-y-0 right-0 flex items-center">
                             <GoEye />
                         </span> */}
                     </div>
+                    {
+                        validationText.err && <p className="block text-[12px] text-red-500 font-sans mb-2 text-right">{validationText.err}</p>
+                    }
+                    <div className="flex mt-2">
+                        <input
+                            type="checkbox"
+                            className="mr-2 w-4 h-4"
+                            checked={showPassword}
+                            onChange={() => {setShowPassword(!showPassword)}}
+                        />
+                        <span className="text-[13px] text-gray-600">Show password</span>
+                    </div>
                     <div className="flex justify-center mt-9">
-                        <button className="flex items-center justify-center py-2 w-64 rounded-md text-neutral-50 hover:bg-purple-600 focus:bg-purple-600 drop-shadow-2xl text-white" style={{backgroundColor: '#51448a'}}>
+                        <button className="flex items-center justify-center py-2 w-64 rounded-md text-neutral-50 hover:bg-purple-600 focus:bg-purple-600 drop-shadow-2xl" style={{backgroundColor: '#51448a', color: '#ffffff'}}>
                             Login
                         </button>
                     </div>

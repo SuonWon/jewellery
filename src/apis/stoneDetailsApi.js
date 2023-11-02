@@ -15,7 +15,7 @@ const stoneDetailsApi = createApi({
                 },
                 query: () => {
                     return {
-                        url:'/v1/stone-detail/get-all-stone-details',
+                        url:'/stone-detail/get-all-stone-details',
                         method: 'GET',
                     };
                 },
@@ -23,7 +23,7 @@ const stoneDetailsApi = createApi({
             fetchStoneDetailsById: builder.query({
                 query: (stoneDetailCode) => {
                     return {
-                        url: `/v1/stone-detail/get-stone-detail/${stoneDetailCode}`,
+                        url: `/stone-detail/get-stone-detail/${stoneDetailCode}`,
                         method: 'GET'
                     };
                 },
@@ -35,24 +35,9 @@ const stoneDetailsApi = createApi({
                 query: (stoneDetailsData) => {
                     console.log(stoneDetailsData);
                     return {
-                        url: '/v1/stone-detail/create-stone-detail',
+                        url: '/stone-detail/create-stone-detail',
                         method: 'POST',
-                        body: {
-                            stoneDesc: stoneDetailsData.stoneDesc,
-                            stoneCode: Number(stoneDetailsData.stoneCode),
-                            typeCode: Number(stoneDetailsData.typeCode),
-                            brightCode: Number(stoneDetailsData.brightCode),
-                            gradeCode: Number(stoneDetailsData.gradeCode),
-                            size: stoneDetailsData.size,
-                            qty: Number(stoneDetailsData.qty),
-                            weight: Number(stoneDetailsData.weight),
-                            unitCode: stoneDetailsData.unitCode,
-                            remark: stoneDetailsData.remark,
-                            createdAt: stoneDetailsData.createdAt,
-                            createdBy: stoneDetailsData.createdBy,
-                            updatedAt: stoneDetailsData.updatedAt,
-                            updatedBy: stoneDetailsData.updatedBy,
-                        },
+                        body: stoneDetailsData,
                     };
                 },
             }),
@@ -62,24 +47,8 @@ const stoneDetailsApi = createApi({
                 },
                 query: (stoneDetailsData) => {
                     return {
-                        url: `/v1/stone-detail/update-stone-detail`,
-                        body: {
-                            stoneDetailCode: stoneDetailsData.stoneDetailCode,
-                            stoneDesc: stoneDetailsData.stoneDesc,
-                            stoneCode: Number(stoneDetailsData.stoneCode),
-                            typeCode: Number(stoneDetailsData.typeCode),
-                            brightCode: Number(stoneDetailsData.brightCode),
-                            gradeCode: Number(stoneDetailsData.gradeCode),
-                            size: stoneDetailsData.size,
-                            qty: Number(stoneDetailsData.qty),
-                            weight: Number(stoneDetailsData.weight),
-                            unitCode: stoneDetailsData.unitCode,
-                            remark: stoneDetailsData.remark,
-                            createdAt: stoneDetailsData.createdAt,
-                            createdBy: stoneDetailsData.createdBy,
-                            updatedAt: stoneDetailsData.updatedAt,
-                            updatedBy: stoneDetailsData.updatedBy,
-                        },
+                        url: `/stone-detail/update-stone-detail`,
+                        body: stoneDetailsData,
                         method: 'PUT',
                     };
                 },
@@ -89,9 +58,8 @@ const stoneDetailsApi = createApi({
                     return[{type: 'StoneDetails', id:'All'}]
                 },
                 query: (stoneDetailCode) => {
-                    console.log(stoneDetailCode);
                     return {
-                        url: `/v1/stone-detail/delete-stone-detail/${stoneDetailCode}`,
+                        url: `/stone-detail/delete-stone-detail/${stoneDetailCode}`,
                         method: 'DELETE'
                     };
                 },

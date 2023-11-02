@@ -33,7 +33,7 @@ function Customer() {
 
     const [ validationText, setValidationText ] = useState({});
 
-    useEffect(() => {
+    const resetData = () => {
         setFormData({
             customerName: "",
             nrcNo: "",
@@ -50,8 +50,8 @@ function Customer() {
             createdBy: auth().username,
             updatedAt: moment().toISOString(),
             updatedBy: "",
-        })
-    }, [addResult.isSuccess]);
+        });
+    }
 
     const [formData, setFormData] = useState({
         customerName: "",
@@ -99,23 +99,7 @@ function Customer() {
 
     const openModal = () => {
         setIsEdit(false);
-        setFormData({
-            customerName: "",
-            nrcNo: "",
-            companyName: "",
-            contactNo: "",
-            officeNo: "",
-            street: "",
-            township: "",
-            city: "",
-            region: "",
-            remark: "",
-            isActive: true,
-            createdAt: moment().toISOString(),
-            createdBy: auth().username,
-            updatedAt: moment().toISOString(),
-            updatedBy: "",
-        })
+        resetData();
         setOpen(!open);
     };
 
@@ -135,6 +119,7 @@ function Customer() {
             addCustomer(formData).then((res) => {
                 console.log(res);
             });
+            resetData();
             setOpen(!open);
         }
     };
@@ -144,6 +129,7 @@ function Customer() {
             addCustomer(formData).then((res) => {
                 console.log(res);
             });
+            resetData();
         }
     };
 

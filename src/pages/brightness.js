@@ -1,12 +1,9 @@
 /* eslint-disable eqeqeq */
-import { Alert, Button, Card, CardBody, Dialog, DialogBody, Input, Switch, Typography } from "@material-tailwind/react";
-import { FaCirclePlus, FaFloppyDisk, FaPencil, FaTrashCan, FaTriangleExclamation } from "react-icons/fa6";
+import { Button, Card, CardBody, Dialog, DialogBody, Input, Switch, Typography } from "@material-tailwind/react";
+import { FaCirclePlus, FaFloppyDisk, FaPencil, FaTrashCan, } from "react-icons/fa6";
 import { useEffect, useState } from "react";
 import { useAddBrightnessMutation, useFetchBrightnessQuery, useRemoveBrightnessMutation, useUpdateBrightnessMutation } from "../store";
-import { useForm } from "react-hook-form";
-import { pause, currentDate } from "../const";
 import DeleteModal from "../components/delete_modal";
-import SuccessAlert from "../components/success_alert";
 import SectionTitle from "../components/section_title";
 import ModalTitle from "../components/modal_title";
 import moment from "moment";
@@ -19,15 +16,13 @@ function Brightness() {
 
     const auth = useAuthUser();
 
+    console.log(auth().username)
+
     const [open, setOpen] = useState(false);
 
     const [openDelete, setOpenDelete] = useState(false);
 
-    const [isAlert, setIsAlert] = useState(true);
-
     const [isEdit, setIsEdit] = useState(false);
-
-    const [editData, setEditData] = useState({});
 
     const [ validationText, setValidationText ] = useState({});
 
@@ -42,17 +37,11 @@ function Brightness() {
         updatedBy: "",
     });
 
-    const {register, handleSubmit, setValue, formState: {errors}, reset, getValues } = useForm({
-        defaultValues: {
-            brightDesc: "",
-        }
-    });
-
     const [addBrightness, addResult] = useAddBrightnessMutation();
 
-    const [editBrightness, editResult] = useUpdateBrightnessMutation();
+    const [editBrightness] = useUpdateBrightnessMutation();
 
-    const [removeBrightness, removeResult] = useRemoveBrightnessMutation();
+    const [removeBrightness] = useRemoveBrightnessMutation();
 
     useEffect(() => {
         setFormData({
@@ -62,13 +51,23 @@ function Brightness() {
             createdBy: auth().username,
             updatedAt: moment().toISOString(),
             updatedBy: "",
-        })
+        });
     }, [addResult.isSuccess]);
 
     const [deleteId, setDeleteId] = useState('');
 
+    const resetData = () => {
+        setFormData({
+            brightDesc: "",
+            status: true,
+            createdAt: moment().toISOString(),
+            createdBy: auth().username,
+            updatedAt: moment().toISOString(),
+            updatedBy: "",
+        });
+    };
+
     const handleChange = async (e) => {
-        console.log(e.target.id);
         let bright = data.filter((bright) => bright.brightCode == e.target.id);
         await editBrightness({
             brightCode: bright[0].brightCode,
@@ -76,7 +75,7 @@ function Brightness() {
             status: e.target.checked ? true: false,
             createdAt: bright[0].createdAt,
             createdBy: bright[0].createdBy,
-            updatedAt: currentDate,
+            updatedAt: moment().toISOString(),
             updatedBy: "Hello World",
         }).then((res) => {
             console.log(res);
@@ -86,6 +85,7 @@ function Brightness() {
 
     const openModal = () => {
         setIsEdit(false);
+        resetData();
         setOpen(!open);
     };
 
@@ -106,6 +106,7 @@ function Brightness() {
                 console.log(res);
             });
             setOpen(!open);
+            resetData();
         }
     };
 
@@ -114,12 +115,12 @@ function Brightness() {
             addBrightness(formData).then((res) => {
                 console.log(res);
             });
+            resetData();
         }
     };
 
     const handleEdit = async (id) => {
         let eData = data.filter((bright) => bright.brightCode === id);
-        setEditData(eData[0]);
         setIsEdit(true);
         setFormData(eData[0]);
         setOpen(!open);
@@ -133,19 +134,12 @@ function Brightness() {
         }).then((res) => {
             console.log(res);
         });
-        setIsAlert(true);
         setOpen(!open);
-        await pause(2000);
-        setIsAlert(false);
     };
 
     const handleRemove = async (id) => {
-        console.log(id);
         removeBrightness(id).then((res) => {console.log(res)});
-        setIsAlert(true);
         setOpenDelete(!openDelete);
-        await pause(2000);
-        setIsAlert(false);
     };
 
     const handleDeleteBtn = (id) => {
@@ -169,7 +163,6 @@ function Brightness() {
         {
             name: 'Description',
             selector: row => row.Description,
-            
         },
         {
             name: 'Created At',

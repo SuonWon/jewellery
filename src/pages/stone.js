@@ -8,8 +8,13 @@ import SectionTitle from "../components/section_title";
 import ModalTitle from "../components/modal_title";
 import moment from "moment";
 import TableList from "../components/data_table";
+import { useAuthUser } from "react-auth-kit";
+
+const validator = require('validator');
 
 function Stone() {
+
+    const auth = useAuthUser();
 
     const [open, setOpen] = useState(false);
 
@@ -25,7 +30,7 @@ function Stone() {
         remark: '',
         status: true,
         createdAt: moment().toISOString(),
-        createdBy: 'admin',
+        createdBy: auth().username,
     })
 
     const [addStone] = useAddStoneMutation();
@@ -36,6 +41,8 @@ function Stone() {
 
     const [deleteId, setDeleteId] = useState('');
 
+    const [validationText, setValidationText] = useState({});
+
     const openModal = () => {
         setIsEdit(false);
         setStone({
@@ -44,38 +51,56 @@ function Stone() {
             remark: "",
             status: true,
             createdAt: moment().toISOString(),
-            createdBy: 'admin',
+            createdBy: auth().username,
         })
         setOpen(!open);
+        setValidationText({});
     };
 
+    function validateForm() {
+        const newErrors = {};
+
+        if(validator.isEmpty(stone.stoneDesc)) {
+            newErrors.desc = 'Description is required.'
+        }
+
+        setValidationText(newErrors);
+
+        return Object.keys(newErrors).length === 0;
+    }
+
     async function handleSubmit(isNew = true) {
-        const saveData = {
-            stoneDesc: stone.stoneDesc,
-            status: stone.status,
-            remark: stone.remark,
-            createdAt: stone.createdAt,
-            createdBy: stone.createdBy,
-            updatedAt: moment().toISOString(),
-            updatedBy: isEdit ? "admin" : "",
+
+        if(validateForm()){
+            
+            const saveData = {
+                stoneDesc: stone.stoneDesc,
+                status: stone.status,
+                remark: stone.remark,
+                createdAt: stone.createdAt,
+                createdBy: stone.createdBy,
+                updatedAt: moment().toISOString(),
+                updatedBy: isEdit ? auth().username : "",
+            }
+
+            if(isEdit) {
+                saveData.stoneCode = stone.stoneCode
+            }
+
+            isEdit ? await editStone(saveData) : await addStone(saveData);
+
+            setOpen(isNew);
+
+            setStone({
+                stoneCode: 0,
+                stoneDesc: "",
+                remark: "",
+                status: true,
+                createdAt: moment().toISOString(),
+                createdBy: auth().username,
+            })
+
         }
-
-        if(isEdit) {
-            saveData.stoneCode = stone.stoneCode
-        }
-
-        isEdit ? await editStone(saveData) : await addStone(saveData);
-
-        setOpen(isNew);
-
-        setStone({
-            stoneCode: 0,
-            stoneDesc: "",
-            remark: "",
-            status: true,
-            createdAt: moment().toISOString(),
-            createdBy: 'admin',
-        })
     }
 
     async function changeStatus(isChecked, id) {
@@ -84,7 +109,7 @@ function Stone() {
             ...focusData,
             status: isChecked, 
             updatedAt: moment().toISOString(),
-            updatedBy: "admin"
+            updatedBy: auth().username
         }
         await editStone(saveData);
     }
@@ -195,6 +220,9 @@ function Stone() {
                                 })
                             }} 
                         />
+                        {
+                            validationText.desc && <p className="block text-[12px] text-red-500 font-sans mb-2">{validationText.desc}</p>
+                        }
                         <Textarea 
                             label="Remark" rows={2} 
                             value={stone.remark}

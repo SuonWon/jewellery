@@ -4,6 +4,7 @@ import { GiDiamondTrophy } from "react-icons/gi";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useAuthUser, useSignOut } from "react-auth-kit";
 
+
 function Nav() {
 
     const auth = useAuthUser();
@@ -74,9 +75,24 @@ function Nav() {
                                     <FaListUl /> <span>Sales List</span>
                                 </MenuItem>
                             </NavLink>
-                            <NavLink to="/sales_invoice">
+                            {/* <NavLink to="/sales_invoice">
                                 <MenuItem className="flex items-center gap-2">
                                     <FaFileInvoice /> <span>Sales invoice</span>
+                                </MenuItem>
+                            </NavLink> */}
+                            <NavLink to="/return_list">
+                                <MenuItem className="flex items-center gap-2">
+                                    <FaListUl /> <span>Return List</span>
+                                </MenuItem>
+                            </NavLink>
+                            <NavLink to="/issue_list">
+                                <MenuItem className="flex items-center gap-2">
+                                    <FaListUl /> <span>Issue List</span>
+                                </MenuItem>
+                            </NavLink>
+                            <NavLink to="/issue">
+                                <MenuItem className="flex items-center gap-2">
+                                    <FaFileInvoice /> <span>Issue</span>
                                 </MenuItem>
                             </NavLink>
                         </MenuList>
@@ -95,9 +111,14 @@ function Nav() {
                                     <FaListUl /> <span>Purchase List</span>
                                 </MenuItem>
                             </NavLink>
-                            <NavLink to="/purchase_invoice">
+                            {/* <NavLink to="/purchase_invoice">
                                 <MenuItem className="flex items-center gap-2">
                                     <FaFileInvoice /> <span>Purchase invoice</span>
+                                </MenuItem>
+                            </NavLink> */}
+                            <NavLink to="/stone_selection">
+                                <MenuItem className="flex items-center gap-2">
+                                    <FaListUl /> <span>Stone Selection</span>
                                 </MenuItem>
                             </NavLink>
                         </MenuList>
@@ -106,11 +127,8 @@ function Nav() {
                 <div className='flex justify-end'>
                     <Menu>
                         <MenuHandler>
-                            <Button size='sm' variant='text' className='flex items-center text-white gap-2 rounded-full py-0.5 pr-1 pl-0 '>
-                                {/* <Avatar
-                                    src={Profile}
-                                    size='sm'
-                                /> */}
+                            <Button size='sm' variant='text' className='flex items-center text-white gap-2 rounded-full py-2 px-3 '>
+                                {/* <BiSolidUserCircle /> */}
                                 <Typography variant='small' className='capitalize'>{auth()?.fullName}</Typography>
                                 <FaChevronDown className='text-sm cursor-pointer' />
                             </Button>

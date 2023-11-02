@@ -33,25 +33,6 @@ function Supplier() {
 
     const [ validationText, setValidationText ] = useState({});
 
-    useEffect(() => {
-        setFormData({
-            supplierName: "",
-            contactName: "",
-            contactNo: "",
-            officeNo: "",
-            street: "",
-            township: "",
-            city: "",
-            region: "",
-            remark: "",
-            isActive: true,
-            createdAt: moment().toISOString(),
-            createdBy: auth().username,
-            updatedAt: moment().toISOString(),
-            updatedBy: "",
-        });
-    }, [addResult.isSuccess]);
-
     const [formData, setFormData] = useState({
         supplierName: "",
         contactName: "",
@@ -68,6 +49,25 @@ function Supplier() {
         updatedAt: moment().toISOString(),
         updatedBy: "",
     });
+
+    const resetData = () => {
+        setFormData({
+            supplierName: "",
+            contactName: "",
+            contactNo: "",
+            officeNo: "",
+            street: "",
+            township: "",
+            city: "",
+            region: "",
+            remark: "",
+            isActive: true,
+            createdAt: moment().toISOString(),
+            createdBy: auth().username,
+            updatedAt: moment().toISOString(),
+            updatedBy: "",
+        });
+    }
 
     const handleChange = async (e) => {
         
@@ -96,22 +96,7 @@ function Supplier() {
 
     const openModal = () => {
         setIsEdit(false);
-        setFormData({
-            supplierName: "",
-            contactName: "",
-            contactNo: "",
-            officeNo: "",
-            street: "",
-            township: "",
-            city: "",
-            region: "",
-            remark: "",
-            isActive: true,
-            createdAt: moment().toISOString(),
-            createdBy: auth().username,
-            updatedAt: moment().toISOString(),
-            updatedBy: "",
-        });
+        resetData();
         setOpen(!open);
     };
 
@@ -131,6 +116,7 @@ function Supplier() {
             addSupplier(formData).then((res) => {
                 console.log(res);
             });
+            resetData();
             setOpen(!open);
         }
     };
@@ -140,6 +126,7 @@ function Supplier() {
             addSupplier(formData).then((res) => {
                 console.log(res);
             });
+            resetData();
         }
     };
 

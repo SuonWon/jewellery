@@ -8,8 +8,13 @@ import SectionTitle from "../components/section_title";
 import ModalTitle from "../components/modal_title";
 import moment from "moment";
 import TableList from "../components/data_table";
+import { useAuthUser } from "react-auth-kit";
+
+const validator = require('validator');
 
 function UOM() {
+
+    const auth = useAuthUser();
 
     const [open, setOpen] = useState(false);
 
@@ -21,7 +26,9 @@ function UOM() {
 
     const [ unitData, setUnitData ] = useState({
         unitCode: '',
-        unitDesc: ''
+        unitDesc: '',
+        createdAt: moment().toISOString(),
+        createdBy: auth().username,
     })
 
     const [addUnit] = useAddUOMMutation();
@@ -32,34 +39,61 @@ function UOM() {
 
     const [deleteId, setDeleteId] = useState('');
 
+    const [validationText, setValidationText] = useState({});
+
     const openModal = () => {
         setIsEdit(false);
         setOpen(!open);
 
         setUnitData({
             unitCode: '',
-            unitDesc: ''
+            unitDesc: '',
+            createdAt: moment().toISOString(),
+            createdBy: auth().username,
         })
+        setValidationText({});
     };
 
-    async function handleSubmit(isNew = true) {
-        const saveData = {
-            unitCode: unitData.unitCode,
-            unitDesc: unitData.unitDesc,
-            createdAt: moment().toISOString(),
-            createdBy: 'admin',
-            updatedAt: moment().toISOString(),
-            updatedBy: isEdit ? "admin" : "",
+    function validateForm() {
+        const newErrors = {};
+
+        if(validator.isEmpty(unitData.unitCode)) {
+            newErrors.code = 'Unit code is required.'
+        }
+        if(validator.isEmpty(unitData.unitDesc)) {
+            newErrors.desc = 'Unit description is required.'
         }
 
-        isEdit ?  await editUnit(saveData) : await addUnit(saveData);
+        console.log(newErrors);
 
-        setOpen(isNew);
+        setValidationText(newErrors);
 
-        setUnitData({
-            unitCode: '',
-            unitDesc: ''
-        })
+        return Object.keys(newErrors).length === 0;
+    }
+
+    async function handleSubmit(isNew = true) {
+
+        if(validateForm()) {
+            const saveData = {
+                unitCode: unitData.unitCode,
+                unitDesc: unitData.unitDesc,
+                createdAt: unitData.createdAt,
+                createdBy: unitData.createdBy,
+                updatedAt: moment().toISOString(),
+                updatedBy: isEdit ? auth().username : "",
+            }
+    
+            isEdit ?  await editUnit(saveData) : await addUnit(saveData);
+    
+            setOpen(isNew);
+    
+            setUnitData({
+                unitCode: '',
+                unitDesc: '',
+                createdAt: moment().toISOString(),
+                createdBy: auth().username,
+            })
+        }
     }
 
     function handleEdit(id) {
@@ -134,27 +168,39 @@ function UOM() {
             
                     <div  className="flex flex-col items-end p-3">
                         <div className="grid grid-cols-2 gap-2 w-full">
-                            <Input 
-                                label="Code"
-                                value={unitData.unitCode}
-                                onChange={(e) => {
-                                    setUnitData({
-                                        ...unitData,
-                                        unitCode: e.target.value
-                                    })
-                                }}
-                                disabled={isEdit}
+                            <div>
+                                <Input 
+                                    label="Code"
+                                    value={unitData.unitCode}
+                                    onChange={(e) => {
+                                        setUnitData({
+                                            ...unitData,
+                                            unitCode: e.target.value
+                                        })
+                                    }}
+                                    readOnly={isEdit}
                                 />
-                            <Input 
-                                label="Description" 
-                                value={unitData.unitDesc}
-                                onChange={(e) => {
-                                    setUnitData({
-                                        ...unitData,
-                                        unitDesc: e.target.value
-                                    })
-                                }} 
-                            />
+                                {
+                                    validationText.code && <p className="block text-[12px] text-red-500 font-sans mb-2">{validationText.code}</p>
+                                }
+                            </div>
+                            
+                            <div>
+                                <Input 
+                                    label="Description" 
+                                    value={unitData.unitDesc}
+                                    onChange={(e) => {
+                                        setUnitData({
+                                            ...unitData,
+                                            unitDesc: e.target.value
+                                        })
+                                    }} 
+                                />
+                                {
+                                    validationText.desc && <p className="block text-[12px] text-red-500 font-sans mb-2">{validationText.desc}</p>
+                                }
+                            </div>
+                            
                         </div>
                             <div className="flex items-center justify-end mt-6 gap-2">
                             <Button onClick={() => handleSubmit(false)} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2">
