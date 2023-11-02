@@ -2,7 +2,7 @@
 import { Button, Card, CardBody, Dialog, DialogBody, Typography } from "@material-tailwind/react";
 import { FaCirclePlus, FaEye, FaFloppyDisk, FaPencil, FaPlus, FaTrashCan,} from "react-icons/fa6";
 import { useState } from "react";
-import { useAddSalesMutation, useFetchSalesQuery, useFetchStoneDetailsQuery, useFetchTrueCustomerQuery, useFetchTrueSalesQuery, useFetchUOMQuery, useRemoveSalesMutation } from "../store";
+import { useAddSalesMutation, useFetchIssueQuery, useFetchSalesQuery, useFetchStoneDetailsQuery, useFetchTrueCustomerQuery, useFetchTrueSalesQuery, useFetchUOMQuery, useRemoveSalesMutation } from "../store";
 import { focusSelect, pause } from "../const";
 import DeleteModal from "../components/delete_modal";
 import SuccessAlert from "../components/success_alert";
@@ -25,6 +25,8 @@ function SalesList() {
     const [isAlert, setIsAlert] = useState(true);
 
     const {data} = useFetchSalesQuery();
+
+    const {data: issueData} = useFetchIssueQuery();
 
     const [removeSales, removeResult] = useRemoveSalesMutation();
 
@@ -175,8 +177,45 @@ function SalesList() {
     };
 
     const handleSave = () => {
-        console.log(formData);
-        setFormData(salesData);
+        if (validateForm()) {
+            console.log(formData);
+            try {
+                console.log("Ji");
+                addSales({
+                    ...formData,
+                    invoiceNo: "SV-0001",
+                    salesDate: moment(formData.salesDate).toISOString(),
+                }).then((res) => {
+                    if(res.error != null) {
+                        let message = '';
+                        if(res.error.data.statusCode == 409) {
+                            message = "Duplicate data found."
+                        }
+                        else {
+                            message = res.error.data.message
+                        }
+                        setAlert({
+                            isAlert: true,
+                            message: message
+                        })
+                        setTimeout(() => {
+                            setAlert({
+                                isAlert: false,
+                                message: ''
+                            })
+                        }, 2000);
+                    }
+                    
+                });
+                setFormData(salesData);
+                
+            }
+            catch(err) {
+                console.log(err.statusCode);
+                
+            }
+            setFormData(salesData);
+        }
     };
 
     const editSales = async (id) => {
@@ -334,18 +373,29 @@ function SalesList() {
                         {/* Issue No */}
                         <div>
                             <label className="text-black text-sm mb-2">Issue No</label>
-                            <input
-                                type="text"
-                                className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
-                                value={formData.issueNo}
-                                readOnly={isView}
-                                onChange={(e) => {
-                                    setFormData({
-                                        ...formData, 
-                                        issueNo: e.target.value,
-                                    });
-                                }}
-                            />
+                            {
+                                    isView? 
+                                    <input
+                                        type="text"
+                                        className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
+                                        value={formData.issueNo}
+                                        readOnly={isView}
+                                    /> : 
+                                    <select 
+                                        className="block w-full text-black border border-blue-gray-200 h-[35px] px-2.5 py-1.5 rounded-md focus:border-black"
+                                        value={formData.issueNo}
+                                        onChange={(e) => {
+                                            setFormData({...formData, issueNo: e.target.value});
+                                        }}
+                                    >
+                                        <option value="" disabled>Select...</option>
+                                        {
+                                            issueData?.map((issue) => {
+                                                return <option value={issue.issueNo} key={issue.issueNo}>{issue.issueNo}</option>
+                                            })
+                                        }
+                                    </select>
+                                }
                         </div>
                         {/* Purchase Date */}
                         <div className="col-start-4 col-end-4">

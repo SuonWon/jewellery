@@ -141,7 +141,7 @@ function PurchaseList() {
                 console.log("Ji");
                 addPurchase({
                     ...formData,
-                    invoiceNo: "PV-0001",
+                    invoiceNo: "PV-0002",
                     purDate: moment(formData.purDate).toISOString(),
                 }).then((res) => {
                     if(res.error != null) {
@@ -179,8 +179,43 @@ function PurchaseList() {
     }
 
     const handleSave = () => {
-        console.log(formData);
-        setFormData(purchaseData);
+        if(validateForm()) {
+            console.log(formData);
+            try {
+                console.log("Ji");
+                addPurchase({
+                    ...formData,
+                    invoiceNo: "PV-0002",
+                    purDate: moment(formData.purDate).toISOString(),
+                }).then((res) => {
+                    if(res.error != null) {
+                        let message = '';
+                        if(res.error.data.statusCode == 409) {
+                            message = "Duplicate data found."
+                        }
+                        else {
+                            message = res.error.data.message
+                        }
+                        setAlert({
+                            isAlert: true,
+                            message: message
+                        })
+                        setTimeout(() => {
+                            setAlert({
+                                isAlert: false,
+                                message: ''
+                            })
+                        }, 2000);
+                    }
+                    
+                });
+                setFormData(purchaseData);
+            }
+            catch(err) {
+                console.log(err.statusCode);
+            }
+            setFormData(purchaseData);
+        }
     }
 
     const column = [
@@ -628,20 +663,23 @@ function PurchaseList() {
                                 </div>
                             </div>
                         </div>
-                        <div className="flex items-center justify-end mt-6 gap-2">
-                            <Button onClick={handleSubmit} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2">
-                                <FaFloppyDisk className="text-base" />
-                                <Typography variant="small" className="capitalize">
-                                    Save
-                                </Typography>
-                            </Button>
-                            <Button  color="green" size="sm" variant="gradient" className="flex items-center gap-2">
-                                <FaCirclePlus className="text-base" />
-                                <Typography variant="small" className="capitalize">
-                                    Save & New
-                                </Typography>
-                            </Button>
-                        </div>
+                        {
+                            isView ? "" : 
+                            <div className="flex items-center justify-end mt-6 gap-2">
+                                <Button onClick={handleSubmit} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2">
+                                    <FaFloppyDisk className="text-base" />
+                                    <Typography variant="small" className="capitalize">
+                                        Save
+                                    </Typography>
+                                </Button>
+                                <Button onClick={handleSave} color="green" size="sm" variant="gradient" className="flex items-center gap-2">
+                                    <FaCirclePlus className="text-base" />
+                                    <Typography variant="small" className="capitalize">
+                                        Save & New
+                                    </Typography>
+                                </Button>
+                            </div>
+                        }
                     </DialogBody>
                 </Dialog>
             </div>
