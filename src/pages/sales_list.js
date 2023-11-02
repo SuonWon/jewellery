@@ -196,80 +196,85 @@ function SalesList() {
             name: 'Date',
             width: "150px",
             selector: row => row.SalesDate,
-
+        },
+        {
+            name: 'Issue No',
+            width: '200px',
+            selector: row => row.IssueNo,
         },
         {
             name: 'Customer',
             width: "200px",
-            selector: row => row.Supplier,
-
+            selector: row => row.Customer,
         },
         {
             name: 'Stone Detail',
             width: "250px",
             selector: row => row.StoneDetailCode,
-
         },
         {
             name: 'Qty',
-            width: "150px",
+            width: "100px",
             selector: row => row.Qty,
-            right: true,
-
+            center: "true"
         },
         {
             name: 'Weight',
-            width: "150px",
+            width: "100px",
             selector: row => row.Weight,
-            right: true,
-
+            center: "true"
         },
         {
             name: 'Unit Price',
             width: "150px",
             selector: row => row.UnitPrice,
-            right: true,
-
+            right: "true",
         },
         {
             name: 'Sub Total',
             width: "150px",
             selector: row => row.SubTotal,
-            right: true,
+            right: "true",
         },
         {
-            name: 'Service Charge',
+            name: "Service (%)",
+            width: "150px",
+            selector: row => row.ServicePer,
+            center: "true"
+        },
+        {
+            name: 'Service Amt',
             width: "150px",
             selector: row => row.ServiceCharge,
-            right: true,
+            right: "true",
         },
         {
             name: 'Discount Amt',
             width: "150px",
             selector: row => row.DiscAmt,
-            right: true,
+            right: "true",
         },
         {
             name: 'Grand Total',
             width: "150px",
             selector: row => row.GrandTotal,
-            right: true,
+            right: "true",
         },
         {
             name: 'Remark',
-            width: "200px",
+            width: "300px",
             selector: row => row.Remark,
         },
-        {
-            name: 'Created At',
-            width: "200px",
-            selector: row => row.CreatedAt,
-        },
-        {
-            name: 'Updated At',
-            width: "200px",
-            selector: row => row.UpdatedAt,
-        },
+        // {
+        //     name: 'Created At',
+        //     width: "200px",
+        //     selector: row => row.CreatedAt,
+        // },
+        // {
+        //     name: 'Updated At',
+        //     width: "200px",
+        //     selector: row => row.UpdatedAt,
+        // },
         {
             name: 'Action',
             center: true,
@@ -287,12 +292,14 @@ function SalesList() {
         return {
             Code: salesData.invoiceNo,
             SalesDate: moment(salesData.salesDate).format("YYYY-MM-DD"),
-            Supplier: salesData.customer.customerName,
+            IssueNo: salesData.IssueNo,
+            Customer: salesData.customer.customerName,
             StoneDetailCode: salesData.stoneDetail.stoneDesc,
             Qty: salesData.qty,
             Weight: salesData.weight,
             UnitPrice: salesData.unitPrice.toLocaleString('en-US'),
             SubTotal: salesData.subTotal.toLocaleString('en-US'),
+            ServicePer: salesData.servicePer,
             ServiceCharge: salesData.serviceCharge.toLocaleString('en-US'),
             DiscAmt: salesData.discAmt.toLocaleString('en-US'),
             GrandTotal: salesData.grandTotal.toLocaleString('en-US'),
@@ -532,9 +539,9 @@ function SalesList() {
                             <div>
                                 <label className="text-black text-sm mb-2">Sub Total</label>
                                 <input
-                                    type="number"
-                                    className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
-                                    value={formData.subTotal}
+                                    type="text"
+                                    className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black text-right"
+                                    value={formData.subTotal.toLocaleString('en-US')}
                                     readOnly
                                 />
                             </div>
@@ -630,9 +637,9 @@ function SalesList() {
                                 <div>
                                     <label className="text-black text-sm mb-2">Grand Total</label>
                                     <input
-                                        type="number"
-                                        className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
-                                        value={formData.grandTotal}
+                                        type="text"
+                                        className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black text-right"
+                                        value={formData.grandTotal.toLocaleString('en-US')}
                                         readOnly
                                     />
                                 </div>
