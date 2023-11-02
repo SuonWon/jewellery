@@ -12,6 +12,7 @@ import SalesList from "./pages/sales_list";
 import ReturnList from "./pages/return_list";
 import StoneSelection from "./pages/stone_selection";
 import IssueList from "./pages/issue_list";
+import Dashboard from "./pages/dashboard";
 
 
 function App() {
@@ -28,6 +29,12 @@ function App() {
         <Routes>
           <Route path="/" element={
             <RequireAuth loginPath="/login">
+              <Dashboard />
+            </RequireAuth>
+          }></Route>
+          <Route path="/dashboard" element={
+            <RequireAuth loginPath="/login">
+              <Dashboard />
             </RequireAuth>
           }></Route>
           <Route path="master/*" element={

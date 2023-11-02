@@ -3,7 +3,7 @@ import { Button, Card, CardBody, Dialog, DialogBody, Typography } from "@materia
 import { FaCirclePlus, FaEye, FaFloppyDisk, FaPlus, FaTrashCan, } from "react-icons/fa6";
 import { useState } from "react";
 import { focusSelect, pause } from "../const";
-import { useFetchStoneDetailsQuery, useFetchTruePurchaseQuery, useFetchUOMQuery, useRemovePurchaseMutation } from "../store";
+import { useAddReturnMutation, useFetchIssueQuery, useFetchReturnQuery, useFetchStoneDetailsQuery, useFetchTruePurchaseQuery, useFetchUOMQuery, useRemovePurchaseMutation } from "../store";
 import DeleteModal from "../components/delete_modal";
 import SuccessAlert from "../components/success_alert";
 import moment from "moment";
@@ -25,13 +25,22 @@ function ReturnList() {
 
     const [isAlert, setIsAlert] = useState(true);
 
-    const { data } = useFetchTruePurchaseQuery();
+    const { data } = useFetchReturnQuery();
 
     const {data: stoneDetails} = useFetchStoneDetailsQuery();
 
     const {data: unitData} = useFetchUOMQuery();
 
+    const {data: issueData} = useFetchIssueQuery();
+
     const [removeReturn, removeResult] = useRemovePurchaseMutation();
+
+    const [addReturn] = useAddReturnMutation();
+
+    const [ alert, setAlert] = useState({
+        isAlert: false,
+        message: ''
+    });
 
     const returnData = {
         returnNo: "",
@@ -114,122 +123,190 @@ function ReturnList() {
     }
 
     const handleSubmit = () => {
-        console.log(returnData)
-        if(validateForm()) {
-            console.log(formData);
+        if (validateForm()) {
+            try {
+                console.log(formData);
+                addReturn({
+                    ...formData,
+                    returnNo: "R-0001",
+                    returnDate: moment(formData.returnDate).toISOString(),
+                }).then((res) => {
+                    if(res.error != null) {
+                        let message = '';
+                        if(res.error.data.statusCode == 409) {
+                            message = "Duplicate data found."
+                        }
+                        else {
+                            message = res.error.data.message
+                        }
+                        setAlert({
+                            isAlert: true,
+                            message: message
+                        })
+                        setTimeout(() => {
+                            setAlert({
+                                isAlert: false,
+                                message: ''
+                            })
+                        }, 2000);
+                    }
+                    
+                });
+                setFormData(returnData);
+                setOpen(!open);
+                
+            }
+            catch(err) {
+                console.log(err.statusCode);
+                
+            }
             setFormData(returnData);
             setOpen(!open);
         }
     }
 
     const handleSave = () => {
-        console.log(formData);
-        setFormData(returnData);
+        if (validateForm()) {
+            try {
+                addReturn({
+                    ...formData,
+                    returnNo: "R-0001",
+                    returnDate: moment(formData.returnDate).toISOString(),
+                }).then((res) => {
+                    if(res.error != null) {
+                        let message = '';
+                        if(res.error.data.statusCode == 409) {
+                            message = "Duplicate data found."
+                        }
+                        else {
+                            message = res.error.data.message
+                        }
+                        setAlert({
+                            isAlert: true,
+                            message: message
+                        })
+                        setTimeout(() => {
+                            setAlert({
+                                isAlert: false,
+                                message: ''
+                            })
+                        }, 2000);
+                    }
+                    
+                });
+                setFormData(returnData);
+                
+            }
+            catch(err) {
+                console.log(err.statusCode);
+                
+            }
+            setFormData(returnData);
+        }
     }
 
-    // const column = [
-    //     {
-    //         name: 'Status',
-    //         width: '200px',
-    //         selector: row => row.status,
-    //         omit: true
-    //     },
-    //     {
-    //         name: 'Return No',
-    //         width: '200px',
-    //         selector: row => row.returnNo,
-    //         omit: true
-    //     },
-    //     {
-    //         name: 'Date',
-    //         width: "150px",
-    //         selector: row => row.returnDate,
-    //     },
-    //     {
-    //         name: 'Reference No',
-    //         width: "200px",
-    //         selector: row => row.referenceNo,
-    //     },
-    //     {
-    //         name: 'Stone Detail',
-    //         width: "200px",
-    //         selector: row => row.stoneDetail,
-    //     },
-    //     {
-    //         name: 'Qty',
-    //         width: "150px",
-    //         selector: row => row.qty,
-    //     },
-    //     {
-    //         name: 'Weight',
-    //         width: "150px",
-    //         selector: row => row.weight,
-    //     },
-    //     {
-    //         name: 'Unit',
-    //         width: "150px",
-    //         selector: row => row.unitCode,
-    //     },
-    //     {
-    //         name: 'Unit Price',
-    //         width: "150px",
-    //         selector: row => row.unitPrice,
-    //     },
-    //     {
-    //         name: 'Total Price',
-    //         width: "150px",
-    //         selector: row => row.totalPrice,
-    //     },
-    //     {
-    //         name: 'Remark',
-    //         width: "200px",
-    //         selector: row => row.remark,
-    //     },
-    //     {
-    //         name: 'Created At',
-    //         width: "200px",
-    //         selector: row => row.createdAt,
-    //     },
-    //     {
-    //         name: 'Updated At',
-    //         width: "200px",
-    //         selector: row => row.updatedAt,
-    //     },
-    //     {
-    //         name: 'Action',
-    //         center: true,
-    //         width: "100px",
-    //         cell: (row) => (
-    //             <div className="flex items-center gap-2">
-    //                 {/* <Link to={`/purchase_edit/${row.Code}`}>
-    //                     <Button variant="text" color="deep-purple" className="p-2"><FaPencil /></Button>
-    //                 </Link> */}
-    //                 <Button variant="text" color="deep-purple" className="p-2" onClick={() => handleView(row.Code)}><FaEye /></Button>
-    //                 <Button variant="text" color="red" className="p-2" onClick={() => handleDeleteBtn(row.Code)}><FaTrashCan /></Button>
-    //             </div>
-    //         )
-    //     },
-    // ];
+    const column = [
+        {
+            name: 'Status',
+            width: '200px',
+            selector: row => row.status,
+            omit: true
+        },
+        {
+            name: 'Return No',
+            width: '200px',
+            selector: row => row.returnNo,
+        },
+        {
+            name: 'Date',
+            width: "150px",
+            selector: row => row.returnDate,
+        },
+        {
+            name: 'Reference No',
+            width: "200px",
+            selector: row => row.referenceNo,
+        },
+        {
+            name: 'Stone Detail',
+            width: "200px",
+            selector: row => row.stoneDetail,
+        },
+        {
+            name: 'Qty',
+            width: "150px",
+            selector: row => row.qty,
+        },
+        {
+            name: 'Weight',
+            width: "150px",
+            selector: row => row.weight,
+        },
+        {
+            name: 'Unit',
+            width: "150px",
+            selector: row => row.unitCode,
+        },
+        {
+            name: 'Unit Price',
+            width: "150px",
+            selector: row => row.unitPrice,
+        },
+        {
+            name: 'Total Price',
+            width: "150px",
+            selector: row => row.totalPrice,
+        },
+        {
+            name: 'Remark',
+            width: "200px",
+            selector: row => row.remark,
+        },
+        {
+            name: 'Created At',
+            width: "200px",
+            selector: row => row.createdAt,
+        },
+        {
+            name: 'Updated At',
+            width: "200px",
+            selector: row => row.updatedAt,
+        },
+        {
+            name: 'Action',
+            center: true,
+            width: "100px",
+            cell: (row) => (
+                <div className="flex items-center gap-2">
+                    {/* <Link to={`/purchase_edit/${row.Code}`}>
+                        <Button variant="text" color="deep-purple" className="p-2"><FaPencil /></Button>
+                    </Link> */}
+                    <Button variant="text" color="deep-purple" className="p-2" onClick={() => handleView(row.Code)}><FaEye /></Button>
+                    <Button variant="text" color="red" className="p-2" onClick={() => handleDeleteBtn(row.Code)}><FaTrashCan /></Button>
+                </div>
+            )
+        },
+    ];
 
-    // const tbodyData = data?.map((returnData) => {
-    //     return {
-    //         returnNo: returnData.returnNo,
-    //         returnDate: moment(returnData.returnDate).format("YYYY-MM-DD"),
-    //         referenceNo: returnData.referenceNo,
-    //         stoneDetail: returnData.stoneDetailCode,
-    //         qty: returnData.qty.toLocaleString('en-US'),
-    //         weight: returnData.weight.toLocaleString('en-US'),
-    //         unit: returnData.unitCode,
-    //         unitPrice: returnData.unitPrice.toLocaleString('en-US'),
-    //         totalPrice: returnData.unitPrice.toLocaleString('en-US'),
-    //         Remark: returnData.remark,
-    //         createdAt: moment(returnData.createdAt).format("YYYY-MM-DD hh:mm:ss a"),
-    //         createdBy: returnData.createdBy,
-    //         updatedAt: moment(returnData.updatedAt).format("YYYY-MM-DD hh:mm:ss a"),
-    //         updatedBy: returnData.updatedBy,
-    //         status: returnData.status,
-    //     }
-    // });
+    const tbodyData = data?.map((returnData) => {
+        return {
+            returnNo: returnData.returnNo,
+            returnDate: moment(returnData.returnDate).format("YYYY-MM-DD"),
+            referenceNo: returnData.referenceNo,
+            stoneDetail: returnData.stoneDetailCode,
+            qty: returnData.qty.toLocaleString('en-US'),
+            weight: returnData.weight.toLocaleString('en-US'),
+            unit: returnData.unitCode,
+            unitPrice: returnData.unitPrice.toLocaleString('en-US'),
+            totalPrice: returnData.unitPrice.toLocaleString('en-US'),
+            Remark: returnData.remark,
+            createdAt: moment(returnData.createdAt).format("YYYY-MM-DD hh:mm:ss a"),
+            createdBy: returnData.createdBy,
+            updatedAt: moment(returnData.updatedAt).format("YYYY-MM-DD hh:mm:ss a"),
+            updatedBy: returnData.updatedBy,
+            status: returnData.status,
+        }
+    });
 
     return (
         <>
@@ -249,7 +326,7 @@ function ReturnList() {
                 </div>
                 <Card className="h-auto shadow-md max-w-screen-xxl rounded-sm p-2 border-t">
                     <CardBody className="rounded-sm overflow-auto p-0">
-                        {/* <TableList columns={column} data={tbodyData} /> */}
+                        <TableList columns={column} data={tbodyData} />
                     </CardBody>
                 </Card>
                 <DeleteModal deleteId={deleteId} open={openDelete} handleDelete={handleRemove} closeModal={() => setOpenDelete(!openDelete)} />
@@ -260,18 +337,29 @@ function ReturnList() {
                             {/* Reference No */}
                             <div>
                                 <label className="text-black text-sm mb-2">Reference No</label>
-                                <input
-                                    type="text"
-                                    className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
-                                    value={formData.referenceNo}
-                                    readOnly={isView}
-                                    onChange={(e) => {
-                                        setFormData({
-                                            ...formData, 
-                                            referenceNo: e.target.value,
-                                        });
-                                    }}
-                                />
+                                {
+                                    isView? 
+                                    <input
+                                        type="text"
+                                        className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
+                                        value={formData.referenceNo}
+                                        readOnly={isView}
+                                    /> : 
+                                    <select 
+                                        className="block w-full text-black border border-blue-gray-200 h-[35px] px-2.5 py-1.5 rounded-md focus:border-black"
+                                        value={formData.referenceNo}
+                                        onChange={(e) => {
+                                            setFormData({...formData, referenceNo: e.target.value});
+                                        }}
+                                    >
+                                        <option value="" disabled>Select...</option>
+                                        {
+                                            issueData?.map((issue) => {
+                                                return <option value={issue.issueNo} key={issue.issueNo}>{issue.issueNo}</option>
+                                            })
+                                        }
+                                    </select>
+                                }
                                 {
                                     validationText.referenceNo && <p className="block text-[12px] text-red-500 font-sans">{validationText.referenceNo}</p>
                                 }
@@ -311,7 +399,7 @@ function ReturnList() {
                                         onChange={(e) => 
                                             setFormData({
                                                 ...formData, 
-                                                stoneDetailCode: Number(e.target.value),
+                                                stoneDetailCode: e.target.value,
                                             })
                                         }
                                         >

@@ -184,6 +184,47 @@ function IssueList() {
         }
     };
 
+    const handleSave = () => {
+        if (validateForm()) {
+            try {
+                addIssue({
+                    ...formData,
+                    issueNo: "IS-0002",
+                    issueDate: moment(formData.issueDate).toISOString(),
+                }).then((res) => {
+                    if(res.error != null) {
+                        let message = '';
+                        if(res.error.data.statusCode == 409) {
+                            message = "Duplicate data found."
+                        }
+                        else {
+                            message = res.error.data.message
+                        }
+                        setAlert({
+                            isAlert: true,
+                            message: message
+                        })
+                        setTimeout(() => {
+                            setAlert({
+                                isAlert: false,
+                                message: ''
+                            })
+                        }, 2000);
+                    }
+                    
+                });
+                setFormData(issueData);
+                
+            }
+            catch(err) {
+                console.log(err.statusCode);
+                
+            }
+            setFormData(issueData);
+            setTBodyData([]);
+        }
+    }
+
     const deleteCustomer = (id) => {
         const leftData = tBodyData.filter(rec => rec.id !== id);
         let newData = [];

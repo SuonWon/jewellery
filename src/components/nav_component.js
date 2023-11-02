@@ -90,11 +90,11 @@ function Nav() {
                                     <FaListUl /> <span>Issue List</span>
                                 </MenuItem>
                             </NavLink>
-                            <NavLink to="/issue">
+                            {/* <NavLink to="/issue">
                                 <MenuItem className="flex items-center gap-2">
                                     <FaFileInvoice /> <span>Issue</span>
                                 </MenuItem>
-                            </NavLink>
+                            </NavLink> */}
                         </MenuList>
                     </Menu>
                     <Menu>
