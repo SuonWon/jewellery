@@ -3,7 +3,7 @@ import { Button, Card, CardBody, Dialog, DialogBody, Typography } from "@materia
 import { FaCirclePlus, FaEye, FaFloppyDisk, FaPencil, FaPlus, FaTrashCan, } from "react-icons/fa6";
 import { useState } from "react";
 import { focusSelect, pause } from "../const";
-import { useAddReturnMutation, useFetchIssueQuery, useFetchReturnQuery, useFetchStoneDetailsQuery, useFetchUOMQuery, useRemoveReturnMutation, useUpdateReturnMutation } from "../store";
+import { useAddDamageMutation, useFetchDamageIdQuery, useFetchDamageQuery, useFetchPurchaseQuery, useFetchStoneDetailsQuery, useFetchUOMQuery, useRemoveDamageMutation, useUpdateDamageMutation, } from "../store";
 import DeleteModal from "../components/delete_modal";
 import SuccessAlert from "../components/success_alert";
 import moment from "moment";
@@ -13,48 +13,48 @@ import ModalTitle from "../components/modal_title";
 import axios from "axios";
 const validator = require('validator');
 
-function ReturnList() {
+function Damage() {
 
-    const { data } = useFetchReturnQuery();
+    const { data } = useFetchDamageQuery();
 
     const {data: stoneDetails} = useFetchStoneDetailsQuery();
 
     const {data: unitData} = useFetchUOMQuery();
 
-    const {data: issueData} = useFetchIssueQuery();
+    const {data: purchaseData} = useFetchPurchaseQuery();
 
-    axios.get('http://localhost:3005/v1/return/get-id').then((res) => {
-        setReturnId(res.data);
+    axios.get('http://localhost:3005/v1/damage/get-id').then((res) => {
+        setDamageId(res.data);
     });
 
     const auth = useAuthUser();
 
     const [open, setOpen] = useState(false);
 
-    const [isEdit, setIsEdit] = useState(false);
-
-    const [returnId, setReturnId] = useState("");
+    const [isEdit, setIsView] = useState(false);
 
     const [openDelete, setOpenDelete] = useState(false);
 
     const [isAlert, setIsAlert] = useState(true);
 
-    const [removeReturn, removeResult] = useRemoveReturnMutation();
+    const [damageId, setDamageId] = useState("");
 
-    const [addReturn] = useAddReturnMutation();
+    const [removeDamage, removeResult] = useRemoveDamageMutation();
 
-    const [updateReturn] = useUpdateReturnMutation();
+    const [addDamage] = useAddDamageMutation();
+
+    const [updateDamage] = useUpdateDamageMutation();
 
     const [ alert, setAlert] = useState({
         isAlert: false,
         message: ''
     });
 
-    const returnData = {
-        returnNo: "",
-        returnDate: moment().format("YYYY-MM-DD"),
+    const damageData = {
+        damageNo: "",
+        damageDate: moment().format("YYYY-MM-DD"),
         referenceNo: "",
-        stoneDetailCode: 0,
+        stoneDetailCode: "",
         qty: 0,
         weight: 0,
         unitCode: 'ct',
@@ -67,16 +67,16 @@ function ReturnList() {
         deletedBy: "",
     };
 
-    const [formData, setFormData] = useState(returnData);
+    const [formData, setFormData] = useState(damageData);
 
     const [deleteId, setDeleteId] = useState('');
 
     const [ validationText, setValidationText ] = useState({});
 
     const handleRemove = async (id) => {
-        let removeData = data.filter((el) => el.invoiceNo === id);
-        removeReturn({
-            id: removeData[0].invoiceNo,
+        let removeData = data.filter((el) => el.damageNo === id);
+        removeDamage({
+            id: removeData[0].damageNo,
             deletedAt: moment().toISOString(),
             deletedBy: auth().username
         }).then((res) => { console.log(res) });
@@ -92,31 +92,31 @@ function ReturnList() {
     };
 
     const handleOpen = () => {
-        setFormData(returnData);
-        setIsEdit(false);
+        setFormData(damageData);
+        setIsView(false);
         setOpen(!open);
     };
 
     const handleView = (id) => {
-        let tempData = data.find(res => res.returnNo === id);
+        let tempData = data.find(res => res.damageNo === id);
         console.log(tempData);
         setFormData(tempData);
-        setIsEdit(true);
+        setIsView(true);
         setOpen(!open);
     };
 
     function validateForm() {
         const newErrors = {};
 
-        if (formData.returnDate === "") {
-            newErrors.returnData = "Return Date is required."
+        if (formData.damageDate === "") {
+            newErrors.damageDate = "Damage Date is required."
         }
 
         if (formData.referenceNo === "") {
             newErrors.referenceNo = "Reference No is required."
         }
 
-        if (formData.stoneDetailCode === 0) {
+        if (validator.isEmpty(formData.stoneDetailCode)) {
             newErrors.stoneDetailCode = "Stone Detail is required."
         }
         
@@ -134,10 +134,10 @@ function ReturnList() {
         if (validateForm()) {
             try {
                 console.log(formData);
-                addReturn({
+                addDamage({
                     ...formData,
-                    returnNo: returnId,
-                    returnDate: moment(formData.returnDate).toISOString(),
+                    damageNo: damageId,
+                    damageDate: moment(formData.returnDate).toISOString(),
                 }).then((res) => {
                     if(res.error != null) {
                         let message = '';
@@ -160,7 +160,7 @@ function ReturnList() {
                     }
                     
                 });
-                setFormData(returnData);
+                setFormData(damageData);
                 setOpen(!open);
                 
             }
@@ -168,18 +168,18 @@ function ReturnList() {
                 console.log(err.statusCode);
                 
             }
-            setFormData(returnData);
+            setFormData(damageData);
             setOpen(!open);
         }
-    }
+    };
 
     const handleSave = () => {
         if (validateForm()) {
             try {
-                addReturn({
+                addDamage({
                     ...formData,
-                    returnNo: returnId,
-                    returnDate: moment(formData.returnDate).toISOString(),
+                    damageNo: damageId,
+                    damageDate: moment(formData.returnDate).toISOString(),
                 }).then((res) => {
                     if(res.error != null) {
                         let message = '';
@@ -202,24 +202,24 @@ function ReturnList() {
                     }
                     
                 });
-                setFormData(returnData);
+                setFormData(damageData);
                 
             }
             catch(err) {
                 console.log(err.statusCode);
                 
             }
-            setFormData(returnData);
+            setFormData(damageData);
         }
-    }
+    };
 
     const handleUpdate = () => {
         if (validateForm()) {
             try {
                 console.log(formData);
-                updateReturn({
-                    returnNo: formData.returnNo,
-                    returnDate: formData.returnDate,
+                updateDamage({
+                    damageNo: formData.damageNo,
+                    damageDate: formData.damageDate,
                     referenceNo: formData.referenceNo,
                     stoneDetailCode: formData.stoneDetailCode,
                     qty: formData.qty,
@@ -230,7 +230,7 @@ function ReturnList() {
                     remark: formData.remark,
                     status: formData.status,
                     createdBy: formData.createdBy,
-                    createdAt: formData.createdAt,
+                    createdAt: formData.createdDate,
                     updatedBy: auth().username,
                     updatedAt: moment().toISOString(),
                     deletedBy: "",
@@ -256,7 +256,7 @@ function ReturnList() {
                     }
                     
                 });
-                setFormData(returnData);
+                setFormData(damageData);
                 setOpen(!open);
                 
             }
@@ -264,7 +264,7 @@ function ReturnList() {
                 console.log(err.statusCode);
                 
             }
-            setFormData(returnData);
+            setFormData(damageData);
             setOpen(!open);
         }
     };
@@ -277,14 +277,14 @@ function ReturnList() {
             omit: true
         },
         {
-            name: 'Return No',
+            name: 'Damage No',
             width: '200px',
-            selector: row => row.returnNo,
+            selector: row => row.damageNo,
         },
         {
             name: 'Date',
             width: "150px",
-            selector: row => row.returnDate,
+            selector: row => row.damageDate,
         },
         {
             name: 'Reference No',
@@ -309,7 +309,7 @@ function ReturnList() {
         {
             name: 'Unit',
             width: "150px",
-            selector: row => row.unitCode,
+            selector: row => row.unit,
         },
         {
             name: 'Unit Price',
@@ -345,30 +345,30 @@ function ReturnList() {
                     {/* <Link to={`/purchase_edit/${row.Code}`}>
                         <Button variant="text" color="deep-purple" className="p-2"><FaPencil /></Button>
                     </Link> */}
-                    <Button variant="text" color="deep-purple" className="p-2" onClick={() => handleView(row.returnNo)}><FaPencil /></Button>
-                    <Button variant="text" color="red" className="p-2" onClick={() => handleDeleteBtn(row.returnNo)}><FaTrashCan /></Button>
+                    <Button variant="text" color="deep-purple" className="p-2" onClick={() => handleView(row.damageNo)}><FaPencil /></Button>
+                    <Button variant="text" color="red" className="p-2" onClick={() => handleDeleteBtn(row.damageNo)}><FaTrashCan /></Button>
                 </div>
             )
         },
     ];
 
-    const tbodyData = data?.map((returnData) => {
+    const tbodyData = data?.map((damageData) => {
         return {
-            returnNo: returnData.returnNo,
-            returnDate: moment(returnData.returnDate).format("YYYY-MM-DD"),
-            referenceNo: returnData.referenceNo,
-            stoneDetail: returnData.stoneDetailCode,
-            qty: returnData.qty.toLocaleString('en-US'),
-            weight: returnData.weight.toLocaleString('en-US'),
-            unitCode: returnData.unitCode,
-            unitPrice: returnData.unitPrice.toLocaleString('en-US'),
-            totalPrice: returnData.totalPrice.toLocaleString('en-US'),
-            Remark: returnData.remark,
-            createdAt: moment(returnData.createdAt).format("YYYY-MM-DD hh:mm:ss a"),
-            createdBy: returnData.createdBy,
-            updatedAt: moment(returnData.updatedAt).format("YYYY-MM-DD hh:mm:ss a"),
-            updatedBy: returnData.updatedBy,
-            status: returnData.status,
+            damageNo: damageData.damageNo,
+            damageDate: moment(damageData.damageDate).format("YYYY-MM-DD"),
+            referenceNo: damageData.referenceNo,
+            stoneDetail: damageData.stoneDetailCode,
+            qty: damageData.qty.toLocaleString('en-US'),
+            weight: damageData.weight.toLocaleString('en-US'),
+            unit: damageData.unitCode,
+            unitPrice: damageData.unitPrice.toLocaleString('en-US'),
+            totalPrice: damageData.unitPrice.toLocaleString('en-US'),
+            remark: damageData.remark,
+            createdAt: moment(damageData.createdAt).format("YYYY-MM-DD hh:mm:ss a"),
+            createdBy: damageData.createdBy,
+            updatedAt: moment(damageData.updatedAt).format("YYYY-MM-DD hh:mm:ss a"),
+            updatedBy: damageData.updatedBy,
+            status: damageData.status,
         }
     });
 
@@ -382,7 +382,7 @@ function ReturnList() {
                 </div>
                 <div className="flex items-center py-3 bg-white gap-4 sticky top-0 z-10">
                     <Typography variant="h5">
-                        Return List
+                        Damage List
                     </Typography>
                     <Button variant="gradient" size="sm" color="deep-purple" className="flex items-center gap-2" onClick={handleOpen}>
                         <FaPlus /> Create New
@@ -396,17 +396,17 @@ function ReturnList() {
                 <DeleteModal deleteId={deleteId} open={openDelete} handleDelete={handleRemove} closeModal={() => setOpenDelete(!openDelete)} />
                 <Dialog open={open} size="lg">
                     <DialogBody>
-                        <ModalTitle titleName={isEdit? "Edit Return" : "Create Return"} handleClick={() => setOpen(!open)} />
+                        <ModalTitle titleName={isEdit ? "Edit Damage" : "Create Damage"} handleClick={() => setOpen(!open)} />
                         <div className="grid grid-cols-4 gap-2 mb-3">
                             {
                                 isEdit? 
                                 <div>
-                                    {/* Return No */}
-                                    <label className="text-black text-sm mb-2">Return No</label>
+                                    {/* Damage No */}
+                                    <label className="text-black text-sm mb-2">Damage No</label>
                                     <input
                                         type="text"
                                         className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
-                                        value={formData.returnNo}
+                                        value={formData.damageNo}
                                         readOnly={isEdit}
                                     />
                                 </div> : 
@@ -422,8 +422,8 @@ function ReturnList() {
                                     >
                                         <option value="" disabled>Select...</option>
                                         {
-                                            issueData?.map((issue) => {
-                                                return <option value={issue.issueNo} key={issue.issueNo}>{issue.issueNo}</option>
+                                            purchaseData?.map((purchase) => {
+                                                return <option value={purchase.invoiceNo} key={purchase.invoiceNo}>{purchase.invoiceNo}</option>
                                             })
                                         }
                                     </select>
@@ -435,18 +435,18 @@ function ReturnList() {
                             
                             {/* Return Date */}
                             <div className="col-start-4 col-end-4">
-                                <label className="text-black mb-2 text-sm">Return Date</label>
+                                <label className="text-black mb-2 text-sm">Damage Date</label>
                                 <input
                                     type="date"
                                     className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
-                                    value={moment(formData.returnDate).format("YYYY-MM-DD")}
+                                    value={moment(formData.damageDate).format("YYYY-MM-DD")}
                                     onChange={(e) => setFormData({
                                         ...formData,
-                                        returnDate: e.target.value
+                                        damageDate: e.target.value
                                     })}
                                 />
                                 {
-                                    validationText.returnDate && <p className="block text-[12px] text-red-500 font-sans">{validationText.returnDate}</p>
+                                    validationText.damageDate && <p className="block text-[12px] text-red-500 font-sans">{validationText.damageDate}</p>
                                 }
                             </div>
                         </div>
@@ -465,8 +465,8 @@ function ReturnList() {
                                     >
                                         <option value="" disabled>Select...</option>
                                         {
-                                            issueData?.map((issue) => {
-                                                return <option value={issue.issueNo} key={issue.issueNo}>{issue.issueNo}</option>
+                                            purchaseData?.map((purchase) => {
+                                                return <option value={purchase.invoiceNo} key={purchase.invoiceNo}>{purchase.invoiceNo}</option>
                                             })
                                         }
                                     </select>
@@ -488,7 +488,7 @@ function ReturnList() {
                                         })
                                     }
                                     >
-                                    <option value="0" disabled>Select stone detail</option>
+                                    <option value="" disabled>Select stone detail</option>
                                     {
                                         stoneDetails?.length === 0 ? <option value="" disabled>There is no Data</option> :
                                         stoneDetails?.map((stoneDetail) => {
@@ -620,7 +620,7 @@ function ReturnList() {
                                     <Typography variant="small" className="capitalize">
                                         Update
                                     </Typography>
-                                </Button> :
+                                </Button> : 
                                 <>
                                     <Button onClick={handleSubmit} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2">
                                         <FaFloppyDisk className="text-base" />
@@ -628,7 +628,7 @@ function ReturnList() {
                                             Save
                                         </Typography>
                                     </Button>
-                                    <Button onClick={handleSave}  color="green" size="sm" variant="gradient" className="flex items-center gap-2">
+                                    <Button onClick={handleSave} color="green" size="sm" variant="gradient" className="flex items-center gap-2">
                                         <FaCirclePlus className="text-base" />
                                         <Typography variant="small" className="capitalize">
                                             Save & New
@@ -646,4 +646,4 @@ function ReturnList() {
 
 }
 
-export default ReturnList;
+export default Damage;

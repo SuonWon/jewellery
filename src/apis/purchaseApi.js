@@ -8,6 +8,14 @@ const purchaseApi = createApi({
     }),
     endpoints(builder) {
         return {
+            fetchPurchaseId: builder.query({
+                query: () => {
+                    return {
+                        url: '/purchase/get-id',
+                        method: 'GET'
+                    };
+                },
+            }),
             fetchPurchase: builder.query({
                 providesTags: () => {
                     return [{type: 'Purchase', id: 'All'}]
@@ -36,7 +44,7 @@ const purchaseApi = createApi({
                 },
                 query: (purchaseNo) => {
                     return {
-                        url: `/purchase/get-purchse/${purchaseNo}`,
+                        url: `/purchase/get-purchase/${purchaseNo}`,
                         method: 'GET'
                     }
                 }
@@ -86,5 +94,5 @@ const purchaseApi = createApi({
     },
 })
 
-export const { useAddPurchaseMutation, useFetchTruePurchaseQuery, useFetchPurchaseQuery, useFetchPurchaseByIdQuery, useUpdatePurchaseMutation, useRemovePurchaseMutation } = purchaseApi; 
+export const { useFetchPurchaseIdQuery, useAddPurchaseMutation, useFetchTruePurchaseQuery, useFetchPurchaseQuery, useFetchPurchaseByIdQuery, useUpdatePurchaseMutation, useRemovePurchaseMutation } = purchaseApi; 
 export {purchaseApi};

@@ -58,6 +58,7 @@ const issueApi = createApi({
                     return [{type: "Issue", id: "All"}]
                 },
                 query: (issueData) => {
+                    console.log(issueData);
                     return {
                         url: "/issue/update-issue",
                         method: "PUT",

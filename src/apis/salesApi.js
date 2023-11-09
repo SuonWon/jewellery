@@ -44,6 +44,18 @@ const salesApi = createApi({
                     }
                 }
             }),
+            updateSales: builder.mutation({
+                invalidatesTags: () => {
+                    return [{type: "Sales", id:"All"}]
+                },
+                query: (salesData) => {
+                    return {
+                        url: "/sales/update-sales",
+                        method: "PUT",
+                        body: salesData,
+                    }
+                }
+            }),
             removeSales: builder.mutation({
                 invalidatesTags: () => {
                     return [{type: "Sales", id:"All"}]
@@ -52,7 +64,7 @@ const salesApi = createApi({
                     return {
                         url: "/sales/delete-sales",
                         method: 'PUT',
-                        body: salesData
+                        body: salesData,
                     };
                 },
             }),
@@ -60,6 +72,6 @@ const salesApi = createApi({
     },
 });
 
-export const { useAddSalesMutation, useFetchSalesQuery, useFetchTrueSalesQuery, useRemoveSalesMutation } = salesApi;
+export const { useAddSalesMutation, useFetchSalesQuery, useFetchTrueSalesQuery, useUpdateSalesMutation, useRemoveSalesMutation } = salesApi;
 
 export { salesApi }

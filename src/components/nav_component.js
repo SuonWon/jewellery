@@ -60,12 +60,17 @@ function Nav() {
                                     <FaUsers /><span>Customers</span>
                                 </MenuItem>
                             </NavLink>
+                            <NavLink to='/share'>
+                                <MenuItem className="flex items-center gap-2">
+                                    <FaUsers /><span>Share</span>
+                                </MenuItem>
+                            </NavLink>
                         </MenuList>
                     </Menu>  
                     <Menu>
                         <MenuHandler>
                             <Typography variant='small' className="flex justify-center items-center p-2 text-white space-x-2 hover:bg-white hover:text-black rounded-lg cursor-pointer">
-                                <FaMoneyBill1 className='text-base' /> <span className=''>Sales</span>
+                                <FaMoneyBill1 className='text-base' /> <span className=''>Sales Management</span>
                                 <FaChevronDown className='text-xs' />
                             </Typography>
                         </MenuHandler>
@@ -101,7 +106,7 @@ function Nav() {
                         <MenuHandler>
                             <Typography variant='small' className="flex justify-center items-center p-2 text-white space-x-2 hover:bg-white hover:text-black rounded-lg cursor-pointer">
                                 <FaCartShopping className='text-base' /> 
-                                <span>Purchase</span>
+                                <span>Purchase Management</span>
                                 <FaChevronDown className='text-xs' />
                             </Typography>
                         </MenuHandler>
@@ -119,6 +124,11 @@ function Nav() {
                             <NavLink to="/stone_selection">
                                 <MenuItem className="flex items-center gap-2">
                                     <FaListUl /> <span>Stone Selection</span>
+                                </MenuItem>
+                            </NavLink>
+                            <NavLink to="/damage">
+                                <MenuItem className="flex items-center gap-2">
+                                    <FaListUl /> <span>Damage</span>
                                 </MenuItem>
                             </NavLink>
                         </MenuList>

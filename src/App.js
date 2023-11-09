@@ -13,6 +13,8 @@ import ReturnList from "./pages/return_list";
 import StoneSelection from "./pages/stone_selection";
 import IssueList from "./pages/issue_list";
 import Dashboard from "./pages/dashboard";
+import Share from "./pages/share";
+import Damage from "./pages/damage";
 
 
 function App() {
@@ -52,6 +54,11 @@ function App() {
               <Supplier />
             </RequireAuth>
           }></Route>
+          <Route path="share" element={
+            <RequireAuth loginPath="/login">
+              <Share />
+            </RequireAuth>
+          }></Route>
           <Route path="stone_details" element={
             <RequireAuth loginPath="/login">
               <StoneDetails />
@@ -81,6 +88,11 @@ function App() {
           <Route path="issue_list" element={
             <RequireAuth loginPath="/login">
               <IssueList />
+            </RequireAuth>
+          }></Route>
+          <Route path="damage" element={
+            <RequireAuth loginPath="/login">
+              <Damage />
             </RequireAuth>
           }></Route>
           <Route path="/login" element={<Login />}></Route>

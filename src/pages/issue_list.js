@@ -1,6 +1,6 @@
 import { Button, Card, CardBody, Dialog, DialogBody, Typography } from "@material-tailwind/react";
-import { FaCirclePlus, FaEye, FaFloppyDisk, FaPlus, FaTrashCan } from "react-icons/fa6";
-import { useAddIssueMutation, useFetchIssueQuery, useFetchStoneDetailsQuery, useFetchTrueCustomerQuery, useFetchUOMQuery } from "../store";
+import { FaCirclePlus, FaEye, FaFloppyDisk, FaPencil, FaPlus, FaTrashCan } from "react-icons/fa6";
+import { useAddIssueMutation, useFetchIssueQuery, useFetchStoneDetailsQuery, useFetchTrueCustomerQuery, useFetchUOMQuery, useRemoveIssueMutation, useUpdateIssueMutation } from "../store";
 import moment from "moment";
 import { useState } from "react";
 import SuccessAlert from "../components/success_alert";
@@ -12,6 +12,7 @@ import ModalTitle from "../components/modal_title";
 import { v4 as uuidv4 } from 'uuid';
 import { useAuthUser } from "react-auth-kit";
 import DataTable from "react-data-table-component";
+import axios from "axios";
 const validator = require('validator');
 
 
@@ -19,13 +20,19 @@ function IssueList() {
 
     const { data } = useFetchIssueQuery();
 
-    const [isView, setIsView] = useState(false);
+    axios.get('http://localhost:3005/v1/damage/get-id').then((res) => {
+        setIssueId(res.data);
+    });
+
+    const [isEdit, setIsEdit] = useState(false);
 
     const [open, setOpen] = useState(false);
 
     const [openDelete, setOpenDelete] = useState(false);
 
     const [deleteId, setDeleteId] = useState('');
+
+    const [issueId, setIssueId] = useState('');
 
     const auth = useAuthUser();
 
@@ -36,6 +43,10 @@ function IssueList() {
     const { data: customerData } = useFetchTrueCustomerQuery();
 
     const [addIssue, addResult] = useAddIssueMutation();
+
+    const [removeIssue] = useRemoveIssueMutation();
+
+    const [updateIssue] = useUpdateIssueMutation();
 
     const [ alert, setAlert] = useState({
         isAlert: false,
@@ -83,28 +94,60 @@ function IssueList() {
     const handleOpen = () => {
         setFormData(issueData);
         setTBodyData([]);
-        setIsView(false);
+        setIsEdit(false);
         setOpen(!open);
     };
 
     const handleView = (id) => {
-        let tempData = data.find(res => res.invoiceNo === id);
+        let tempData = data.find(res => res.issueNo === id);
         console.log(tempData);
-        setFormData(tempData);
-        setTBodyData(tempData.issueMember);
-        setIsView(true);
+        setFormData({
+            issueNo: tempData.issueNo,
+            issueDate: tempData.issueDate,
+            stoneDetailCode: tempData.stoneDetailCode,
+            qty: tempData.qty,
+            weight: tempData.weight,
+            unitCode: tempData.unitCode,
+            unitPrice: tempData.unitPrice,
+            totalPrice: tempData.totalPrice,
+            status: tempData.status,
+            remark: tempData.remark,
+            createdAt: tempData.createdAt,
+            createdBy: tempData.createdBy,
+            updatedAt: tempData.updatedAt,
+            updatedBy: tempData.updatedBy,
+            deletedAt: tempData.deletedAt,
+            deletedBy: tempData.deletedBy,
+            issueMember: tempData.issueMember.map(el => {
+                return {
+                    id: el.id,
+                    lineNo: el.lineNo,
+                    customerCode: el.customerCode,
+                }
+            })
+        });
+        setTBodyData(tempData.issueMember.map(el => {
+            return {
+                id: el.id,
+                issueNo: el.issueNo,
+                lineNo: el.lineNo,
+                customerCode: el.customerCode,
+                customerName: el.customer.customerName,
+            }
+        }));
+        setIsEdit(true);
         setOpen(!open);
     };
 
     const handleRemove = async (id) => {
-        // let removeData = data.filter((el) => el.invoiceNo === id);
-        // removePurchase({
-        //     id: removeData[0].invoiceNo,
-        //     deletedAt: moment().toISOString(),
-        //     deletedBy: auth().username
-        // }).then((res) => { console.log(res) });
+        let removeData = data.filter((el) => el.invoiceNo === id);
+        removeIssue({
+            id: removeData[0].invoiceNo,
+            deletedAt: moment().toISOString(),
+            deletedBy: auth().username
+        }).then((res) => { console.log(res) });
         // setIsAlert(true);
-        // setOpenDelete(!openDelete);
+        setOpenDelete(!openDelete);
         // await pause(2000);
         // setIsAlert(false);
     };
@@ -147,7 +190,7 @@ function IssueList() {
             try {
                 addIssue({
                     ...formData,
-                    issueNo: "IS-0002",
+                    issueNo: issueId,
                     issueDate: moment(formData.issueDate).toISOString(),
                 }).then((res) => {
                     if(res.error != null) {
@@ -189,7 +232,7 @@ function IssueList() {
             try {
                 addIssue({
                     ...formData,
-                    issueNo: "IS-0002",
+                    issueNo: issueId,
                     issueDate: moment(formData.issueDate).toISOString(),
                 }).then((res) => {
                     if(res.error != null) {
@@ -223,7 +266,63 @@ function IssueList() {
             setFormData(issueData);
             setTBodyData([]);
         }
-    }
+    };
+
+    const handleUpdate = () => {
+        if (validateForm()) {
+            try {
+                console.log(formData);
+                updateIssue({
+                    issueNo: formData.issueNo,
+                    issueDate: formData.issueDate,
+                    stoneDetailCode: formData.stoneDetailCode,
+                    qty: formData.qty,
+                    weight: formData.weight,
+                    unitCode: formData.unitCode,
+                    unitPrice: formData.unitPrice,
+                    totalPrice: formData.totalPrice,
+                    status: formData.status,
+                    remark: formData.remark,
+                    createdBy: formData.createdBy,
+                    createdAt: formData.createdAt,
+                    updatedBy: auth().username,
+                    updatedAt: moment().toISOString(),
+                    deletedBy: "",
+                    issueMember: formData.issueMember,
+                }).then((res) => {
+                    if(res.error != null) {
+                        let message = '';
+                        if(res.error.data.statusCode == 409) {
+                            message = "Duplicate data found."
+                        }
+                        else {
+                            message = res.error.data.message
+                        }
+                        setAlert({
+                            isAlert: true,
+                            message: message
+                        })
+                        setTimeout(() => {
+                            setAlert({
+                                isAlert: false,
+                                message: ''
+                            })
+                        }, 2000);
+                    }
+                    
+                });
+                setFormData(issueData);
+                setOpen(!open);
+                
+            }
+            catch(err) {
+                console.log(err.statusCode);
+                
+            }
+            setFormData(issueData);
+            setOpen(!open);
+        }
+    };
 
     const deleteCustomer = (id) => {
         const leftData = tBodyData.filter(rec => rec.id !== id);
@@ -272,7 +371,7 @@ function IssueList() {
         }
     };
 
-    const supplierColumn = [
+    const customerColumn = [
         {
             name: 'No',
             width: "80px",
@@ -280,7 +379,7 @@ function IssueList() {
         },
         {
             name: 'Customer Name',
-            selector: row => isView? row.customer.customerName : row.customerName,
+            selector: row => row.customerName,
         },
         {
             name: 'Action',
@@ -288,7 +387,7 @@ function IssueList() {
             width: "100px",
             cell: (row) => (
                 <div className="flex items-center gap-2">
-                    <Button variant="text" color="red" className="p-2" onClick={() => deleteCustomer(row.id)} disabled={isView} ><FaTrashCan /></Button>
+                    <Button variant="text" color="red" className="p-2" onClick={() => deleteCustomer(row.id)} ><FaTrashCan /></Button>
                 </div>
             )
         },
@@ -299,7 +398,6 @@ function IssueList() {
             name: 'Issue No',
             width: '200px',
             selector: row => row.issueNo,
-            omit: true
         },
         {
             name: 'Date',
@@ -308,7 +406,7 @@ function IssueList() {
         },
         {
             name: 'Stone Detail',
-            width: "200px",
+            width: "250px",
             selector: row => row.stoneDetailCode,
         },
         {
@@ -371,8 +469,8 @@ function IssueList() {
                     {/* <Link to={`/purchase_edit/${row.Code}`}>
                         <Button variant="text" color="deep-purple" className="p-2"><FaPencil /></Button>
                     </Link> */}
-                    <Button variant="text" color="deep-purple" className="p-2" onClick={() => handleView(row.Code)}><FaEye /></Button>
-                    <Button variant="text" color="red" className="p-2" onClick={() => handleDeleteBtn(row.Code)}><FaTrashCan /></Button>
+                    <Button variant="text" color="deep-purple" className="p-2" onClick={() => handleView(row.issueNo)}><FaPencil /></Button>
+                    <Button variant="text" color="red" className="p-2" onClick={() => handleDeleteBtn(row.issueNo)}><FaTrashCan /></Button>
                 </div>
             )
         },
@@ -423,11 +521,11 @@ function IssueList() {
                 <DeleteModal deleteId={deleteId} open={openDelete} handleDelete={handleRemove} closeModal={() => setOpenDelete(!openDelete)} />
                 <Dialog open={open} size="lg">
                     <DialogBody>
-                        <ModalTitle titleName="Issue" handleClick={() => setOpen(!open)} />
+                        <ModalTitle titleName={isEdit ? "Edit Issue" : "Create Issue"} handleClick={() => setOpen(!open)} />
                         <div className="grid grid-cols-4 gap-4 px-3 mb-3">
                             <div className="col-span-2 grid grid-cols-2 gap-2 h-fit">
                                 {
-                                    isView? 
+                                    isEdit? 
                                     <div className="col-span-2 grid grid-cols-2">
                                         <div className="">
                                             <label className="text-black mb-2 text-sm">Issue No</label>
@@ -435,7 +533,7 @@ function IssueList() {
                                                 type="text"
                                                 className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
                                                 value={formData.issueNo}
-                                                readOnly={isView}
+                                                readOnly={isEdit}
                                             />
                                         </div>
                                     </div> : ""
@@ -451,7 +549,6 @@ function IssueList() {
                                             ...formData,
                                             issueDate: e.target.value
                                         })}
-                                        readOnly={isView}
                                     />
                                     {
                                         validationText.issueDate && <p className="block text-[12px] text-red-500 font-sans mb-2">{validationText.issueDate}</p>
@@ -460,32 +557,24 @@ function IssueList() {
                                 {/* Stone Details */}
                                 <div className="">
                                     <label className="text-black mb-2 text-sm">Stone Details</label>
-                                    {
-                                        isView ? <input
-                                            type="text"
-                                            className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
-                                            value={formData.stoneDetail.stoneDesc}
-                                            readOnly={isView}
-                                        /> : 
-                                        <select 
-                                            className="block w-full px-2.5 py-1.5 border border-blue-gray-200 h-[35px] rounded-md focus:border-black text-black" 
-                                            value={formData.stoneDetailCode} 
-                                            onChange={(e) => 
-                                                setFormData({
-                                                    ...formData, 
-                                                    stoneDetailCode: e.target.value,
-                                                })
-                                            }
-                                        >
-                                            <option value="" disabled>Select stone detail</option>
-                                            {
-                                                stoneDetails?.length === 0 ? <option value="" disabled>There is no Data</option> :
-                                                stoneDetails?.map((stoneDetail) => {
-                                                    return <option value={stoneDetail.stoneDetailCode} key={stoneDetail.stoneDetailCode} >{stoneDetail.stoneDesc}</option>
-                                                })
-                                            }
-                                        </select>
-                                    }
+                                    <select 
+                                        className="block w-full px-2.5 py-1.5 border border-blue-gray-200 h-[35px] rounded-md focus:border-black text-black" 
+                                        value={formData.stoneDetailCode} 
+                                        onChange={(e) => 
+                                            setFormData({
+                                                ...formData, 
+                                                stoneDetailCode: e.target.value,
+                                            })
+                                        }
+                                    >
+                                        <option value="" disabled>Select stone detail</option>
+                                        {
+                                            stoneDetails?.length === 0 ? <option value="" disabled>There is no Data</option> :
+                                            stoneDetails?.map((stoneDetail) => {
+                                                return <option value={stoneDetail.stoneDetailCode} key={stoneDetail.stoneDetailCode} >{stoneDetail.stoneDesc}</option>
+                                            })
+                                        }
+                                    </select>
                                     {
                                         validationText.stoneDetailCode && <p className="block text-[12px] text-red-500 font-sans mb-2">{validationText.stoneDetailCode}</p>
                                     } 
@@ -505,7 +594,6 @@ function IssueList() {
                                                 });
                                             }}
                                             onFocus={(e) => focusSelect(e)}
-                                            readOnly={isView}
                                         />
                                     </div>
                                     {/* Weight */}
@@ -524,38 +612,28 @@ function IssueList() {
                                                 });
                                             }}
                                             onFocus={(e) => focusSelect(e)}
-                                            readOnly={isView}
                                         />
                                     </div>
                                     {/* Unit */}
                                     <div>
                                         <label className="text-black text-sm mb-2">Unit</label>
-                                        {
-                                            isView ? <input
-                                                type="text"
-                                                className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
-                                                value={formData.unitCode}
-                                                readOnly={isView}
-                                            /> :
-                                            <select 
-                                                className="block w-full px-2.5 py-1.5 border border-blue-gray-200 h-[35px] rounded-md focus:border-black text-black" 
-                                                value={formData.unitCode}
-                                                onChange={(e) => {
-                                                    setFormData({
-                                                        ...formData, 
-                                                        unitCode: e.target.value,
-                                                    });
-                                                }}
-                                            >
-                                                <option value=""  disabled>Select Unit</option>
-                                                {
-                                                    unitData?.map((unit) => {
-                                                        return <option value={unit.unitCode} key={unit.unitCode} >{unit.unitCode}</option>
-                                                    })
-                                                }
-                                            </select>
-                                        }
-                                        
+                                        <select 
+                                            className="block w-full px-2.5 py-1.5 border border-blue-gray-200 h-[35px] rounded-md focus:border-black text-black" 
+                                            value={formData.unitCode}
+                                            onChange={(e) => {
+                                                setFormData({
+                                                    ...formData, 
+                                                    unitCode: e.target.value,
+                                                });
+                                            }}
+                                        >
+                                            <option value=""  disabled>Select Unit</option>
+                                            {
+                                                unitData?.map((unit) => {
+                                                    return <option value={unit.unitCode} key={unit.unitCode} >{unit.unitCode}</option>
+                                                })
+                                            }
+                                        </select>
                                         {
                                             validationText.unitCode && <p className="block text-[12px] text-red-500 font-sans mb-2">{validationText.unitCode}</p>
                                         }
@@ -577,61 +655,72 @@ function IssueList() {
                                             });
                                         }}
                                         onFocus={(e) => focusSelect(e)}
-                                        readOnly={isView}
                                     />
                                 </div>
                                 {/* Total Price */}
                                 <div>
                                     <label className="text-black text-sm mb-2">Total Price</label>
                                     <input
-                                        type="text"
+                                        type="number"
                                         className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
-                                        value={formData.totalPrice.toLocaleString()}
-                                        readOnly={isView}
+                                        value={formData.totalPrice}
+                                        readOnly
+                                    />
+                                </div>
+                                {/* Remark */}
+                                <div className="grid col-span-2 h-fit">
+                                    <label className="text-black mb-2 text-sm">Remark</label>
+                                    <textarea
+                                        className="border border-blue-gray-200 w-full px-2.5 py-1.5 rounded-md text-black"
+                                        value={formData.remark}
+                                        rows="1"
+                                        onChange={(e) => {
+                                            setFormData({
+                                                ...formData, 
+                                                remark: e.target.value
+                                            });
+                                        }}
                                     />
                                 </div>
                             </div>
                             <div className="col-span-2 grid grid-cols-3 gap-2 h-fit">
                                 {/* Select Customer */}
-                                {
-                                    isView ? "" : 
-                                    <div className="col-span-3 gap-2">
-                                        <div className="w-full">
-                                            <label className="text-black mb-2 text-sm">Customer Name</label>
-                                            <div className="flex items-center gap-2">
-                                                <select 
-                                                className="block w-full px-2.5 py-1.5 border border-blue-gray-200 h-[35px] rounded-md focus:border-black text-black"
-                                                value={memberData.customerCode} 
-                                                onChange={(e) => setMemberData({
-                                                    ...memberData,
-                                                    customerCode: Number(e.target.value),
-                                                    customerName: e.target.selectedOptions[0].text
-                                                })}
-                                                >
-                                                    <option value="0" disabled>Select Customer</option>
-                                                    {
-                                                        customerData?.map((customer) => {
-                                                            return <option value={customer.customerCode} key={customer.customerCode} >{customer.customerName}</option>
-                                                        })
-                                                    }
-                                                </select>
-                                                <Button type="button" variant="gradient" color="deep-purple" className="py-2 px-4 capitalize" onClick={saveMember}>
-                                                    Select
-                                                </Button>
-                                            </div>
-                                            
-                                            {
-                                                validationText.customer && <p className="block text-[12px] text-red-500 font-sans mb-2">{validationText.customer}</p>
-                                            }
+                                <div className="col-span-3 gap-2">
+                                    <div className="w-full">
+                                        <label className="text-black mb-2 text-sm">Customer Name</label>
+                                        <div className="flex items-center gap-2">
+                                            <select 
+                                            className="block w-full px-2.5 py-1.5 border border-blue-gray-200 h-[35px] rounded-md focus:border-black text-black"
+                                            value={memberData.customerCode} 
+                                            onChange={(e) => setMemberData({
+                                                ...memberData,
+                                                customerCode: Number(e.target.value),
+                                                customerName: e.target.selectedOptions[0].text
+                                            })}
+                                            >
+                                                <option value="0" disabled>Select Customer</option>
+                                                {
+                                                    customerData?.map((customer) => {
+                                                        return <option value={customer.customerCode} key={customer.customerCode} >{customer.customerName}</option>
+                                                    })
+                                                }
+                                            </select>
+                                            <Button type="button" variant="gradient" color="deep-purple" className="py-2 px-4 capitalize" onClick={saveMember}>
+                                                Select
+                                            </Button>
                                         </div>
+                                        
+                                        {
+                                            validationText.customer && <p className="block text-[12px] text-red-500 font-sans mb-2">{validationText.customer}</p>
+                                        }
                                     </div>
-                                }
+                                </div>
                                 {/* Customer table list */}
                                 <div className="col-span-3">
                                     <Card className="w-full shadow-sm border border-blue-gray-200 rounded-md">
                                         <CardBody className="overflow-auto rounded-md p-0">
                                         <DataTable 
-                                            columns={supplierColumn} 
+                                            columns={customerColumn} 
                                             data={tBodyData} 
                                             customStyles={{
                                                 rows: {
@@ -655,18 +744,29 @@ function IssueList() {
                             </div>
                         </div>
                         <div className="flex items-center justify-end mt-6 gap-2">
-                            <Button onClick={handleSubmit} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2">
-                                <FaFloppyDisk className="text-base" />
-                                <Typography variant="small" className="capitalize">
-                                    Save
-                                </Typography>
-                            </Button>
-                            <Button  color="green" size="sm" variant="gradient" className="flex items-center gap-2">
-                                <FaCirclePlus className="text-base" />
-                                <Typography variant="small" className="capitalize">
-                                    Save & New
-                                </Typography>
-                            </Button>
+                            {
+                                isEdit? 
+                                <Button onClick={handleUpdate} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2">
+                                    <FaFloppyDisk className="text-base" />
+                                    <Typography variant="small" className="capitalize">
+                                        Update
+                                    </Typography>
+                                </Button> :
+                                <>
+                                    <Button onClick={handleSubmit} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2">
+                                        <FaFloppyDisk className="text-base" />
+                                        <Typography variant="small" className="capitalize">
+                                            Save
+                                        </Typography>
+                                    </Button>
+                                    <Button onClick={handleSave} color="green" size="sm" variant="gradient" className="flex items-center gap-2">
+                                        <FaCirclePlus className="text-base" />
+                                        <Typography variant="small" className="capitalize">
+                                            Save & New
+                                        </Typography>
+                                    </Button>
+                                </>
+                            }
                         </div>
                     </DialogBody>
                 </Dialog>

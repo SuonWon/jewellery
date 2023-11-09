@@ -2,7 +2,7 @@
 import { Button, Card, CardBody, Dialog, DialogBody, Typography } from "@material-tailwind/react";
 import { FaCirclePlus, FaEye, FaFloppyDisk, FaPencil, FaPlus, FaTrashCan,} from "react-icons/fa6";
 import { useState } from "react";
-import { useAddSalesMutation, useFetchIssueQuery, useFetchSalesQuery, useFetchStoneDetailsQuery, useFetchTrueCustomerQuery, useFetchTrueSalesQuery, useFetchUOMQuery, useRemoveSalesMutation } from "../store";
+import { useAddSalesMutation, useFetchIssueQuery, useFetchSalesQuery, useFetchStoneDetailsQuery, useFetchTrueCustomerQuery, useFetchTrueSalesQuery, useFetchUOMQuery, useRemoveSalesMutation, useUpdateSalesMutation } from "../store";
 import { focusSelect, pause } from "../const";
 import DeleteModal from "../components/delete_modal";
 import SuccessAlert from "../components/success_alert";
@@ -12,25 +12,40 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuthUser } from "react-auth-kit";
 import ModalTitle from "../components/modal_title";
 import { v4 as uuidv4 } from 'uuid';
+import axios from "axios";
 const validator = require('validator');
 
 function SalesList() {
-
-    const auth = useAuthUser();
-
-    const [openDelete, setOpenDelete] = useState(false);
-
-    const navigate = useNavigate();
-
-    const [isAlert, setIsAlert] = useState(true);
 
     const {data} = useFetchSalesQuery();
 
     const {data: issueData} = useFetchIssueQuery();
 
+    const {data: customerData} = useFetchTrueCustomerQuery();
+
+    const {data: stoneDetails} = useFetchStoneDetailsQuery();
+
+    const {data: unitData} = useFetchUOMQuery();
+
+    axios.get('http://localhost:3005/v1/damage/get-id').then((res) => {
+        setSalesId(res.data);
+    });
+
     const [removeSales, removeResult] = useRemoveSalesMutation();
 
     const [addSales] = useAddSalesMutation();
+
+    const [updateSales] = useUpdateSalesMutation();
+
+    const auth = useAuthUser();
+
+    const [openDelete, setOpenDelete] = useState(false);
+
+    const [salesId, setSalesId] = useState("");
+
+    const navigate = useNavigate();
+
+    const [isAlert, setIsAlert] = useState(true);
 
     const [open, setOpen] = useState(false);
 
@@ -62,12 +77,6 @@ function SalesList() {
         updatedBy: "",
         deletedBy: "",
     };
-
-    const {data: customerData} = useFetchTrueCustomerQuery();
-
-    const {data: stoneDetails} = useFetchStoneDetailsQuery();
-
-    const {data: unitData} = useFetchUOMQuery();
 
     const [formData, setFormData] = useState(salesData);
 
