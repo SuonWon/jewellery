@@ -20,6 +20,14 @@ const stoneDetailsApi = createApi({
                     };
                 },
             }),
+            fetchPurchaseShare: builder.query({
+                query: () => {
+                    return {
+                        url: "/stone-detail/get-purchase-share/{purchaseId}",
+                        method: 'GET',
+                    };
+                },
+            }),
             fetchStoneDetailsById: builder.query({
                 query: (stoneDetailCode) => {
                     return {
@@ -68,5 +76,5 @@ const stoneDetailsApi = createApi({
     }
 });
 
-export const { useFetchStoneDetailsQuery, useFetchStoneDetailsByIdQuery, useAddStoneDetailsMutation, useUpdateStoneDetailsMutation, useRemoveStoneDetailsMutation } = stoneDetailsApi;
+export const { useFetchStoneDetailsQuery, useFetchStoneDetailsByIdQuery, useFetchPurchaseShareQuery, useAddStoneDetailsMutation, useUpdateStoneDetailsMutation, useRemoveStoneDetailsMutation } = stoneDetailsApi;
 export { stoneDetailsApi };

@@ -1,5 +1,5 @@
 import { Button, Menu, MenuHandler, MenuItem, MenuList, Typography } from "@material-tailwind/react";
-import { FaArrowRightFromBracket, FaCartShopping, FaChartPie, FaChevronDown, FaDatabase, FaFileInvoice, FaListUl, FaMoneyBill1, FaSliders, FaUsers } from "react-icons/fa6";
+import { FaArrowRightFromBracket, FaBoxesPacking, FaCartShopping, FaChartPie, FaChevronDown, FaDatabase, FaFileInvoice, FaListUl, FaMoneyBill1, FaSliders, FaUsers, FaWallet } from "react-icons/fa6";
 import { GiDiamondTrophy } from "react-icons/gi";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useAuthUser, useSignOut } from "react-auth-kit";
@@ -47,7 +47,7 @@ function Nav() {
                             </NavLink>
                             <NavLink to='/stone_details'>
                                 <MenuItem className="flex items-center gap-2">
-                                    <GiDiamondTrophy /><span>Stone Details</span>
+                                    <GiDiamondTrophy /><span>Stone Selection</span>
                                 </MenuItem>
                             </NavLink>
                             <NavLink to='/supplier'>
@@ -70,7 +70,8 @@ function Nav() {
                     <Menu>
                         <MenuHandler>
                             <Typography variant='small' className="flex justify-center items-center p-2 text-white space-x-2 hover:bg-white hover:text-black rounded-lg cursor-pointer">
-                                <FaMoneyBill1 className='text-base' /> <span className=''>Sales Management</span>
+                                <FaMoneyBill1 className='text-base' /> 
+                                    <span className=''>Sales</span>
                                 <FaChevronDown className='text-xs' />
                             </Typography>
                         </MenuHandler>
@@ -90,11 +91,6 @@ function Nav() {
                                     <FaListUl /> <span>Return List</span>
                                 </MenuItem>
                             </NavLink>
-                            <NavLink to="/issue_list">
-                                <MenuItem className="flex items-center gap-2">
-                                    <FaListUl /> <span>Issue List</span>
-                                </MenuItem>
-                            </NavLink>
                             {/* <NavLink to="/issue">
                                 <MenuItem className="flex items-center gap-2">
                                     <FaFileInvoice /> <span>Issue</span>
@@ -106,7 +102,7 @@ function Nav() {
                         <MenuHandler>
                             <Typography variant='small' className="flex justify-center items-center p-2 text-white space-x-2 hover:bg-white hover:text-black rounded-lg cursor-pointer">
                                 <FaCartShopping className='text-base' /> 
-                                <span>Purchase Management</span>
+                                    <span>Purchase</span>
                                 <FaChevronDown className='text-xs' />
                             </Typography>
                         </MenuHandler>
@@ -121,18 +117,40 @@ function Nav() {
                                     <FaFileInvoice /> <span>Purchase invoice</span>
                                 </MenuItem>
                             </NavLink> */}
-                            <NavLink to="/stone_selection">
+                            <NavLink to="/stone_details">
                                 <MenuItem className="flex items-center gap-2">
                                     <FaListUl /> <span>Stone Selection</span>
                                 </MenuItem>
                             </NavLink>
+                        </MenuList>
+                    </Menu>
+                    <Menu>
+                        <MenuHandler>
+                            <Typography variant='small' className="flex justify-center items-center p-2 text-white space-x-2 hover:bg-white hover:text-black rounded-lg cursor-pointer">
+                                <FaBoxesPacking className='text-base' /> 
+                                    <span>Stock</span>
+                                <FaChevronDown className='text-xs' />
+                            </Typography>
+                        </MenuHandler>
+                        <MenuList className="z-[99999] bg-main text-white">
                             <NavLink to="/damage">
                                 <MenuItem className="flex items-center gap-2">
                                     <FaListUl /> <span>Damage</span>
                                 </MenuItem>
                             </NavLink>
+                            <NavLink to="/issue_list">
+                                <MenuItem className="flex items-center gap-2">
+                                    <FaListUl /> <span>Issue List</span>
+                                </MenuItem>
+                            </NavLink>
                         </MenuList>
                     </Menu>
+                    <NavLink to='/dashboard'>
+                        <Typography variant='small' className="flex justify-center items-center text-white p-2 space-x-2 hover:bg-white hover:text-black rounded-lg ">
+                            <FaWallet className='text-base' /> <span className=''>Wallet</span>
+                        </Typography>
+                    </NavLink>
+                    
                 </div>
                 <div className='flex justify-end'>
                     <Menu>

@@ -2,7 +2,7 @@
 import { Button, Card, CardBody, Dialog, DialogBody, Typography } from "@material-tailwind/react";
 import { FaCirclePlus, FaEye, FaFloppyDisk, FaPencil, FaPlus, FaTrashCan, } from "react-icons/fa6";
 import { useState } from "react";
-import { focusSelect, pause } from "../const";
+import { apiUrl, focusSelect, pause } from "../const";
 import { useAddPurchaseMutation, useFetchPurchaseIdQuery, useFetchPurchaseQuery, useFetchShareByIdQuery, useFetchShareQuery, useFetchStoneQuery, useFetchTrueSupplierQuery, useFetchUOMQuery, useRemovePurchaseMutation, useUpdatePurchaseMutation } from "../store";
 import DeleteModal from "../components/delete_modal";
 import SuccessAlert from "../components/success_alert";
@@ -27,7 +27,7 @@ function PurchaseList() {
 
     const { data: stoneData } = useFetchStoneQuery();
 
-    axios.get('http://localhost:3005/v1/purchase/get-id').then((res) => {
+    axios.get(`${apiUrl}/purchase/get-id`).then((res) => {
         setPurchaseInvoiceNo(res.data);
     });
 
@@ -55,8 +55,6 @@ function PurchaseList() {
         isAlert: false,
         message: ''
     });
-
-    const defaultShareCode = 5;
 
     const [removePurchase, removeResult] = useRemovePurchaseMutation();
 
@@ -94,8 +92,8 @@ function PurchaseList() {
     const [dShare, setDShare] = useState({
         id: uuidv4(),
         lineNo: 1,
-        shareCode: defaultShareCode,
-        shareName: "Ko Aung Han Soe",
+        shareCode: 0,
+        shareName: "",
         sharePercentage: 100,
         amount: 0,
     });
@@ -129,9 +127,22 @@ function PurchaseList() {
     };
 
     const handleOpen = () => {
+        axios.get(`${apiUrl}/share/get-owner`).then((res) => {
+            setTBodyData([
+                {
+                    ...dShare,
+                    shareCode: res.data.shareCode,
+                    shareName: res.data.shareName,
+                }
+            ]);
+            setDShare({
+                ...dShare,
+                shareCode: res.data.shareCode,
+                shareName: res.data.shareName,
+            });
+        });
         setFormData(purchaseData);
         setIsEdit(false);
-        setTBodyData([dShare]);
         setOpen(!open);
     };
 
@@ -179,7 +190,7 @@ function PurchaseList() {
             }
         }));
         tempData.purchaseShareDetails.map(el => {
-            if (el.shareCode === defaultShareCode) {
+            if (el.shareCode === dShare.shareCode) {
                 setDShare({
                     ...dShare,
                     sharePercentage: el.sharePercentage,
@@ -406,7 +417,7 @@ function PurchaseList() {
         if(validateShare()) {
             let isExist = tBodyData.find(res => res.shareCode === shares.shareCode);
             if(!isExist){
-                let newTbody = tBodyData.filter(el => el.shareCode !== defaultShareCode);
+                let newTbody = tBodyData.filter(el => el.shareCode !== dShare.shareCode);
                 newTbody.push(
                     {
                         ...dShare,
@@ -463,7 +474,7 @@ function PurchaseList() {
                     sharePercentage: shares.sharePercentage,
                     amount: (shares.sharePercentage / 100) * formData.grandTotal,
                 }
-            } else if (el.shareCode === defaultShareCode) {
+            } else if (el.shareCode === dShare.shareCode) {
                 return {
                     ...el,
                     sharePercentage: (el.sharePercentage + oldPer) - shares.sharePercentage,
@@ -487,7 +498,7 @@ function PurchaseList() {
         const leftData = tBodyData.filter(rec => rec.id !== id);
         let newData = [];
         leftData.map((rec, index) => {
-            if (rec.shareCode === defaultShareCode) {
+            if (rec.shareCode === dShare.shareCode) {
                 newData.push({
                     ...rec,
                     lineNo: index + 1,
@@ -526,14 +537,14 @@ function PurchaseList() {
         },
         {
             name: 'Amount',
-            width: "100px",
+            width: "150px",
             right: true,
             selector: row => row.amount.toLocaleString(),
         },
         {
             name: 'Action',
             center: "true",
-            width: "100px",
+            width: "80px",
             cell: (row) => (
                 <div className="flex items-center gap-2">
                     <Button 
@@ -541,7 +552,7 @@ function PurchaseList() {
                         color="deep-purple" 
                         className="p-2" 
                         onClick={() => editShare(row.id)}
-                        disabled={ row.shareCode === defaultShareCode? true : isEditShare? true : false } 
+                        disabled={ row.shareCode === dShare.shareCode? true : isEditShare? true : false } 
                     >
                         <FaPencil />
                     </Button>
@@ -550,7 +561,7 @@ function PurchaseList() {
                         color="red" 
                         className="p-2" 
                         onClick={() => deleteShare(row.id, row.sharePercentage, row.amount)} 
-                        disabled={ row.shareCode === defaultShareCode? true : isEditShare? true : false} 
+                        disabled={ row.shareCode === dShare.shareCode? true : isEditShare? true : false} 
                     >
                         <FaTrashCan />
                     </Button>
@@ -564,7 +575,6 @@ function PurchaseList() {
             name: 'Invoice No',
             width: '200px',
             selector: row => row.Code,
-            omit: true
         },
         {
             name: 'Date',
@@ -1014,7 +1024,7 @@ function PurchaseList() {
                                             <option value="0" disabled>Select Share</option>
                                             {
                                                 shareData?.map((share) => {
-                                                    return <option value={share.shareCode} key={share.shareCode} disabled={share.shareCode === defaultShareCode? true : false}>{share.shareName}</option>
+                                                    return <option value={share.shareCode} key={share.shareCode} disabled={share.shareCode === dShare.shareCode? true : false}>{share.shareName}</option>
                                                 })
                                             }
                                         </select>

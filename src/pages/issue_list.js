@@ -7,7 +7,7 @@ import SuccessAlert from "../components/success_alert";
 import TableList from "../components/data_table";
 import DeleteModal from "../components/delete_modal";
 import { Link } from "react-router-dom";
-import { focusSelect } from "../const";
+import { apiUrl, focusSelect } from "../const";
 import ModalTitle from "../components/modal_title";
 import { v4 as uuidv4 } from 'uuid';
 import { useAuthUser } from "react-auth-kit";
@@ -20,7 +20,7 @@ function IssueList() {
 
     const { data } = useFetchIssueQuery();
 
-    axios.get('http://localhost:3005/v1/damage/get-id').then((res) => {
+    axios.get(`${apiUrl}/issue/get-id`).then((res) => {
         setIssueId(res.data);
     });
 

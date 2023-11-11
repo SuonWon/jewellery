@@ -217,8 +217,22 @@ function Share() {
                     <div className="border-r border-gray-400 pr-2">
                         <Switch color="deep-purple" defaultChecked={row.status} id={row.code} onChange={handleChange} />
                     </div>
-                    <Button variant="text" color="deep-purple" className="p-2" onClick={() => handleEdit(row.code)}><FaPencil /></Button>
-                    <Button variant="text" color="red" className="p-2" onClick={() => handleDeleteBtn(Number(row.code))}><FaTrashCan /></Button>
+                    <Button 
+                        variant="text" color="deep-purple" 
+                        className="p-2" 
+                        onClick={() => handleEdit(row.code)}
+                    >
+                        <FaPencil />
+                    </Button>
+                    <Button 
+                        variant="text" 
+                        color="red" 
+                        className="p-2" 
+                        onClick={() => handleDeleteBtn(Number(row.code))}
+                        disabled={row.isOwner}
+                    >
+                        <FaTrashCan />
+                    </Button>
                 </div>
             )
         },
@@ -240,6 +254,7 @@ function Share() {
             updatedBy: share.updatedBy,
             remark: share.remark,
             status: share.isActive,
+            isOwner: share.isOwner,
         }
     });
 

@@ -14,6 +14,7 @@ import { returnApi } from "../apis/returnApi";
 import { issueApi } from "../apis/issueApi";
 import { shareApi } from "../apis/shareApi";
 import { damageApi } from "../apis/damageApi";
+import { adjustmentApi } from "../apis/adjustmentApi";
 
 export const store = configureStore({
     reducer: {
@@ -32,6 +33,7 @@ export const store = configureStore({
         [issueApi.reducerPath] : issueApi.reducer,
         [shareApi.reducerPath] : shareApi.reducer,
         [damageApi.reducerPath] : damageApi.reducer,
+        [adjustmentApi.reducerPath] : adjustmentApi.reducer,
     },
     middleware: (getDefaultMiddleware) => {
         return getDefaultMiddleware()
@@ -49,7 +51,8 @@ export const store = configureStore({
             .concat(returnApi.middleware)
             .concat(issueApi.middleware)
             .concat(shareApi.middleware)
-            .concat(damageApi.middleware);
+            .concat(damageApi.middleware)
+            .concat(adjustmentApi.middleware);
     }
 });
 
@@ -60,7 +63,7 @@ export { useFetchStoneQuery, useFetchTrueStoneQuery, useFetchStoneByIdQuery, use
 export { useFetchUOMQuery, useFetchUOMByIdQuery, useAddUOMMutation, useUpdateUOMMutation, useRemoveUOMMutation } from "../apis/uomApi";
 export { useFetchCustomerQuery, useFetchTrueCustomerQuery, useFetchCustomerByIdQuery, useAddCustomerMutation, useUpdateCustomerMutation, useRemoveCustomerMutation } from "../apis/customerApi";
 export { useFetchSupplierQuery, useFetchTrueSupplierQuery, useFetchSupplierByIdQuery, useAddSupplierMutation, useUpdateSupplierMutation, useRemoveSupplierMutation } from "../apis/supplierApi";
-export { useFetchStoneDetailsQuery, useFetchStoneDetailsByIdQuery, useAddStoneDetailsMutation, useUpdateStoneDetailsMutation, useRemoveStoneDetailsMutation } from "../apis/stoneDetailsApi";
+export { useFetchStoneDetailsQuery, useFetchStoneDetailsByIdQuery, useFetchPurchaseShareQuery, useAddStoneDetailsMutation, useUpdateStoneDetailsMutation, useRemoveStoneDetailsMutation } from "../apis/stoneDetailsApi";
 export { useFetchPurchaseIdQuery, useFetchPurchaseQuery, useFetchTruePurchaseQuery, useAddPurchaseMutation, useFetchPurchaseByIdQuery, useUpdatePurchaseMutation, useRemovePurchaseMutation } from "../apis/purchaseApi";
 export { useFetchSalesQuery, useFetchTrueSalesQuery, useAddSalesMutation, useUpdateSalesMutation, useRemoveSalesMutation} from "../apis/salesApi";
 export { useFetchStoneSelectionQuery, useAddStoneSelectionMutation, useUpdateStoneSelectionMutation } from "../apis/stoneSelectionApi";
@@ -68,3 +71,4 @@ export { useFetchReturnQuery, useAddReturnMutation, useUpdateReturnMutation, use
 export { useFetchIssueQuery, useAddIssueMutation, useUpdateIssueMutation, useRemoveIssueMutation } from "../apis/issueApi";
 export { useFetchShareQuery, useFetchShareByIdQuery, useAddShareMutation, useUpdateShareMutation, useRemoveShareMutation } from "../apis/shareApi";
 export { useFetchDamageIdQuery, useFetchDamageQuery, useFetchDamageByIdQuery, useAddDamageMutation, useUpdateDamageMutation, useRemoveDamageMutation } from "../apis/damageApi";
+export { useFetchAdjustmentQuery, useFetchAdjustmentByIdQuery, useAddAdjustmentMutation, useUpdateAdjustmentMutation, useRemoveAdjustMutation } from "../apis/adjustmentApi";
