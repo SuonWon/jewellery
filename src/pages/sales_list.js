@@ -28,7 +28,7 @@ function SalesList() {
 
     const { data: unitData } = useFetchUOMQuery();
 
-    axios.get('http://localhost:3005/v1/damage/get-id').then((res) => {
+    axios.get('http://localhost:3005/v1/sales/get-id').then((res) => {
         setSalesId(res.data);
     });
 
@@ -135,26 +135,26 @@ function SalesList() {
             updatedBy: tempData.updatedBy,
             updatedAt: tempData.updatedAt,
             deletedBy: tempData.deletedBy,
-            // salesShareDetails: tempData.salesShareDetails.map(el => {
-            //     return {
-            //         id: el.id,
-            //         lineNo: el.lineNo,
-            //         shareCode: el.shareCode,
-            //         sharePercentage: el.sharePercentage,
-            //         amount: el.amount,
-            //     }
-            // }),
+            salesShareDetails: tempData.salesShareDetails.map(el => {
+                return {
+                    id: el.id,
+                    lineNo: el.lineNo,
+                    shareCode: el.shareCode,
+                    sharePercentage: el.sharePercentage,
+                    amount: el.amount,
+                }
+            }),
         });
-        // setTBodyData(tempData.purchaseShareDetails.map(el => {
-        //     return {
-        //         id: el.id,
-        //         lineNo: el.lineNo,
-        //         shareCode: el.shareCode,
-        //         shareName: el.share.shareName,
-        //         sharePercentage: el.sharePercentage,
-        //         amount: el.amount,
-        //     }
-        // }));
+        setTBodyData(tempData.salesShareDetails.map(el => {
+            return {
+                id: el.id,
+                lineNo: el.lineNo,
+                shareCode: el.shareCode,
+                shareName: el.share.shareName,
+                sharePercentage: el.sharePercentage,
+                amount: el.amount,
+            }
+        }));
         setIsEdit(true);
         setOpen(!open);
     };
@@ -188,11 +188,20 @@ function SalesList() {
         if (validateForm()) {
             console.log(formData);
             try {
-                console.log("Ji");
+                console.log(tBodyData);
                 addSales({
                     ...formData,
-                    invoiceNo: "SV-0001",
+                    invoiceNo: salesId,
                     salesDate: moment(formData.salesDate).toISOString(),
+                    salesShareDetails: tBodyData.map(el => {
+                        return {
+                            id: uuidv4(),
+                            lineNo: el.lineNo,
+                            shareCode: el.shareCode,
+                            sharePercentage: el.sharePercentage,
+                            amount: el.amount,
+                        };
+                    }),
                 }).then((res) => {
                     if (res.error != null) {
                         let message = '';
@@ -232,11 +241,20 @@ function SalesList() {
         if (validateForm()) {
             console.log(formData);
             try {
-                console.log("Ji");
+                console.log(tBodyData);
                 addSales({
                     ...formData,
-                    invoiceNo: "SV-0001",
+                    invoiceNo: salesId,
                     salesDate: moment(formData.salesDate).toISOString(),
+                    salesShareDetails: tBodyData.map(el => {
+                        return {
+                            id: uuidv4(),
+                            lineNo: el.lineNo,
+                            shareCode: el.shareCode,
+                            sharePercentage: el.sharePercentage,
+                            amount: el.amount,
+                        };
+                    }),
                 }).then((res) => {
                     if (res.error != null) {
                         let message = '';
@@ -267,6 +285,76 @@ function SalesList() {
 
             }
             setFormData(salesData);
+        }
+    };
+
+    const handleUpdate = () => {
+        if (validateForm()) {
+            try {
+                console.log(formData);
+                updateSales({
+                    invoiceNo: formData.invoiceNo,
+                    salesDate: formData.salesDate,
+                    issueNo: formData.issueNo,
+                    customerCode: formData.customerCode,
+                    stoneDetailCode: formData.stoneDetailCode,
+                    qty: formData.qty,
+                    weight: formData.weight,
+                    unitCode: formData.unitCode,
+                    unitPrice: formData.unitPrice,
+                    subTotal: formData.subTotal,
+                    servicePer: formData.servicePer,
+                    serviceCharge: formData.serviceCharge,
+                    discAmt: formData.discAmt,
+                    grandTotal: formData.grandTotal,
+                    remark: formData.remark,
+                    status: formData.status,
+                    createdBy: formData.createdBy,
+                    createdAt: formData.createdAt,
+                    updatedBy: auth().username,
+                    updatedAt: formData.updatedAt,
+                    deletedBy: "",
+                    salesShareDetails: tBodyData.map(el => {
+                        return {
+                            id: el.id,
+                            lineNo: el.lineNo,
+                            shareCode: el.shareCode,
+                            sharePercentage: el.sharePercentage,
+                            amount: el.amount,
+                        }
+                    }),
+                }).then((res) => {
+                    if(res.error != null) {
+                        let message = '';
+                        if(res.error.data.statusCode == 409) {
+                            message = "Duplicate data found."
+                        }
+                        else {
+                            message = res.error.data.message
+                        }
+                        setAlert({
+                            isAlert: true,
+                            message: message
+                        })
+                        setTimeout(() => {
+                            setAlert({
+                                isAlert: false,
+                                message: ''
+                            })
+                        }, 2000);
+                    }
+                    
+                });
+                setFormData(salesData);
+                setOpen(!open);
+                
+            }
+            catch(err) {
+                console.log(err.statusCode);
+                
+            }
+            setFormData(salesData);
+            setOpen(!open);
         }
     };
 
@@ -391,7 +479,7 @@ function SalesList() {
             width: "100px",
             cell: (row) => (
                 <div className="flex items-center gap-2">
-                    <Button variant="text" color="deep-purple" className="p-2" onClick={() => handleView(row.Code)}><FaEye /></Button>
+                    <Button variant="text" color="deep-purple" className="p-2" onClick={() => handleView(row.Code)}><FaPencil /></Button>
                     <Button variant="text" color="red" className="p-2" onClick={() => handleDeleteBtn(row.Code)}><FaTrashCan /></Button>
                 </div>
             )
@@ -451,25 +539,35 @@ function SalesList() {
                             <div className="col-span-3">
                                 <div className="grid grid-cols-3 gap-2 mb-3">
                                     {/* Issue No */}
-                                    <div className="col-start-1 col-end-2">
+                                    <div className="col-span-2">
                                         <label className="text-black text-sm mb-2">Issue No</label>
                                         <select
                                             className="block w-full text-black border border-blue-gray-200 h-[35px] px-2.5 py-1.5 rounded-md focus:border-black"
                                             value={formData.issueNo}
                                             onChange={(e) => {
-                                                setFormData({ ...formData, issueNo: e.target.value });
+                                                let stoneDetailCode = issueData.find(el => el.issueNo === e.target.value).stoneDetailCode;
+                                                let refNo = stoneDetails.find(el => el.stoneDetailCode === stoneDetailCode).referenceNo;
+                                                setFormData({ 
+                                                    ...formData, 
+                                                    issueNo: e.target.value,
+                                                    stoneDetailCode: stoneDetailCode
+                                                });
+                                                axios.get(`${apiUrl}/stone-detail/get-purchase-share/${refNo}`).then((res) => {
+                                                    setTBodyData(res.data);
+                                                    console.log(res.data);
+                                                });
                                             }}
                                         >
                                             <option value="" disabled>Select...</option>
                                             {
                                                 issueData?.map((issue) => {
-                                                    return <option value={issue.issueNo} key={issue.issueNo}>{issue.issueNo}</option>
+                                                    return <option value={issue.issueNo} key={issue.issueNo}>{issue.issueNo}({issue.stoneDetail.stoneDesc})</option>
                                                 })
                                             }
                                         </select>
                                     </div>
                                     {/* Purchase Date */}
-                                    <div className="col-start-3 col-end-3">
+                                    <div className="">
                                         <label className="text-black mb-2 text-sm">Sales Date</label>
                                         <input
                                             type="date"
@@ -575,6 +673,13 @@ function SalesList() {
                                                         subTotal: totalP,
                                                         grandTotal: totalA,
                                                     });
+                                                    let newTbody = tBodyData.map(el => {
+                                                        return {
+                                                            ...el,
+                                                            amount: (el.sharePercentage / 100) * totalA,
+                                                        }
+                                                    });
+                                                    setTBodyData(newTbody);
                                                 }}
                                                 onFocus={(e) => focusSelect(e)}
                                             />
@@ -623,6 +728,13 @@ function SalesList() {
                                                         grandTotal: totalA,
 
                                                     });
+                                                    let newTbody = tBodyData.map(el => {
+                                                        return {
+                                                            ...el,
+                                                            amount: (el.sharePercentage / 100) * totalA,
+                                                        }
+                                                    });
+                                                    setTBodyData(newTbody);
                                                 }}
                                                 onFocus={(e) => focusSelect(e)}
                                             />
@@ -674,6 +786,13 @@ function SalesList() {
                                                                 serviceCharge: serviceCharge,
                                                                 grandTotal: (formData.subTotal + serviceCharge) - formData.discAmt
                                                             });
+                                                            let newTbody = tBodyData.map(el => {
+                                                                return {
+                                                                    ...el,
+                                                                    amount: (el.sharePercentage / 100) * ((formData.subTotal + serviceCharge) - formData.discAmt),
+                                                                }
+                                                            });
+                                                            setTBodyData(newTbody);
                                                         } else {
                                                             setFormData({
                                                                 ...formData,
@@ -702,6 +821,13 @@ function SalesList() {
                                                             servicePer: charge > 0 ? 0 : formData.servicePer,
                                                             grandTotal: totalA - formData.discAmt,
                                                         });
+                                                        let newTbody = tBodyData.map(el => {
+                                                            return {
+                                                                ...el,
+                                                                amount: (el.sharePercentage / 100) * (totalA - formData.discAmt),
+                                                            }
+                                                        });
+                                                        setTBodyData(newTbody);
                                                     }}
                                                     onFocus={(e) => focusSelect(e)}
                                                 />
@@ -720,6 +846,13 @@ function SalesList() {
                                                             discAmt: discAmt,
                                                             grandTotal: (formData.subTotal + formData.serviceCharge) - discAmt
                                                         });
+                                                        let newTbody = tBodyData.map(el => {
+                                                            return {
+                                                                ...el,
+                                                                amount: (el.sharePercentage / 100) * ((formData.subTotal + formData.serviceCharge) - discAmt),
+                                                            }
+                                                        });
+                                                        setTBodyData(newTbody);
                                                     }}
                                                     onFocus={(e) => focusSelect(e)}
                                                 />
@@ -768,18 +901,29 @@ function SalesList() {
                         </div>
 
                         <div className="flex items-center justify-end mt-6 gap-2">
-                            <Button onClick={handleSubmit} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2">
-                                <FaFloppyDisk className="text-base" />
-                                <Typography variant="small" className="capitalize">
-                                    Save
-                                </Typography>
-                            </Button>
-                            <Button color="green" size="sm" variant="gradient" className="flex items-center gap-2">
-                                <FaCirclePlus className="text-base" />
-                                <Typography variant="small" className="capitalize">
-                                    Save & New
-                                </Typography>
-                            </Button>
+                            {
+                                isEdit? 
+                                <Button onClick={handleUpdate} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2">
+                                    <FaFloppyDisk className="text-base" />
+                                    <Typography variant="small" className="capitalize">
+                                        Update
+                                    </Typography>
+                                </Button> :
+                                <>
+                                    <Button onClick={handleSubmit} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2">
+                                        <FaFloppyDisk className="text-base" />
+                                        <Typography variant="small" className="capitalize">
+                                            Save
+                                        </Typography>
+                                    </Button>
+                                    <Button onClick={handleSave} color="green" size="sm" variant="gradient" className="flex items-center gap-2">
+                                        <FaCirclePlus className="text-base" />
+                                        <Typography variant="small" className="capitalize">
+                                            Save & New
+                                        </Typography>
+                                    </Button>
+                                </>
+                            }
                         </div>
                     </DialogBody>
                 </Dialog>

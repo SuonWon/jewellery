@@ -943,6 +943,13 @@ function PurchaseList() {
                                                                 serviceCharge: serviceCharge,
                                                                 grandTotal: (formData.subTotal + serviceCharge) - formData.discAmt
                                                             });
+                                                            let newTbody = tBodyData.map(el => {
+                                                                return {
+                                                                    ...el,
+                                                                    amount: (el.sharePercentage / 100) * ((formData.subTotal + serviceCharge) - formData.discAmt),
+                                                                }
+                                                            });
+                                                            setTBodyData(newTbody);
                                                         } else {
                                                             setFormData({
                                                                 ...formData,
@@ -971,6 +978,13 @@ function PurchaseList() {
                                                             servicePer: charge > 0 ? 0 : formData.servicePer,
                                                             grandTotal: totalA - formData.discAmt,
                                                         });
+                                                        let newTbody = tBodyData.map(el => {
+                                                            return {
+                                                                ...el,
+                                                                amount: (el.sharePercentage / 100) * (totalA - formData.discAmt),
+                                                            }
+                                                        });
+                                                        setTBodyData(newTbody);
                                                     }}
                                                     onFocus={(e) => focusSelect(e)}
                                                 />
@@ -989,6 +1003,13 @@ function PurchaseList() {
                                                             discAmt: discAmt,
                                                             grandTotal: (formData.subTotal + formData.serviceCharge) - discAmt
                                                         });
+                                                        let newTbody = tBodyData.map(el => {
+                                                            return {
+                                                                ...el,
+                                                                amount: (el.sharePercentage / 100) * ((formData.subTotal + formData.serviceCharge) - discAmt),
+                                                            }
+                                                        });
+                                                        setTBodyData(newTbody);
                                                     }}
                                                     onFocus={(e) => focusSelect(e)}
                                                 />

@@ -74,6 +74,7 @@ function StoneDetails() {
         brightDesc: "",
         gradeDesc: "",
         size: "",
+        sizeUnit: "လုံးစီး",
     });
 
     const [addStoneDetail] = useAddStoneDetailsMutation();
@@ -95,7 +96,7 @@ function StoneDetails() {
         brightCode: 0,
         gradeCode: 0,
         size: 0,
-        sizeUnit: "လုံး",
+        sizeUnit: "လုံးစီး",
         qty: 0,
         weight: 0,
         unitCode: "ct",
@@ -114,7 +115,8 @@ function StoneDetails() {
             stoneDesc: "",
             brightDesc: "",
             gradeDesc: "",
-            size: ""
+            size: "",
+            sizeUnit: "လုံးစီး",
         });
         setOpen(!open);
     };
@@ -165,8 +167,7 @@ function StoneDetails() {
                 console.log("Ji");
                 addStoneDetail({
                     ...formData,
-                    stoneDesc: `${description.stoneDesc} ${description.size} ${description.gradeDesc} ${description.brightDesc}`,
-                    stoneDetailCode: "SD-0003",
+                    stoneDesc: `${description.stoneDesc} ${description.size}${description.sizeUnit} ${description.gradeDesc} ${description.brightDesc}`,
                 }).then((res) => {
                     if(res.error != null) {
                         let message = '';
@@ -205,8 +206,7 @@ function StoneDetails() {
             try {
                 addStoneDetail({
                     ...formData,
-                    stoneDesc: `${description.stoneDesc} ${description.size} ${description.gradeDesc} ${description.brightDesc}`,
-                    stoneDetailCode: "SD-0003",
+                    stoneDesc: `${description.stoneDesc} ${description.size}${description.sizeUnit} ${description.gradeDesc} ${description.brightDesc}`,
                 }).then((res) => {
 
                     if(res.error != null) {
@@ -236,7 +236,8 @@ function StoneDetails() {
                     stoneDesc: "",
                     brightDesc: "",
                     gradeDesc: "",
-                    size: ""
+                    size: "",
+                    sizeUnit: "လုံးစီး",
                 });
             }
             catch(err) {
@@ -254,7 +255,8 @@ function StoneDetails() {
             stoneDesc: eData[0].stone.stoneDesc,
             brightDesc: eData[0].stoneBrightness.brightDesc,
             gradeDesc: eData[0].stoneGrade.gradeDesc,
-            size: eData[0].size
+            size: eData[0].size,
+            sizeUnit: eData[0].sizeUnit,
         });
         setOpen(!open);
     };
@@ -447,7 +449,7 @@ function StoneDetails() {
                         <div className="grid grid-cols-4 gap-2">
                             <div className="w-full col-span-2">
                                 <label className="text-black text-sm mb-2">Description</label>
-                                <input className="border border-blue-gray-200 text-black w-full h-[40px] p-2.5 rounded-md" value={`${description.stoneDesc} ${description.size} ${description.gradeDesc} ${description.brightDesc}`} disabled />
+                                <input className="border border-blue-gray-200 text-black w-full h-[40px] p-2.5 rounded-md" value={`${description.stoneDesc} ${description.size}${description.sizeUnit} ${description.gradeDesc} ${description.brightDesc}`} disabled />
                                 {
                                     validationText.description && <p className="block text-[12px] text-red-500 font-sans mb-2">{validationText.description}</p>
                                 }
@@ -634,6 +636,7 @@ function StoneDetails() {
                                             className="block w-full text-sm text-black p-2.5 border border-blue-gray-200 max-h-[2.5rem] rounded-md focus:border-black"
                                             value={formData.sizeUnit}
                                             onChange={(e) => {
+                                                setDescription({...description, sizeUnit: e.target.value});
                                                 setFormData({...formData, sizeUnit: e.target.value});
                                             }}
                                         >
