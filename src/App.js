@@ -15,6 +15,7 @@ import IssueList from "./pages/issue_list";
 import Dashboard from "./pages/dashboard";
 import Share from "./pages/share";
 import Damage from "./pages/damage";
+import Wallet from "./pages/wallet";
 
 
 function App() {
@@ -93,6 +94,11 @@ function App() {
           <Route path="damage" element={
             <RequireAuth loginPath="/login">
               <Damage />
+            </RequireAuth>
+          }></Route>
+          <Route path="wallet" element={
+            <RequireAuth loginPath="/login">
+              <Wallet />
             </RequireAuth>
           }></Route>
           <Route path="/login" element={<Login />}></Route>

@@ -15,6 +15,7 @@ import { issueApi } from "../apis/issueApi";
 import { shareApi } from "../apis/shareApi";
 import { damageApi } from "../apis/damageApi";
 import { adjustmentApi } from "../apis/adjustmentApi";
+import { walletTransitionApi } from "../apis/walletTransitionApi";
 
 export const store = configureStore({
     reducer: {
@@ -34,6 +35,7 @@ export const store = configureStore({
         [shareApi.reducerPath] : shareApi.reducer,
         [damageApi.reducerPath] : damageApi.reducer,
         [adjustmentApi.reducerPath] : adjustmentApi.reducer,
+        [walletTransitionApi.reducerPath] : walletTransitionApi.reducer,
     },
     middleware: (getDefaultMiddleware) => {
         return getDefaultMiddleware()
@@ -52,7 +54,8 @@ export const store = configureStore({
             .concat(issueApi.middleware)
             .concat(shareApi.middleware)
             .concat(damageApi.middleware)
-            .concat(adjustmentApi.middleware);
+            .concat(adjustmentApi.middleware)
+            .concat(walletTransitionApi.middleware);
     }
 });
 
@@ -72,3 +75,4 @@ export { useFetchIssueQuery, useAddIssueMutation, useUpdateIssueMutation, useRem
 export { useFetchShareQuery, useFetchShareByIdQuery, useAddShareMutation, useUpdateShareMutation, useRemoveShareMutation } from "../apis/shareApi";
 export { useFetchDamageIdQuery, useFetchDamageQuery, useFetchDamageByIdQuery, useAddDamageMutation, useUpdateDamageMutation, useRemoveDamageMutation } from "../apis/damageApi";
 export { useFetchAdjustmentQuery, useFetchAdjustmentByIdQuery, useAddAdjustmentMutation, useUpdateAdjustmentMutation, useRemoveAdjustMutation } from "../apis/adjustmentApi";
+export { useFetchWalletQuery, useFetchWalletTransactionQuery, useFetchWalletTransactionByIdQuery, useAddWalletTransactionMutation, useUpdateWalletTransactionMutation, useRemoveWalletTransactionMutation } from "../apis/walletTransitionApi"

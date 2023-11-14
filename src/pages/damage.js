@@ -137,7 +137,7 @@ function Damage() {
                 addDamage({
                     ...formData,
                     damageNo: damageId,
-                    damageDate: moment(formData.returnDate).toISOString(),
+                    damageDate: moment(formData.damageDate).toISOString(),
                 }).then((res) => {
                     if(res.error != null) {
                         let message = '';
@@ -179,7 +179,7 @@ function Damage() {
                 addDamage({
                     ...formData,
                     damageNo: damageId,
-                    damageDate: moment(formData.returnDate).toISOString(),
+                    damageDate: moment(formData.damageDate).toISOString(),
                 }).then((res) => {
                     if(res.error != null) {
                         let message = '';
@@ -433,7 +433,7 @@ function Damage() {
                                 </div>
                             }
                             
-                            {/* Return Date */}
+                            {/* Damage Date */}
                             <div className="col-start-4 col-end-4">
                                 <label className="text-black mb-2 text-sm">Damage Date</label>
                                 <input

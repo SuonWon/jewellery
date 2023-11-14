@@ -145,7 +145,7 @@ function Nav() {
                             </NavLink>
                         </MenuList>
                     </Menu>
-                    <NavLink to='/dashboard'>
+                    <NavLink to='/wallet'>
                         <Typography variant='small' className="flex justify-center items-center text-white p-2 space-x-2 hover:bg-white hover:text-black rounded-lg ">
                             <FaWallet className='text-base' /> <span className=''>Wallet</span>
                         </Typography>
