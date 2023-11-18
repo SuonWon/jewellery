@@ -18,12 +18,6 @@ function StoneDetails() {
 
     const auth = useAuthUser();
 
-    const [open, setOpen] = useState(false);
-
-    const [openDelete, setOpenDelete] = useState(false);
-
-    const [isEdit, setIsEdit] = useState(false);
-
     const {data, refetch} = useFetchStoneDetailsQuery();
 
     const {data: stoneData} = useFetchTrueStoneQuery();
@@ -39,6 +33,14 @@ function StoneDetails() {
     const {data: supplierData} = useFetchTrueSupplierQuery();
 
     const {data: purchaseData} = useFetchPurchaseQuery();
+
+    const [open, setOpen] = useState(false);
+
+    const [openDelete, setOpenDelete] = useState(false);
+
+    const [isEdit, setIsEdit] = useState(false);
+
+    const [selectedPurchase, setSelectedPurchase] = useState([]);
 
     const [ alert, setAlert] = useState({
         isAlert: false,
@@ -454,31 +456,19 @@ function StoneDetails() {
                                     validationText.description && <p className="block text-[12px] text-red-500 font-sans mb-2">{validationText.description}</p>
                                 }
                             </div>
-                            <div className="w-full">
-                                <label className="text-black text-sm mb-2">Reference No</label>
-                                <select 
-                                    className="block w-full text-black p-2.5 border border-blue-gray-200 max-h-[2.5rem] rounded-md focus:border-black"
-                                    value={formData.referenceNo}
-                                    onChange={(e) => {
-                                        setFormData({...formData, referenceNo: e.target.value});
-                                    }}
-                                >
-                                    <option value="" disabled>Select...</option>
-                                    {
-                                        purchaseData?.map((purchase) => {
-                                            return <option value={purchase.invoiceNo} key={purchase.invoiceNo}>{purchase.invoiceNo}</option>
-                                        })
-                                    }
-                                </select>
-                                {/* <input className="border border-blue-gray-200 text-black w-full h-[40px] p-2.5 rounded-md" value={formData.referenceNo} disabled /> */}
-                            </div>
                             <div>
                                 <label className="text-black text-sm mb-2">Supplier Name</label>
                                 <select 
                                     className="block w-full text-black p-2.5 border border-blue-gray-200 max-h-[2.5rem] rounded-md focus:border-black"
                                     value={formData.supplierCode}
                                     onChange={(e) => {
-                                        setFormData({...formData, supplierCode: Number(e.target.value)});
+                                        let selectP = purchaseData.filter(el => el.supplierCode === Number(e.target.value));
+                                        console.log(selectP);
+                                        setSelectedPurchase(selectP);
+                                        setFormData({
+                                            ...formData, 
+                                            supplierCode: Number(e.target.value)
+                                        });
                                     }}
                                 >
                                     <option value="0" disabled>Select supplier</option>
@@ -491,6 +481,28 @@ function StoneDetails() {
                                 {
                                     validationText.supplierCode && <p className="block text-[12px] text-red-500 font-sans">{validationText.supplierCode}</p>
                                 }
+                            </div>
+                            <div className="w-full">
+                                <label className="text-black text-sm mb-2">Reference No</label>
+                                <select 
+                                    className="block w-full text-black p-2.5 border border-blue-gray-200 max-h-[2.5rem] rounded-md focus:border-black"
+                                    value={formData.referenceNo}
+                                    onChange={(e) => {
+                                        setFormData({...formData, referenceNo: e.target.value});
+                                    }}
+                                >
+                                    <option value="" disabled>Select...</option>
+                                    {
+                                        selectedPurchase.length === 0?
+                                        purchaseData?.map((purchase) => {
+                                            return <option value={purchase.invoiceNo} key={purchase.invoiceNo}>{purchase.invoiceNo} ({purchase.supplier.supplierName})</option>
+                                        }) : 
+                                        selectedPurchase?.map((purchase) => {
+                                            return <option value={purchase.invoiceNo} key={purchase.invoiceNo}>{purchase.invoiceNo}</option>
+                                        })
+                                    }
+                                </select>
+                                {/* <input className="border border-blue-gray-200 text-black w-full h-[40px] p-2.5 rounded-md" value={formData.referenceNo} disabled /> */}
                             </div>
                             {/* <div className="w-full col-span-2">
                                 <Input label="Name" value={`${description.stoneDesc} ${description.brightDesc} ${description.typeDesc}`} readOnly/>

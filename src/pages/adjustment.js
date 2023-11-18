@@ -3,7 +3,7 @@ import { Button, Card, CardBody, Dialog, DialogBody, Typography } from "@materia
 import { FaCirclePlus, FaEye, FaFloppyDisk, FaPencil, FaPlus, FaTrashCan, } from "react-icons/fa6";
 import { useState } from "react";
 import { focusSelect, pause } from "../const";
-import { useAddDamageMutation, useFetchDamageIdQuery, useFetchDamageQuery, useFetchPurchaseQuery, useFetchStoneDetailsQuery, useFetchUOMQuery, useRemoveDamageMutation, useUpdateDamageMutation, } from "../store";
+import { useAddAdjustmentMutation, useFetchAdjustmentQuery, useFetchPurchaseQuery, useFetchStoneDetailsQuery, useFetchUOMQuery, useRemoveAdjustMutation, useUpdateAdjustmentMutation, } from "../store";
 import DeleteModal from "../components/delete_modal";
 import SuccessAlert from "../components/success_alert";
 import moment from "moment";
@@ -15,7 +15,7 @@ const validator = require('validator');
 
 function Adjustment() {
 
-    const { data } = useFetchDamageQuery();
+    const { data } = useFetchAdjustmentQuery();
 
     const {data: stoneDetails} = useFetchStoneDetailsQuery();
 
@@ -23,8 +23,8 @@ function Adjustment() {
 
     const {data: purchaseData} = useFetchPurchaseQuery();
 
-    axios.get('http://localhost:3005/v1/damage/get-id').then((res) => {
-        setDamageId(res.data);
+    axios.get('http://localhost:3005/v1/adjustment/get-id').then((res) => {
+        setAdjustId(res.data);
     });
 
     const auth = useAuthUser();
@@ -35,24 +35,26 @@ function Adjustment() {
 
     const [openDelete, setOpenDelete] = useState(false);
 
+    const [selectedStoneDetails, setSelectedStoneDetails] = useState([]);
+
     const [isAlert, setIsAlert] = useState(true);
 
-    const [damageId, setDamageId] = useState("");
+    const [adjustId, setAdjustId] = useState("");
 
-    const [removeDamage, removeResult] = useRemoveDamageMutation();
+    const [removeAdjust, removeResult] = useRemoveAdjustMutation();
 
-    const [addDamage] = useAddDamageMutation();
+    const [addAdjust] = useAddAdjustmentMutation();
 
-    const [updateDamage] = useUpdateDamageMutation();
+    const [updateAdjust] = useUpdateAdjustmentMutation();
 
     const [ alert, setAlert] = useState({
         isAlert: false,
         message: ''
     });
 
-    const damageData = {
-        damageNo: "",
-        damageDate: moment().format("YYYY-MM-DD"),
+    const adjustData = {
+        adjustmentNo: "",
+        adjustmentDate: moment().format("YYYY-MM-DD"),
         referenceNo: "",
         stoneDetailCode: "",
         qty: 0,
@@ -60,6 +62,7 @@ function Adjustment() {
         unitCode: 'ct',
         unitPrice: 0,
         totalPrice: 0,
+        adjustmentType: "+",
         remark: "",
         status: "O",
         createdBy: auth().username,
@@ -67,7 +70,7 @@ function Adjustment() {
         deletedBy: "",
     };
 
-    const [formData, setFormData] = useState(damageData);
+    const [formData, setFormData] = useState(adjustData);
 
     const [deleteId, setDeleteId] = useState('');
 
@@ -75,7 +78,7 @@ function Adjustment() {
 
     const handleRemove = async (id) => {
         let removeData = data.filter((el) => el.damageNo === id);
-        removeDamage({
+        removeAdjust({
             id: removeData[0].damageNo,
             deletedAt: moment().toISOString(),
             deletedBy: auth().username
@@ -92,13 +95,15 @@ function Adjustment() {
     };
 
     const handleOpen = () => {
-        setFormData(damageData);
+        setFormData(adjustData);
         setIsView(false);
         setOpen(!open);
     };
 
     const handleView = (id) => {
-        let tempData = data.find(res => res.damageNo === id);
+        let tempData = data.find(res => res.adjustmentNo === id);
+        let selectedStoneD = stoneDetails.filter(el => el.referenceNo === tempData.referenceNo);
+        setSelectedStoneDetails(selectedStoneD);
         console.log(tempData);
         setFormData(tempData);
         setIsView(true);
@@ -108,8 +113,8 @@ function Adjustment() {
     function validateForm() {
         const newErrors = {};
 
-        if (formData.damageDate === "") {
-            newErrors.damageDate = "Damage Date is required."
+        if (formData.adjustmentDate === "") {
+            newErrors.adjustmentDate = "Damage Date is required."
         }
 
         if (formData.referenceNo === "") {
@@ -134,10 +139,10 @@ function Adjustment() {
         if (validateForm()) {
             try {
                 console.log(formData);
-                addDamage({
+                addAdjust({
                     ...formData,
-                    damageNo: damageId,
-                    damageDate: moment(formData.returnDate).toISOString(),
+                    adjustmentNo: adjustId,
+                    adjustmentDate: moment(formData.damageDate).toISOString(),
                 }).then((res) => {
                     if(res.error != null) {
                         let message = '';
@@ -160,7 +165,7 @@ function Adjustment() {
                     }
                     
                 });
-                setFormData(damageData);
+                setFormData(adjustData);
                 setOpen(!open);
                 
             }
@@ -168,7 +173,7 @@ function Adjustment() {
                 console.log(err.statusCode);
                 
             }
-            setFormData(damageData);
+            setFormData(adjustData);
             setOpen(!open);
         }
     };
@@ -176,10 +181,10 @@ function Adjustment() {
     const handleSave = () => {
         if (validateForm()) {
             try {
-                addDamage({
+                addAdjust({
                     ...formData,
-                    damageNo: damageId,
-                    damageDate: moment(formData.returnDate).toISOString(),
+                    adjustmentNo: adjustId,
+                    adjustmentDate: moment(formData.damageDate).toISOString(),
                 }).then((res) => {
                     if(res.error != null) {
                         let message = '';
@@ -202,14 +207,14 @@ function Adjustment() {
                     }
                     
                 });
-                setFormData(damageData);
+                setFormData(adjustData);
                 
             }
             catch(err) {
                 console.log(err.statusCode);
                 
             }
-            setFormData(damageData);
+            setFormData(adjustData);
         }
     };
 
@@ -217,9 +222,9 @@ function Adjustment() {
         if (validateForm()) {
             try {
                 console.log(formData);
-                updateDamage({
-                    damageNo: formData.damageNo,
-                    damageDate: formData.damageDate,
+                updateAdjust({
+                    adjustmentNo: formData.adjustmentNo,
+                    adjustmentDate: formData.adjustmentDate,
                     referenceNo: formData.referenceNo,
                     stoneDetailCode: formData.stoneDetailCode,
                     qty: formData.qty,
@@ -227,6 +232,7 @@ function Adjustment() {
                     unitCode: formData.unitCode,
                     unitPrice: formData.unitPrice,
                     totalPrice: formData.totalPrice,
+                    adjustmentType: formData.adjustmentType,
                     remark: formData.remark,
                     status: formData.status,
                     createdBy: formData.createdBy,
@@ -256,7 +262,7 @@ function Adjustment() {
                     }
                     
                 });
-                setFormData(damageData);
+                setFormData(adjustData);
                 setOpen(!open);
                 
             }
@@ -264,7 +270,7 @@ function Adjustment() {
                 console.log(err.statusCode);
                 
             }
-            setFormData(damageData);
+            setFormData(adjustData);
             setOpen(!open);
         }
     };
@@ -279,12 +285,17 @@ function Adjustment() {
         {
             name: 'Damage No',
             width: '200px',
-            selector: row => row.damageNo,
+            selector: row => row.adjustmentNo,
         },
         {
             name: 'Date',
             width: "150px",
-            selector: row => row.damageDate,
+            selector: row => row.adjustmentDate,
+        },
+        {
+            name: "Adjustment Type",
+            width: "150px",
+            selector: row => row.adjustmentType === "+" ? "Gain" : "Loss"
         },
         {
             name: 'Reference No',
@@ -345,30 +356,31 @@ function Adjustment() {
                     {/* <Link to={`/purchase_edit/${row.Code}`}>
                         <Button variant="text" color="deep-purple" className="p-2"><FaPencil /></Button>
                     </Link> */}
-                    <Button variant="text" color="deep-purple" className="p-2" onClick={() => handleView(row.damageNo)}><FaPencil /></Button>
-                    <Button variant="text" color="red" className="p-2" onClick={() => handleDeleteBtn(row.damageNo)}><FaTrashCan /></Button>
+                    <Button variant="text" color="deep-purple" className="p-2" onClick={() => handleView(row.adjustmentNo)}><FaPencil /></Button>
+                    <Button variant="text" color="red" className="p-2" onClick={() => handleDeleteBtn(row.adjustmentNo)}><FaTrashCan /></Button>
                 </div>
             )
         },
     ];
 
-    const tbodyData = data?.map((damageData) => {
+    const tbodyData = data?.map((adjust) => {
         return {
-            damageNo: damageData.damageNo,
-            damageDate: moment(damageData.damageDate).format("YYYY-MM-DD"),
-            referenceNo: damageData.referenceNo,
-            stoneDetail: damageData.stoneDetailCode,
-            qty: damageData.qty.toLocaleString('en-US'),
-            weight: damageData.weight.toLocaleString('en-US'),
-            unit: damageData.unitCode,
-            unitPrice: damageData.unitPrice.toLocaleString('en-US'),
-            totalPrice: damageData.unitPrice.toLocaleString('en-US'),
-            remark: damageData.remark,
-            createdAt: moment(damageData.createdAt).format("YYYY-MM-DD hh:mm:ss a"),
-            createdBy: damageData.createdBy,
-            updatedAt: moment(damageData.updatedAt).format("YYYY-MM-DD hh:mm:ss a"),
-            updatedBy: damageData.updatedBy,
-            status: damageData.status,
+            adjustmentNo: adjust.adjustmentNo,
+            adjustmentDate: moment(adjust.adjustmentDate).format("YYYY-MM-DD"),
+            referenceNo: adjust.referenceNo,
+            stoneDetail: adjust.stoneDetailCode,
+            qty: adjust.qty.toLocaleString('en-US'),
+            weight: adjust.weight.toLocaleString('en-US'),
+            unit: adjust.unitCode,
+            unitPrice: adjust.unitPrice.toLocaleString('en-US'),
+            totalPrice: adjust.unitPrice.toLocaleString('en-US'),
+            adjustmentType: adjust.adjustmentType,
+            remark: adjust.remark,
+            createdAt: moment(adjust.createdAt).format("YYYY-MM-DD hh:mm:ss a"),
+            createdBy: adjust.createdBy,
+            updatedAt: moment(adjust.updatedAt).format("YYYY-MM-DD hh:mm:ss a"),
+            updatedBy: adjust.updatedBy,
+            status: adjust.status,
         }
     });
 
@@ -382,7 +394,7 @@ function Adjustment() {
                 </div>
                 <div className="flex items-center py-3 bg-white gap-4 sticky top-0 z-10">
                     <Typography variant="h5">
-                        Damage List
+                        Adjustment List
                     </Typography>
                     <Button variant="gradient" size="sm" color="deep-purple" className="flex items-center gap-2" onClick={handleOpen}>
                         <FaPlus /> Create New
@@ -396,17 +408,17 @@ function Adjustment() {
                 <DeleteModal deleteId={deleteId} open={openDelete} handleDelete={handleRemove} closeModal={() => setOpenDelete(!openDelete)} />
                 <Dialog open={open} size="lg">
                     <DialogBody>
-                        <ModalTitle titleName={isEdit ? "Edit Damage" : "Create Damage"} handleClick={() => setOpen(!open)} />
+                        <ModalTitle titleName={isEdit ? "Edit Adjustment" : "Create Adjustment"} handleClick={() => setOpen(!open)} />
                         <div className="grid grid-cols-4 gap-2 mb-3">
                             {
                                 isEdit? 
                                 <div>
-                                    {/* Damage No */}
-                                    <label className="text-black text-sm mb-2">Damage No</label>
+                                    {/* Adjustment No */}
+                                    <label className="text-black text-sm mb-2">Adjustment No</label>
                                     <input
                                         type="text"
                                         className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
-                                        value={formData.damageNo}
+                                        value={formData.adjustmentNo}
                                         readOnly={isEdit}
                                     />
                                 </div> : 
@@ -417,13 +429,18 @@ function Adjustment() {
                                         className="block w-full text-black border border-blue-gray-200 h-[35px] px-2.5 py-1.5 rounded-md focus:border-black"
                                         value={formData.referenceNo}
                                         onChange={(e) => {
-                                            setFormData({...formData, referenceNo: e.target.value});
+                                            let stoneDetail = stoneDetails.filter(el => el.referenceNo === e.target.value);
+                                            setSelectedStoneDetails(stoneDetail);
+                                            setFormData({
+                                                ...formData, 
+                                                referenceNo: e.target.value,
+                                            });
                                         }}
                                     >
                                         <option value="" disabled>Select...</option>
                                         {
                                             purchaseData?.map((purchase) => {
-                                                return <option value={purchase.invoiceNo} key={purchase.invoiceNo}>{purchase.invoiceNo}</option>
+                                                return <option value={purchase.invoiceNo} key={purchase.invoiceNo}>{purchase.invoiceNo} ({purchase.supplier.supplierName})</option>
                                             })
                                         }
                                     </select>
@@ -433,20 +450,20 @@ function Adjustment() {
                                 </div>
                             }
                             
-                            {/* Return Date */}
+                            {/* Adjustment Date */}
                             <div className="col-start-4 col-end-4">
-                                <label className="text-black mb-2 text-sm">Damage Date</label>
+                                <label className="text-black mb-2 text-sm">Adjustment Date</label>
                                 <input
                                     type="date"
                                     className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
-                                    value={moment(formData.damageDate).format("YYYY-MM-DD")}
+                                    value={moment(formData.adjustmentDate).format("YYYY-MM-DD")}
                                     onChange={(e) => setFormData({
                                         ...formData,
-                                        damageDate: e.target.value
+                                        adjustmentDate: e.target.value
                                     })}
                                 />
                                 {
-                                    validationText.damageDate && <p className="block text-[12px] text-red-500 font-sans">{validationText.damageDate}</p>
+                                    validationText.adjustmentDate && <p className="block text-[12px] text-red-500 font-sans">{validationText.adjustmentDate}</p>
                                 }
                             </div>
                         </div>
@@ -460,13 +477,18 @@ function Adjustment() {
                                         className="block w-full text-black border border-blue-gray-200 h-[35px] px-2.5 py-1.5 rounded-md focus:border-black"
                                         value={formData.referenceNo}
                                         onChange={(e) => {
-                                            setFormData({...formData, referenceNo: e.target.value});
+                                            let stoneDetail = stoneDetails.filter(el => el.referenceNo === e.target.value);
+                                            setSelectedStoneDetails(stoneDetail);
+                                            setFormData({
+                                                ...formData, 
+                                                referenceNo: e.target.value
+                                            });
                                         }}
                                     >
                                         <option value="" disabled>Select...</option>
                                         {
                                             purchaseData?.map((purchase) => {
-                                                return <option value={purchase.invoiceNo} key={purchase.invoiceNo}>{purchase.invoiceNo}</option>
+                                                return <option value={purchase.invoiceNo} key={purchase.invoiceNo}>{purchase.invoiceNo} ({purchase.supplier.supplierName})</option>
                                             })
                                         }
                                     </select>
@@ -476,7 +498,7 @@ function Adjustment() {
                                 </div> : ""
                             }
                             {/* Stone Details */}
-                            <div className="">
+                            <div className="col-span-2">
                                 <label className="text-black mb-2 text-sm">Stone Details</label>
                                 <select 
                                     className="block w-full px-2.5 py-1.5 border border-blue-gray-200 h-[35px] rounded-md focus:border-black text-black" 
@@ -487,18 +509,39 @@ function Adjustment() {
                                             stoneDetailCode: e.target.value,
                                         })
                                     }
-                                    >
+                                >
                                     <option value="" disabled>Select stone detail</option>
                                     {
+                                        selectedStoneDetails.length === 0? 
                                         stoneDetails?.length === 0 ? <option value="" disabled>There is no Data</option> :
                                         stoneDetails?.map((stoneDetail) => {
-                                            return <option value={stoneDetail.stoneDetailCode} key={stoneDetail.stoneDetailCode} >{stoneDetail.stoneDesc}</option>
+                                            return <option value={stoneDetail.stoneDetailCode} key={stoneDetail.stoneDetailCode} >{stoneDetail.stoneDesc} ({stoneDetail.supplier.supplierName})</option>
+                                        }) : stoneDetails?.length === 0 ? <option value="" disabled>There is no Data</option> :
+                                        selectedStoneDetails?.map((stoneDetail) => {
+                                            return <option value={stoneDetail.stoneDetailCode} key={stoneDetail.stoneDetailCode} >{stoneDetail.stoneDesc} ({stoneDetail.supplier.supplierName})</option>
                                         })
                                     }
                                 </select>
                                 {
                                     validationText.stoneDetailCode && <p className="block text-[12px] text-red-500 font-sans">{validationText.stoneDetailCode}</p>
                                 } 
+                            </div>
+                            {/* Adjustment Type */}
+                            <div>
+                                <label className="text-black mb-2 text-sm">Adjustment Type</label>
+                                <select 
+                                    className="block w-full px-2.5 py-1.5 border border-blue-gray-200 h-[35px] rounded-md focus:border-black text-black" 
+                                    value={formData.adjustmentType} 
+                                    onChange={(e) => 
+                                        setFormData({
+                                            ...formData, 
+                                            adjustmentType: e.target.value,
+                                        })
+                                    }
+                                >
+                                    <option value="+">Gain</option>
+                                    <option value="-">Loss</option>
+                                </select>
                             </div>
                             
                         </div>

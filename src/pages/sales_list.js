@@ -1,14 +1,14 @@
 /* eslint-disable eqeqeq */
 import { Button, Card, CardBody, Dialog, DialogBody, Typography } from "@material-tailwind/react";
-import { FaCirclePlus, FaEye, FaFloppyDisk, FaPencil, FaPlus, FaTrashCan, } from "react-icons/fa6";
+import { FaCirclePlus, FaFloppyDisk, FaPencil, FaPlus, FaTrashCan, } from "react-icons/fa6";
 import { useState } from "react";
-import { useAddSalesMutation, useFetchIssueQuery, useFetchSalesQuery, useFetchStoneDetailsQuery, useFetchTrueCustomerQuery, useFetchTrueSalesQuery, useFetchUOMQuery, useRemoveSalesMutation, useUpdateSalesMutation } from "../store";
+import { useAddSalesMutation, useFetchIssueQuery, useFetchSalesQuery, useFetchStoneDetailsQuery, useFetchTrueCustomerQuery, useFetchUOMQuery, useRemoveSalesMutation, useUpdateSalesMutation } from "../store";
 import { apiUrl, focusSelect, pause } from "../const";
 import DeleteModal from "../components/delete_modal";
 import SuccessAlert from "../components/success_alert";
 import moment from "moment";
 import TableList from "../components/data_table";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useAuthUser } from "react-auth-kit";
 import ModalTitle from "../components/modal_title";
 import { v4 as uuidv4 } from 'uuid';
@@ -110,6 +110,7 @@ function SalesList() {
         setFormData(salesData);
         setIsEdit(false);
         setOpen(!open);
+        setTBodyData([]);
     };
 
     const handleView = (id) => {

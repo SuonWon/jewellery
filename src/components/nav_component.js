@@ -143,6 +143,11 @@ function Nav() {
                                     <FaListUl /> <span>Issue List</span>
                                 </MenuItem>
                             </NavLink>
+                            <NavLink to="/adjustment">
+                                <MenuItem className="flex items-center gap-2">
+                                    <FaListUl /> <span>Adjustment List</span>
+                                </MenuItem>
+                            </NavLink>
                         </MenuList>
                     </Menu>
                     <NavLink to='/wallet'>

@@ -16,6 +16,7 @@ import Dashboard from "./pages/dashboard";
 import Share from "./pages/share";
 import Damage from "./pages/damage";
 import Wallet from "./pages/wallet";
+import Adjustment from "./pages/adjustment";
 
 
 function App() {
@@ -94,6 +95,11 @@ function App() {
           <Route path="damage" element={
             <RequireAuth loginPath="/login">
               <Damage />
+            </RequireAuth>
+          }></Route>
+          <Route path="adjustment" element={
+            <RequireAuth loginPath="/login">
+              <Adjustment />
             </RequireAuth>
           }></Route>
           <Route path="wallet" element={

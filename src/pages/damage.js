@@ -3,7 +3,7 @@ import { Button, Card, CardBody, Dialog, DialogBody, Typography } from "@materia
 import { FaCirclePlus, FaEye, FaFloppyDisk, FaPencil, FaPlus, FaTrashCan, } from "react-icons/fa6";
 import { useState } from "react";
 import { focusSelect, pause } from "../const";
-import { useAddDamageMutation, useFetchDamageIdQuery, useFetchDamageQuery, useFetchPurchaseQuery, useFetchStoneDetailsQuery, useFetchUOMQuery, useRemoveDamageMutation, useUpdateDamageMutation, } from "../store";
+import { useAddDamageMutation, useFetchDamageQuery, useFetchPurchaseQuery, useFetchStoneDetailsQuery, useFetchUOMQuery, useRemoveDamageMutation, useUpdateDamageMutation, } from "../store";
 import DeleteModal from "../components/delete_modal";
 import SuccessAlert from "../components/success_alert";
 import moment from "moment";
@@ -34,6 +34,8 @@ function Damage() {
     const [isEdit, setIsView] = useState(false);
 
     const [openDelete, setOpenDelete] = useState(false);
+
+    const [selectedStoneDetails, setSelectedStoneDetails] = useState([]);
 
     const [isAlert, setIsAlert] = useState(true);
 
@@ -99,6 +101,8 @@ function Damage() {
 
     const handleView = (id) => {
         let tempData = data.find(res => res.damageNo === id);
+        let selectedStoneD = stoneDetails.filter(el => el.referenceNo === tempData.referenceNo);
+        setSelectedStoneDetails(selectedStoneD);
         console.log(tempData);
         setFormData(tempData);
         setIsView(true);
@@ -417,13 +421,18 @@ function Damage() {
                                         className="block w-full text-black border border-blue-gray-200 h-[35px] px-2.5 py-1.5 rounded-md focus:border-black"
                                         value={formData.referenceNo}
                                         onChange={(e) => {
-                                            setFormData({...formData, referenceNo: e.target.value});
+                                            let stoneDetail = stoneDetails.filter(el => el.referenceNo === e.target.value);
+                                            setSelectedStoneDetails(stoneDetail);
+                                            setFormData({
+                                                ...formData, 
+                                                referenceNo: e.target.value,
+                                            });
                                         }}
                                     >
                                         <option value="" disabled>Select...</option>
                                         {
                                             purchaseData?.map((purchase) => {
-                                                return <option value={purchase.invoiceNo} key={purchase.invoiceNo}>{purchase.invoiceNo}</option>
+                                                return <option value={purchase.invoiceNo} key={purchase.invoiceNo}>{purchase.invoiceNo} ({purchase.supplier.supplierName})</option>
                                             })
                                         }
                                     </select>
@@ -460,13 +469,18 @@ function Damage() {
                                         className="block w-full text-black border border-blue-gray-200 h-[35px] px-2.5 py-1.5 rounded-md focus:border-black"
                                         value={formData.referenceNo}
                                         onChange={(e) => {
-                                            setFormData({...formData, referenceNo: e.target.value});
+                                            let stoneDetail = stoneDetails.filter(el => el.referenceNo === e.target.value);
+                                            setSelectedStoneDetails(stoneDetail);
+                                            setFormData({
+                                                ...formData, 
+                                                referenceNo: e.target.value
+                                            });
                                         }}
                                     >
                                         <option value="" disabled>Select...</option>
                                         {
                                             purchaseData?.map((purchase) => {
-                                                return <option value={purchase.invoiceNo} key={purchase.invoiceNo}>{purchase.invoiceNo}</option>
+                                                return <option value={purchase.invoiceNo} key={purchase.invoiceNo}>{purchase.invoiceNo} ({purchase.supplier.supplierName})</option>
                                             })
                                         }
                                     </select>
@@ -476,7 +490,7 @@ function Damage() {
                                 </div> : ""
                             }
                             {/* Stone Details */}
-                            <div className="">
+                            <div className="col-span-2">
                                 <label className="text-black mb-2 text-sm">Stone Details</label>
                                 <select 
                                     className="block w-full px-2.5 py-1.5 border border-blue-gray-200 h-[35px] rounded-md focus:border-black text-black" 
@@ -487,12 +501,16 @@ function Damage() {
                                             stoneDetailCode: e.target.value,
                                         })
                                     }
-                                    >
+                                >
                                     <option value="" disabled>Select stone detail</option>
                                     {
+                                        selectedStoneDetails.length === 0? 
                                         stoneDetails?.length === 0 ? <option value="" disabled>There is no Data</option> :
                                         stoneDetails?.map((stoneDetail) => {
-                                            return <option value={stoneDetail.stoneDetailCode} key={stoneDetail.stoneDetailCode} >{stoneDetail.stoneDesc}</option>
+                                            return <option value={stoneDetail.stoneDetailCode} key={stoneDetail.stoneDetailCode} >{stoneDetail.stoneDesc} ({stoneDetail.supplier.supplierName})</option>
+                                        }) : stoneDetails?.length === 0 ? <option value="" disabled>There is no Data</option> :
+                                        selectedStoneDetails?.map((stoneDetail) => {
+                                            return <option value={stoneDetail.stoneDetailCode} key={stoneDetail.stoneDetailCode} >{stoneDetail.stoneDesc} ({stoneDetail.supplier.supplierName})</option>
                                         })
                                     }
                                 </select>

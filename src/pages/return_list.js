@@ -417,7 +417,12 @@ function ReturnList() {
                                         className="block w-full text-black border border-blue-gray-200 h-[35px] px-2.5 py-1.5 rounded-md focus:border-black"
                                         value={formData.referenceNo}
                                         onChange={(e) => {
-                                            setFormData({...formData, referenceNo: e.target.value});
+                                            let stoneDetailCode = issueData.find(el => el.issueNo === e.target.value).stoneDetailCode;
+                                            setFormData({
+                                                ...formData, 
+                                                referenceNo: e.target.value,
+                                                stoneDetailCode: stoneDetailCode,
+                                            });
                                         }}
                                     >
                                         <option value="" disabled>Select...</option>
@@ -460,7 +465,12 @@ function ReturnList() {
                                         className="block w-full text-black border border-blue-gray-200 h-[35px] px-2.5 py-1.5 rounded-md focus:border-black"
                                         value={formData.referenceNo}
                                         onChange={(e) => {
-                                            setFormData({...formData, referenceNo: e.target.value});
+                                            let stoneDetailCode = issueData.find(el => el.issueNo === e.target.value).stoneDetailCode;
+                                            setFormData({
+                                                ...formData, 
+                                                referenceNo: e.target.value,
+                                                stoneDetailCode: stoneDetailCode,
+                                            });
                                         }}
                                     >
                                         <option value="" disabled>Select...</option>
@@ -476,7 +486,7 @@ function ReturnList() {
                                 </div> : ""
                             }
                             {/* Stone Details */}
-                            <div className="">
+                            <div className="col-span-2">
                                 <label className="text-black mb-2 text-sm">Stone Details</label>
                                 <select 
                                     className="block w-full px-2.5 py-1.5 border border-blue-gray-200 h-[35px] rounded-md focus:border-black text-black" 
@@ -492,7 +502,7 @@ function ReturnList() {
                                     {
                                         stoneDetails?.length === 0 ? <option value="" disabled>There is no Data</option> :
                                         stoneDetails?.map((stoneDetail) => {
-                                            return <option value={stoneDetail.stoneDetailCode} key={stoneDetail.stoneDetailCode} >{stoneDetail.stoneDesc}</option>
+                                            return <option value={stoneDetail.stoneDetailCode} key={stoneDetail.stoneDetailCode} >{stoneDetail.stoneDesc} ({stoneDetail.supplier.supplierName})</option>
                                         })
                                     }
                                 </select>
