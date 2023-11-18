@@ -395,6 +395,11 @@ function IssueList() {
 
     const column = [
         {
+            name: 'Status',
+            width: '150px',
+            selector: row => row.status,
+        },
+        {
             name: 'Issue No',
             width: '200px',
             selector: row => row.issueNo,

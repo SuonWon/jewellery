@@ -280,7 +280,6 @@ function Adjustment() {
             name: 'Status',
             width: '200px',
             selector: row => row.status,
-            omit: true
         },
         {
             name: 'Damage No',
@@ -311,26 +310,31 @@ function Adjustment() {
             name: 'Qty',
             width: "150px",
             selector: row => row.qty,
+            center: "true"
         },
         {
             name: 'Weight',
             width: "150px",
             selector: row => row.weight,
+            center: "true"
         },
         {
             name: 'Unit',
             width: "150px",
             selector: row => row.unit,
+            center: "true"
         },
         {
             name: 'Unit Price',
             width: "150px",
             selector: row => row.unitPrice,
+            right: "true"
         },
         {
             name: 'Total Price',
             width: "150px",
             selector: row => row.totalPrice,
+            right: "true"
         },
         {
             name: 'Remark',
@@ -349,7 +353,7 @@ function Adjustment() {
         },
         {
             name: 'Action',
-            center: true,
+            center: "true",
             width: "100px",
             cell: (row) => (
                 <div className="flex items-center gap-2">

@@ -151,7 +151,7 @@ function Brightness() {
         {
             name: 'Status',
             width: "150px",
-            center: true,
+            center: "true",
             cell: row => (
                 <div className={`w-[90px] flex items-center justify-center text-white h-7 rounded-full ${row.Status ? 'bg-green-500' : 'bg-red-500' } `}>
                     {
@@ -176,7 +176,7 @@ function Brightness() {
         },
         {
             name: 'Action',
-            center: true,
+            center: "true",
             width: "150px",
             cell: (row) => (
                 <div className="flex items-center gap-2">

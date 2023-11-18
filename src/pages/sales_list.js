@@ -373,13 +373,13 @@ function SalesList() {
         {
             name: 'Share(%)',
             width: "90px",
-            center: true,
+            center: "true",
             selector: row => row.sharePercentage,
         },
         {
             name: 'Amount',
             width: "200px",
-            right: true,
+            right: "true",
             selector: row => row.amount.toLocaleString(),
         },
     ];
@@ -389,7 +389,23 @@ function SalesList() {
             name: 'Invoice No',
             width: '200px',
             selector: row => row.Code,
-            omit: true
+            omit: "true"
+        },
+        {
+            name: 'Status',
+            width: '100px',
+            selector: row => row.Status == 'O' ? 
+                <div className="bg-green-500 px-3 py-[5px] text-white rounded-xl">
+                    Open
+                </div>
+                : row.Status == 'V' ? 
+                    <div className="bg-red-500 px-3 py-[5px] text-white rounded-xl">
+                        Void
+                    </div> : 
+                    <div className="bg-orange-500 px-3 py-[5px] text-white rounded-xl">
+                        Closed
+                    </div>,
+            center: 'true'
         },
         {
             name: 'Date',
@@ -397,9 +413,10 @@ function SalesList() {
             selector: row => row.SalesDate,
         },
         {
-            name: 'Issue No',
-            width: '200px',
-            selector: row => row.IssueNo,
+            name: 'Grand Total',
+            width: "130px",
+            selector: row => row.GrandTotal,
+            right: "true",
         },
         {
             name: 'Customer',
@@ -410,6 +427,11 @@ function SalesList() {
             name: 'Stone Detail',
             width: "250px",
             selector: row => row.StoneDetailCode,
+        },
+        {
+            name: 'Issue No',
+            width: '150px',
+            selector: row => row.IssueNo,
         },
         {
             name: 'Qty',
@@ -454,12 +476,6 @@ function SalesList() {
             right: "true",
         },
         {
-            name: 'Grand Total',
-            width: "150px",
-            selector: row => row.GrandTotal,
-            right: "true",
-        },
-        {
             name: 'Remark',
             width: "300px",
             selector: row => row.Remark,
@@ -476,7 +492,7 @@ function SalesList() {
         // },
         {
             name: 'Action',
-            center: true,
+            center: "true",
             width: "100px",
             cell: (row) => (
                 <div className="flex items-center gap-2">

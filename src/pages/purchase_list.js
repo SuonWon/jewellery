@@ -21,6 +21,8 @@ function PurchaseList() {
 
     const { data: supplierData } = useFetchTrueSupplierQuery();
 
+    console.log(supplierData);
+
     const { data: shareData } = useFetchShareQuery();
 
     const { data: unitData } = useFetchUOMQuery();
@@ -346,7 +348,6 @@ function PurchaseList() {
     const handleUpdate = () => {
         if (validateForm()) {
             try {
-                console.log(formData);
                 updatePurchase({
                     invoiceNo: formData.invoiceNo,
                     purDate: formData.purDate,
@@ -538,7 +539,7 @@ function PurchaseList() {
         {
             name: 'Amount',
             width: "150px",
-            right: true,
+            right: "true",
             selector: row => row.amount.toLocaleString(),
         },
         {
@@ -575,12 +576,34 @@ function PurchaseList() {
             name: 'Invoice No',
             width: '200px',
             selector: row => row.Code,
+            omit: "true"
+        },
+        {
+            name: 'Status',
+            width: '100px',
+            selector: row => row.Status == 'O' ? 
+            <div className="bg-green-500 px-3 py-[5px] text-white rounded-xl">
+                Open
+            </div>
+            : row.Status == 'V' ? 
+                <div className="bg-red-500 px-3 py-[5px] text-white rounded-xl">
+                    Void
+                </div> : 
+                <div className="bg-orange-500 px-3 py-[5px] text-white rounded-xl">
+                    Closed
+                </div>,
+            center: 'true'
         },
         {
             name: 'Date',
-            width: "150px",
+            width: "130px",
             selector: row => row.PurDate,
-
+        },
+        {
+            name: 'Grand Total',
+            width: "150px",
+            selector: row => row.GrandTotal,
+            right: "true",
         },
         {
             name: 'Supplier',
@@ -633,12 +656,6 @@ function PurchaseList() {
             name: 'Discount Amt',
             width: "150px",
             selector: row => row.DiscAmt,
-            right: "true",
-        },
-        {
-            name: 'Grand Total',
-            width: "150px",
-            selector: row => row.GrandTotal,
             right: "true",
         },
         {

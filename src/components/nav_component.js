@@ -62,7 +62,7 @@ function Nav() {
                             </NavLink>
                             <NavLink to='/share'>
                                 <MenuItem className="flex items-center gap-2">
-                                    <FaUsers /><span>Share</span>
+                                    <FaUsers /><span>Shares</span>
                                 </MenuItem>
                             </NavLink>
                         </MenuList>
@@ -81,21 +81,16 @@ function Nav() {
                                     <FaListUl /> <span>Sales List</span>
                                 </MenuItem>
                             </NavLink>
-                            {/* <NavLink to="/sales_invoice">
+                            <NavLink to="/issue_list">
                                 <MenuItem className="flex items-center gap-2">
-                                    <FaFileInvoice /> <span>Sales invoice</span>
+                                    <FaListUl /> <span>Issue List</span>
                                 </MenuItem>
-                            </NavLink> */}
+                            </NavLink>
                             <NavLink to="/return_list">
                                 <MenuItem className="flex items-center gap-2">
                                     <FaListUl /> <span>Return List</span>
                                 </MenuItem>
                             </NavLink>
-                            {/* <NavLink to="/issue">
-                                <MenuItem className="flex items-center gap-2">
-                                    <FaFileInvoice /> <span>Issue</span>
-                                </MenuItem>
-                            </NavLink> */}
                         </MenuList>
                     </Menu>
                     <Menu>
@@ -112,11 +107,6 @@ function Nav() {
                                     <FaListUl /> <span>Purchase List</span>
                                 </MenuItem>
                             </NavLink>
-                            {/* <NavLink to="/purchase_invoice">
-                                <MenuItem className="flex items-center gap-2">
-                                    <FaFileInvoice /> <span>Purchase invoice</span>
-                                </MenuItem>
-                            </NavLink> */}
                             <NavLink to="/stone_details">
                                 <MenuItem className="flex items-center gap-2">
                                     <FaListUl /> <span>Stone Selection</span>
@@ -135,12 +125,12 @@ function Nav() {
                         <MenuList className="z-[99999] bg-main text-white">
                             <NavLink to="/damage">
                                 <MenuItem className="flex items-center gap-2">
-                                    <FaListUl /> <span>Damage</span>
+                                    <FaListUl /> <span>Damage List</span>
                                 </MenuItem>
                             </NavLink>
                             <NavLink to="/issue_list">
                                 <MenuItem className="flex items-center gap-2">
-                                    <FaListUl /> <span>Issue List</span>
+                                    <FaListUl /> <span>Adjustment List</span>
                                 </MenuItem>
                             </NavLink>
                             <NavLink to="/adjustment">

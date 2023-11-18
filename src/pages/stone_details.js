@@ -129,9 +129,9 @@ function StoneDetails() {
         // if(validator.isEmpty(formData.referenceNo.toString())) {
         //     newErrors.referenceNo = 'Reference No is required.';
         // }
-        // if(formData.supplierCode === 0) {
-        //     newErrors.supplierCode = 'Supplier name is required.'
-        // }
+        if(formData.supplierCode === 0) {
+            newErrors.supplierCode = 'Supplier name is required.'
+        }
         if(formData.stoneCode === 0) {
             newErrors.stoneDesc = 'Stone Description is required.'
         } 
@@ -269,7 +269,7 @@ function StoneDetails() {
             stoneDetailCode: formData.stoneDetailCode,
             referenceNo: formData.referenceNo,
             supplierCode: formData.supplierCode,
-            stoneDesc: `${description.stoneDesc} ${description.size} ${description.gradeDesc} ${description.brightDesc}`,
+            stoneDesc: `${description.stoneDesc} ${description.size}${description.sizeUnit} ${description.gradeDesc} ${description.brightDesc}`,
             stoneCode: formData.stoneCode,
             typeCode: formData.typeCode,
             brightCode: formData.brightCode,
@@ -303,7 +303,7 @@ function StoneDetails() {
         {
             name: 'Status',
             width: "150px",
-            center: true,
+            center: "true",
             cell: row => (
                 <div className={`w-[90px] flex items-center justify-center text-white h-7 rounded-full ${row.Status ? 'bg-green-500' : 'bg-red-500' } `}>
                     {
@@ -395,7 +395,7 @@ function StoneDetails() {
         },
         {
             name: 'Action',
-            center: true,
+            center: "true",
             width: "100px",
             cell: (row) => (
                 <div className="flex items-center gap-2">
