@@ -466,8 +466,9 @@ function StoneDetails() {
                                         console.log(selectP);
                                         setSelectedPurchase(selectP);
                                         setFormData({
-                                            ...formData, 
-                                            supplierCode: Number(e.target.value)
+                                            ...formData,
+                                            supplierCode: Number(e.target.value),
+                                            referenceNo: "",
                                         });
                                     }}
                                 >

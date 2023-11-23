@@ -1,6 +1,6 @@
 /* eslint-disable eqeqeq */
 import { Button, Card, CardBody, Dialog, DialogBody, Typography } from "@material-tailwind/react";
-import { FaCirclePlus, FaFloppyDisk, FaPencil, FaPlus, FaTrashCan, } from "react-icons/fa6";
+import { FaCirclePlus, FaFloppyDisk, FaMoneyBillTrendUp, FaPencil, FaPlus, FaTrashCan, } from "react-icons/fa6";
 import { useState } from "react";
 import { useAddSalesMutation, useFetchIssueQuery, useFetchSalesQuery, useFetchStoneDetailsQuery, useFetchTrueCustomerQuery, useFetchUOMQuery, useRemoveSalesMutation, useUpdateSalesMutation } from "../store";
 import { apiUrl, focusSelect, pause } from "../const";
@@ -14,6 +14,7 @@ import ModalTitle from "../components/modal_title";
 import { v4 as uuidv4 } from 'uuid';
 import axios from "axios";
 import DataTable from "react-data-table-component";
+import Receivable from "./receivable";
 const validator = require('validator');
 
 function SalesList() {
@@ -46,6 +47,13 @@ function SalesList() {
 
     const [tBodyData, setTBodyData] = useState([]);
 
+    const [payOpen, setPayOpen] = useState(false);
+
+     const [payData, setPayData] = useState({
+        invoiceNo: "",
+        balance: 0,
+     });
+
     const navigate = useNavigate();
 
     const [isAlert, setIsAlert] = useState(true);
@@ -60,7 +68,7 @@ function SalesList() {
     });
 
     const salesData = {
-        invoiceNo: uuidv4(),
+        invoiceNo: "",
         salesDate: moment().format("YYYY-MM-DD"),
         issueNo: "",
         customerCode: 0,
@@ -87,6 +95,15 @@ function SalesList() {
     const [validationText, setValidationText] = useState({});
 
     const [deleteId, setDeleteId] = useState('');
+
+    const openPayable = (invoiceNo, balance) => {
+        setPayData({
+            ...payData,
+            invoiceNo: invoiceNo,
+            balance: Number(balance.replace(/,/g, "")),
+        });
+        setPayOpen(!payOpen);
+    }
 
     const handleRemove = async (id) => {
         let removeData = data.filter((el) => el.invoiceNo === id);
@@ -187,7 +204,7 @@ function SalesList() {
 
     const handleSubmit = () => {
         if (validateForm()) {
-            console.log(formData);
+            console.log(JSON.stringify(formData));
             try {
                 console.log(tBodyData);
                 addSales({
@@ -408,6 +425,21 @@ function SalesList() {
             center: 'true'
         },
         {
+            name: 'Paid Status',
+            width: '120px',
+            selector: row => row.PaidStatus == 'PAID' ? 
+            <div className="bg-green-500 px-3 py-[5px] text-white rounded-xl">
+                Paid
+            </div> : row.PaidStatus === 'UNPAID'?
+            <div className="bg-red-500 px-3 py-[5px] text-white rounded-xl">
+                Unpaid
+            </div> : 
+            <div className="bg-orange-500 px-3 py-[5px] text-white rounded-xl">
+                Partial
+            </div>,
+            center: 'true'
+        },
+        {
             name: 'Date',
             width: "150px",
             selector: row => row.SalesDate,
@@ -496,6 +528,7 @@ function SalesList() {
             width: "100px",
             cell: (row) => (
                 <div className="flex items-center gap-2">
+                    <Button variant="text" color="deep-purple" className="p-2" onClick={() => openPayable(row.Code, row.GrandTotal)}><FaMoneyBillTrendUp /></Button>
                     <Button variant="text" color="deep-purple" className="p-2" onClick={() => handleView(row.Code)}><FaPencil /></Button>
                     <Button variant="text" color="red" className="p-2" onClick={() => handleDeleteBtn(row.Code)}><FaTrashCan /></Button>
                 </div>
@@ -524,6 +557,7 @@ function SalesList() {
             UpdatedAt: moment(salesData.updatedAt).format("YYYY-MM-DD hh:mm:ss a"),
             UpdatedBy: salesData.updatedBy,
             Status: salesData.status,
+            PaidStatus: salesData.paidStatus
         }
     });
 
@@ -944,6 +978,9 @@ function SalesList() {
                         </div>
                     </DialogBody>
                 </Dialog>
+                {
+                    payOpen? <Receivable payOpen={payOpen} invoiceNo={payData.invoiceNo} balance={payData.balance}  closePay={() => setPayOpen(!payOpen)} /> : <div></div>
+                }
             </div>
 
         </>

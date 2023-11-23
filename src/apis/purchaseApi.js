@@ -1,10 +1,14 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { apiUrl } from "../const";
+import { apiUrl, pause } from "../const";
 
 const purchaseApi = createApi({
     reducerPath: "purchase",
     baseQuery: fetchBaseQuery({
         baseUrl: apiUrl,
+        fetchFn: async (...argus) => {
+            await pause(2000);
+            return fetch(...argus);
+        }
     }),
     endpoints(builder) {
         return {

@@ -397,7 +397,18 @@ function IssueList() {
         {
             name: 'Status',
             width: '150px',
-            selector: row => row.status,
+            selector: row => row.status === 'O' ? 
+                <div className="bg-green-500 px-3 py-[5px] text-white rounded-xl">
+                    Open
+                </div>
+                : row.Status === 'V' ? 
+                    <div className="bg-red-500 px-3 py-[5px] text-white rounded-xl">
+                        Void
+                    </div> : 
+                    <div className="bg-orange-500 px-3 py-[5px] text-white rounded-xl">
+                        Closed
+                    </div>,
+            center: 'true'
         },
         {
             name: 'Issue No',
