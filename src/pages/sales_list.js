@@ -451,7 +451,7 @@ function SalesList() {
         },
         {
             name: 'Amount',
-            width: "200px",
+            width: "150px",
             right: "true",
             selector: row => row.amount.toLocaleString(),
         },
@@ -673,23 +673,46 @@ function SalesList() {
                                             className="block w-full text-black border border-blue-gray-200 h-[35px] px-2.5 py-1.5 rounded-md focus:border-black"
                                             value={formData.issueNo}
                                             onChange={(e) => {
-                                                let stoneDetailCode = issueData.find(el => el.issueNo === e.target.value).stoneDetailCode;
-                                                let refNo = stoneDetails.find(el => el.stoneDetailCode === stoneDetailCode).referenceNo;
-                                                setFormData({ 
-                                                    ...formData, 
-                                                    issueNo: e.target.value,
-                                                    stoneDetailCode: stoneDetailCode
-                                                });
-                                                axios.get(`${apiUrl}/stone-detail/get-purchase-share/${refNo}`).then((res) => {
-                                                    setTBodyData(res.data);
-                                                    console.log(res.data);
-                                                });
+                                                if (e.target.value !== "") {
+                                                    let stoneDetailCode = issueData.find(el => el.issueNo === e.target.value).stoneDetailCode;
+                                                    let refNo = stoneDetails.find(el => el.stoneDetailCode === stoneDetailCode).referenceNo;
+                                                    setFormData({ 
+                                                        ...formData, 
+                                                        issueNo: e.target.value,
+                                                        stoneDetailCode: stoneDetailCode
+                                                    });
+                                                    axios.get(`${apiUrl}/stone-detail/get-purchase-share/${refNo}`).then((res) => {
+                                                        setTBodyData(
+                                                            res.data.map(el => {
+                                                                return {
+                                                                    id: el.id,
+                                                                    invoiceNo: el.invoiceNo,
+                                                                    lineNo: el.lineNo,
+                                                                    shareCode: el.shareCode,
+                                                                    shareName: el.shareName,
+                                                                    sharePercentage: el.sharePercentage,
+                                                                    amount: 0,
+                                                                }
+                                                            })
+                                                        );
+                                                    });
+                                                } else {
+                                                    setFormData({
+                                                        ...formData,
+                                                        issueNo: "",
+                                                        stoneDetailCode: "",
+                                                    });
+                                                    setTBodyData([]);
+                                                }
                                             }}
                                         >
-                                            <option value="" disabled>Select...</option>
+                                            <option value="" >Select...</option>
                                             {
                                                 issueData?.map((issue) => {
-                                                    return <option value={issue.issueNo} key={issue.issueNo}>{issue.issueNo}({issue.stoneDetail.stoneDesc})</option>
+                                                    return <option value={issue.issueNo} key={issue.issueNo}>({issue.stoneDetail.stoneDesc}, {issue.issueMember.map(el => {
+                                                            return el.customer.customerName + ",";
+                                                        })})
+                                                    </option>
                                                 })
                                             }
                                         </select>
@@ -762,8 +785,19 @@ function SalesList() {
                                                 });
                                                 let refNo = stoneDetails.find(el => el.stoneDetailCode === e.target.value).referenceNo;
                                                 axios.get(`${apiUrl}/stone-detail/get-purchase-share/${refNo}`).then((res) => {
-                                                    setTBodyData(res.data);
-                                                    console.log(res.data);
+                                                    setTBodyData(
+                                                        res.data.map(el => {
+                                                            return {
+                                                                id: el.id,
+                                                                invoiceNo: el.invoiceNo,
+                                                                lineNo: el.lineNo,
+                                                                shareCode: el.shareCode,
+                                                                shareName: el.shareName,
+                                                                sharePercentage: el.sharePercentage,
+                                                                amount: 0,
+                                                            }
+                                                        })
+                                                    );
                                                 });
                                             }}
                                         >
