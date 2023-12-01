@@ -426,7 +426,7 @@ function Adjustment() {
                                         readOnly={isEdit}
                                     />
                                 </div> : 
-                                <div>
+                                <div className="col-span-2">
                                     {/* Reference No */}
                                     <label className="text-black text-sm mb-2">Reference No</label>
                                     <select 
@@ -444,7 +444,7 @@ function Adjustment() {
                                         <option value="" disabled>Select...</option>
                                         {
                                             purchaseData?.map((purchase) => {
-                                                return <option value={purchase.invoiceNo} key={purchase.invoiceNo}>{purchase.invoiceNo} ({purchase.supplier.supplierName})</option>
+                                                return <option value={purchase.invoiceNo} key={purchase.invoiceNo}>{purchase.invoiceNo} ({purchase.supplier.supplierName}, {purchase.stone.stoneDesc})</option>
                                             })
                                         }
                                     </select>
@@ -471,10 +471,10 @@ function Adjustment() {
                                 }
                             </div>
                         </div>
-                        <div className="grid grid-cols-4 gap-2 mb-3">
+                        <div className="grid grid-cols-6 gap-2 mb-3">
                             {
                                 isEdit? 
-                                <div>
+                                <div className="col-span-2">
                                     {/* Reference No */}
                                     <label className="text-black text-sm mb-2">Reference No</label>
                                     <select 
@@ -492,7 +492,7 @@ function Adjustment() {
                                         <option value="" disabled>Select...</option>
                                         {
                                             purchaseData?.map((purchase) => {
-                                                return <option value={purchase.invoiceNo} key={purchase.invoiceNo}>{purchase.invoiceNo} ({purchase.supplier.supplierName})</option>
+                                                return <option value={purchase.invoiceNo} key={purchase.invoiceNo}>{purchase.invoiceNo} ({purchase.supplier.supplierName}, {purchase.stone.stoneDesc})</option>
                                             })
                                         }
                                     </select>
@@ -502,7 +502,7 @@ function Adjustment() {
                                 </div> : ""
                             }
                             {/* Stone Details */}
-                            <div className="col-span-2">
+                            <div className="col-span-3">
                                 <label className="text-black mb-2 text-sm">Stone Details</label>
                                 <select 
                                     className="block w-full px-2.5 py-1.5 border border-blue-gray-200 h-[35px] rounded-md focus:border-black text-black" 

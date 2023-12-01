@@ -80,6 +80,18 @@ const purchaseApi = createApi({
                     }
                 }
             }),
+            updatePurchaseStatus: builder.mutation({
+                invalidatesTags: () => {
+                    return [{type: "Purchase", id: "All"}]
+                },
+                query: (purchaseData) => {
+                    return {
+                        url: "/purchase/update-purchase-finish",
+                        method: "PUT",
+                        body: purchaseData,
+                    };
+                },
+            }),
             removePurchase: builder.mutation({
                 invalidatesTags: () => {
                     return [{type: "Purchase", id: "All"}]
@@ -98,5 +110,5 @@ const purchaseApi = createApi({
     },
 })
 
-export const { useFetchPurchaseIdQuery, useAddPurchaseMutation, useFetchTruePurchaseQuery, useFetchPurchaseQuery, useFetchPurchaseByIdQuery, useUpdatePurchaseMutation, useRemovePurchaseMutation } = purchaseApi; 
+export const { useFetchPurchaseIdQuery, useAddPurchaseMutation, useFetchTruePurchaseQuery, useFetchPurchaseQuery, useFetchPurchaseByIdQuery, useUpdatePurchaseMutation, useUpdatePurchaseStatusMutation, useRemovePurchaseMutation } = purchaseApi; 
 export {purchaseApi};

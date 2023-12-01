@@ -50,8 +50,6 @@ function Receivable(props) {
         });
     }
 
-    console.log(payForm);
-
     function validatePayable() {
         
         const newErrors = {};

@@ -414,7 +414,7 @@ function ReturnList() {
                                         readOnly={isEdit}
                                     />
                                 </div> : 
-                                <div>
+                                <div className="col-span-2">
                                     {/* Reference No */}
                                     <label className="text-black text-sm mb-2">Reference No</label>
                                     <select 
@@ -432,7 +432,7 @@ function ReturnList() {
                                         <option value="" disabled>Select...</option>
                                         {
                                             issueData?.map((issue) => {
-                                                return <option value={issue.issueNo} key={issue.issueNo}>{issue.issueNo}</option>
+                                                return <option value={issue.issueNo} key={issue.issueNo}>{issue.issueNo} ({issue.stoneDetail.stoneDesc})</option>
                                             })
                                         }
                                     </select>
@@ -480,7 +480,7 @@ function ReturnList() {
                                         <option value="" disabled>Select...</option>
                                         {
                                             issueData?.map((issue) => {
-                                                return <option value={issue.issueNo} key={issue.issueNo}>{issue.issueNo}</option>
+                                                return <option value={issue.issueNo} key={issue.issueNo}>{issue.issueNo} ({issue.stoneDetail.stoneDesc})</option>
                                             })
                                         }
                                     </select>

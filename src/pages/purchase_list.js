@@ -1,6 +1,6 @@
 /* eslint-disable eqeqeq */
 import { Button, Card, CardBody, Dialog, DialogBody, Typography } from "@material-tailwind/react";
-import { FaAlipay, FaCirclePlus, FaEye, FaFloppyDisk, FaMoneyBillTrendUp, FaPencil, FaPlus, FaTheRedYeti, FaTrashCan, } from "react-icons/fa6";
+import { FaCirclePlus, FaEye, FaFloppyDisk, FaMoneyBillTrendUp, FaPencil, FaPlus, FaTheRedYeti, FaTrashCan, } from "react-icons/fa6";
 import { useState } from "react";
 import { apiUrl, focusSelect, pause } from "../const";
 import { useAddPurchaseMutation, useFetchPurchaseQuery, useFetchShareQuery, useFetchStoneQuery, useFetchTrueSupplierQuery, useFetchUOMQuery, useRemovePurchaseMutation, useUpdatePurchaseMutation } from "../store";
@@ -613,15 +613,19 @@ function PurchaseList() {
         },
         {
             name: 'Status',
-            width: '100px',
+            width: '120px',
             selector: row => row.Status == 'O' ? 
             <div className="bg-green-500 px-3 py-[5px] text-white rounded-xl">
                 Open
             </div>
-            : row.Status == 'V' ? 
+            : row.Status === 'V' ? 
                 <div className="bg-red-500 px-3 py-[5px] text-white rounded-xl">
                     Void
-                </div> : 
+                </div> 
+            : row.Status === 'F' ?
+                <div className="bg-blue-500 px-3 py-[5px] text-white rounded-xl">
+                    Complete
+                </div> :
                 <div className="bg-orange-500 px-3 py-[5px] text-white rounded-xl">
                     Closed
                 </div>,
@@ -716,11 +720,11 @@ function PurchaseList() {
         //     width: "200px",
         //     selector: row => row.CreatedAt,
         // },
-        // {
-        //     name: 'Updated At',
-        //     width: "200px",
-        //     selector: row => row.UpdatedAt,
-        // },
+        {
+            name: 'Updated At',
+            width: "200px",
+            selector: row => row.UpdatedAt,
+        },
         {
             name: 'Action',
             center: "true",

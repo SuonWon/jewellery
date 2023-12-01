@@ -2,7 +2,7 @@
 import { Button, Card, CardBody, Dialog, DialogBody, Typography } from "@material-tailwind/react";
 import { FaCirclePlus, FaFloppyDisk, FaMoneyBillTrendUp, FaPencil, FaPlus, FaTrashCan, } from "react-icons/fa6";
 import { useState } from "react";
-import { useAddSalesMutation, useFetchIssueQuery, useFetchSalesQuery, useFetchStoneDetailsQuery, useFetchTrueCustomerQuery, useFetchUOMQuery, useRemoveSalesMutation, useUpdateSalesMutation } from "../store";
+import { useAddSalesMutation, useFetchIssueQuery, useFetchSalesQuery, useFetchStoneDetailsQuery, useFetchTrueCustomerQuery, useFetchUOMQuery, useRemoveSalesMutation, useUpdateIssueMutation, useUpdateIssueStatusMutation, useUpdateSalesMutation } from "../store";
 import { apiUrl, focusSelect, pause } from "../const";
 import DeleteModal from "../components/delete_modal";
 import SuccessAlert from "../components/success_alert";
@@ -39,6 +39,10 @@ function SalesList() {
 
     const [updateSales] = useUpdateSalesMutation();
 
+    const [updateStatus] = useUpdateIssueMutation();
+
+    const [updateIssueStatus] = useUpdateIssueStatusMutation();
+
     const auth = useAuthUser();
 
     const [openDelete, setOpenDelete] = useState(false);
@@ -48,6 +52,8 @@ function SalesList() {
     const [tBodyData, setTBodyData] = useState([]);
 
     const [payOpen, setPayOpen] = useState(false);
+
+    const [issueStatus, setIssueStatus] = useState(false);
 
      const [payData, setPayData] = useState({
         invoiceNo: "",
@@ -64,8 +70,13 @@ function SalesList() {
 
     const [alert, setAlert] = useState({
         isAlert: false,
-        message: ''
+        message: '',
+        isWarning: false,
+        isError: false,
+        title: ""
     });
+
+    const [selectedIssue, setSelectedIssue] = useState({});
 
     const salesData = {
         invoiceNo: "",
@@ -132,11 +143,41 @@ function SalesList() {
 
     const handleView = (id) => {
         let tempData = data.find(res => res.invoiceNo === id);
+        if (tempData.issueNo !== "") {
+            let tempIssue = issueData.find(res => res.issueNo === tempData.issueNo);
+            setSelectedIssue({
+                issueNo: tempIssue.issueNo,
+                issueDate: tempIssue.issueDate,
+                stoneDetailCode: tempIssue.stoneDetailCode,
+                qty: tempIssue.qty,
+                weight: tempIssue.weight,
+                unitCode: tempIssue.unitCode,
+                unitPrice: tempIssue.unitPrice,
+                totalPrice: tempIssue.totalPrice,
+                status: tempIssue.status,
+                remark: tempIssue.remark,
+                createdAt: tempIssue.createdAt,
+                createdBy: tempIssue.createdBy,
+                updatedAt: tempIssue.updatedAt,
+                updatedBy: tempIssue.updatedBy,
+                deletedAt: tempIssue.deletedAt,
+                deletedBy: tempIssue.deletedBy,
+                issueMember: tempIssue.issueMember.map(el => {
+                    return {
+                        id: el.id,
+                        lineNo: el.lineNo,
+                        customerCode: el.customerCode,
+                    }
+                })
+            })
+            setIssueStatus(tempIssue.status === 'F'? true : false);
+        }
         setFormData({
             invoiceNo: tempData.invoiceNo,
             salesDate: tempData.salesDate,
             customerCode: tempData.customerCode,
             stoneDetailCode: tempData.stoneDetailCode,
+            issueNo: tempData.issueNo,
             qty: tempData.qty,
             weight: tempData.weight,
             unitCode: tempData.unitCode,
@@ -204,9 +245,7 @@ function SalesList() {
 
     const handleSubmit = () => {
         if (validateForm()) {
-            console.log(JSON.stringify(formData));
             try {
-                console.log(tBodyData);
                 addSales({
                     ...formData,
                     invoiceNo: salesId,
@@ -242,6 +281,13 @@ function SalesList() {
                     }
 
                 });
+                if (issueStatus) {
+                    updateIssueStatus({
+                        id: formData.issueNo,
+                        updatedBy: auth().username,
+                    });
+                }
+                setIssueStatus(false);
                 setFormData(salesData);
                 setOpen(!open);
 
@@ -250,6 +296,7 @@ function SalesList() {
                 console.log(err.statusCode);
 
             }
+            setIssueStatus(false);
             setFormData(salesData);
             setOpen(!open);
         }
@@ -295,6 +342,13 @@ function SalesList() {
                     }
 
                 });
+                if (issueStatus) {
+                    updateIssueStatus({
+                        id: formData.issueNo,
+                        updatedBy: auth().username,
+                    });
+                }
+                setIssueStatus(false);
                 setFormData(salesData);
 
             }
@@ -302,6 +356,7 @@ function SalesList() {
                 console.log(err.statusCode);
 
             }
+            setIssueStatus(false);
             setFormData(salesData);
         }
     };
@@ -309,7 +364,7 @@ function SalesList() {
     const handleUpdate = () => {
         if (validateForm()) {
             try {
-                console.log(formData);
+                let tempStatus = issueStatus? 'F' : 'O';
                 updateSales({
                     invoiceNo: formData.invoiceNo,
                     salesDate: formData.salesDate,
@@ -363,23 +418,24 @@ function SalesList() {
                     }
                     
                 });
+                if (tempStatus !== selectedIssue.status && formData.issueNo !== "") {
+                    updateStatus({
+                        ...selectedIssue,
+                        status: tempStatus,
+                        updatedBy: auth().username,
+                    });
+                    setSelectedIssue({});
+                }
                 setFormData(salesData);
                 setOpen(!open);
                 
             }
             catch(err) {
-                console.log(err.statusCode);
-                
+                console.log(err.statusCode);   
             }
             setFormData(salesData);
             setOpen(!open);
         }
-    };
-
-    const editSales = async (id) => {
-        let editPuData = data.filter((e) => e.invoiceNo === id);
-        console.log(editPuData);
-        navigate(`/sales_edit/${editPuData}`);
     };
 
     const shareColumn = [
@@ -565,9 +621,9 @@ function SalesList() {
         <>
             <div className="flex flex-col gap-4 relative max-w-[85%] min-w-[85%]">
                 <div className="w-78 absolute top-0 right-0 z-[9999]">
-                    {
+                    {/* {
                         removeResult.isSuccess && isAlert && <SuccessAlert title="Sales" message="Delete successful." handleAlert={() => setIsAlert(false)} />
-                    }
+                    } */}
                 </div>
                 <div className="flex items-center py-3 bg-white gap-4 sticky top-0 z-10">
                     <Typography variant="h5">
@@ -586,11 +642,32 @@ function SalesList() {
                 <Dialog open={open} size="xl">
                     <DialogBody>
                         <ModalTitle titleName="Sales" handleClick={() => setOpen(!open)} />
+                        {
+                            alert.isAlert? <SuccessAlert title={alert.title} message={alert.message} isWarning={alert.isWarning} /> : ""
+                        }
                         <div className="grid grid-cols-5 gap-2 mb-3">
                             <div className="col-span-3">
-                                <div className="grid grid-cols-3 gap-2 mb-3">
+                                <div className="grid grid-cols-3 mb-3">
+                                    {/* Sales Date */}
+                                    <div className="">
+                                        <label className="text-black mb-2 text-sm">Sales Date</label>
+                                        <input
+                                            type="date"
+                                            className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
+                                            value={moment(formData.salesDate).format("YYYY-MM-DD")}
+                                            onChange={(e) => setFormData({
+                                                ...formData,
+                                                salesDate: e.target.value
+                                            })}
+                                        />
+                                        {
+                                            validationText.salesDate && <p className="block text-[12px] text-red-500 font-sans mb-2">{validationText.salesDate}</p>
+                                        }
+                                    </div>
+                                </div>
+                                <div className="grid grid-cols-4 gap-2 mb-3">
                                     {/* Issue No */}
-                                    <div className="col-span-2">
+                                    <div className="col-span-3">
                                         <label className="text-black text-sm mb-2">Issue No</label>
                                         <select
                                             className="block w-full text-black border border-blue-gray-200 h-[35px] px-2.5 py-1.5 rounded-md focus:border-black"
@@ -617,21 +694,35 @@ function SalesList() {
                                             }
                                         </select>
                                     </div>
-                                    {/* Purchase Date */}
                                     <div className="">
-                                        <label className="text-black mb-2 text-sm">Sales Date</label>
-                                        <input
-                                            type="date"
-                                            className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
-                                            value={moment(formData.salesDate).format("YYYY-MM-DD")}
-                                            onChange={(e) => setFormData({
-                                                ...formData,
-                                                salesDate: e.target.value
-                                            })}
-                                        />
-                                        {
-                                            validationText.salesDate && <p className="block text-[12px] text-red-500 font-sans mb-2">{validationText.salesDate}</p>
-                                        }
+                                        <label className="text-black text-sm mb-2">Issue Complete</label>
+                                        <div className="w-full">
+                                            <input 
+                                                type="checkbox" 
+                                                className="border border-blue-gray-200 w-[20px] h-[20px] py-1.5 rounded-md text-black"
+                                                checked={issueStatus}
+                                                onChange={() => {
+                                                    if (formData.issueNo === "") {
+                                                        setAlert({
+                                                            isAlert: true,
+                                                            message: "Please select issue no.",
+                                                            isWarning: true,
+                                                            title: "Warning"
+                                                        })
+                                                        setTimeout(() => {
+                                                            setAlert({
+                                                                isAlert: false,
+                                                                message: '',
+                                                                isWarning: false,
+                                                                title: '',
+                                                            })
+                                                        }, 2000);
+                                                    } else {
+                                                        setIssueStatus(!issueStatus);
+                                                    }
+                                                }}
+                                            />
+                                        </div>
                                     </div>
                                 </div>
                                 <div className="grid grid-cols-3 gap-2 mb-3">

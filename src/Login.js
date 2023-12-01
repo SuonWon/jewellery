@@ -56,7 +56,6 @@ function Login() {
             .then((res) => {
                 const newErrors = {}
                 if(res.data !== '') {
-                    console.log(res.data);
                     if(signIn(
                         {
                             token : res.data.token,
