@@ -5,10 +5,6 @@ const purchaseApi = createApi({
     reducerPath: "purchase",
     baseQuery: fetchBaseQuery({
         baseUrl: apiUrl,
-        fetchFn: async (...argus) => {
-            await pause(2000);
-            return fetch(...argus);
-        }
     }),
     endpoints(builder) {
         return {
@@ -37,8 +33,9 @@ const purchaseApi = createApi({
                 },
                 query: () => {
                     return {
-                        url: '/purchase/get-true-purchases/?status=O',
-                        method: 'GET'
+                        url: '/purchase/get-all-purchases/',
+                        method: 'GET',
+                        params: {status: "O"}
                     }
                 }
             }),

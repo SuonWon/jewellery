@@ -24,7 +24,8 @@ const walletTransitionApi = createApi({
                     return {
                         url: "/transaction/get-all-transactions",
                         params: {
-                            status: status
+                            status: status,
+                            walletCode: "661af9ef-2087-438c-92ba-bb98ca5a7133"
                         },
                         method: "GET",
                     };

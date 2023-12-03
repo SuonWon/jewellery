@@ -2,7 +2,7 @@
 import { Button, Card, CardBody, Dialog, DialogBody, Typography } from "@material-tailwind/react";
 import { FaCirclePlus, FaFloppyDisk, FaPencil, FaTrashCan, } from "react-icons/fa6";
 import { useEffect, useState } from "react";
-import { useFetchStoneDetailsQuery, useAddStoneDetailsMutation, useUpdateStoneDetailsMutation, useRemoveStoneDetailsMutation, useFetchUOMQuery, useFetchTrueBrightnessQuery, useFetchTrueStoneQuery, useFetchTrueGradeQuery, useFetchTrueTypeQuery, useFetchTrueSupplierQuery, useFetchPurchaseQuery, useUpdatePurchaseStatusMutation, useUpdatePurchaseMutation } from "../store";
+import { useFetchStoneDetailsQuery, useAddStoneDetailsMutation, useUpdateStoneDetailsMutation, useRemoveStoneDetailsMutation, useFetchUOMQuery, useFetchTrueBrightnessQuery, useFetchTrueStoneQuery, useFetchTrueGradeQuery, useFetchTrueTypeQuery, useFetchTrueSupplierQuery, useFetchPurchaseQuery, useUpdatePurchaseStatusMutation, useUpdatePurchaseMutation, useFetchTruePurchaseQuery } from "../store";
 import DeleteModal from "../components/delete_modal";
 import SectionTitle from "../components/section_title";
 import ModalTitle from "../components/modal_title";
@@ -33,6 +33,8 @@ function StoneDetails() {
     const {data: supplierData} = useFetchTrueSupplierQuery();
 
     const {data: purchaseData} = useFetchPurchaseQuery();
+
+    const {data: truePurchaseData} = useFetchTruePurchaseQuery();
 
     const [open, setOpen] = useState(false);
 
@@ -112,7 +114,7 @@ function StoneDetails() {
         sizeUnit: "လုံးစီး",
         qty: 0,
         weight: 0,
-        unitCode: "ct",
+        unitCode: "",
         remark: "",
         isActive: true,
         createdBy: auth().username,
@@ -131,6 +133,7 @@ function StoneDetails() {
             size: "",
             sizeUnit: "လုံးစီး",
         });
+        setPurchaseStatus(false);
         setOpen(!open);
     };
 
@@ -541,7 +544,7 @@ function StoneDetails() {
                                     className="block w-full text-black p-2.5 border border-blue-gray-200 max-h-[2.5rem] rounded-md focus:border-black"
                                     value={formData.supplierCode}
                                     onChange={(e) => {
-                                        let selectP = purchaseData.filter(el => el.supplierCode === Number(e.target.value));
+                                        let selectP = truePurchaseData.filter(el => el.supplierCode === Number(e.target.value));
                                         console.log(selectP);
                                         setSelectedPurchase(selectP);
                                         setFormData({
@@ -575,7 +578,7 @@ function StoneDetails() {
                                         <option value="" disabled>Select...</option>
                                         {
                                             selectedPurchase.length === 0?
-                                            purchaseData?.map((purchase) => {
+                                            truePurchaseData?.map((purchase) => {
                                                 return <option value={purchase.invoiceNo} key={purchase.invoiceNo}>{purchase.invoiceNo} ({purchase.supplier.supplierName}, {purchase.stone.stoneDesc})</option>
                                             }) : 
                                             selectedPurchase?.map((purchase) => {
@@ -598,7 +601,7 @@ function StoneDetails() {
                                                         message: "Please select reference no.",
                                                         isWarning: true,
                                                         title: "Warning"
-                                                    })
+                                                    });
                                                     setTimeout(() => {
                                                         setAlert({
                                                             isAlert: false,

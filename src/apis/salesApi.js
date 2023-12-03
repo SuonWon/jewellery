@@ -27,8 +27,9 @@ const salesApi = createApi({
                 },
                 query: () => {
                     return {
-                        url: '/sales/get-true-sales/?status=O',
-                        method: 'GET'
+                        url: '/sales/get-all-sales',
+                        method: 'GET',
+                        params: {status: "O"}
                     }
                 }
             }),

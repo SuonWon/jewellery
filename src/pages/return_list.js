@@ -11,6 +11,7 @@ import TableList from "../components/data_table";
 import { useAuthUser } from "react-auth-kit";
 import ModalTitle from "../components/modal_title";
 import axios from "axios";
+import { useFetchTrueIssueQuery } from "../apis/issueApi";
 const validator = require('validator');
 
 function ReturnList() {
@@ -21,7 +22,7 @@ function ReturnList() {
 
     const {data: unitData} = useFetchUOMQuery();
 
-    const {data: issueData} = useFetchIssueQuery();
+    const {data: issueData} = useFetchTrueIssueQuery();
 
     axios.get('http://localhost:3005/v1/return/get-id').then((res) => {
         setReturnId(res.data);
@@ -273,7 +274,22 @@ function ReturnList() {
         {
             name: 'Status',
             width: '150px',
-            selector: row => row.status,
+            selector: row => row.status === 'O' ? 
+                <div className="bg-green-500 px-3 py-[5px] text-white rounded-xl">
+                    Open
+                </div>
+                : row.status === 'V' ? 
+                    <div className="bg-red-500 px-3 py-[5px] text-white rounded-xl">
+                        Void
+                    </div> 
+                : row.status === 'F' ? 
+                    <div className="bg-blue-500 px-3 py-[5px] text-white rounded-xl">
+                        Complete
+                    </div> :
+                    <div className="bg-orange-500 px-3 py-[5px] text-white rounded-xl">
+                        Closed
+                    </div>,
+            center: 'true'
         },
         {
             name: 'Return No',
@@ -432,7 +448,10 @@ function ReturnList() {
                                         <option value="" disabled>Select...</option>
                                         {
                                             issueData?.map((issue) => {
-                                                return <option value={issue.issueNo} key={issue.issueNo}>{issue.issueNo} ({issue.stoneDetail.stoneDesc})</option>
+                                                return <option value={issue.issueNo} key={issue.issueNo}>({issue.stoneDetail.stoneDesc}, {issue.issueMember.map(el => {
+                                                        return el.customer.customerName + ",";
+                                                    })})
+                                                </option>
                                             })
                                         }
                                     </select>
@@ -480,7 +499,10 @@ function ReturnList() {
                                         <option value="" disabled>Select...</option>
                                         {
                                             issueData?.map((issue) => {
-                                                return <option value={issue.issueNo} key={issue.issueNo}>{issue.issueNo} ({issue.stoneDetail.stoneDesc})</option>
+                                                return <option value={issue.issueNo} key={issue.issueNo}>({issue.stoneDetail.stoneDesc}, {issue.issueMember.map(el => {
+                                                        return el.customer.customerName + ",";
+                                                    })})
+                                                </option>
                                             })
                                         }
                                     </select>

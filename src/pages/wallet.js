@@ -147,7 +147,6 @@ function Wallet() {
     const handleSubmit = () => {
         if (validateForm()) {
             try {
-                console.log(formData);
                 addTransaction({
                     id: uuidv4(),
                     walletCode: formData.walletCode,
@@ -203,6 +202,7 @@ function Wallet() {
                     walletCode: formData.walletCode,
                     date: moment(formData.date + "T" + formData.time).toISOString(),
                     cashType: isCashIn? "DEBIT" : "CREDIT",
+                    categoryCode: formData.categoryCode,
                     amount: formData.amount,
                     remark: formData.remark,
                     status: formData.status,
@@ -250,7 +250,8 @@ function Wallet() {
                     id: formData.id,
                     walletCode: formData.walletCode,
                     date: formData.date,
-                    cashType: formData.cashType,
+                    cashType: isCashIn? "DEBIT" : "CREDIT",
+                    categoryCode: formData.categoryCode,
                     amount: formData.amount,
                     remark: formData.remark,
                     status: formData.status,

@@ -3,7 +3,7 @@ import { Button, Card, CardBody, Dialog, DialogBody, Typography } from "@materia
 import { FaCirclePlus, FaEye, FaFloppyDisk, FaMoneyBillTrendUp, FaPencil, FaPlus, FaTheRedYeti, FaTrashCan, } from "react-icons/fa6";
 import { useState } from "react";
 import { apiUrl, focusSelect, pause } from "../const";
-import { useAddPurchaseMutation, useFetchPurchaseQuery, useFetchShareQuery, useFetchStoneQuery, useFetchTrueSupplierQuery, useFetchUOMQuery, useRemovePurchaseMutation, useUpdatePurchaseMutation } from "../store";
+import { useAddPurchaseMutation, useFetchPurchaseQuery, useFetchShareQuery, useFetchStoneQuery, useFetchTruePurchaseQuery, useFetchTrueShareQuery, useFetchTrueStoneQuery, useFetchTrueSupplierQuery, useFetchUOMQuery, useRemovePurchaseMutation, useUpdatePurchaseMutation } from "../store";
 import DeleteModal from "../components/delete_modal";
 import SuccessAlert from "../components/success_alert";
 import moment from "moment";
@@ -19,15 +19,15 @@ const validator = require('validator');
 
 function PurchaseList() {
 
-    const { data, isLoading : dataLoad, } = useFetchPurchaseQuery();
+    const { data, isLoading : dataLoad, } = useFetchTruePurchaseQuery();
 
     const { data: supplierData } = useFetchTrueSupplierQuery();
 
-    const { data: shareData } = useFetchShareQuery();
+    const { data: shareData } = useFetchTrueShareQuery();
 
     const { data: unitData } = useFetchUOMQuery();
 
-    const { data: stoneData } = useFetchStoneQuery();
+    const { data: stoneData } = useFetchTrueStoneQuery();
 
     const auth = useAuthUser();
 
@@ -112,9 +112,9 @@ function PurchaseList() {
     const [validationText, setValidationText] = useState({});
 
     const handleRemove = async (id) => {
-        let removeData = data.filter((el) => el.invoiceNo === id);
+        let removeData = data.find((el) => el.invoiceNo === id);
         removePurchase({
-            id: removeData[0].invoiceNo,
+            id: removeData.invoiceNo,
             deletedAt: moment().toISOString(),
             deletedBy: auth().username
         }).then((res) => { console.log(res) });
@@ -339,6 +339,15 @@ function PurchaseList() {
                     ...formData,
                     invoiceNo: purchaseInvoiceNo,
                     purDate: moment(formData.purDate).toISOString(),
+                    purchaseShareDetails: tBodyData.map(el => {
+                        return {
+                            id: el.id,
+                            lineNo: el.lineNo,
+                            shareCode: el.shareCode,
+                            sharePercentage: el.sharePercentage,
+                            amount: el.amount,
+                        }
+                    }),
                 }).then((res) => {
                     if (res.error != null) {
                         let message = '';
@@ -1131,11 +1140,19 @@ function PurchaseList() {
                                             value={shares.sharePercentage}
                                             onChange={(e) => {
                                                 let percentage = Number(e.target.value)
-                                                setShares({
-                                                    ...shares,
-                                                    sharePercentage: percentage,
-                                                    amount: (percentage / 100) * formData.grandTotal,
-                                                });
+                                                if (percentage <= dShare.sharePercentage) {
+                                                    setShares({
+                                                        ...shares,
+                                                        sharePercentage: percentage,
+                                                        amount: (percentage / 100) * formData.grandTotal,
+                                                    });
+                                                } else {
+                                                    setShares({
+                                                        ...shares,
+                                                        sharePercentage: 0,
+                                                        amount: 0,
+                                                    });
+                                                }
                                             }}
                                             onFocus={(e) => focusSelect(e)}
                                         />

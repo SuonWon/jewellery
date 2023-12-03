@@ -140,9 +140,9 @@ function IssueList() {
     };
 
     const handleRemove = async (id) => {
-        let removeData = data.filter((el) => el.invoiceNo === id);
+        let removeData = data.filter((el) => el.issueNo === id);
         removeIssue({
-            id: removeData[0].invoiceNo,
+            id: removeData[0].issueNo,
             deletedAt: moment().toISOString(),
             deletedBy: auth().username
         }).then((res) => { console.log(res) });
@@ -164,6 +164,9 @@ function IssueList() {
         }
         if(validator.isEmpty(formData.unitCode)) {
             newErrors.unitCode = "Unit is required.";
+        }
+        if(formData.issueMember.length === 0) {
+            newErrors.issueMember = "Please choose at least one customer.";
         }
 
         setValidationText(newErrors);
@@ -365,7 +368,20 @@ function IssueList() {
                 });
                 setMemberData(issueMemberData);
             } else {
-                alert("Member already exist in the list");
+                setAlert({
+                    isAlert: true,
+                    message: "Customer is already selected.",
+                    isWarning: true,
+                    title: "Warning"
+                });
+                setTimeout(() => {
+                    setAlert({
+                        isAlert: false,
+                        message: '',
+                        isWarning: false,
+                        title: ''
+                    })
+                }, 2000);
             }
             
         }
@@ -401,7 +417,7 @@ function IssueList() {
                 <div className="bg-green-500 px-3 py-[5px] text-white rounded-xl">
                     Open
                 </div>
-                : row.Status === 'V' ? 
+                : row.status === 'V' ? 
                     <div className="bg-red-500 px-3 py-[5px] text-white rounded-xl">
                         Void
                     </div> 
@@ -542,6 +558,9 @@ function IssueList() {
                 <Dialog open={open} size="lg">
                     <DialogBody>
                         <ModalTitle titleName={isEdit ? "Edit Issue" : "Create Issue"} handleClick={() => setOpen(!open)} />
+                        {
+                            alert.isAlert? <SuccessAlert title={alert.title} message={alert.message} isWarning={alert.isWarning} /> : ""
+                        }
                         <div className="grid grid-cols-4 gap-4 px-3 mb-3">
                             <div className="col-span-2 grid grid-cols-2 gap-2 h-fit">
                                 {
@@ -757,7 +776,9 @@ function IssueList() {
                                         />
                                         </CardBody>
                                     </Card>
-                                    
+                                    {
+                                        validationText.issueMember && <p className="block text-[12px] text-red-500 font-sans mb-2">{validationText.issueMember}</p>
+                                    }
                                 </div>
                             </div>
                         </div>

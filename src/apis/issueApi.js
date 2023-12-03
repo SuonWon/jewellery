@@ -25,8 +25,9 @@ const issueApi = createApi({
                 },
                 query: () => {
                     return {
-                        url: `/issue/get-true-issue`,
+                        url: `/issue/get-all-issue`,
                         method: "GET",
+                        params: {status: "O"}
                     }
                 }
             }),

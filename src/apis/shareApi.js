@@ -19,6 +19,18 @@ const shareApi = createApi({
                     };
                 },
             }),
+            fetchTrueShare: builder.query({
+                providesTags: () => {
+                    return [{type: "Share", id: "All"}]
+                },
+                query: (search = "", status = true) => {
+                    return {
+                        url: "/share/get-all-shares",
+                        method: "GET",
+                        params: {search , status}
+                    }
+                }
+            }),
             fetchShareById: builder.query({
                 providesTags: () => {
                     return [{type: "Share", id:"All"}]
@@ -70,5 +82,5 @@ const shareApi = createApi({
     },
 });
 
-export const { useFetchShareQuery, useFetchShareByIdQuery, useAddShareMutation, useUpdateShareMutation, useRemoveShareMutation } = shareApi
+export const { useFetchShareQuery, useFetchShareByIdQuery, useFetchTrueShareQuery, useAddShareMutation, useUpdateShareMutation, useRemoveShareMutation } = shareApi
 export { shareApi };
