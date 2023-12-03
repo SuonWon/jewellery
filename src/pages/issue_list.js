@@ -397,7 +397,22 @@ function IssueList() {
         {
             name: 'Status',
             width: '150px',
-            selector: row => row.status,
+            selector: row => row.status === 'O' ? 
+                <div className="bg-green-500 px-3 py-[5px] text-white rounded-xl">
+                    Open
+                </div>
+                : row.Status === 'V' ? 
+                    <div className="bg-red-500 px-3 py-[5px] text-white rounded-xl">
+                        Void
+                    </div> 
+                : row.status === 'F' ? 
+                    <div className="bg-blue-500 px-3 py-[5px] text-white rounded-xl">
+                        Complete
+                    </div> :
+                    <div className="bg-orange-500 px-3 py-[5px] text-white rounded-xl">
+                        Closed
+                    </div>,
+            center: 'true'
         },
         {
             name: 'Issue No',
@@ -455,11 +470,11 @@ function IssueList() {
         //     width: "200px",
         //     selector: row => row.createdAt,
         // },
-        // {
-        //     name: 'Updated At',
-        //     width: "200px",
-        //     selector: row => row.updatedAt,
-        // },
+        {
+            name: 'Updated At',
+            width: "200px",
+            selector: row => row.updatedAt,
+        },
         // {
         //     name: 'Deleted At',
         //     width: "200px",
@@ -531,7 +546,6 @@ function IssueList() {
                             <div className="col-span-2 grid grid-cols-2 gap-2 h-fit">
                                 {
                                     isEdit? 
-                                    <div className="col-span-2 grid grid-cols-2">
                                         <div className="">
                                             <label className="text-black mb-2 text-sm">Issue No</label>
                                             <input
@@ -540,8 +554,7 @@ function IssueList() {
                                                 value={formData.issueNo}
                                                 readOnly={isEdit}
                                             />
-                                        </div>
-                                    </div> : ""
+                                        </div> : ""
                                 }
                                 {/* Issue Date */}
                                 <div className="">
@@ -559,32 +572,32 @@ function IssueList() {
                                         validationText.issueDate && <p className="block text-[12px] text-red-500 font-sans mb-2">{validationText.issueDate}</p>
                                     }
                                 </div>
-                                {/* Stone Details */}
-                                <div className="">
-                                    <label className="text-black mb-2 text-sm">Stone Details</label>
-                                    <select 
-                                        className="block w-full px-2.5 py-1.5 border border-blue-gray-200 h-[35px] rounded-md focus:border-black text-black" 
-                                        value={formData.stoneDetailCode} 
-                                        onChange={(e) => 
-                                            setFormData({
-                                                ...formData, 
-                                                stoneDetailCode: e.target.value,
-                                            })
-                                        }
-                                    >
-                                        <option value="" disabled>Select stone detail</option>
-                                        {
-                                            stoneDetails?.length === 0 ? <option value="" disabled>There is no Data</option> :
-                                            stoneDetails?.map((stoneDetail) => {
-                                                return <option value={stoneDetail.stoneDetailCode} key={stoneDetail.stoneDetailCode} >{stoneDetail.stoneDesc}</option>
-                                            })
-                                        }
-                                    </select>
-                                    {
-                                        validationText.stoneDetailCode && <p className="block text-[12px] text-red-500 font-sans mb-2">{validationText.stoneDetailCode}</p>
-                                    } 
-                                </div>
                                 <div className="col-span-2 grid grid-cols-3 gap-2">
+                                    {/* Stone Details */}
+                                    <div className="col-span-3">
+                                        <label className="text-black mb-2 text-sm">Stone Details</label>
+                                        <select 
+                                            className="block w-full px-2.5 py-1.5 border border-blue-gray-200 h-[35px] rounded-md focus:border-black text-black" 
+                                            value={formData.stoneDetailCode} 
+                                            onChange={(e) => 
+                                                setFormData({
+                                                    ...formData, 
+                                                    stoneDetailCode: e.target.value,
+                                                })
+                                            }
+                                        >
+                                            <option value="" disabled>Select stone detail</option>
+                                            {
+                                                stoneDetails?.length === 0 ? <option value="" disabled>There is no Data</option> :
+                                                stoneDetails?.map((stoneDetail) => {
+                                                    return <option value={stoneDetail.stoneDetailCode} key={stoneDetail.stoneDetailCode} >{stoneDetail.stoneDesc}</option>
+                                                })
+                                            }
+                                        </select>
+                                        {
+                                            validationText.stoneDetailCode && <p className="block text-[12px] text-red-500 font-sans mb-2">{validationText.stoneDetailCode}</p>
+                                        } 
+                                    </div>
                                     {/* Qty */}
                                     <div>
                                         <label className="text-black text-sm mb-2">Qty</label>

@@ -66,6 +66,18 @@ const issueApi = createApi({
                     };
                 },
             }),
+            updateIssueStatus: builder.mutation({
+                invalidatesTags: () => {
+                    return [{type: "Issue", id: "All"}]
+                },
+                query: (issueData) => {
+                    return {
+                        url: "/issue/update-issue-finish",
+                        method: "PUT",
+                        body: issueData,
+                    };
+                },
+            }),
             removeIssue: builder.mutation({
                 invalidatesTags: () => {
                     return [{type: "Issue", id: "All"}]
@@ -82,5 +94,5 @@ const issueApi = createApi({
     },
 });
 
-export const { useFetchIssueQuery, useFetchIssueByIdQuery, useFetchTrueIssueQuery, useAddIssueMutation, useUpdateIssueMutation, useRemoveIssueMutation } = issueApi;
+export const { useFetchIssueQuery, useFetchIssueByIdQuery, useFetchTrueIssueQuery, useAddIssueMutation, useUpdateIssueMutation, useUpdateIssueStatusMutation, useRemoveIssueMutation } = issueApi;
 export { issueApi }

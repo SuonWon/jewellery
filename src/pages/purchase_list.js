@@ -1,9 +1,9 @@
 /* eslint-disable eqeqeq */
 import { Button, Card, CardBody, Dialog, DialogBody, Typography } from "@material-tailwind/react";
-import { FaCirclePlus, FaEye, FaFloppyDisk, FaPencil, FaPlus, FaTrashCan, } from "react-icons/fa6";
+import { FaCirclePlus, FaEye, FaFloppyDisk, FaMoneyBillTrendUp, FaPencil, FaPlus, FaTheRedYeti, FaTrashCan, } from "react-icons/fa6";
 import { useState } from "react";
 import { apiUrl, focusSelect, pause } from "../const";
-import { useAddPurchaseMutation, useFetchPurchaseIdQuery, useFetchPurchaseQuery, useFetchShareByIdQuery, useFetchShareQuery, useFetchStoneQuery, useFetchTrueSupplierQuery, useFetchUOMQuery, useRemovePurchaseMutation, useUpdatePurchaseMutation } from "../store";
+import { useAddPurchaseMutation, useFetchPurchaseQuery, useFetchShareQuery, useFetchStoneQuery, useFetchTrueSupplierQuery, useFetchUOMQuery, useRemovePurchaseMutation, useUpdatePurchaseMutation } from "../store";
 import DeleteModal from "../components/delete_modal";
 import SuccessAlert from "../components/success_alert";
 import moment from "moment";
@@ -13,15 +13,15 @@ import ModalTitle from "../components/modal_title";
 import { v4 as uuidv4 } from 'uuid';
 import DataTable from "react-data-table-component";
 import axios from "axios";
+import Payable from "./payable";
+import ButtonLoader from "../components/buttonLoader";
 const validator = require('validator');
 
 function PurchaseList() {
 
-    const { data } = useFetchPurchaseQuery();
+    const { data, isLoading : dataLoad, } = useFetchPurchaseQuery();
 
     const { data: supplierData } = useFetchTrueSupplierQuery();
-
-    console.log(supplierData);
 
     const { data: shareData } = useFetchShareQuery();
 
@@ -29,15 +29,16 @@ function PurchaseList() {
 
     const { data: stoneData } = useFetchStoneQuery();
 
-    axios.get(`${apiUrl}/purchase/get-id`).then((res) => {
-        setPurchaseInvoiceNo(res.data);
-    });
-
     const auth = useAuthUser();
 
     const [open, setOpen] = useState(false);
 
-    const [purchaseInvoiceNo, setPurchaseInvoiceNo] = useState("");
+    const [payOpen, setPayOpen] = useState(false);
+
+     const [payData, setPayData] = useState({
+        invoiceNo: "",
+        balance: 0,
+     });
 
     const [oldPer, setOldPer] = useState(0);
 
@@ -49,7 +50,7 @@ function PurchaseList() {
 
     const [isAlert, setIsAlert] = useState(true);
 
-    const [addPurchase] = useAddPurchaseMutation();
+    const [addPurchase, addResult] = useAddPurchaseMutation();
 
     const [updatePurchase] = useUpdatePurchaseMutation();
 
@@ -135,18 +136,31 @@ function PurchaseList() {
                     ...dShare,
                     shareCode: res.data.shareCode,
                     shareName: res.data.shareName,
+                    sharePercentage: 100,
+                    amount: 0,
                 }
             ]);
             setDShare({
                 ...dShare,
                 shareCode: res.data.shareCode,
                 shareName: res.data.shareName,
+                sharePercentage: 100,
+                amount: 0,
             });
         });
         setFormData(purchaseData);
         setIsEdit(false);
         setOpen(!open);
     };
+
+    const openPayable = (invoiceNo, balance) => {
+        setPayData({
+            ...payData,
+            invoiceNo: invoiceNo,
+            balance: Number(balance.replace(/,/g, "")),
+        });
+        setPayOpen(!payOpen);
+    }
 
     const handleView = (id) => {
         let tempData = data.find(res => res.invoiceNo === id);
@@ -165,6 +179,7 @@ function PurchaseList() {
             discAmt: tempData.discAmt,
             grandTotal: tempData.grandTotal,
             remark: tempData.remark,
+            paidStatus: tempData.paidStatus,
             status: tempData.status,
             createdBy: tempData.createdBy,
             createdAt: tempData.createdAt,
@@ -248,11 +263,14 @@ function PurchaseList() {
 
     };
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         if (validateForm()) {
-            console.log(formData);
+            let purchaseInvoiceNo = "";
+            await axios.get(`${apiUrl}/purchase/get-id`).then((res) => {
+                purchaseInvoiceNo = res.data
+            });
+            console.log(purchaseInvoiceNo);
             try {
-                console.log("Ji");
                 addPurchase({
                     ...formData,
                     invoiceNo: purchaseInvoiceNo,
@@ -290,12 +308,19 @@ function PurchaseList() {
                 });
                 setFormData(purchaseData);
                 setTBodyData([]);
+                setDShare({
+                    id: uuidv4(),
+                    lineNo: 1,
+                    shareCode: 0,
+                    shareName: "",
+                    sharePercentage: 100,
+                    amount: 0,
+                });
                 setOpen(!open);
 
             }
             catch (err) {
                 console.log(err.statusCode);
-
             }
             setFormData(purchaseData);
             setTBodyData([]);
@@ -303,11 +328,13 @@ function PurchaseList() {
         }
     }
 
-    const handleSave = () => {
+    const handleSave = async () => {
         if (validateForm()) {
-            console.log(formData);
+            let purchaseInvoiceNo = "";
+            await axios.get(`${apiUrl}/purchase/get-id`).then((res) => {
+                purchaseInvoiceNo = res.data
+            });
             try {
-                console.log("Ji");
                 addPurchase({
                     ...formData,
                     invoiceNo: purchaseInvoiceNo,
@@ -336,6 +363,24 @@ function PurchaseList() {
                 });
                 setFormData(purchaseData);
                 setTBodyData([]);
+                axios.get(`${apiUrl}/share/get-owner`).then((res) => {
+                    setTBodyData([
+                        {
+                            ...dShare,
+                            shareCode: res.data.shareCode,
+                            shareName: res.data.shareName,
+                            sharePercentage: 100,
+                            amount: 0,
+                        }
+                    ]);
+                    setDShare({
+                        ...dShare,
+                        shareCode: res.data.shareCode,
+                        shareName: res.data.shareName,
+                        sharePercentage: 100,
+                        amount: 0,
+                    });
+                });
             }
             catch (err) {
                 console.log(err.statusCode);
@@ -364,6 +409,7 @@ function PurchaseList() {
                     grandTotal: formData.grandTotal,
                     remark: formData.remark,
                     status: formData.status,
+                    paidStatus: formData.paidStatus,
                     createdBy: formData.createdBy,
                     createdAt: formData.createdAt,
                     updatedBy: auth().username,
@@ -430,19 +476,6 @@ function PurchaseList() {
                     ...shares,
                     lineNo: tBodyData.length + 1,
                 });
-                // setFormData({
-                //     ...formData,
-                //     purchaseShareDetails: [
-                //         ...formData.purchaseShareDetails,
-                //         {
-                //             id: shares.id,
-                //             lineNo: tBodyData.length + 1,
-                //             shareCode: shares.shareCode,
-                //             sharePercentage: shares.sharePercentage,
-                //             amount: shares.amount
-                //         }
-                //     ]
-                // });
                 setTBodyData(newTbody);
                 setDShare({
                     ...dShare,
@@ -576,22 +609,41 @@ function PurchaseList() {
             name: 'Invoice No',
             width: '200px',
             selector: row => row.Code,
-            omit: "true"
+            omit: true,
         },
         {
             name: 'Status',
-            width: '100px',
+            width: '120px',
             selector: row => row.Status == 'O' ? 
             <div className="bg-green-500 px-3 py-[5px] text-white rounded-xl">
                 Open
             </div>
-            : row.Status == 'V' ? 
+            : row.Status === 'V' ? 
                 <div className="bg-red-500 px-3 py-[5px] text-white rounded-xl">
                     Void
-                </div> : 
+                </div> 
+            : row.Status === 'F' ?
+                <div className="bg-blue-500 px-3 py-[5px] text-white rounded-xl">
+                    Complete
+                </div> :
                 <div className="bg-orange-500 px-3 py-[5px] text-white rounded-xl">
                     Closed
                 </div>,
+            center: 'true'
+        },
+        {
+            name: 'Paid Status',
+            width: '120px',
+            selector: row => row.PaidStatus == 'PAID' ? 
+            <div className="bg-green-500 px-3 py-[5px] text-white rounded-xl">
+                Paid
+            </div> : row.PaidStatus === 'UNPAID'?
+            <div className="bg-red-500 px-3 py-[5px] text-white rounded-xl">
+                Unpaid
+            </div> : 
+            <div className="bg-orange-500 px-3 py-[5px] text-white rounded-xl">
+                Partial
+            </div>,
             center: 'true'
         },
         {
@@ -668,20 +720,18 @@ function PurchaseList() {
         //     width: "200px",
         //     selector: row => row.CreatedAt,
         // },
-        // {
-        //     name: 'Updated At',
-        //     width: "200px",
-        //     selector: row => row.UpdatedAt,
-        // },
+        {
+            name: 'Updated At',
+            width: "200px",
+            selector: row => row.UpdatedAt,
+        },
         {
             name: 'Action',
             center: "true",
             width: "100px",
             cell: (row) => (
                 <div className="flex items-center gap-2">
-                    {/* <Link to={`/purchase_edit/${row.Code}`}>
-                        <Button variant="text" color="deep-purple" className="p-2"><FaPencil /></Button>
-                    </Link> */}
+                    <Button variant="text" color="deep-purple" className="p-2" onClick={() => openPayable(row.Code, row.GrandTotal)}><FaMoneyBillTrendUp /></Button>
                     <Button variant="text" color="deep-purple" className="p-2" onClick={() => handleView(row.Code)}><FaPencil /></Button>
                     <Button variant="text" color="red" className="p-2" onClick={() => handleDeleteBtn(row.Code)}><FaTrashCan /></Button>
                 </div>
@@ -704,6 +754,7 @@ function PurchaseList() {
             DiscAmt: purchaseData.discAmt.toLocaleString('en-US'),
             GrandTotal: purchaseData.grandTotal.toLocaleString('en-US'),
             Remark: purchaseData.remark,
+            PaidStatus: purchaseData.paidStatus,
             CreatedAt: moment(purchaseData.createdAt).format("YYYY-MM-DD hh:mm:ss a"),
             CreatedBy: purchaseData.createdBy,
             UpdatedAt: moment(purchaseData.updatedAt).format("YYYY-MM-DD hh:mm:ss a"),
@@ -730,7 +781,7 @@ function PurchaseList() {
                 </div>
                 <Card className="h-auto shadow-md max-w-screen-xxl rounded-sm p-2 border-t">
                     <CardBody className="rounded-sm overflow-auto p-0">
-                        <TableList columns={column} data={tbodyData} />
+                        <TableList columns={column} data={tbodyData} pending={dataLoad} />
                     </CardBody>
                 </Card>
                 <DeleteModal deleteId={deleteId} open={openDelete} handleDelete={handleRemove} closeModal={() => setOpenDelete(!openDelete)} />
@@ -1141,7 +1192,9 @@ function PurchaseList() {
                                 </Button> :
                                 <>
                                     <Button onClick={handleSubmit} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2">
-                                        <FaFloppyDisk className="text-base" />
+                                        {
+                                            addResult.isLoading? <ButtonLoader /> : <FaFloppyDisk className="text-base" />
+                                        }
                                         <Typography variant="small" className="capitalize">
                                             Save
                                         </Typography>
@@ -1157,7 +1210,11 @@ function PurchaseList() {
                         </div>
                     </DialogBody>
                 </Dialog>
+                {
+                    payOpen? <Payable payOpen={payOpen} invoiceNo={payData.invoiceNo} balance={payData.balance}  closePay={() => setPayOpen(!payOpen)} /> : <div></div>
+                }
             </div>
+            
 
         </>
     );

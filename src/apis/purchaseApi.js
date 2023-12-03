@@ -1,10 +1,14 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { apiUrl } from "../const";
+import { apiUrl, pause } from "../const";
 
 const purchaseApi = createApi({
     reducerPath: "purchase",
     baseQuery: fetchBaseQuery({
         baseUrl: apiUrl,
+        fetchFn: async (...argus) => {
+            await pause(2000);
+            return fetch(...argus);
+        }
     }),
     endpoints(builder) {
         return {
@@ -76,6 +80,18 @@ const purchaseApi = createApi({
                     }
                 }
             }),
+            updatePurchaseStatus: builder.mutation({
+                invalidatesTags: () => {
+                    return [{type: "Purchase", id: "All"}]
+                },
+                query: (purchaseData) => {
+                    return {
+                        url: "/purchase/update-purchase-finish",
+                        method: "PUT",
+                        body: purchaseData,
+                    };
+                },
+            }),
             removePurchase: builder.mutation({
                 invalidatesTags: () => {
                     return [{type: "Purchase", id: "All"}]
@@ -94,5 +110,5 @@ const purchaseApi = createApi({
     },
 })
 
-export const { useFetchPurchaseIdQuery, useAddPurchaseMutation, useFetchTruePurchaseQuery, useFetchPurchaseQuery, useFetchPurchaseByIdQuery, useUpdatePurchaseMutation, useRemovePurchaseMutation } = purchaseApi; 
+export const { useFetchPurchaseIdQuery, useAddPurchaseMutation, useFetchTruePurchaseQuery, useFetchPurchaseQuery, useFetchPurchaseByIdQuery, useUpdatePurchaseMutation, useUpdatePurchaseStatusMutation, useRemovePurchaseMutation } = purchaseApi; 
 export {purchaseApi};

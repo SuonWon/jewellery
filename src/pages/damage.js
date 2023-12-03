@@ -418,7 +418,7 @@ function Damage() {
                                         readOnly={isEdit}
                                     />
                                 </div> : 
-                                <div>
+                                <div className="col-span-2">
                                     {/* Reference No */}
                                     <label className="text-black text-sm mb-2">Reference No</label>
                                     <select 
@@ -436,7 +436,7 @@ function Damage() {
                                         <option value="" disabled>Select...</option>
                                         {
                                             purchaseData?.map((purchase) => {
-                                                return <option value={purchase.invoiceNo} key={purchase.invoiceNo}>{purchase.invoiceNo} ({purchase.supplier.supplierName})</option>
+                                                return <option value={purchase.invoiceNo} key={purchase.invoiceNo}>{purchase.invoiceNo} ({purchase.supplier.supplierName}, {purchase.stone.stoneDesc})</option>
                                             })
                                         }
                                     </select>
@@ -466,7 +466,7 @@ function Damage() {
                         <div className="grid grid-cols-4 gap-2 mb-3">
                             {
                                 isEdit? 
-                                <div>
+                                <div className="col-span-2">
                                     {/* Reference No */}
                                     <label className="text-black text-sm mb-2">Reference No</label>
                                     <select 
@@ -484,7 +484,7 @@ function Damage() {
                                         <option value="" disabled>Select...</option>
                                         {
                                             purchaseData?.map((purchase) => {
-                                                return <option value={purchase.invoiceNo} key={purchase.invoiceNo}>{purchase.invoiceNo} ({purchase.supplier.supplierName})</option>
+                                                return <option value={purchase.invoiceNo} key={purchase.invoiceNo}>{purchase.invoiceNo} ({purchase.supplier.supplierName}, {purchase.stone.stoneDesc})</option>
                                             })
                                         }
                                     </select>

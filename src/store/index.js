@@ -16,6 +16,8 @@ import { shareApi } from "../apis/shareApi";
 import { damageApi } from "../apis/damageApi";
 import { adjustmentApi } from "../apis/adjustmentApi";
 import { walletTransitionApi } from "../apis/walletTransitionApi";
+import { payableApi } from "../apis/payableApi";
+import { receivableApi } from "../apis/receivableApi";
 
 export const store = configureStore({
     reducer: {
@@ -36,6 +38,8 @@ export const store = configureStore({
         [damageApi.reducerPath] : damageApi.reducer,
         [adjustmentApi.reducerPath] : adjustmentApi.reducer,
         [walletTransitionApi.reducerPath] : walletTransitionApi.reducer,
+        [payableApi.reducerPath] : payableApi.reducer,
+        [receivableApi.reducerPath] : receivableApi.reducer,
     },
     middleware: (getDefaultMiddleware) => {
         return getDefaultMiddleware()
@@ -55,7 +59,9 @@ export const store = configureStore({
             .concat(shareApi.middleware)
             .concat(damageApi.middleware)
             .concat(adjustmentApi.middleware)
-            .concat(walletTransitionApi.middleware);
+            .concat(walletTransitionApi.middleware)
+            .concat(payableApi.middleware)
+            .concat(receivableApi.middleware);
     }
 });
 
@@ -67,12 +73,14 @@ export { useFetchUOMQuery, useFetchUOMByIdQuery, useAddUOMMutation, useUpdateUOM
 export { useFetchCustomerQuery, useFetchTrueCustomerQuery, useFetchCustomerByIdQuery, useAddCustomerMutation, useUpdateCustomerMutation, useRemoveCustomerMutation } from "../apis/customerApi";
 export { useFetchSupplierQuery, useFetchTrueSupplierQuery, useFetchSupplierByIdQuery, useAddSupplierMutation, useUpdateSupplierMutation, useRemoveSupplierMutation } from "../apis/supplierApi";
 export { useFetchStoneDetailsQuery, useFetchStoneDetailsByIdQuery, useFetchPurchaseShareQuery, useAddStoneDetailsMutation, useUpdateStoneDetailsMutation, useRemoveStoneDetailsMutation } from "../apis/stoneDetailsApi";
-export { useFetchPurchaseIdQuery, useFetchPurchaseQuery, useFetchTruePurchaseQuery, useAddPurchaseMutation, useFetchPurchaseByIdQuery, useUpdatePurchaseMutation, useRemovePurchaseMutation } from "../apis/purchaseApi";
+export { useFetchPurchaseIdQuery, useFetchPurchaseQuery, useFetchTruePurchaseQuery, useAddPurchaseMutation, useFetchPurchaseByIdQuery, useUpdatePurchaseMutation, useUpdatePurchaseStatusMutation, useRemovePurchaseMutation } from "../apis/purchaseApi";
 export { useFetchSalesQuery, useFetchTrueSalesQuery, useAddSalesMutation, useUpdateSalesMutation, useRemoveSalesMutation} from "../apis/salesApi";
 export { useFetchStoneSelectionQuery, useAddStoneSelectionMutation, useUpdateStoneSelectionMutation } from "../apis/stoneSelectionApi";
 export { useFetchReturnQuery, useAddReturnMutation, useUpdateReturnMutation, useRemoveReturnMutation } from "../apis/returnApi";
-export { useFetchIssueQuery, useAddIssueMutation, useUpdateIssueMutation, useRemoveIssueMutation } from "../apis/issueApi";
+export { useFetchIssueQuery, useAddIssueMutation, useUpdateIssueMutation, useUpdateIssueStatusMutation, useRemoveIssueMutation } from "../apis/issueApi";
 export { useFetchShareQuery, useFetchShareByIdQuery, useAddShareMutation, useUpdateShareMutation, useRemoveShareMutation } from "../apis/shareApi";
 export { useFetchDamageIdQuery, useFetchDamageQuery, useFetchDamageByIdQuery, useAddDamageMutation, useUpdateDamageMutation, useRemoveDamageMutation } from "../apis/damageApi";
 export { useFetchAdjustmentQuery, useFetchAdjustmentByIdQuery, useAddAdjustmentMutation, useUpdateAdjustmentMutation, useRemoveAdjustMutation } from "../apis/adjustmentApi";
-export { useFetchWalletQuery, useFetchWalletTransactionQuery, useFetchWalletTransactionByIdQuery, useAddWalletTransactionMutation, useUpdateWalletTransactionMutation, useRemoveWalletTransactionMutation } from "../apis/walletTransitionApi"
+export { useFetchWalletQuery, useFetchWalletTransactionQuery, useFetchWalletTransactionByIdQuery, useAddWalletTransactionMutation, useUpdateWalletTransactionMutation, useRemoveWalletTransactionMutation } from "../apis/walletTransitionApi";
+export { useFetchPayableQuery, useFetchPayableByIdQuery, useAddPayableMutation, useUpdatePayableMutation, useRemovePayableMutation } from "../apis/payableApi";
+export { useFetchReceivableQuery, useFetchReceivableByIdQuery, useAddReceivableMutation, useUpdateReceivableMutation, useRemoveReceivableMutation } from "../apis/receivableApi";

@@ -1,8 +1,9 @@
 /* eslint-disable eqeqeq */
 import { Button, Card, CardBody, Dialog, DialogBody, Typography } from "@material-tailwind/react";
-import { FaCirclePlus, FaEye, FaFloppyDisk, FaPencil, FaPlus, FaTrashCan, } from "react-icons/fa6";
+import { FaCircleMinus, FaCirclePlus, FaEquals, FaFilter, FaFloppyDisk, FaPencil, FaPlus, FaTrashCan, } from "react-icons/fa6";
+import { BiReset } from "react-icons/bi"
 import { useState } from "react";
-import { focusSelect, pause } from "../const";
+import { focusSelect } from "../const";
 import { useAddWalletTransactionMutation, useFetchWalletQuery, useFetchWalletTransactionQuery, useRemoveWalletTransactionMutation, useUpdateWalletTransactionMutation } from "../store";
 import DeleteModal from "../components/delete_modal";
 import SuccessAlert from "../components/success_alert";
@@ -15,7 +16,7 @@ const validator = require('validator');
 
 function Wallet() {
 
-    const { data } = useFetchWalletTransactionQuery();
+    const { data } = useFetchWalletTransactionQuery(true);
 
     const { data: walletData } = useFetchWalletQuery();
 
@@ -44,11 +45,27 @@ function Wallet() {
         message: ''
     });
 
+    let totalCashIn = 0;
+    let totalCashOut = 0;
+    let total = 0;
+
+    if(data) {
+        data.map((el) => {
+            total += el.amount;
+            if(el.cashType === "DEBIT") {
+                totalCashIn += el.amount;
+            } else if (el.cashType === "CREDIT") {
+                totalCashOut += el.amount;
+            }
+        })
+    }
+
     const transactionData = {
         id: "",
         walletCode: "",
         date: moment().format("YYYY-MM-DD"),
         time: moment().format("hh:mm:ss"),
+        categoryCode: "stone",
         cashType: "",
         amount: 0,
         remark: "",
@@ -136,6 +153,7 @@ function Wallet() {
                     walletCode: formData.walletCode,
                     date: moment(formData.date + "T" + formData.time).toISOString(),
                     cashType: isCashIn? "DEBIT" : "CREDIT",
+                    categoryCode: formData.categoryCode,
                     amount: formData.amount,
                     remark: formData.remark,
                     status: formData.status,
@@ -305,6 +323,11 @@ function Wallet() {
             selector: row => row.cashType,
         },
         {
+            name: 'Category',
+            width: "150px",
+            selector: row => row.categoryCode
+        },
+        {
             name: 'Amount',
             width: "150px",
             selector: row => row.amount,
@@ -347,6 +370,7 @@ function Wallet() {
             date: moment(wallet.date).format("YYYY-MM-DD hh:mm:ss"),
             shareName: wallet.wallet.share.shareName,
             cashType: wallet.cashType,
+            categoryCode: wallet.categoryCode,
             amount: wallet.amount.toLocaleString('en-US'),
             remark: wallet.remark,
             createdAt: moment(wallet.createdAt).format("YYYY-MM-DD hh:mm:ss a"),
@@ -367,15 +391,110 @@ function Wallet() {
                 </div>
                 <div className="flex items-center py-3 bg-white gap-4 sticky top-0 z-10">
                     <Typography variant="h5">
-                        Wallet List
+                        Cash In/Out Record
                     </Typography>
-                    <Button variant="gradient" size="sm" color="deep-purple" className="flex items-center gap-2" onClick={handleOpen}>
-                        <FaPlus /> Create New
+                    <Button 
+                        variant="gradient" 
+                        size="sm" 
+                        color="green" 
+                        className="flex items-center gap-2 capitalize" 
+                        onClick={() => {
+                            setIsCashIn(true)
+                            setIsCashOut(false)
+                            handleOpen()
+                        }}
+                    >
+                        <FaCirclePlus /> Cash In
+                    </Button>
+                    <Button 
+                        variant="gradient" 
+                        size="sm" 
+                        color="red" 
+                        className="flex items-center gap-2 capitalize" 
+                        onClick={() => {
+                            setIsCashIn(false)
+                            setIsCashOut(true)
+                            handleOpen()
+                        }}
+                    >
+                        <FaCircleMinus /> Cash Out
                     </Button>
                 </div>
+                <Card className="h-auto shadow-none max-w-screen-xxl rounded-sm p-2 border">
+                    <CardBody className="grid grid-cols-3 gap-2 rounded-sm overflow-auto p-2">
+                        <div className="border-r-2 grid grid-rows gap-2 justify-center items-center">
+                            <Typography variant="h6" className="flex items-center gap-2">
+                                <FaCirclePlus className="text-green-700" />
+                                Cash In
+                            </Typography>
+                            <Typography variant="h5" className="text-end">
+                                {totalCashIn.toLocaleString("en-us")}
+                            </Typography>
+                        </div>
+                        <div className="border-r-2 grid grid-rows gap-2 justify-center items-center">
+                            <Typography variant="h6" className="flex items-center gap-2">
+                                <FaCircleMinus className="text-red-700" />
+                                Cash Out
+                            </Typography>
+                            <Typography variant="h5" className="text-end">
+                                {totalCashOut.toLocaleString("en-us")}
+                            </Typography>
+                        </div>
+                        <div className="grid grid-rows gap-2 justify-center items-center">
+                            <Typography variant="h6" className="flex items-center gap-2">
+                                <FaEquals className="text-blue-700" />
+                                Net Balance
+                            </Typography>
+                            <Typography variant="h5" className="text-end">
+                                {total.toLocaleString("en-us")}
+                            </Typography>
+                        </div>
+                    </CardBody>
+                </Card>
                 <Card className="h-auto shadow-md max-w-screen-xxl rounded-sm p-2 border-t">
-                    <CardBody className="rounded-sm overflow-auto p-0">
-                        <TableList columns={column} data={tbodyData} />
+                    <CardBody className="grid grid-rows gap-2 rounded-sm overflow-auto p-0">
+                        <div className="grid grid-cols-5 gap-2 px-2">
+                            {/* Start Date */}
+                            <div className="">
+                                <label className="text-black mb-2 text-sm">Start Date</label>
+                                <input
+                                    type="date"
+                                    className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
+                                />
+                            </div>
+                            {/* End Date */}
+                            <div className="">
+                                <label className="text-black mb-2 text-sm">End Date</label>
+                                <input
+                                    type="date"
+                                    className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
+                                />
+                            </div>
+                            {/* Wallet Category */}
+                            <div>
+                                <label className="text-black text-sm mb-2">Category</label>
+                                <select 
+                                    className="block w-full text-black border border-blue-gray-200 h-[35px] px-2.5 py-1.5 rounded-md focus:border-black"
+                                    // value={formData.categoryCode}
+                                    // onChange={(e) => {
+                                    //     setFormData({...formData, categoryCode: e.target.value});
+                                    // }}
+                                >
+                                    <option value="all">All</option>
+                                    <option value="stone">Stone</option>
+                                    <option value="home">Home</option>
+                                </select>
+                            </div>
+                            <div className="flex items-end gap-2">
+                                <Button className="flex items-center gap-2 bg-main capitalize py-2 px-3">
+                                    <FaFilter /> <span>Filter</span>
+                                </Button>
+                                <Button variant="filled" className="flex items-center capitalize gap-2 py-2 px-3">
+                                    <BiReset /> <span>Reset</span>
+                                </Button>
+                            </div>
+                        </div>
+                        <TableList columns={column} data={tbodyData} isSearch={true} />
                     </CardBody>
                 </Card>
                 <DeleteModal deleteId={deleteId} open={openDelete} handleDelete={handleRemove} closeModal={() => setOpenDelete(!openDelete)} />
@@ -478,15 +597,28 @@ function Wallet() {
                                     onFocus={(e) => focusSelect(e)}
                                 />
                             </div>
-                            {/* Qty */}
+                            {/* Wallet Category */}
                             <div>
+                                <label className="text-black text-sm mb-2">Category</label>
+                                <select 
+                                    className="block w-full text-black border border-blue-gray-200 h-[35px] px-2.5 py-1.5 rounded-md focus:border-black"
+                                    value={formData.categoryCode}
+                                    onChange={(e) => {
+                                        setFormData({...formData, categoryCode: e.target.value});
+                                    }}
+                                >
+                                    <option value="stone">Stone</option>
+                                    <option value="home">Home</option>
+                                </select>
+                            </div>
+                            {/* <div>
                                 <label className="text-black text-sm mb-2">Cash Type</label>
                                 <input
                                     type="text"
                                     className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
                                     value={isCashIn? "Cash In" : "Cash Out"}
                                 />
-                            </div>
+                            </div> */}
                             {/* Remark */}
                             <div className="grid col-span-3 h-fit">
                                 <label className="text-black mb-2 text-sm">Remark</label>
