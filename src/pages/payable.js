@@ -283,12 +283,21 @@ function Payable(props) {
                                     className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
                                     value={payForm.amount}
                                     onChange={(e) => {
-                                        setPayForm({
-                                            ...payForm,
-                                            amount: parseFloat(e.target.value),
-                                            balance: isEdit? payForm.balance : props.balance,
-                                            remainBalance: isEdit? payForm.balance - e.target.value : (props.balance -paidAmt) - e.target.value
-                                        });
+                                        if (Number(e.target.value <= (props.balance - paidAmt))) {
+                                            setPayForm({
+                                                ...payForm,
+                                                amount: parseFloat(e.target.value),
+                                                balance: isEdit? payForm.balance : props.balance,
+                                                remainBalance: isEdit? payForm.balance - e.target.value : (props.balance -paidAmt) - e.target.value
+                                            });
+                                        } else {
+                                            setPayForm({
+                                                ...payForm,
+                                                amount: 0,
+                                                balance: isEdit? payForm.balance : props.balance,
+                                            })
+                                        }
+                                        
                                     }}
                                     onFocus={(e) => focusSelect(e)}
                                 />

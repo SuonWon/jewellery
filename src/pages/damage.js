@@ -277,7 +277,22 @@ function Damage() {
         {
             name: 'Status',
             width: '200px',
-            selector: row => row.status,
+            selector: row => row.status === 'O' ? 
+                <div className="bg-green-500 px-3 py-[5px] text-white rounded-xl">
+                    Open
+                </div>
+                : row.status === 'V' ? 
+                    <div className="bg-red-500 px-3 py-[5px] text-white rounded-xl">
+                        Void
+                    </div> 
+                : row.status === 'F' ? 
+                    <div className="bg-blue-500 px-3 py-[5px] text-white rounded-xl">
+                        Complete
+                    </div> :
+                    <div className="bg-orange-500 px-3 py-[5px] text-white rounded-xl">
+                        Closed
+                    </div>,
+            center: 'true'
         },
         {
             name: 'Damage No',

@@ -78,7 +78,7 @@ export { useFetchSalesQuery, useFetchTrueSalesQuery, useAddSalesMutation, useUpd
 export { useFetchStoneSelectionQuery, useAddStoneSelectionMutation, useUpdateStoneSelectionMutation } from "../apis/stoneSelectionApi";
 export { useFetchReturnQuery, useAddReturnMutation, useUpdateReturnMutation, useRemoveReturnMutation } from "../apis/returnApi";
 export { useFetchIssueQuery, useAddIssueMutation, useUpdateIssueMutation, useUpdateIssueStatusMutation, useRemoveIssueMutation } from "../apis/issueApi";
-export { useFetchShareQuery, useFetchShareByIdQuery, useAddShareMutation, useUpdateShareMutation, useRemoveShareMutation } from "../apis/shareApi";
+export { useFetchShareQuery, useFetchTrueShareQuery, useFetchShareByIdQuery, useAddShareMutation, useUpdateShareMutation, useRemoveShareMutation } from "../apis/shareApi";
 export { useFetchDamageIdQuery, useFetchDamageQuery, useFetchDamageByIdQuery, useAddDamageMutation, useUpdateDamageMutation, useRemoveDamageMutation } from "../apis/damageApi";
 export { useFetchAdjustmentQuery, useFetchAdjustmentByIdQuery, useAddAdjustmentMutation, useUpdateAdjustmentMutation, useRemoveAdjustMutation } from "../apis/adjustmentApi";
 export { useFetchWalletQuery, useFetchWalletTransactionQuery, useFetchWalletTransactionByIdQuery, useAddWalletTransactionMutation, useUpdateWalletTransactionMutation, useRemoveWalletTransactionMutation } from "../apis/walletTransitionApi";

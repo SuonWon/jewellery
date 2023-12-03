@@ -16,6 +16,10 @@ const receivableApi = createApi({
                     return {
                         url: `/receivable/get-receivable/${invoiceNo}`,
                         method: "GET",
+                        params: {
+                            invoiceNo: invoiceNo,
+                            status: "O"
+                        },
                     };
                 },
             }),

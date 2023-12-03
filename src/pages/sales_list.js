@@ -2,7 +2,7 @@
 import { Button, Card, CardBody, Dialog, DialogBody, Typography } from "@material-tailwind/react";
 import { FaCirclePlus, FaFloppyDisk, FaMoneyBillTrendUp, FaPencil, FaPlus, FaTrashCan, } from "react-icons/fa6";
 import { useState } from "react";
-import { useAddSalesMutation, useFetchIssueQuery, useFetchSalesQuery, useFetchStoneDetailsQuery, useFetchTrueCustomerQuery, useFetchUOMQuery, useRemoveSalesMutation, useUpdateIssueMutation, useUpdateIssueStatusMutation, useUpdateSalesMutation } from "../store";
+import { useAddSalesMutation, useFetchSalesQuery, useFetchStoneDetailsQuery, useFetchTrueCustomerQuery, useFetchTrueSalesQuery, useFetchUOMQuery, useRemoveSalesMutation, useUpdateIssueMutation, useUpdateIssueStatusMutation, useUpdateSalesMutation } from "../store";
 import { apiUrl, focusSelect, pause } from "../const";
 import DeleteModal from "../components/delete_modal";
 import SuccessAlert from "../components/success_alert";
@@ -15,13 +15,14 @@ import { v4 as uuidv4 } from 'uuid';
 import axios from "axios";
 import DataTable from "react-data-table-component";
 import Receivable from "./receivable";
+import { useFetchTrueIssueQuery } from "../apis/issueApi";
 const validator = require('validator');
 
 function SalesList() {
 
-    const { data } = useFetchSalesQuery();
+    const { data } = useFetchTrueSalesQuery();
 
-    const { data: issueData } = useFetchIssueQuery();
+    const { data: issueData } = useFetchTrueIssueQuery();
 
     const { data: customerData } = useFetchTrueCustomerQuery();
 
@@ -86,7 +87,7 @@ function SalesList() {
         stoneDetailCode: "",
         qty: 0,
         weight: 0,
-        unitCode: 'ct',
+        unitCode: '',
         unitPrice: 0,
         subTotal: 0,
         servicePer: 0,
@@ -350,6 +351,7 @@ function SalesList() {
                 }
                 setIssueStatus(false);
                 setFormData(salesData);
+                setTBodyData([]);
 
             }
             catch (err) {
@@ -358,6 +360,7 @@ function SalesList() {
             }
             setIssueStatus(false);
             setFormData(salesData);
+            setTBodyData([]);
         }
     };
 
@@ -847,6 +850,7 @@ function SalesList() {
                                                         ...formData,
                                                         weight: weight,
                                                         subTotal: totalP,
+                                                        serviceCharge: (formData.servicePer / 100) * totalP,
                                                         grandTotal: totalA,
                                                     });
                                                     let newTbody = tBodyData.map(el => {
@@ -901,6 +905,7 @@ function SalesList() {
                                                         ...formData,
                                                         unitPrice: price,
                                                         subTotal: totalP,
+                                                        serviceCharge: (formData.servicePer / 100) * totalP,
                                                         grandTotal: totalA,
 
                                                     });

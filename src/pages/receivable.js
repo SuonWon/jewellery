@@ -7,7 +7,7 @@ import { v4 as uuidv4 } from 'uuid';
 import moment from "moment";
 import { useAuthUser } from "react-auth-kit";
 import { focusSelect } from "../const";
-import { useAddReceivableMutation, useFetchReceivableQuery, useUpdateReceivableMutation } from "../store";
+import { useAddReceivableMutation, useFetchReceivableQuery, useRemoveReceivableMutation, useUpdateReceivableMutation } from "../store";
 const validator = require('validator');
 
 function Receivable(props) {
@@ -17,6 +17,8 @@ function Receivable(props) {
     const [addReceivable] = useAddReceivableMutation();
 
     const [updateReceivable] = useUpdateReceivableMutation();
+
+    const [removeReceivable] = useRemoveReceivableMutation();
 
     const auth = useAuthUser();
 
@@ -121,11 +123,11 @@ function Receivable(props) {
     const handleRemove = async (id) => {
         let removeData = data.filter((el) => el.id === id);
         console.log(removeData);
-        // removePayable({
-        //     id: removeData[0].id,
-        //     deletedAt: moment().toISOString(),
-        //     deletedBy: auth().username
-        // }).then((res) => { console.log(res) });
+        removeReceivable({
+            id: removeData[0].id,
+            deletedAt: moment().toISOString(),
+            deletedBy: auth().username
+        }).then((res) => { console.log(res) });
         document.getElementById("deleteWarning").style.display = "none";
     };
 
@@ -279,12 +281,20 @@ function Receivable(props) {
                                     className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
                                     value={payForm.amount}
                                     onChange={(e) => {
-                                        setPayForm({
-                                            ...payForm,
-                                            amount: parseFloat(e.target.value),
-                                            balance: isEdit? payForm.balance : props.balance,
-                                            remainBalance: isEdit? payForm.balance - e.target.value : (props.balance -receivedAmt) - e.target.value
-                                        });
+                                        if (Number(e.target.value <= (props.balance - receivedAmt))) {
+                                            setPayForm({
+                                                ...payForm,
+                                                amount: parseFloat(e.target.value),
+                                                balance: isEdit? payForm.balance : props.balance,
+                                                remainBalance: isEdit? payForm.balance - e.target.value : (props.balance -receivedAmt) - e.target.value
+                                            });
+                                        } else {
+                                            setPayForm({
+                                                ...payForm,
+                                                amount: 0,
+                                                balance: isEdit? payForm.balance : props.balance,
+                                            });
+                                        }
                                     }}
                                     onFocus={(e) => focusSelect(e)}
                                 />
