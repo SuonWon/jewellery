@@ -490,8 +490,11 @@ function Wallet({walletId}) {
         <>
             <div className="flex flex-col gap-4 relative max-w-[85%] min-w-[85%]">
                 <div className="w-78 absolute top-0 right-0 z-[9999]">
-                    {
+                    {/* {
                         isAlert && <SuccessAlert title="Purchase" message="Delete successful." handleAlert={() => setIsAlert(false)} />
+                    } */}
+                    {
+                        alert.isAlert? <SuccessAlert title={alert.title} message={alert.message} isWarning={alert.isWarning} /> : ""
                     }
                 </div>
                 <div className="flex items-center py-3 bg-white gap-4 sticky top-0 z-10">
@@ -594,12 +597,12 @@ function Wallet({walletId}) {
                                     value={filterForm.startDate}
                                     className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
                                     onChange={(e) => {
-                                        console.log(e.target.value);
                                         if (filterForm.endDate !== "") {
-                                            if(e.target.value > filterForm.endDate) {
+                                            if(moment(e.target.value) > moment(filterForm.endDate)) {
+                                                console.log(e.target.value)
                                                 setAlert({
                                                     isAlert: true,
-                                                    message: "Please select reference no.",
+                                                    message: "Start Date cannot be greater than End Date.",
                                                     isWarning: true,
                                                     title: "Warning"
                                                 });
@@ -674,9 +677,6 @@ function Wallet({walletId}) {
                 <Dialog open={open} size="md">
                     <DialogBody>
                         <ModalTitle titleName={isCashIn? "Add Cash In" : "Add Cash Out"} handleClick={() => setOpen(!open)} />
-                        {
-                            alert.isAlert? <SuccessAlert title={alert.title} message={alert.message} isWarning={alert.isWarning} /> : ""
-                        }
                         <div className="flex items-center justify-start gap-2">
                             <Button 
                                 variant={isCashIn? "gradient" : "outlined"}
