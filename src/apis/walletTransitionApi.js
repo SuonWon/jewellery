@@ -23,11 +23,11 @@ const walletTransitionApi = createApi({
                 query: (walletData) => {
                     console.log(walletData);
                     return {
-                        url: "/transaction/get-all-transactions",
-                        params: {
-                            status: walletData.status,
-                            walletCode: walletData.walletCode
-                        },
+                        url: `/transaction/get-all-transactions?status=true&walletCode=${walletData.walletCode}`,
+                        // params: {
+                        //     status: walletData.status,
+                        //     walletCode: walletData.walletCode
+                        // },
                         method: "GET",
                     };
                 },
