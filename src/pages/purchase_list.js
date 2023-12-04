@@ -580,7 +580,7 @@ function PurchaseList() {
         },
         {
             name: 'Amount',
-            width: "150px",
+            width: "110px",
             right: "true",
             selector: row => row.amount.toLocaleString(),
         },
@@ -905,6 +905,7 @@ function PurchaseList() {
                                                         ...formData,
                                                         totalWeight: weight,
                                                         subTotal: totalP,
+                                                        serviceCharge: formData.servicePer > 0 ? (formData.servicePer / 100) * totalP : formData.serviceCharge,
                                                         grandTotal: totalA,
                                                     });
                                                     let newTbody = tBodyData.map(el => {
@@ -959,6 +960,7 @@ function PurchaseList() {
                                                         ...formData,
                                                         unitPrice: price,
                                                         subTotal: totalP,
+                                                        serviceCharge: formData.servicePer > 0 ? (formData.servicePer / 100) * totalP : formData.serviceCharge,
                                                         grandTotal: totalA,
 
                                                     });

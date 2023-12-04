@@ -34,7 +34,7 @@ function Receivable(props) {
         receivedDate: moment().format("YYYY-MM-DD"),
         amount: 0,
         balance: 0,
-        type: "cash",
+        type: "Cash",
         status: "O",
         remark: "",
         createdBy: auth().username,
@@ -257,8 +257,8 @@ function Receivable(props) {
                                         })
                                     }
                                 >
-                                    <option value="cash">Cash</option>
-                                    <option value="bank">Bank</option>
+                                    <option value="Cash">Cash</option>
+                                    <option value="Bank">Bank</option>
                                 </select>
                                 {
                                     validationText.type && <p className="block text-[12px] text-red-500 font-sans mb-2">{validationText.type}</p>

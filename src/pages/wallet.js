@@ -3,7 +3,7 @@ import { Button, Card, CardBody, Dialog, DialogBody, Typography } from "@materia
 import { FaCircleMinus, FaCirclePlus, FaEquals, FaFilter, FaFloppyDisk, FaPencil, FaPlus, FaTrashCan, } from "react-icons/fa6";
 import { BiReset } from "react-icons/bi"
 import { useState } from "react";
-import { focusSelect } from "../const";
+import { apiUrl, focusSelect } from "../const";
 import { useAddWalletTransactionMutation, useFetchWalletQuery, useFetchWalletTransactionQuery, useRemoveWalletTransactionMutation, useUpdateWalletTransactionMutation } from "../store";
 import DeleteModal from "../components/delete_modal";
 import SuccessAlert from "../components/success_alert";
@@ -12,13 +12,14 @@ import TableList from "../components/data_table";
 import { useAuthUser } from "react-auth-kit";
 import ModalTitle from "../components/modal_title";
 import { v4 as uuidv4 } from 'uuid';
+import axios from "axios";
 const validator = require('validator');
 
-function Wallet() {
-
-    const { data } = useFetchWalletTransactionQuery(true);
+function Wallet({walletId}) {
 
     const { data: walletData } = useFetchWalletQuery();
+
+    const { data } = useFetchWalletTransactionQuery({status: true, walletCode: walletId}, { refetchOnMountOrArgChange: true });
 
     const auth = useAuthUser();
 
@@ -33,6 +34,10 @@ function Wallet() {
     const [isCashIn, setIsCashIn] = useState(true);
 
     const [isCashOut, setIsCashOut] = useState(false);
+
+    const [isFilter, setIsFilter] = useState(false);
+
+    const [filterData, setFilterData] = useState([]);
 
     const [removeTransaction, removeResult] = useRemoveWalletTransactionMutation();
 
@@ -65,7 +70,8 @@ function Wallet() {
         walletCode: "",
         date: moment().format("YYYY-MM-DD"),
         time: moment().format("hh:mm:ss"),
-        categoryCode: "stone",
+        categoryCode: "Stone",
+        paymentMode: "CASH",
         cashType: "",
         amount: 0,
         remark: "",
@@ -153,6 +159,7 @@ function Wallet() {
                     date: moment(formData.date + "T" + formData.time).toISOString(),
                     cashType: isCashIn? "DEBIT" : "CREDIT",
                     categoryCode: formData.categoryCode,
+                    paymentMode: formData.paymentMode,
                     amount: formData.amount,
                     remark: formData.remark,
                     status: formData.status,
@@ -203,6 +210,7 @@ function Wallet() {
                     date: moment(formData.date + "T" + formData.time).toISOString(),
                     cashType: isCashIn? "DEBIT" : "CREDIT",
                     categoryCode: formData.categoryCode,
+                    paymentMode: formData.paymentMode,
                     amount: formData.amount,
                     remark: formData.remark,
                     status: formData.status,
@@ -252,6 +260,7 @@ function Wallet() {
                     date: formData.date,
                     cashType: isCashIn? "DEBIT" : "CREDIT",
                     categoryCode: formData.categoryCode,
+                    paymentMode: formData.paymentMode,
                     amount: formData.amount,
                     remark: formData.remark,
                     status: formData.status,
@@ -329,6 +338,11 @@ function Wallet() {
             selector: row => row.categoryCode
         },
         {
+            name: 'Payment Mode',
+            width: "150px",
+            selector: row => row.paymentMode
+        },
+        {
             name: 'Amount',
             width: "150px",
             selector: row => row.amount,
@@ -364,7 +378,7 @@ function Wallet() {
         },
     ];
 
-    const tbodyData = data?.map((wallet) => {
+    const tbodyData = isFilter? filterData.map((wallet) => {
         return {
             id: wallet.id,
             walletCode: wallet.walletCode,
@@ -372,6 +386,24 @@ function Wallet() {
             shareName: wallet.wallet.share.shareName,
             cashType: wallet.cashType,
             categoryCode: wallet.categoryCode,
+            paymentMode: wallet.paymentMode,
+            amount: wallet.amount.toLocaleString('en-US'),
+            remark: wallet.remark,
+            createdAt: moment(wallet.createdAt).format("YYYY-MM-DD hh:mm:ss a"),
+            createdBy: wallet.createdBy,
+            updatedAt: moment(wallet.updatedAt).format("YYYY-MM-DD hh:mm:ss a"),
+            updatedBy: wallet.updatedBy,
+            status: wallet.status,
+        }
+    }) : data?.map((wallet) => {
+        return {
+            id: wallet.id,
+            walletCode: wallet.walletCode,
+            date: moment(wallet.date).format("YYYY-MM-DD hh:mm:ss"),
+            shareName: wallet.wallet.share.shareName,
+            cashType: wallet.cashType,
+            categoryCode: wallet.categoryCode,
+            paymentMode: wallet.paymentMode,
             amount: wallet.amount.toLocaleString('en-US'),
             remark: wallet.remark,
             createdAt: moment(wallet.createdAt).format("YYYY-MM-DD hh:mm:ss a"),
@@ -455,6 +487,49 @@ function Wallet() {
                 <Card className="h-auto shadow-md max-w-screen-xxl rounded-sm p-2 border-t">
                     <CardBody className="grid grid-rows gap-2 rounded-sm overflow-auto p-0">
                         <div className="grid grid-cols-5 gap-2 px-2">
+                            {/* Wallet Code */}
+                            <div>
+                                <label className="text-black text-sm mb-2">Share</label>
+                                <select 
+                                    className="block w-full text-black border border-blue-gray-200 h-[35px] px-2.5 py-1.5 rounded-md focus:border-black"
+                                    onChange={(e) => {
+                                        setIsFilter(true)
+                                        axios.get(`${apiUrl}/transaction/get-all-transactions?status=true&walletCode=${e.target.value}`).then((res) => {
+                                            setFilterData(res.data);
+                                        });
+                                    }}
+                                >
+                                    <option value="" disabled>Select...</option>
+                                    {
+                                        walletData?.map((wallet) => {
+                                            return <option 
+                                                value={wallet.id} 
+                                                key={wallet.id}
+                                                selected={wallet.share.isOwner}
+                                            >
+                                                {wallet.share.shareName}
+                                            </option>
+                                        })
+                                    }
+                                </select>
+                            </div>
+                            {/* Wallet Category */}
+                            <div>
+                                <label className="text-black text-sm mb-2">Category</label>
+                                <select 
+                                    className="block w-full text-black border border-blue-gray-200 h-[35px] px-2.5 py-1.5 rounded-md focus:border-black"
+                                    // value={formData.categoryCode}
+                                    // onChange={(e) => {
+                                    //     setFormData({...formData, categoryCode: e.target.value});
+                                    // }}
+                                >
+                                    <option value="all">All</option>
+                                    <option value="Stone">Stone</option>
+                                    <option value="Home">Home</option>
+                                    <option value="Sales">Sales</option>
+                                    <option value="purchase">Purchase</option>
+                                </select>
+                            </div>
                             {/* Start Date */}
                             <div className="">
                                 <label className="text-black mb-2 text-sm">Start Date</label>
@@ -470,21 +545,6 @@ function Wallet() {
                                     type="date"
                                     className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
                                 />
-                            </div>
-                            {/* Wallet Category */}
-                            <div>
-                                <label className="text-black text-sm mb-2">Category</label>
-                                <select 
-                                    className="block w-full text-black border border-blue-gray-200 h-[35px] px-2.5 py-1.5 rounded-md focus:border-black"
-                                    // value={formData.categoryCode}
-                                    // onChange={(e) => {
-                                    //     setFormData({...formData, categoryCode: e.target.value});
-                                    // }}
-                                >
-                                    <option value="all">All</option>
-                                    <option value="stone">Stone</option>
-                                    <option value="home">Home</option>
-                                </select>
                             </div>
                             <div className="flex items-end gap-2">
                                 <Button className="flex items-center gap-2 bg-main capitalize py-2 px-3">
@@ -559,10 +619,24 @@ function Wallet() {
                                     validationText.time && <p className="block text-[12px] text-red-500 font-sans">{validationText.time}</p>
                                 }
                             </div>
+                            {/* Payment method */}
+                            <div>
+                                <label className="text-black text-sm mb-2">Payment Method</label>
+                                <select 
+                                    className="block w-full text-black border border-blue-gray-200 h-[35px] px-2.5 py-1.5 rounded-md focus:border-black"
+                                    value={formData.paymentMode}
+                                    onChange={(e) => {
+                                        setFormData({...formData, paymentMode: e.target.value});
+                                    }}
+                                >
+                                    <option value="CASH">Cash</option>
+                                    <option value="BANK">Bank</option>
+                                </select>
+                            </div>
                         </div>
                         <div className="grid grid-cols-3 gap-2">
+                            {/* Wallet Code */}
                             <div>
-                                {/* Wallet Code */}
                                 <label className="text-black text-sm mb-2">Share</label>
                                 <select 
                                     className="block w-full text-black border border-blue-gray-200 h-[35px] px-2.5 py-1.5 rounded-md focus:border-black"
@@ -608,8 +682,8 @@ function Wallet() {
                                         setFormData({...formData, categoryCode: e.target.value});
                                     }}
                                 >
-                                    <option value="stone">Stone</option>
-                                    <option value="home">Home</option>
+                                    <option value="Stone">Stone</option>
+                                    <option value="Home">Home</option>
                                 </select>
                             </div>
                             {/* <div>

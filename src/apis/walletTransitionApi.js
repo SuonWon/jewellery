@@ -20,12 +20,13 @@ const walletTransitionApi = createApi({
                 providesTags: () => {
                     return [{type: "WalletTransaction", id: "All"}]
                 },
-                query: (status) => {
+                query: (walletData) => {
+                    console.log(walletData);
                     return {
                         url: "/transaction/get-all-transactions",
                         params: {
-                            status: status,
-                            walletCode: "661af9ef-2087-438c-92ba-bb98ca5a7133"
+                            status: walletData.status,
+                            walletCode: walletData.walletCode
                         },
                         method: "GET",
                     };
