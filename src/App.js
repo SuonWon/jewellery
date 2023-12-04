@@ -6,7 +6,6 @@ import Customer from "./pages/customer";
 import Supplier from "./pages/supplier";
 import StoneDetails from "./pages/stone_details";
 import PurchaseList from "./pages/purchase_list";
-import PurchaseEdit from "./pages/purchase_edit";
 import { RequireAuth } from "react-auth-kit";
 import SalesList from "./pages/sales_list";
 import ReturnList from "./pages/return_list";
@@ -17,11 +16,14 @@ import Share from "./pages/share";
 import Damage from "./pages/damage";
 import Wallet from "./pages/wallet";
 import Adjustment from "./pages/adjustment";
+import { useFetchWalletQuery } from "./store";
 
 
 function App() {
 
-  const currentUrl = useLocation()
+  const {data : walletData } = useFetchWalletQuery();
+
+  const currentUrl = useLocation();
 
   return (
     <div className="flex flex-col justify-center">
@@ -104,7 +106,9 @@ function App() {
           }></Route>
           <Route path="wallet" element={
             <RequireAuth loginPath="/login">
-              <Wallet />
+              <Wallet 
+                walletId={walletData?.find(el => el.share.isOwner === true).id}
+              />
             </RequireAuth>
           }></Route>
           <Route path="/login" element={<Login />}></Route>

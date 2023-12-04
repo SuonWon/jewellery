@@ -15,7 +15,11 @@ const payableApi = createApi({
                 query: (invoiceNo) => {
                     return {
                         url: `/payable/get-payables/${invoiceNo}`,
-                        method: "GET"
+                        method: "GET",
+                        params: {
+                            invoiceNo: invoiceNo,
+                            status: "O"
+                        },
                     };
                 },
             }),
@@ -60,7 +64,7 @@ const payableApi = createApi({
                 },
                 query: (payData) => {
                     return {
-                        url: "",
+                        url: "/payable/delete-payable",
                         method: "PUT",
                         body: payData,
                     };

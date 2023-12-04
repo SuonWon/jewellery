@@ -850,7 +850,7 @@ function SalesList() {
                                                         ...formData,
                                                         weight: weight,
                                                         subTotal: totalP,
-                                                        serviceCharge: (formData.servicePer / 100) * totalP,
+                                                        serviceCharge: formData.servicePer > 0 ? (formData.servicePer / 100) * totalP : formData.serviceCharge,
                                                         grandTotal: totalA,
                                                     });
                                                     let newTbody = tBodyData.map(el => {
@@ -905,7 +905,7 @@ function SalesList() {
                                                         ...formData,
                                                         unitPrice: price,
                                                         subTotal: totalP,
-                                                        serviceCharge: (formData.servicePer / 100) * totalP,
+                                                        serviceCharge: formData.servicePer > 0 ? (formData.servicePer / 100) * totalP : formData.serviceCharge,
                                                         grandTotal: totalA,
 
                                                     });

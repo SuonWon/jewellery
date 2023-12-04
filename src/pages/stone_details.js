@@ -18,7 +18,7 @@ function StoneDetails() {
 
     const auth = useAuthUser();
 
-    const {data, refetch} = useFetchStoneDetailsQuery();
+    const {data, refetch} = useFetchStoneDetailsQuery({ refetchOnMountOrArgChange: true });
 
     const {data: stoneData} = useFetchTrueStoneQuery();
 
