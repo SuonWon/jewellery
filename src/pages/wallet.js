@@ -3,7 +3,7 @@ import { Button, Card, CardBody, Dialog, DialogBody, Typography } from "@materia
 import { FaCircleMinus, FaCirclePlus, FaEquals, FaFilter, FaFloppyDisk, FaPencil, FaPlus, FaTrashCan, } from "react-icons/fa6";
 import { BiReset } from "react-icons/bi"
 import { useState } from "react";
-import { apiUrl, focusSelect } from "../const";
+import { apiUrl, focusSelect, pause } from "../const";
 import { useAddWalletTransactionMutation, useFetchWalletQuery, useFetchWalletTransactionQuery, useRemoveWalletTransactionMutation, useUpdateWalletTransactionMutation } from "../store";
 import DeleteModal from "../components/delete_modal";
 import SuccessAlert from "../components/success_alert";
@@ -29,7 +29,7 @@ function Wallet({walletId}) {
 
     const [openDelete, setOpenDelete] = useState(false);
 
-    const [isAlert, setIsAlert] = useState(true);
+    const [isAlert, setIsAlert] = useState(false);
 
     const [isCashIn, setIsCashIn] = useState(true);
 
@@ -54,15 +54,24 @@ function Wallet({walletId}) {
     let totalCashOut = 0;
     let total = 0;
 
-    if(data) {
-        data.map((el) => {
+    if(isFilter) {
+        filterData.map((el) => {
             total += el.amount;
             if(el.cashType === "DEBIT") {
                 totalCashIn += el.amount;
             } else if (el.cashType === "CREDIT") {
                 totalCashOut += el.amount;
             }
-        })
+        });
+    } else {
+        data?.map((el) => {
+            total += el.amount;
+            if(el.cashType === "DEBIT") {
+                totalCashIn += el.amount;
+            } else if (el.cashType === "CREDIT") {
+                totalCashOut += el.amount;
+            }
+        });
     }
 
     const transactionData = {
@@ -71,7 +80,7 @@ function Wallet({walletId}) {
         date: moment().format("YYYY-MM-DD"),
         time: moment().format("hh:mm:ss"),
         categoryCode: "Stone",
-        paymentMode: "CASH",
+        paymentMode: "Cash",
         cashType: "",
         amount: 0,
         remark: "",
@@ -88,16 +97,28 @@ function Wallet({walletId}) {
     const [ validationText, setValidationText ] = useState({});
 
     const handleRemove = async (id) => {
-        // let removeData = data.filter((el) => el.damageNo === id);
-        // removeDamage({
-        //     id: removeData[0].damageNo,
-        //     deletedAt: moment().toISOString(),
-        //     deletedBy: auth().username
-        // }).then((res) => { console.log(res) });
-        // setIsAlert(true);
-        // setOpenDelete(!openDelete);
-        // await pause(2000);
-        // setIsAlert(false);
+        let removeData = {};
+        if(isFilter) {
+            removeData = filterData.find((el) => el.id === id);
+        } else {
+            removeData = data.find((el) => el.id === id);
+        }
+        console.log(removeData);
+        await removeTransaction({
+            id: removeData.id,
+            deletedAt: moment().toISOString(),
+            deletedBy: auth().username
+        }).then((res) => { console.log(res) });
+        if(isFilter) {
+            axios.get(`${apiUrl}/transaction/get-all-transactions?status=true&walletCode=${removeData.walletCode}`).then((res) => {
+                setFilterData(res.data);
+                console.log(res.data);
+            });
+        }
+        setIsAlert(true);
+        setOpenDelete(!openDelete);
+        await pause(2000);
+        setIsAlert(false);
     };
 
     const handleDeleteBtn = (id) => {
@@ -331,21 +352,25 @@ function Wallet({walletId}) {
             name: 'Cash Type',
             width: "200px",
             selector: row => row.cashType,
+            center: true,
         },
         {
             name: 'Category',
             width: "150px",
-            selector: row => row.categoryCode
+            selector: row => row.categoryCode,
+            center: true
         },
         {
             name: 'Payment Mode',
             width: "150px",
-            selector: row => row.paymentMode
+            selector: row => row.paymentMode,
+            center: true,
         },
         {
             name: 'Amount',
             width: "150px",
             selector: row => row.amount,
+            right: true,
         },
         {
             name: 'Remark',
@@ -371,8 +396,8 @@ function Wallet({walletId}) {
                     {/* <Link to={`/purchase_edit/${row.Code}`}>
                         <Button variant="text" color="deep-purple" className="p-2"><FaPencil /></Button>
                     </Link> */}
-                    <Button variant="text" color="deep-purple" className="p-2" onClick={() => handleView(row.id)}><FaPencil /></Button>
-                    <Button variant="text" color="red" className="p-2" onClick={() => handleDeleteBtn(row.id)}><FaTrashCan /></Button>
+                    {/* <Button variant="text" color="deep-purple" className="p-2" onClick={() => handleView(row.id)}><FaPencil /></Button> */}
+                    <Button variant="text" color="red" className="p-2" disabled={row.categoryCode === "Sales" || row.categoryCode === "Purchase" ? true : false} onClick={() => handleDeleteBtn(row.id)}><FaTrashCan /></Button>
                 </div>
             )
         },
@@ -419,7 +444,7 @@ function Wallet({walletId}) {
             <div className="flex flex-col gap-4 relative max-w-[85%] min-w-[85%]">
                 <div className="w-78 absolute top-0 right-0 z-[9999]">
                     {
-                        removeResult.isSuccess && isAlert && <SuccessAlert title="Purchase" message="Delete successful." handleAlert={() => setIsAlert(false)} />
+                        isAlert && <SuccessAlert title="Purchase" message="Delete successful." handleAlert={() => setIsAlert(false)} />
                     }
                 </div>
                 <div className="flex items-center py-3 bg-white gap-4 sticky top-0 z-10">
@@ -629,8 +654,8 @@ function Wallet({walletId}) {
                                         setFormData({...formData, paymentMode: e.target.value});
                                     }}
                                 >
-                                    <option value="CASH">Cash</option>
-                                    <option value="BANK">Bank</option>
+                                    <option value="Cash">Cash</option>
+                                    <option value="Bank">Bank</option>
                                 </select>
                             </div>
                         </div>
