@@ -39,6 +39,14 @@ function Wallet({walletId}) {
 
     const [filterData, setFilterData] = useState([]);
 
+    const [filterForm, setFilterForm] = useState({
+        status: true,
+        walletCode: "",
+        startDate: "",
+        endDate: "",
+        category: "",
+    })
+
     const [removeTransaction, removeResult] = useRemoveWalletTransactionMutation();
 
     const [addTransaction] = useAddWalletTransactionMutation();
@@ -47,7 +55,10 @@ function Wallet({walletId}) {
 
     const [ alert, setAlert] = useState({
         isAlert: false,
-        message: ''
+        message: '',
+        isWarning: false,
+        isError: false,
+        title: ""
     });
 
     let totalCashIn = 0;
@@ -325,6 +336,42 @@ function Wallet({walletId}) {
         }
     };
 
+    const handleFilter = () => {
+        setIsFilter(true);
+        console.log(filterForm);
+        let url = `${apiUrl}/transaction/get-all-transactions?status=${filterForm.status}&walletCode=${filterForm.walletCode}`;
+        if(filterForm.startDate !== "" && filterForm.endDate === "") {
+            url+= `&start_date=${moment(filterForm.startDate).toISOString()}`;
+        }
+        if(filterForm.startDate !== "" && filterForm.endDate !== "") {
+            url+=`&start_date=${moment(filterForm.startDate).toISOString()}&end_date=${moment(filterForm.endDate).toISOString()}`;
+        }
+        if (filterForm.category !== "") {
+            url+=`&category=${filterForm.category}`;
+        }
+        axios.get(url).then((res) => {
+            setFilterData(res.data);
+        });
+
+        // if(filterForm.startDate === "" && filterForm.endDate === "" && filterForm.category === "") {
+        //     axios.get(`${apiUrl}/transaction/get-all-transactions?status=${filterForm.status}&walletCode=${filterForm.walletCode}`).then((res) => {
+        //         setFilterData(res.data);
+        //     });
+        // } else if (filterForm.startDate === "" && filterForm.endDate === "" && filterForm.category !== "") {
+        //     axios.get(`${apiUrl}/transaction/get-all-transactions?status=${filterForm.status}&walletCode=${filterForm.walletCode}&category=${filterForm.category}`).then((res) => {
+        //         setFilterData(res.data);
+        //     });
+        // } else if (filterForm.startDate !== "" && filterForm.endDate === "" && filterForm.category !== "") {
+        //     axios.get(`${apiUrl}/transaction/get-all-transactions?status=${filterForm.status}&walletCode=${filterForm.walletCode}&category=${filterForm.category}&start_date=${moment(filterForm.startDate).toISOString()}`).then((res) => {
+        //         setFilterData(res.data);
+        //     });
+        // } else {
+        //     axios.get(`${apiUrl}/transaction/get-all-transactions?status=${filterForm.status}&walletCode=${filterForm.walletCode}&category=${filterForm.category}&start_date=${moment(filterForm.startDate).toISOString()}&end_date=${moment(filterForm.endDate).toISOString()}`).then((res) => {
+        //         setFilterData(res.data);
+        //     });
+        // }
+    }
+
     const column = [
         {
             name: 'Status',
@@ -517,11 +564,12 @@ function Wallet({walletId}) {
                                 <label className="text-black text-sm mb-2">Share</label>
                                 <select 
                                     className="block w-full text-black border border-blue-gray-200 h-[35px] px-2.5 py-1.5 rounded-md focus:border-black"
+                                    value={filterForm.walletCode}
                                     onChange={(e) => {
-                                        setIsFilter(true)
-                                        axios.get(`${apiUrl}/transaction/get-all-transactions?status=true&walletCode=${e.target.value}`).then((res) => {
-                                            setFilterData(res.data);
-                                        });
+                                        setFilterForm({
+                                            ...filterForm,
+                                            walletCode: e.target.value,
+                                        })
                                     }}
                                 >
                                     <option value="" disabled>Select...</option>
@@ -538,29 +586,44 @@ function Wallet({walletId}) {
                                     }
                                 </select>
                             </div>
-                            {/* Wallet Category */}
-                            <div>
-                                <label className="text-black text-sm mb-2">Category</label>
-                                <select 
-                                    className="block w-full text-black border border-blue-gray-200 h-[35px] px-2.5 py-1.5 rounded-md focus:border-black"
-                                    // value={formData.categoryCode}
-                                    // onChange={(e) => {
-                                    //     setFormData({...formData, categoryCode: e.target.value});
-                                    // }}
-                                >
-                                    <option value="all">All</option>
-                                    <option value="Stone">Stone</option>
-                                    <option value="Home">Home</option>
-                                    <option value="Sales">Sales</option>
-                                    <option value="purchase">Purchase</option>
-                                </select>
-                            </div>
                             {/* Start Date */}
                             <div className="">
                                 <label className="text-black mb-2 text-sm">Start Date</label>
                                 <input
                                     type="date"
+                                    value={filterForm.startDate}
                                     className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
+                                    onChange={(e) => {
+                                        console.log(e.target.value);
+                                        if (filterForm.endDate !== "") {
+                                            if(e.target.value > filterForm.endDate) {
+                                                setAlert({
+                                                    isAlert: true,
+                                                    message: "Please select reference no.",
+                                                    isWarning: true,
+                                                    title: "Warning"
+                                                });
+                                                setTimeout(() => {
+                                                    setAlert({
+                                                        isAlert: false,
+                                                        message: '',
+                                                        isWarning: false,
+                                                        title: ''
+                                                    })
+                                                }, 2000);
+                                            } else {
+                                                setFilterForm({
+                                                    ...filterForm,
+                                                    startDate: e.target.value,
+                                                });
+                                            }
+                                        } else {
+                                            setFilterForm({
+                                                ...filterForm,
+                                                startDate: e.target.value,
+                                            });
+                                        }
+                                    }}
                                 />
                             </div>
                             {/* End Date */}
@@ -568,11 +631,35 @@ function Wallet({walletId}) {
                                 <label className="text-black mb-2 text-sm">End Date</label>
                                 <input
                                     type="date"
+                                    value={filterForm.endDate}
                                     className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
+                                    onChange={(e) => {
+                                        setFilterForm({
+                                            ...filterForm,
+                                            endDate: e.target.value,
+                                        });
+                                    }}
                                 />
                             </div>
+                            {/* Wallet Category */}
+                            <div>
+                                <label className="text-black text-sm mb-2">Category</label>
+                                <select 
+                                    className="block w-full text-black border border-blue-gray-200 h-[35px] px-2.5 py-1.5 rounded-md focus:border-black"
+                                    value={filterForm.category}
+                                    onChange={(e) => {
+                                        setFilterForm({...filterForm, category: e.target.value});
+                                    }}
+                                >
+                                    <option value="">All</option>
+                                    <option value="Stone">Stone</option>
+                                    <option value="Home">Home</option>
+                                    <option value="Sales">Sales</option>
+                                    <option value="Purchase">Purchase</option>
+                                </select>
+                            </div>
                             <div className="flex items-end gap-2">
-                                <Button className="flex items-center gap-2 bg-main capitalize py-2 px-3">
+                                <Button className="flex items-center gap-2 bg-main capitalize py-2 px-3" onClick={handleFilter}>
                                     <FaFilter /> <span>Filter</span>
                                 </Button>
                                 <Button variant="filled" className="flex items-center capitalize gap-2 py-2 px-3">
@@ -587,6 +674,9 @@ function Wallet({walletId}) {
                 <Dialog open={open} size="md">
                     <DialogBody>
                         <ModalTitle titleName={isCashIn? "Add Cash In" : "Add Cash Out"} handleClick={() => setOpen(!open)} />
+                        {
+                            alert.isAlert? <SuccessAlert title={alert.title} message={alert.message} isWarning={alert.isWarning} /> : ""
+                        }
                         <div className="flex items-center justify-start gap-2">
                             <Button 
                                 variant={isCashIn? "gradient" : "outlined"}
