@@ -1,9 +1,9 @@
 /* eslint-disable eqeqeq */
 import { Button, Card, CardBody, Dialog, DialogBody, Typography } from "@material-tailwind/react";
-import { FaCirclePlus, FaEye, FaFloppyDisk, FaMoneyBillTrendUp, FaPencil, FaPlus, FaTheRedYeti, FaTrashCan, } from "react-icons/fa6";
+import { FaCirclePlus, FaFloppyDisk, FaMoneyBillTrendUp, FaPencil, FaPlus, FaTrashCan, } from "react-icons/fa6";
 import { useState } from "react";
 import { apiUrl, focusSelect, pause } from "../const";
-import { useAddPurchaseMutation, useFetchPurchaseQuery, useFetchShareQuery, useFetchStoneQuery, useFetchTruePurchaseQuery, useFetchTrueShareQuery, useFetchTrueStoneQuery, useFetchTrueSupplierQuery, useFetchUOMQuery, useRemovePurchaseMutation, useUpdatePurchaseMutation } from "../store";
+import { useAddPurchaseMutation, useFetchTruePurchaseQuery, useFetchTrueShareQuery, useFetchTrueStoneQuery, useFetchTrueSupplierQuery, useFetchUOMQuery, useRemovePurchaseMutation, useUpdatePurchaseMutation } from "../store";
 import DeleteModal from "../components/delete_modal";
 import SuccessAlert from "../components/success_alert";
 import moment from "moment";
@@ -19,7 +19,7 @@ const validator = require('validator');
 
 function PurchaseList() {
 
-    const { data, isLoading : dataLoad, } = useFetchTruePurchaseQuery();
+    const { data, isLoading : dataLoad, refetch} = useFetchTruePurchaseQuery();
 
     const { data: supplierData } = useFetchTrueSupplierQuery();
 
@@ -35,10 +35,10 @@ function PurchaseList() {
 
     const [payOpen, setPayOpen] = useState(false);
 
-     const [payData, setPayData] = useState({
+    const [payData, setPayData] = useState({
         invoiceNo: "",
         balance: 0,
-     });
+    });
 
     const [oldPer, setOldPer] = useState(0);
 
@@ -1234,7 +1234,11 @@ function PurchaseList() {
                     </DialogBody>
                 </Dialog>
                 {
-                    payOpen? <Payable payOpen={payOpen} invoiceNo={payData.invoiceNo} balance={payData.balance}  closePay={() => {setPayOpen(!payOpen); }} /> : <div></div>
+                    payOpen? <Payable payOpen={payOpen} invoiceNo={payData.invoiceNo} balance={payData.balance}  
+                        closePay={() => {
+                            refetch();
+                            setPayOpen(!payOpen)
+                        }} /> : <div></div>
                 }
             </div>
             
