@@ -48,7 +48,7 @@ function PurchaseList() {
 
     const [openDelete, setOpenDelete] = useState(false);
 
-    const [isAlert, setIsAlert] = useState(true);
+    const [isAlert, setIsAlert] = useState(false);
 
     const [addPurchase, addResult] = useAddPurchaseMutation();
 
@@ -118,13 +118,14 @@ function PurchaseList() {
             deletedAt: moment().toISOString(),
             deletedBy: auth().username
         }).then(async (res) => { 
-            console.log(res.data != null);
+            if(res.data != null) {
+                setIsAlert(true);
+                await pause(2000);
+                setIsAlert(false);
+            }
          });
-        setIsAlert(true);
-        await pause(2000);
-        setIsAlert(false);
-        setOpenDelete(!openDelete);
         
+        setOpenDelete(!openDelete);
     };
 
     const handleDeleteBtn = (id) => {

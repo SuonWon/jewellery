@@ -63,7 +63,7 @@ function SalesList() {
 
     const navigate = useNavigate();
 
-    const [isAlert, setIsAlert] = useState(true);
+    const [isAlert, setIsAlert] = useState(false);
 
     const [open, setOpen] = useState(false);
 
@@ -123,11 +123,14 @@ function SalesList() {
             id: removeData[0].invoiceNo,
             deletedAt: moment().toISOString(),
             deletedBy: auth().username
-        }).then((res) => { console.log(res) });
-        setIsAlert(true);
-        setOpenDelete(!openDelete);
-        await pause(2000);
-        setIsAlert(false);
+        }).then(async (res) => { 
+        if(res.data != null) 
+            setIsAlert(true);
+            await pause(2000);
+            setIsAlert(false);
+         });
+        
+         setOpenDelete(!openDelete);
     };
 
     const handleDeleteBtn = (id) => {
@@ -624,9 +627,9 @@ function SalesList() {
         <>
             <div className="flex flex-col gap-4 relative max-w-[85%] min-w-[85%]">
                 <div className="w-78 absolute top-0 right-0 z-[9999]">
-                    {/* {
-                        removeResult.isSuccess && isAlert && <SuccessAlert title="Sales" message="Delete successful." handleAlert={() => setIsAlert(false)} />
-                    } */}
+                    {
+                        isAlert && <SuccessAlert title="Sales" message="Delete successful." handleAlert={() => setIsAlert(false)} />
+                    }
                 </div>
                 <div className="flex items-center py-3 bg-white gap-4 sticky top-0 z-10">
                     <Typography variant="h5">
