@@ -20,7 +20,7 @@ const validator = require('validator');
 
 function SalesList() {
 
-    const { data } = useFetchTrueSalesQuery();
+    const { data, refetch } = useFetchTrueSalesQuery();
 
     const { data: issueData } = useFetchTrueIssueQuery();
 
@@ -1109,7 +1109,11 @@ function SalesList() {
                     </DialogBody>
                 </Dialog>
                 {
-                    payOpen? <Receivable payOpen={payOpen} invoiceNo={payData.invoiceNo} balance={payData.balance}  closePay={() => setPayOpen(!payOpen)} /> : <div></div>
+                    payOpen? <Receivable payOpen={payOpen} invoiceNo={payData.invoiceNo} balance={payData.balance} 
+                    closePay={() => {
+                        refetch();
+                        setPayOpen(!payOpen);
+                    }} /> : <div></div>
                 }
             </div>
 

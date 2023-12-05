@@ -19,7 +19,7 @@ function Wallet({walletId}) {
 
     const { data: walletData } = useFetchWalletQuery();
 
-    const { data } = useFetchWalletTransactionQuery({status: true, walletCode: walletId}, { refetchOnMountOrArgChange: true });
+    const { data, refetch } = useFetchWalletTransactionQuery({status: true, walletCode: walletId}, { refetchOnMountOrArgChange: true });
 
     const auth = useAuthUser();
 
@@ -665,7 +665,12 @@ function Wallet({walletId}) {
                                 <Button className="flex items-center gap-2 bg-main capitalize py-2 px-3" onClick={handleFilter}>
                                     <FaFilter /> <span>Filter</span>
                                 </Button>
-                                <Button variant="filled" className="flex items-center capitalize gap-2 py-2 px-3">
+                                <Button variant="filled" className="flex items-center capitalize gap-2 py-2 px-3" 
+                                    onClick={() => {
+                                        setIsFilter(false);
+                                        refetch();
+                                    }}
+                                >
                                     <BiReset /> <span>Reset</span>
                                 </Button>
                             </div>

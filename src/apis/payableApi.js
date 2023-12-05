@@ -14,7 +14,7 @@ const payableApi = createApi({
                 },
                 query: (invoiceNo) => {
                     return {
-                        url: `/payable/get-payables/${invoiceNo}`,
+                        url: `/payable/get-payables`,
                         method: "GET",
                         params: {
                             invoiceNo: invoiceNo,

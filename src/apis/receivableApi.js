@@ -14,7 +14,7 @@ const receivableApi = createApi({
                 },
                 query: (invoiceNo) => {
                     return {
-                        url: `/receivable/get-receivable/${invoiceNo}`,
+                        url: `/receivable/get-receivable`,
                         method: "GET",
                         params: {
                             invoiceNo: invoiceNo,
