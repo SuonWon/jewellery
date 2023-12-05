@@ -41,7 +41,7 @@ function Wallet({walletId}) {
 
     const [filterForm, setFilterForm] = useState({
         status: true,
-        walletCode: "",
+        walletCode: walletId,
         startDate: "",
         endDate: "",
         category: "",
@@ -388,22 +388,21 @@ function Wallet({walletId}) {
         {
             name: 'Date',
             width: "200px",
-            selector: row => row.date,
+            selector: row => moment(row.date).format('DD-MMM-YYYY'),
         },
         {
             name: 'Share',
-            width: "200px",
+            width: "150px",
             selector: row => row.shareName,
         },
         {
-            name: 'Cash Type',
+            name: 'Remark',
             width: "200px",
-            selector: row => row.cashType,
-            center: true,
+            selector: row => row.remark,
         },
         {
             name: 'Category',
-            width: "150px",
+            width: "120px",
             selector: row => row.categoryCode,
             center: true
         },
@@ -420,9 +419,10 @@ function Wallet({walletId}) {
             right: true,
         },
         {
-            name: 'Remark',
+            name: 'Cash Type',
             width: "200px",
-            selector: row => row.remark,
+            selector: row => row.cashType == "DEBIT" ? "Cash In" : "Cash Out",
+            center: true,
         },
         {
             name: 'Created At',
@@ -554,7 +554,7 @@ function Wallet({walletId}) {
                                 Net Balance
                             </Typography>
                             <Typography variant="h5" className="text-end">
-                                {total.toLocaleString("en-us")}
+                                {(totalCashIn - totalCashOut).toLocaleString("en-us")}
                             </Typography>
                         </div>
                     </CardBody>
@@ -637,10 +637,32 @@ function Wallet({walletId}) {
                                     value={filterForm.endDate}
                                     className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
                                     onChange={(e) => {
+                                        if(filterForm.startDate === "" || moment(e.target.value) < moment(filterForm.startDate)) {
+                                            setAlert({
+                                                isAlert: true,
+                                                message: "Start Date cannot be greater than End Date.",
+                                                isWarning: true,
+                                                title: "Warning"
+                                            });
+                                            setTimeout(() => {
+                                                setAlert({
+                                                    isAlert: false,
+                                                    message: '',
+                                                    isWarning: false,
+                                                    title: ''
+                                                })
+                                            }, 2000);
+                                            
+                                            return; 
+                                        }
                                         setFilterForm({
                                             ...filterForm,
                                             endDate: e.target.value,
                                         });
+                                        // setFilterForm({
+                                        //     ...filterForm,
+                                        //     endDate: e.target.value,
+                                        // });
                                     }}
                                 />
                             </div>
@@ -657,8 +679,8 @@ function Wallet({walletId}) {
                                     <option value="">All</option>
                                     <option value="Stone">Stone</option>
                                     <option value="Home">Home</option>
-                                    <option value="Sales">Sales</option>
-                                    <option value="Purchase">Purchase</option>
+                                    {/* <option value="Sales">Sales</option>
+                                    <option value="Purchase">Purchase</option> */}
                                 </select>
                             </div>
                             <div className="flex items-end gap-2">

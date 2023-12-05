@@ -117,11 +117,14 @@ function PurchaseList() {
             id: removeData.invoiceNo,
             deletedAt: moment().toISOString(),
             deletedBy: auth().username
-        }).then((res) => { console.log(res) });
+        }).then(async (res) => { 
+            console.log(res.data != null);
+         });
         setIsAlert(true);
-        setOpenDelete(!openDelete);
         await pause(2000);
         setIsAlert(false);
+        setOpenDelete(!openDelete);
+        
     };
 
     const handleDeleteBtn = (id) => {
@@ -777,7 +780,7 @@ function PurchaseList() {
             <div className="flex flex-col gap-4 relative max-w-[85%] min-w-[85%]">
                 <div className="w-78 absolute top-0 right-0 z-[9999]">
                     {
-                        removeResult.isSuccess && isAlert && <SuccessAlert title="Purchase" message="Delete successful." handleAlert={() => setIsAlert(false)} />
+                        isAlert && <SuccessAlert title="Purchase" message="Delete successful." handleAlert={() => setIsAlert(false)} />
                     }
                 </div>
                 <div className="flex items-center py-3 bg-white gap-4 sticky top-0 z-10">
@@ -1230,7 +1233,7 @@ function PurchaseList() {
                     </DialogBody>
                 </Dialog>
                 {
-                    payOpen? <Payable payOpen={payOpen} invoiceNo={payData.invoiceNo} balance={payData.balance}  closePay={() => setPayOpen(!payOpen)} /> : <div></div>
+                    payOpen? <Payable payOpen={payOpen} invoiceNo={payData.invoiceNo} balance={payData.balance}  closePay={() => {setPayOpen(!payOpen); }} /> : <div></div>
                 }
             </div>
             

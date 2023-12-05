@@ -2,7 +2,7 @@
 import { Button, Card, CardBody, Dialog, DialogBody, Typography } from "@material-tailwind/react";
 import { FaCirclePlus, FaEye, FaFloppyDisk, FaPencil, FaPlus, FaTrashCan, } from "react-icons/fa6";
 import { useState } from "react";
-import { focusSelect, pause } from "../const";
+import { apiUrl, focusSelect, pause } from "../const";
 import { useAddDamageMutation, useFetchDamageQuery, useFetchPurchaseQuery, useFetchStoneDetailsQuery, useFetchUOMQuery, useRemoveDamageMutation, useUpdateDamageMutation, } from "../store";
 import DeleteModal from "../components/delete_modal";
 import SuccessAlert from "../components/success_alert";
@@ -23,7 +23,7 @@ function Damage() {
 
     const {data: purchaseData} = useFetchPurchaseQuery();
 
-    axios.get('http://localhost:3005/v1/damage/get-id').then((res) => {
+    axios.get(apiUrl + '/damage/get-id').then((res) => {
         setDamageId(res.data);
     });
 

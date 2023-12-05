@@ -30,7 +30,7 @@ function SalesList() {
 
     const { data: unitData } = useFetchUOMQuery();
 
-    axios.get('http://localhost:3005/v1/sales/get-id').then((res) => {
+    axios.get(apiUrl + '/sales/get-id').then((res) => {
         setSalesId(res.data);
     });
 
@@ -87,7 +87,7 @@ function SalesList() {
         stoneDetailCode: "",
         qty: 0,
         weight: 0,
-        unitCode: '',
+        unitCode: 'ct',
         unitPrice: 0,
         subTotal: 0,
         servicePer: 0,

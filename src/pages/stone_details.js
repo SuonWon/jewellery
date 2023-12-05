@@ -114,7 +114,7 @@ function StoneDetails() {
         sizeUnit: "လုံးစီး",
         qty: 0,
         weight: 0,
-        unitCode: "",
+        unitCode: "ct",
         remark: "",
         isActive: true,
         createdBy: auth().username,
@@ -143,9 +143,9 @@ function StoneDetails() {
         // if(validator.isEmpty(formData.referenceNo.toString())) {
         //     newErrors.referenceNo = 'Reference No is required.';
         // }
-        if(formData.supplierCode === 0) {
-            newErrors.supplierCode = 'Supplier name is required.'
-        }
+        // if(formData.supplierCode === 0) {
+        //     newErrors.supplierCode = 'Supplier name is required.'
+        // }
         if(formData.stoneCode === 0) {
             newErrors.stoneDesc = 'Stone Description is required.'
         } 
@@ -390,6 +390,11 @@ function StoneDetails() {
 
         },
         {
+            name: 'Weight',
+            width: "150px",
+            selector: row => row.Weight,
+        },
+        {
             name: 'Description',
             width: '280px',
             selector: row => row.Description,
@@ -438,11 +443,6 @@ function StoneDetails() {
             name: 'Type',
             width: "150px",
             selector: row => row.TypeDesc,
-        },
-        {
-            name: 'Weight',
-            width: "150px",
-            selector: row => row.Weight,
         },
         {
             name: 'Unit',
@@ -780,7 +780,7 @@ function StoneDetails() {
                                     </div>
                                     <div>
                                         <label className="text-black text-sm mb-2">Weight</label>
-                                        <input type="number" className="border border-blue-gray-200 w-full h-[40px] p-2.5 rounded-md text-black" value={formData.weight} onChange={(e) => setFormData({...formData, weight: parseFloat(e.target.value)})} onFocus={(e) => focusSelect(e)} />
+                                        <input type="number" className="border border-blue-gray-200 w-full h-[40px] p-2.5 rounded-md text-black" value={formData.weight} onChange={(e) => setFormData({...formData, weight: parseFloat(e.target.value)})} readOnly={isEdit} onFocus={(e) => focusSelect(e)} />
                                         {
                                             validationText.weight && <p className="block text-[12px] text-red-500 font-sans">{validationText.weight}</p>
                                         }

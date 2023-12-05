@@ -2,7 +2,7 @@
 import { Button, Card, CardBody, Dialog, DialogBody, Typography } from "@material-tailwind/react";
 import { FaCirclePlus, FaEye, FaFloppyDisk, FaPencil, FaPlus, FaTrashCan, } from "react-icons/fa6";
 import { useState } from "react";
-import { focusSelect, pause } from "../const";
+import { apiUrl, focusSelect, pause } from "../const";
 import { useAddReturnMutation, useFetchIssueQuery, useFetchReturnQuery, useFetchStoneDetailsQuery, useFetchUOMQuery, useRemoveReturnMutation, useUpdateReturnMutation } from "../store";
 import DeleteModal from "../components/delete_modal";
 import SuccessAlert from "../components/success_alert";
@@ -24,7 +24,7 @@ function ReturnList() {
 
     const {data: issueData} = useFetchTrueIssueQuery();
 
-    axios.get('http://localhost:3005/v1/return/get-id').then((res) => {
+    axios.get(apiUrl + '/return/get-id').then((res) => {
         setReturnId(res.data);
     });
 

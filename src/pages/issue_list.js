@@ -59,7 +59,7 @@ function IssueList() {
         stoneDetailCode: "",
         qty: 0,
         weight: 0,
-        unitCode: "",
+        unitCode: "ct",
         unitPrice: 0,
         totalPrice: 0,
         status: "O",

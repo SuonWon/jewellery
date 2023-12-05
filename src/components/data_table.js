@@ -34,7 +34,7 @@ function TableList(props) {
                 {...props}
                 striped={true}
                 subHeader
-                subHeaderComponent={props.isSearch? "" : searchBox}
+                //subHeaderComponent={props.isSearch? "" : searchBox}
                 subHeaderAlign="right"
                 subHeaderWrap
                 progressPending={props.pending}

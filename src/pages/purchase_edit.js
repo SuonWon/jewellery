@@ -7,6 +7,7 @@ import { useForm } from "react-hook-form";
 import DataTable from "react-data-table-component";
 import moment from "moment";
 import { useParams } from "react-router-dom";
+import { apiUrl } from "../const";
 
 function PurchaseEdit() {
 
@@ -31,7 +32,7 @@ function PurchaseEdit() {
     const [no, setNo] = useState(0);
 
     useEffect(() => {
-        fetch(`http://localhost:3005/v1/purchase/get-purchse/${params.puId}`)
+        fetch(`${apiUrl}/purchase/get-purchse/${params.puId}`)
         .then(res => res.json())
         .then(json => {
             setPurchase({
