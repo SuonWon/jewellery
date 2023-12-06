@@ -619,12 +619,6 @@ function PurchaseList() {
 
     const column = [
         {
-            name: 'Invoice No',
-            width: '200px',
-            selector: row => row.Code,
-            omit: true,
-        },
-        {
             name: 'Status',
             width: '120px',
             selector: row => row.Status == 'O' ? 
@@ -634,15 +628,21 @@ function PurchaseList() {
             : row.Status === 'V' ? 
                 <div className="bg-red-500 px-3 py-[5px] text-white rounded-xl">
                     Void
-                </div> 
-            : row.Status === 'F' ?
-                <div className="bg-blue-500 px-3 py-[5px] text-white rounded-xl">
-                    Complete
                 </div> :
                 <div className="bg-orange-500 px-3 py-[5px] text-white rounded-xl">
                     Closed
                 </div>,
             center: 'true'
+        },
+        {
+            name: 'Invoice No',
+            width: '130px',
+            selector: row => row.IsComplete? <div className="bg-blue-500 px-3 py-[5px] text-white rounded-xl">
+                {row.Code}
+            </div> : <div className="bg-red-500 px-3 py-[5px] text-white rounded-xl">
+                {row.Code}
+            </div>,
+            center: true,
         },
         {
             name: 'Paid Status',
@@ -746,7 +746,7 @@ function PurchaseList() {
                 <div className="flex items-center gap-2">
                     <Button variant="text" color="deep-purple" className="p-2" onClick={() => openPayable(row.Code, row.GrandTotal)}><FaMoneyBillTrendUp /></Button>
                     <Button variant="text" color="deep-purple" className="p-2" onClick={() => handleView(row.Code)}><FaPencil /></Button>
-                    <Button variant="text" color="red" className="p-2" onClick={() => handleDeleteBtn(row.Code)}><FaTrashCan /></Button>
+                    {/* <Button variant="text" color="red" className="p-2" onClick={() => handleDeleteBtn(row.Code)}><FaTrashCan /></Button> */}
                 </div>
             )
         },
@@ -773,6 +773,7 @@ function PurchaseList() {
             UpdatedAt: moment(purchaseData.updatedAt).format("YYYY-MM-DD hh:mm:ss a"),
             UpdatedBy: purchaseData.updatedBy,
             Status: purchaseData.status,
+            IsComplete: purchaseData.isComplete
         }
     });
 

@@ -2,7 +2,7 @@
 import { Button, Card, CardBody, Dialog, DialogBody, Typography } from "@material-tailwind/react";
 import { FaCircleMinus, FaCirclePlus, FaEquals, FaFilter, FaFloppyDisk, FaPencil, FaPlus, FaTrashCan, } from "react-icons/fa6";
 import { BiReset } from "react-icons/bi"
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { apiUrl, focusSelect, pause } from "../const";
 import { useAddWalletTransactionMutation, useFetchWalletQuery, useFetchWalletTransactionQuery, useRemoveWalletTransactionMutation, useUpdateWalletTransactionMutation } from "../store";
 import DeleteModal from "../components/delete_modal";
@@ -17,9 +17,14 @@ const validator = require('validator');
 
 function Wallet({walletId}) {
 
-    const { data: walletData } = useFetchWalletQuery();
+    const { data: walletData, refetch: refetchShare } = useFetchWalletQuery();
 
-    const { data, refetch } = useFetchWalletTransactionQuery({status: true, walletCode: walletId}, { refetchOnMountOrArgChange: true });
+    const { data, refetch } = useFetchWalletTransactionQuery({status: true, walletCode: walletId});
+
+    useEffect(() => {
+        refetch();
+        refetchShare();
+    }, []);
 
     const auth = useAuthUser();
 
@@ -93,6 +98,7 @@ function Wallet({walletId}) {
         categoryCode: "Stone",
         paymentMode: "Cash",
         cashType: "",
+        isSalesPruchase: false,
         amount: 0,
         remark: "",
         status: true,
@@ -195,6 +201,7 @@ function Wallet({walletId}) {
                     amount: formData.amount,
                     remark: formData.remark,
                     status: formData.status,
+                    isSalesPruchase: formData.isSalesPruchase,
                     createdBy: formData.createdBy,
                     updatedBy: formData.updatedBy,
                     deletedBy: formData.deletedBy,
@@ -246,6 +253,7 @@ function Wallet({walletId}) {
                     amount: formData.amount,
                     remark: formData.remark,
                     status: formData.status,
+                    isSalesPruchase: formData.isSalesPruchase,
                     createdBy: formData.createdBy,
                     updatedBy: formData.updatedBy,
                     deletedBy: formData.deletedBy,
@@ -296,6 +304,7 @@ function Wallet({walletId}) {
                     amount: formData.amount,
                     remark: formData.remark,
                     status: formData.status,
+                    isSalesPruchase: formData.isSalesPruchase,
                     createdBy: formData.createdBy,
                     createdAt: formData.createdDate,
                     updatedBy: auth().username,
@@ -352,24 +361,6 @@ function Wallet({walletId}) {
         axios.get(url).then((res) => {
             setFilterData(res.data);
         });
-
-        // if(filterForm.startDate === "" && filterForm.endDate === "" && filterForm.category === "") {
-        //     axios.get(`${apiUrl}/transaction/get-all-transactions?status=${filterForm.status}&walletCode=${filterForm.walletCode}`).then((res) => {
-        //         setFilterData(res.data);
-        //     });
-        // } else if (filterForm.startDate === "" && filterForm.endDate === "" && filterForm.category !== "") {
-        //     axios.get(`${apiUrl}/transaction/get-all-transactions?status=${filterForm.status}&walletCode=${filterForm.walletCode}&category=${filterForm.category}`).then((res) => {
-        //         setFilterData(res.data);
-        //     });
-        // } else if (filterForm.startDate !== "" && filterForm.endDate === "" && filterForm.category !== "") {
-        //     axios.get(`${apiUrl}/transaction/get-all-transactions?status=${filterForm.status}&walletCode=${filterForm.walletCode}&category=${filterForm.category}&start_date=${moment(filterForm.startDate).toISOString()}`).then((res) => {
-        //         setFilterData(res.data);
-        //     });
-        // } else {
-        //     axios.get(`${apiUrl}/transaction/get-all-transactions?status=${filterForm.status}&walletCode=${filterForm.walletCode}&category=${filterForm.category}&start_date=${moment(filterForm.startDate).toISOString()}&end_date=${moment(filterForm.endDate).toISOString()}`).then((res) => {
-        //         setFilterData(res.data);
-        //     });
-        // }
     }
 
     const column = [
@@ -444,7 +435,7 @@ function Wallet({walletId}) {
                         <Button variant="text" color="deep-purple" className="p-2"><FaPencil /></Button>
                     </Link> */}
                     {/* <Button variant="text" color="deep-purple" className="p-2" onClick={() => handleView(row.id)}><FaPencil /></Button> */}
-                    <Button variant="text" color="red" className="p-2" disabled={row.categoryCode === "Sales" || row.categoryCode === "Purchase" ? true : false} onClick={() => handleDeleteBtn(row.id)}><FaTrashCan /></Button>
+                    <Button variant="text" color="red" className="p-2" disabled={row.isSalesPruchase} onClick={() => handleDeleteBtn(row.id)}><FaTrashCan /></Button>
                 </div>
             )
         },
@@ -458,6 +449,7 @@ function Wallet({walletId}) {
             shareName: wallet.wallet.share.shareName,
             cashType: wallet.cashType,
             categoryCode: wallet.categoryCode,
+            isSalesPruchase: wallet.isSalesPruchase,
             paymentMode: wallet.paymentMode,
             amount: wallet.amount.toLocaleString('en-US'),
             remark: wallet.remark,
@@ -483,6 +475,7 @@ function Wallet({walletId}) {
             updatedAt: moment(wallet.updatedAt).format("YYYY-MM-DD hh:mm:ss a"),
             updatedBy: wallet.updatedBy,
             status: wallet.status,
+            isSalesPruchase: wallet.isSalesPruchase,
         }
     });
 
@@ -690,6 +683,13 @@ function Wallet({walletId}) {
                                 <Button variant="filled" className="flex items-center capitalize gap-2 py-2 px-3" 
                                     onClick={() => {
                                         setIsFilter(false);
+                                        setFilterForm({
+                                            status: true,
+                                            walletCode: walletId,
+                                            startDate: "",
+                                            endDate: "",
+                                            category: "",
+                                        });
                                         refetch();
                                     }}
                                 >
