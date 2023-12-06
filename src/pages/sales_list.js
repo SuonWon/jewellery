@@ -108,6 +108,8 @@ function SalesList() {
 
     const [deleteId, setDeleteId] = useState('');
 
+    console.log(issueData)
+
     const openPayable = (invoiceNo, balance) => {
         setPayData({
             ...payData,

@@ -1,5 +1,5 @@
 import { Button, Menu, MenuHandler, MenuItem, MenuList, Typography } from "@material-tailwind/react";
-import { FaArrowRightFromBracket, FaBoxesPacking, FaCartShopping, FaChartPie, FaChevronDown, FaDatabase, FaBoxTissue, FaListUl, FaMoneyBill1, FaSliders, FaUsers, FaWallet, FaArrowRotateLeft, FaPlusMinus } from "react-icons/fa6";
+import { FaArrowRightFromBracket, FaBoxesPacking, FaCartShopping, FaChartPie, FaChevronDown, FaDatabase, FaBoxOpen, FaListUl, FaMoneyBill1, FaSliders, FaUsers, FaWallet, FaArrowRotateLeft, FaPlusMinus } from "react-icons/fa6";
 import { GiDiamondTrophy } from "react-icons/gi";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useAuthUser, useSignOut } from "react-auth-kit";
@@ -96,7 +96,7 @@ function Nav() {
                     <Menu>
                         <MenuHandler>
                             <Typography variant='small' className="flex justify-center items-center p-2 text-white space-x-2 hover:bg-white hover:text-black rounded-lg cursor-pointer">
-                                <FaBoxTissue className='text-base' /> 
+                                <FaBoxOpen className='text-base' /> 
                                     <span className=''>Issues</span>
                                 <FaChevronDown className='text-xs' />
                             </Typography>
@@ -104,7 +104,7 @@ function Nav() {
                         <MenuList className="z-[99999] bg-main text-white">
                             <NavLink to="/issue_list">
                                 <MenuItem className="flex items-center gap-2">
-                                    <FaBoxTissue /> <span>Issue List</span>
+                                    <FaBoxOpen /> <span>Issue List</span>
                                 </MenuItem>
                             </NavLink>
                             <NavLink to="/return_list">

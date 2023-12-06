@@ -379,7 +379,7 @@ function Wallet({walletId}) {
         {
             name: 'Date',
             width: "200px",
-            selector: row => moment(row.date).format('DD-MMM-YYYY'),
+            selector: row => moment(row.date).format('DD-MMM-YYYY hh:mm a'),
         },
         {
             name: 'Share',
