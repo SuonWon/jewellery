@@ -9,6 +9,15 @@ import { supplierApi } from "../apis/supplierApi";
 import { stoneDetailsApi } from "../apis/stoneDetailsApi";
 import { purchaseApi } from "../apis/purchaseApi";
 import { salesApi } from "../apis/salesApi";
+import { stoneSelectionApi } from "../apis/stoneSelectionApi";
+import { returnApi } from "../apis/returnApi";
+import { issueApi } from "../apis/issueApi";
+import { shareApi } from "../apis/shareApi";
+import { damageApi } from "../apis/damageApi";
+import { adjustmentApi } from "../apis/adjustmentApi";
+import { walletTransitionApi } from "../apis/walletTransitionApi";
+import { payableApi } from "../apis/payableApi";
+import { receivableApi } from "../apis/receivableApi";
 
 export const store = configureStore({
     reducer: {
@@ -21,7 +30,16 @@ export const store = configureStore({
         [supplierApi.reducerPath] : supplierApi.reducer,
         [stoneDetailsApi.reducerPath] : stoneDetailsApi.reducer,
         [purchaseApi.reducerPath] : purchaseApi.reducer,
-        [salesApi.reducerPath] : salesApi.reducer
+        [salesApi.reducerPath] : salesApi.reducer,
+        [stoneSelectionApi.reducerPath] : stoneSelectionApi.reducer,
+        [returnApi.reducerPath] : returnApi.reducer,
+        [issueApi.reducerPath] : issueApi.reducer,
+        [shareApi.reducerPath] : shareApi.reducer,
+        [damageApi.reducerPath] : damageApi.reducer,
+        [adjustmentApi.reducerPath] : adjustmentApi.reducer,
+        [walletTransitionApi.reducerPath] : walletTransitionApi.reducer,
+        [payableApi.reducerPath] : payableApi.reducer,
+        [receivableApi.reducerPath] : receivableApi.reducer,
     },
     middleware: (getDefaultMiddleware) => {
         return getDefaultMiddleware()
@@ -34,7 +52,16 @@ export const store = configureStore({
             .concat(supplierApi.middleware)
             .concat(stoneDetailsApi.middleware)
             .concat(purchaseApi.middleware)
-            .concat(salesApi.middleware);
+            .concat(salesApi.middleware)
+            .concat(stoneSelectionApi.middleware)
+            .concat(returnApi.middleware)
+            .concat(issueApi.middleware)
+            .concat(shareApi.middleware)
+            .concat(damageApi.middleware)
+            .concat(adjustmentApi.middleware)
+            .concat(walletTransitionApi.middleware)
+            .concat(payableApi.middleware)
+            .concat(receivableApi.middleware);
     }
 });
 
@@ -45,6 +72,15 @@ export { useFetchStoneQuery, useFetchTrueStoneQuery, useFetchStoneByIdQuery, use
 export { useFetchUOMQuery, useFetchUOMByIdQuery, useAddUOMMutation, useUpdateUOMMutation, useRemoveUOMMutation } from "../apis/uomApi";
 export { useFetchCustomerQuery, useFetchTrueCustomerQuery, useFetchCustomerByIdQuery, useAddCustomerMutation, useUpdateCustomerMutation, useRemoveCustomerMutation } from "../apis/customerApi";
 export { useFetchSupplierQuery, useFetchTrueSupplierQuery, useFetchSupplierByIdQuery, useAddSupplierMutation, useUpdateSupplierMutation, useRemoveSupplierMutation } from "../apis/supplierApi";
-export { useFetchStoneDetailsQuery, useFetchStoneDetailsByIdQuery, useAddStoneDetailsMutation, useUpdateStoneDetailsMutation, useRemoveStoneDetailsMutation } from "../apis/stoneDetailsApi";
-export { useFetchPurchaseQuery, useFetchTruePurchaseQuery, useAddPurchaseMutation, useFetchPurchaseByIdQuery, useUpdatePurchaseMutation, useRemovePurchaseMutation } from "../apis/purchaseApi";
-export { useFetchSalesQuery, useFetchTrueSalesQuery, useAddSalesMutation, useRemoveSalesMutation} from "../apis/salesApi"; 
+export { useFetchStoneDetailsQuery, useFetchStoneDetailsByIdQuery, useFetchPurchaseShareQuery, useAddStoneDetailsMutation, useUpdateStoneDetailsMutation, useRemoveStoneDetailsMutation } from "../apis/stoneDetailsApi";
+export { useFetchPurchaseIdQuery, useFetchPurchaseQuery, useFetchTruePurchaseQuery, useAddPurchaseMutation, useFetchPurchaseByIdQuery, useUpdatePurchaseMutation, useUpdatePurchaseStatusMutation, useRemovePurchaseMutation } from "../apis/purchaseApi";
+export { useFetchSalesQuery, useFetchTrueSalesQuery, useAddSalesMutation, useUpdateSalesMutation, useRemoveSalesMutation} from "../apis/salesApi";
+export { useFetchStoneSelectionQuery, useAddStoneSelectionMutation, useUpdateStoneSelectionMutation } from "../apis/stoneSelectionApi";
+export { useFetchReturnQuery, useAddReturnMutation, useUpdateReturnMutation, useRemoveReturnMutation } from "../apis/returnApi";
+export { useFetchIssueQuery, useAddIssueMutation, useUpdateIssueMutation, useUpdateIssueStatusMutation, useRemoveIssueMutation } from "../apis/issueApi";
+export { useFetchShareQuery, useFetchTrueShareQuery, useFetchShareByIdQuery, useAddShareMutation, useUpdateShareMutation, useRemoveShareMutation } from "../apis/shareApi";
+export { useFetchDamageIdQuery, useFetchDamageQuery, useFetchDamageByIdQuery, useAddDamageMutation, useUpdateDamageMutation, useRemoveDamageMutation } from "../apis/damageApi";
+export { useFetchAdjustmentQuery, useFetchAdjustmentByIdQuery, useAddAdjustmentMutation, useUpdateAdjustmentMutation, useRemoveAdjustMutation } from "../apis/adjustmentApi";
+export { useFetchWalletQuery, useFetchWalletTransactionQuery, useFetchWalletTransactionByIdQuery, useAddWalletTransactionMutation, useUpdateWalletTransactionMutation, useRemoveWalletTransactionMutation } from "../apis/walletTransitionApi";
+export { useFetchPayableQuery, useFetchPayableByIdQuery, useAddPayableMutation, useUpdatePayableMutation, useRemovePayableMutation } from "../apis/payableApi";
+export { useFetchReceivableQuery, useFetchReceivableByIdQuery, useAddReceivableMutation, useUpdateReceivableMutation, useRemoveReceivableMutation } from "../apis/receivableApi";

@@ -11,9 +11,21 @@ import { AuthProvider } from 'react-auth-kit';
 
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
+
+const customTheme = {
+  dialog: {
+    styles: {
+      sizes: {
+        xl: {
+          width: "w-full",
+        }
+      }
+    }
+  }
+}
 root.render(
   <React.StrictMode>
-    <ThemeProvider>
+    <ThemeProvider value={customTheme}>
       <AuthProvider 
         authType = {'cookie'}
         authName={'_auth'}

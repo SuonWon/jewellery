@@ -1,8 +1,8 @@
 /* eslint-disable eqeqeq */
-import { Button, Card, CardBody, Dialog, DialogBody, Typography } from "@material-tailwind/react";
+import { Button, Card, CardBody, Dialog, DialogBody, Switch, Typography } from "@material-tailwind/react";
 import { FaCirclePlus, FaFloppyDisk, FaPencil, FaTrashCan, } from "react-icons/fa6";
 import { useEffect, useState } from "react";
-import { useFetchStoneDetailsQuery, useAddStoneDetailsMutation, useUpdateStoneDetailsMutation, useRemoveStoneDetailsMutation, useFetchUOMQuery, useFetchTrueBrightnessQuery, useFetchTrueStoneQuery, useFetchTrueGradeQuery, useFetchTrueTypeQuery } from "../store";
+import { useFetchStoneDetailsQuery, useAddStoneDetailsMutation, useUpdateStoneDetailsMutation, useRemoveStoneDetailsMutation, useFetchUOMQuery, useFetchTrueBrightnessQuery, useFetchTrueStoneQuery, useFetchTrueGradeQuery, useFetchTrueTypeQuery, useFetchTrueSupplierQuery, useFetchPurchaseQuery, useUpdatePurchaseStatusMutation, useUpdatePurchaseMutation, useFetchTruePurchaseQuery } from "../store";
 import DeleteModal from "../components/delete_modal";
 import SectionTitle from "../components/section_title";
 import ModalTitle from "../components/modal_title";
@@ -10,7 +10,7 @@ import moment from "moment";
 import TableList from "../components/data_table";
 import { useAuthUser } from "react-auth-kit";
 import SuccessAlert from "../components/success_alert";
-import { pause } from "../const";
+import { focusSelect, sizeUnit } from "../const";
 
 const validator = require("validator");
 
@@ -18,13 +18,7 @@ function StoneDetails() {
 
     const auth = useAuthUser();
 
-    const [open, setOpen] = useState(false);
-
-    const [openDelete, setOpenDelete] = useState(false);
-
-    const [isEdit, setIsEdit] = useState(false);
-
-    const {data, refetch} = useFetchStoneDetailsQuery();
+    const {data, refetch} = useFetchStoneDetailsQuery({ refetchOnMountOrArgChange: true });
 
     const {data: stoneData} = useFetchTrueStoneQuery();
 
@@ -36,9 +30,28 @@ function StoneDetails() {
 
     const {data: brightData} = useFetchTrueBrightnessQuery();
 
+    const {data: supplierData} = useFetchTrueSupplierQuery();
+
+    const {data: purchaseData} = useFetchPurchaseQuery();
+
+    const {data: truePurchaseData} = useFetchTruePurchaseQuery();
+
+    const [open, setOpen] = useState(false);
+
+    const [openDelete, setOpenDelete] = useState(false);
+
+    const [isEdit, setIsEdit] = useState(false);
+
+    const [selectedPurchase, setSelectedPurchase] = useState([]);
+
+    const [isSupplier, setIsSupplier] = useState(false);
+
     const [ alert, setAlert] = useState({
         isAlert: false,
-        message: ''
+        message: '',
+        isWarning: false,
+        isError: false,
+        title: ""
     });
 
     useEffect(() => {
@@ -70,6 +83,7 @@ function StoneDetails() {
         brightDesc: "",
         gradeDesc: "",
         size: "",
+        sizeUnit: "လုံးစီး",
     });
 
     const [addStoneDetail] = useAddStoneDetailsMutation();
@@ -78,29 +92,34 @@ function StoneDetails() {
 
     const [removeStoneDetail] = useRemoveStoneDetailsMutation();
 
+    const [updateStatus] = useUpdatePurchaseMutation();
+
+    const [updatePStatus] = useUpdatePurchaseStatusMutation();
+
     const [deleteId, setDeleteId] = useState('');
+
+    const [purchaseStatus, setPurchaseStatus] = useState(false);
 
     const [ validationText, setValidationText ] = useState({});
 
+    const [purchase, setPurchase] = useState({});
+
     const stoneDetail = {
         stoneDesc: "",
-        stone: "",
-        stoneCode: "",
-        type: "",
-        typeCode: "",
-        bright: "",
-        brightCode: "",
-        grade: "",
-        gradeCode: "",
-        size: "",
+        referenceNo: "",
+        supplierCode: 0,
+        stoneCode: 0,
+        typeCode: 0,
+        brightCode: 0,
+        gradeCode: 0,
+        size: 0,
+        sizeUnit: "လုံးစီး",
         qty: 0,
         weight: 0,
         unitCode: "ct",
         remark: "",
         isActive: true,
-        createdAt: moment().toISOString(),
         createdBy: auth().username,
-        updatedAt: moment().toISOString(),
         updatedBy: "",
     };
 
@@ -113,30 +132,38 @@ function StoneDetails() {
             stoneDesc: "",
             brightDesc: "",
             gradeDesc: "",
-            size: ""
+            size: "",
+            sizeUnit: "လုံးစီး",
         });
+        setPurchaseStatus(false);
         setOpen(!open);
     };
 
     function validateForm() {
         const newErrors = {};
 
-        if(validator.isEmpty(formData.stoneCode.toString())) {
+        // if(validator.isEmpty(formData.referenceNo.toString())) {
+        //     newErrors.referenceNo = 'Reference No is required.';
+        // }
+        // if(formData.supplierCode === 0) {
+        //     newErrors.supplierCode = 'Supplier name is required.'
+        // }
+        if(formData.stoneCode === 0) {
             newErrors.stoneDesc = 'Stone Description is required.'
         } 
-        if(validator.isEmpty(formData.brightCode.toString())) {
+        if(formData.brightCode === 0) {
             newErrors.brightDesc = 'Bright Description is required.'
         }
-        if(validator.isEmpty(formData.gradeCode.toString())) {
+        if(formData.gradeCode === 0) {
             newErrors.gradeDesc = 'Grade Description is required.'
         }
-        if(validator.isEmpty(formData.typeCode.toString())) {
+        if(formData.typeCode === 0) {
             newErrors.typeDesc = 'Type Description is required.'
         }
         if(validator.isEmpty(formData.unitCode.toString())) {
             newErrors.unitDesc = 'Unit is required.'
         }
-        if(validator.isEmpty(formData.size.toString())) {
+        if(formData.size === 0) {
             newErrors.size = 'Size is required.'
         }
         // if(formData.qty === 0) {
@@ -153,10 +180,12 @@ function StoneDetails() {
 
     const onSubmit = async () => {
         if(validateForm()) {
+            console.log(formData);
             try {
+                console.log("Ji");
                 addStoneDetail({
                     ...formData,
-                    stoneDesc: `${description.stoneDesc} ${description.size} ${description.gradeDesc} ${description.brightDesc}`,
+                    stoneDesc: `${description.stoneDesc} ${description.size}${description.sizeUnit} ${description.gradeDesc} ${description.brightDesc}`,
                 }).then((res) => {
                     if(res.error != null) {
                         let message = '';
@@ -179,6 +208,13 @@ function StoneDetails() {
                     }
                     
                 });
+                if (purchaseStatus) {
+                    updatePStatus({
+                        id: formData.referenceNo,
+                        updatedBy: auth().username,
+                    });
+                }
+                setPurchaseStatus(false);
                 setFormData(stoneDetail);
                 setOpen(!open);
                 
@@ -195,7 +231,7 @@ function StoneDetails() {
             try {
                 addStoneDetail({
                     ...formData,
-                    stoneDesc: `${description.stoneDesc} ${description.size} ${description.gradeDesc} ${description.brightDesc}`,
+                    stoneDesc: `${description.stoneDesc} ${description.size}${description.sizeUnit} ${description.gradeDesc} ${description.brightDesc}`,
                 }).then((res) => {
 
                     if(res.error != null) {
@@ -220,12 +256,20 @@ function StoneDetails() {
                         }, 2000);
                     }
                 });
+                if (purchaseStatus) {
+                    updatePStatus({
+                        id: formData.referenceNo,
+                        updatedBy: auth().username,
+                    });
+                }
+                setPurchaseStatus(false);
                 setFormData(stoneDetail);
                 setDescription({
                     stoneDesc: "",
                     brightDesc: "",
                     gradeDesc: "",
-                    size: ""
+                    size: "",
+                    sizeUnit: "လုံးစီး",
                 });
             }
             catch(err) {
@@ -236,48 +280,115 @@ function StoneDetails() {
     };
 
     const handleEdit = async (id) => {
-        let eData = data.filter((stoneDetail) => stoneDetail.stoneDetailCode === id);
-        setIsEdit(true);
-        setFormData({
-            ...formData,
-            stoneDetailCode: eData[0].stoneDetailCode,
-            stoneDesc: eData[0].stoneDesc,
-            stone: eData[0].stone.stoneDesc,
-            stoneCode: eData[0].stone.stoneCode,
-            type: eData[0].stoneType.typeDesc,
-            typeCode: eData[0].stoneType.typeCode,
-            bright: eData[0].stoneBrightness.brightDesc,
-            brightCode: eData[0].stoneBrightness.brightCode,
-            grade: eData[0].stoneGrade.gradeDesc,
-            gradeCode: eData[0].stoneGrade.gradeCode,
-            size: eData[0].size,
-            qty: eData[0].qty,
-            weight: eData[0].weight,
-            unitCode: eData[0].unitCode,
-            remark: eData[0].remark,
-            isActive: eData[0].isActive,
-            createdAt: eData[0].createdAt,
-            createdBy: eData[0].createdBy,
+        let eData = data.find((stoneDetail) => stoneDetail.stoneDetailCode === id);
+        let tempPurchase = purchaseData.find(res => res.invoiceNo === eData.referenceNo);
+        setPurchase({
+            invoiceNo: tempPurchase.invoiceNo,
+            purDate: tempPurchase.purDate,
+            supplierCode: tempPurchase.supplierCode,
+            stoneCode: tempPurchase.stoneCode,
+            qty: tempPurchase.qty,
+            totalWeight: tempPurchase.totalWeight,
+            unitCode: tempPurchase.unitCode,
+            unitPrice: tempPurchase.unitPrice,
+            subTotal: tempPurchase.subTotal,
+            servicePer: tempPurchase.servicePer,
+            serviceCharge: tempPurchase.serviceCharge,
+            discAmt: tempPurchase.discAmt,
+            grandTotal: tempPurchase.grandTotal,
+            remark: tempPurchase.remark,
+            paidStatus: tempPurchase.paidStatus,
+            status: tempPurchase.status,
+            isComplete: tempPurchase.isComplete,
+            createdBy: tempPurchase.createdBy,
+            createdAt: tempPurchase.createdAt,
+            updatedBy: tempPurchase.updatedBy,
+            updatedAt: tempPurchase.updatedAt,
+            deletedBy: tempPurchase.deletedBy,
+            purchaseShareDetails: tempPurchase.purchaseShareDetails.map(el => {
+                return {
+                    id: el.id,
+                    lineNo: el.lineNo,
+                    shareCode: el.shareCode,
+                    sharePercentage: el.sharePercentage,
+                    amount: el.amount,
+                }
+            }),
         });
+        setPurchaseStatus(tempPurchase.isComplete)
+        setIsEdit(true);
+        setFormData(eData);
         setDescription({
-            stoneDesc: eData[0].stone.stoneDesc,
-            brightDesc: eData[0].stoneBrightness.brightDesc,
-            gradeDesc: eData[0].stoneGrade.gradeDesc,
-            size: eData[0].size
+            stoneDesc: eData.stone.stoneDesc,
+            brightDesc: eData.stoneBrightness.brightDesc,
+            gradeDesc: eData.stoneGrade.gradeDesc,
+            size: eData.size,
+            sizeUnit: eData.sizeUnit,
         });
         setOpen(!open);
     };
 
     const submitEdit = async () => {
-        editStoneDetail({
-            ...formData,
-            stoneDesc: `${description.stoneDesc} ${description.size} ${description.gradeDesc} ${description.brightDesc}`,
-            updatedAt: moment().toISOString(),
+        if(validateForm()) {
+            editStoneDetail({
+                stoneDetailCode: formData.stoneDetailCode,
+                referenceNo: formData.referenceNo,
+                supplierCode: formData.supplierCode,
+                stoneDesc: `${description.stoneDesc} ${description.size}${description.sizeUnit} ${description.gradeDesc} ${description.brightDesc}`,
+                stoneCode: formData.stoneCode,
+                typeCode: formData.typeCode,
+                brightCode: formData.brightCode,
+                gradeCode: formData.gradeCode,
+                size: formData.size,
+                sizeUnit: formData.sizeUnit,
+                qty: formData.qty,
+                weight: formData.weight,
+                unitCode: formData.unitCode,
+                remark: formData.remark,
+                isActive: formData.isActive,
+                createdBy: formData.createdBy,
+                updatedBy: auth().username,
+            }).then((res) => {
+                console.log(res);
+            });
+            if(purchaseStatus !== purchase.isComplete && formData.referenceNo !== "") {
+                console.log(purchaseStatus);
+                updateStatus({
+                    ...purchase,
+                    isComplete: purchaseStatus,
+                    updatedBy: auth().username,
+                }).then((res) => {
+                    console.log(res);
+                });
+            }
+            setOpen(!open);
+        }
+    };
+
+    const handleChange = async (e) => {
+        let stoneDetail = data.find((stone) => stone.stoneDetailCode == e.target.id);
+        await editStoneDetail({
+            stoneDetailCode: stoneDetail.stoneDetailCode,
+            referenceNo: stoneDetail.referenceNo,
+            supplierCode: stoneDetail.supplierCode,
+            stoneDesc: stoneDetail.stoneDesc,
+            stoneCode: stoneDetail.stoneCode,
+            typeCode: stoneDetail.typeCode,
+            brightCode: stoneDetail.brightCode,
+            gradeCode: stoneDetail.gradeCode,
+            size: stoneDetail.size,
+            sizeUnit: stoneDetail.sizeUnit,
+            qty: stoneDetail.qty,
+            weight: stoneDetail.weight,
+            unitCode: stoneDetail.unitCode,
+            remark: stoneDetail.remark,
+            isActive: e.target.checked ? true: false,
+            createdBy: stoneDetail.createdBy,
             updatedBy: auth().username,
         }).then((res) => {
             console.log(res);
         });
-        setOpen(!open);
+
     };
 
     const handleRemove = async (id) => {
@@ -292,10 +403,27 @@ function StoneDetails() {
 
     const column = [
         {
+            name: 'Status',
+            width: "150px",
+            center: "true",
+            cell: row => (
+                <div className={`w-[90px] flex items-center justify-center text-white h-7 rounded-full ${row.Status ? 'bg-green-500' : 'bg-red-500' } `}>
+                    {
+                        row.Status ? 'Active' : 'Inactive'
+                    }
+                </div>
+            ),
+        },
+        {
             name: 'Quantity',
             width: "100px",
             selector: row => row.Qty,
 
+        },
+        {
+            name: 'Weight',
+            width: "150px",
+            selector: row => row.Weight,
         },
         {
             name: 'Description',
@@ -303,9 +431,25 @@ function StoneDetails() {
             selector: row => row.Description,
         },
         {
+            name: 'Reference No',
+            width: '150px',
+            selector: row => row.ReferenceNo,
+        },
+        {
+            name: 'Supplier Name',
+            width: '200px',
+            selector: row => row.SupplierName,
+        },
+        {
             name: 'Size',
             width: "150",
             selector: row => row.Size,
+
+        },
+        {
+            name: 'Size Unit',
+            width: "150",
+            selector: row => row.SizeUnit,
 
         },
         // {
@@ -332,11 +476,6 @@ function StoneDetails() {
             selector: row => row.TypeDesc,
         },
         {
-            name: 'Weight',
-            width: "150px",
-            selector: row => row.Weight,
-        },
-        {
             name: 'Unit',
             width: "150px",
             selector: row => row.UnitDesc,
@@ -358,12 +497,15 @@ function StoneDetails() {
         },
         {
             name: 'Action',
-            center: true,
+            center: "true",
             width: "100px",
             cell: (row) => (
                 <div className="flex items-center gap-2">
+                    <div className="border-r border-gray-400 pr-2">
+                        <Switch color="deep-purple" defaultChecked={row.Status} id={row.Code} onChange={handleChange} />
+                    </div>
                     <Button variant="text" color="deep-purple" className="p-2" onClick={() => handleEdit(row.Code)}><FaPencil /></Button>
-                    <Button variant="text" color="red" className="p-2" onClick={() => handleDeleteBtn(row.Code)}><FaTrashCan /></Button>
+                    {/* <Button variant="text" color="red" className="p-2" onClick={() => handleDeleteBtn(row.Code)}><FaTrashCan /></Button> */}
                 </div>
             )
         },
@@ -372,12 +514,15 @@ function StoneDetails() {
     const tbodyData = data?.map((stoneDetail) => {
         return {
             Code: stoneDetail.stoneDetailCode,
+            ReferenceNo: stoneDetail.referenceNo,
+            SupplierName: stoneDetail.supplier.supplierName,
             Description: stoneDetail.stoneDesc,
             StoneDesc: stoneDetail.stone.stoneDesc,
             BrightnessDesc: stoneDetail.stoneBrightness.brightDesc,
             GradeDesc: stoneDetail.stoneGrade.gradeDesc,
             TypeDesc: stoneDetail.stoneType.typeDesc,
             Size: stoneDetail.size,
+            SizeUnit: stoneDetail.sizeUnit,
             Qty: stoneDetail.qty,
             Weight: stoneDetail.weight,
             UnitDesc: stoneDetail.unitCode,
@@ -407,11 +552,14 @@ function StoneDetails() {
             <Dialog open={open} handler={openModal} size="lg">
                 <DialogBody>
                     <ModalTitle titleName={isEdit ? "Edit Stone Detail" : "Create Stone Detail"} handleClick={openModal} />
+                    {
+                        alert.isAlert? <SuccessAlert title={alert.title} message={alert.message} isWarning={alert.isWarning} /> : ""
+                    }
                     <form  className="flex flex-col p-3 gap-4">
-                        <div className="grid grid-cols-4">
+                        <div className="grid grid-cols-4 gap-2">
                             <div className="w-full col-span-2">
                                 <label className="text-black text-sm mb-2">Description</label>
-                                <input className="border border-blue-gray-200 text-black w-full h-[40px] p-2.5 rounded-md" value={`${description.stoneDesc} ${description.size} ${description.gradeDesc} ${description.brightDesc}`} disabled />
+                                <input className="border border-blue-gray-200 text-black w-full h-[40px] p-2.5 rounded-md" value={`${description.stoneDesc} ${description.size}${description.sizeUnit} ${description.gradeDesc} ${description.brightDesc}`} disabled />
                                 {
                                     validationText.description && <p className="block text-[12px] text-red-500 font-sans mb-2">{validationText.description}</p>
                                 }
@@ -423,7 +571,114 @@ function StoneDetails() {
                                 }
                             </div> */}
                         </div>
+                        <div className="grid grid-cols-3 gap-2">
+                            <div>
+                                <label className="text-black text-sm mb-2">Supplier Name</label>
+                                <select 
+                                    className="block w-full text-black p-2.5 border border-blue-gray-200 max-h-[2.5rem] rounded-md focus:border-black"
+                                    value={formData.supplierCode}
+                                    onChange={(e) => {
+                                        setIsSupplier(true);
+                                        let selectP = truePurchaseData.filter(el => el.supplierCode === Number(e.target.value));
+                                        setSelectedPurchase(selectP);
+                                        setFormData({
+                                            ...formData,
+                                            supplierCode: Number(e.target.value),
+                                            referenceNo: "",
+                                        });
+                                    }}
+                                >
+                                    <option value="0" disabled>Select supplier</option>
+                                    {
+                                        supplierData?.map((supplier) => {
+                                            return <option value={supplier.supplierCode} key={supplier.supplierCode}>{supplier.supplierName}</option>
+                                        })
+                                    }
+                                </select>
+                                {
+                                    validationText.supplierCode && <p className="block text-[12px] text-red-500 font-sans">{validationText.supplierCode}</p>
+                                }
+                            </div>
+                            <div className="col-span-2 grid grid-cols-3 gap-2">
+                                <div className="col-span-2">
+                                    <label className="text-black text-sm mb-2">Reference No</label>
+                                    <select 
+                                        className="block w-full text-black p-2.5 border border-blue-gray-200 max-h-[2.5rem] rounded-md focus:border-black"
+                                        value={formData.referenceNo}
+                                        onChange={(e) => {
+                                            setFormData({...formData, referenceNo: e.target.value});
+                                        }}
+                                    >
+                                        <option value="" disabled>Select...</option>
+                                        {
+                                            isSupplier?
+                                            selectedPurchase?.map((purchase) => {
+                                                if(!purchase.isComplete) {
+                                                    return <option value={purchase.invoiceNo} key={purchase.invoiceNo}>{purchase.invoiceNo} ({purchase.supplier.supplierName}, {purchase.stone.stoneDesc})</option>
+                                                }
+                                            }) :
+                                            truePurchaseData?.map((purchase) => {
+                                                if(!purchase.isComplete) {
+                                                    return <option value={purchase.invoiceNo} key={purchase.invoiceNo}>{purchase.invoiceNo} ({purchase.supplier.supplierName}, {purchase.stone.stoneDesc})</option>
+                                                }
+                                            })
+                                        }
+                                    </select>
+                                </div>
+                                <div className="">
+                                    <label className="text-black text-sm mb-2">Purchase Complete</label>
+                                    <div className="w-full">
+                                        <input 
+                                            type="checkbox" 
+                                            className="border border-blue-gray-200 w-[20px] h-[20px] py-1.5 rounded-md text-black"
+                                            checked={purchaseStatus}
+                                            onChange={() => {
+                                                if (formData.referenceNo === "") {
+                                                    setAlert({
+                                                        isAlert: true,
+                                                        message: "Please select reference no.",
+                                                        isWarning: true,
+                                                        title: "Warning"
+                                                    });
+                                                    setTimeout(() => {
+                                                        setAlert({
+                                                            isAlert: false,
+                                                            message: '',
+                                                            isWarning: false,
+                                                            title: ''
+                                                        })
+                                                    }, 2000);
+                                                } else {
+                                                    setPurchaseStatus(!purchaseStatus);
+                                                }
+                                            }}
+                                        />
+                                    </div>
+                                </div>
+                                {/* <input className="border border-blue-gray-200 text-black w-full h-[40px] p-2.5 rounded-md" value={formData.referenceNo} disabled /> */}
+                            </div>
+                        </div>
                         <div className="grid grid-cols-3 gap-2 w-full">
+                            <div>
+                                <label className="text-black text-sm mb-2">Type</label>
+                                <select 
+                                    className="block w-full text-black p-2.5 border border-blue-gray-200 max-h-[2.5rem] rounded-md focus:border-black"
+                                    value={formData.typeCode}
+                                    onChange={(e) => {
+                                        setFormData({...formData, typeCode: Number(e.target.value)});
+                                    }}
+                                >
+                                    <option value="0" disabled>Select...</option>
+                                    {
+                                        typeData?.map((type) => {
+                                            return <option value={type.typeCode} key={type.typeCode}>{type.typeDesc}</option>
+                                        })
+                                    }
+                                </select>
+                                {
+                                    validationText.typeDesc && <p className="block text-[12px] text-red-500 font-sans">{validationText.typeDesc}</p>
+                                }
+                            </div>
                             <div>
                                 <label className="text-black text-sm mb-2">Stone Description</label>
                                 <select 
@@ -434,7 +689,7 @@ function StoneDetails() {
                                         setFormData({...formData, stoneCode: Number(e.target.value)});
                                     }}
                                 >
-                                    <option value="" disabled>Select...</option>
+                                    <option value="0" disabled>Select...</option>
                                     {
                                         stoneData?.map((stone) => {
                                             return <option value={stone.stoneCode} key={stone.stoneCode}>{stone.stoneDesc}</option>
@@ -464,7 +719,7 @@ function StoneDetails() {
                                         setFormData({...formData, brightCode: Number(e.target.value)});
                                     }}
                                 >
-                                    <option value="" disabled>Select...</option>
+                                    <option value="0" disabled>Select...</option>
                                     {
                                         brightData?.map((bright) => {
                                             return <option value={bright.brightCode} key={bright.brightCode}>{bright.brightDesc}</option>
@@ -484,35 +739,7 @@ function StoneDetails() {
                                     validationText.brightDesc && <p className="block text-[12px] text-red-500 font-sans">{validationText.brightDesc}</p>
                                 }
                             </div>
-                            <div>
-                                <label className="text-black text-sm mb-2">Type</label>
-                                <select 
-                                    className="block w-full text-black p-2.5 border border-blue-gray-200 max-h-[2.5rem] rounded-md focus:border-black"
-                                    value={formData.typeCode}
-                                    onChange={(e) => {
-                                        setFormData({...formData, typeCode: Number(e.target.value)});
-                                    }}
-                                >
-                                    <option value="" disabled>Select...</option>
-                                    {
-                                        typeData?.map((type) => {
-                                            return <option value={type.typeCode} key={type.typeCode}>{type.typeDesc}</option>
-                                        })
-                                    }
-                                </select>
-                                {/* <Select 
-                                    options={typeOption} 
-                                    isSearchable
-                                    defaultValue={{value: formData.typeCode, label: formData.type === ""? "Select..." : formData.type}}
-                                    onChange={(e) => {
-                                        setDescription({...description, typeDesc: e.label}); 
-                                        setFormData({...formData, typeCode: Number(e.value)});
-                                    }}
-                                /> */}
-                                {
-                                    validationText.typeDesc && <p className="block text-[12px] text-red-500 font-sans">{validationText.typeDesc}</p>
-                                }
-                            </div>
+                            
                         </div>
                         <div className="grid grid-cols-3 gap-2 w-full">
                             <div>
@@ -525,7 +752,7 @@ function StoneDetails() {
                                         setFormData({...formData, gradeCode: Number(e.target.value)});
                                     }}
                                 >
-                                    <option value="" disabled>Select...</option>
+                                    <option value="0" disabled>Select...</option>
                                     {
                                         gradeData?.map((grade) => {
                                             return <option value={grade.gradeCode} key={grade.gradeCode}>{grade.gradeDesc}</option>
@@ -545,32 +772,53 @@ function StoneDetails() {
                                 }
                             </div>
                             <div className="col-span-2">
-                                <div className="grid grid-cols-3 gap-2">
+                                <div className="grid grid-cols-4 gap-2">
                                     <div className="w-full">
                                         <label className="text-black text-sm mb-2">Size</label>
                                         <input 
-                                            type="text" 
+                                            type="number" 
                                             className="border border-blue-gray-200 w-full h-[40px] p-2.5 rounded-md text-black" 
                                             value={formData.size} 
                                             onChange={(e) => {
-                                                setDescription({...description, size: e.target.value}); 
-                                                setFormData({...formData, size: e.target.value})
-                                            }} 
+                                                setDescription({...description, size: Number(e.target.value)}); 
+                                                setFormData({...formData, size: Number(e.target.value)})
+                                            }}
+                                            onFocus={(e) => focusSelect(e)}
                                         />
                                         {
                                             validationText.size && <p className="block text-[12px] text-red-500 font-sans">{validationText.size}</p>
                                         }
                                     </div>
                                     <div>
+                                        <label className="text-black text-sm mb-2">Size Unit</label>
+                                        <select 
+                                            className="block w-full text-sm text-black p-2.5 border border-blue-gray-200 max-h-[2.5rem] rounded-md focus:border-black"
+                                            value={formData.sizeUnit}
+                                            onChange={(e) => {
+                                                setDescription({...description, sizeUnit: e.target.value});
+                                                setFormData({...formData, sizeUnit: e.target.value});
+                                            }}
+                                        >
+                                            {
+                                                sizeUnit.map((el, index) => {
+                                                    return <option value={el} key={index}>{el}</option>
+                                                })
+                                            }
+                                        </select>
+                                        {
+                                            validationText.sizeUnit && <p className="block text-[12px] text-red-500 font-sans">{validationText.sizeUnit}</p>
+                                        }
+                                    </div>
+                                    <div>
                                         <label className="text-black text-sm mb-2">Qty</label>
-                                        <input type="number" className="border border-blue-gray-200 w-full h-[40px] p-2.5 rounded-md text-black" value={formData.qty} onChange={(e) => setFormData({...formData, qty: e.target.value})} readOnly={isEdit}/>
+                                        <input type="number" className="border border-blue-gray-200 w-full h-[40px] p-2.5 rounded-md text-black" value={formData.qty} onChange={(e) => setFormData({...formData, qty: Number(e.target.value)})} readOnly={isEdit} onFocus={(e) => focusSelect(e)}/>
                                         {
                                             validationText.qty && <p className="block text-[12px] text-red-500 font-sans">{validationText.qty}</p>
                                         }
                                     </div>
                                     <div>
                                         <label className="text-black text-sm mb-2">Weight</label>
-                                        <input type="number" className="border border-blue-gray-200 w-full h-[40px] p-2.5 rounded-md text-black" value={formData.weight} onChange={(e) => setFormData({...formData, weight: e.target.value})} />
+                                        <input type="number" className="border border-blue-gray-200 w-full h-[40px] p-2.5 rounded-md text-black" value={formData.weight} onChange={(e) => setFormData({...formData, weight: parseFloat(e.target.value)})} readOnly={isEdit} onFocus={(e) => focusSelect(e)} />
                                         {
                                             validationText.weight && <p className="block text-[12px] text-red-500 font-sans">{validationText.weight}</p>
                                         }

@@ -20,6 +20,14 @@ const stoneDetailsApi = createApi({
                     };
                 },
             }),
+            fetchPurchaseShare: builder.query({
+                query: () => {
+                    return {
+                        url: "/stone-detail/get-purchase-share/{purchaseId}",
+                        method: 'GET',
+                    };
+                },
+            }),
             fetchStoneDetailsById: builder.query({
                 query: (stoneDetailCode) => {
                     return {
@@ -37,22 +45,7 @@ const stoneDetailsApi = createApi({
                     return {
                         url: '/stone-detail/create-stone-detail',
                         method: 'POST',
-                        body: {
-                            stoneDesc: stoneDetailsData.stoneDesc,
-                            stoneCode: Number(stoneDetailsData.stoneCode),
-                            typeCode: Number(stoneDetailsData.typeCode),
-                            brightCode: Number(stoneDetailsData.brightCode),
-                            gradeCode: Number(stoneDetailsData.gradeCode),
-                            size: stoneDetailsData.size,
-                            qty: Number(stoneDetailsData.qty),
-                            weight: Number(stoneDetailsData.weight),
-                            unitCode: stoneDetailsData.unitCode,
-                            remark: stoneDetailsData.remark,
-                            createdAt: stoneDetailsData.createdAt,
-                            createdBy: stoneDetailsData.createdBy,
-                            updatedAt: stoneDetailsData.updatedAt,
-                            updatedBy: stoneDetailsData.updatedBy,
-                        },
+                        body: stoneDetailsData,
                     };
                 },
             }),
@@ -63,23 +56,7 @@ const stoneDetailsApi = createApi({
                 query: (stoneDetailsData) => {
                     return {
                         url: `/stone-detail/update-stone-detail`,
-                        body: {
-                            stoneDetailCode: stoneDetailsData.stoneDetailCode,
-                            stoneDesc: stoneDetailsData.stoneDesc,
-                            stoneCode: Number(stoneDetailsData.stoneCode),
-                            typeCode: Number(stoneDetailsData.typeCode),
-                            brightCode: Number(stoneDetailsData.brightCode),
-                            gradeCode: Number(stoneDetailsData.gradeCode),
-                            size: stoneDetailsData.size,
-                            qty: Number(stoneDetailsData.qty),
-                            weight: Number(stoneDetailsData.weight),
-                            unitCode: stoneDetailsData.unitCode,
-                            remark: stoneDetailsData.remark,
-                            createdAt: stoneDetailsData.createdAt,
-                            createdBy: stoneDetailsData.createdBy,
-                            updatedAt: stoneDetailsData.updatedAt,
-                            updatedBy: stoneDetailsData.updatedBy,
-                        },
+                        body: stoneDetailsData,
                         method: 'PUT',
                     };
                 },
@@ -89,7 +66,6 @@ const stoneDetailsApi = createApi({
                     return[{type: 'StoneDetails', id:'All'}]
                 },
                 query: (stoneDetailCode) => {
-                    console.log(stoneDetailCode);
                     return {
                         url: `/stone-detail/delete-stone-detail/${stoneDetailCode}`,
                         method: 'DELETE'
@@ -100,5 +76,5 @@ const stoneDetailsApi = createApi({
     }
 });
 
-export const { useFetchStoneDetailsQuery, useFetchStoneDetailsByIdQuery, useAddStoneDetailsMutation, useUpdateStoneDetailsMutation, useRemoveStoneDetailsMutation } = stoneDetailsApi;
+export const { useFetchStoneDetailsQuery, useFetchStoneDetailsByIdQuery, useFetchPurchaseShareQuery, useAddStoneDetailsMutation, useUpdateStoneDetailsMutation, useRemoveStoneDetailsMutation } = stoneDetailsApi;
 export { stoneDetailsApi };

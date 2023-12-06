@@ -3,6 +3,7 @@ import { useSignIn } from 'react-auth-kit';
 import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { apiUrl } from "./const";
 
 const validator = require('validator');
 
@@ -52,11 +53,10 @@ function Login() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         if(validateForm()) {
-            axios.post('http://localhost:3005/v1/auth/login', formData)
+            axios.post(apiUrl + '/auth/login', formData)
             .then((res) => {
                 const newErrors = {}
                 if(res.data !== '') {
-                    console.log(res.data);
                     if(signIn(
                         {
                             token : res.data.token,

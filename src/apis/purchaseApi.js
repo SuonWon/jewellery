@@ -1,5 +1,5 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { apiUrl } from "../const";
+import { apiUrl, pause } from "../const";
 
 const purchaseApi = createApi({
     reducerPath: "purchase",
@@ -8,6 +8,14 @@ const purchaseApi = createApi({
     }),
     endpoints(builder) {
         return {
+            fetchPurchaseId: builder.query({
+                query: () => {
+                    return {
+                        url: '/purchase/get-id',
+                        method: 'GET'
+                    };
+                },
+            }),
             fetchPurchase: builder.query({
                 providesTags: () => {
                     return [{type: 'Purchase', id: 'All'}]
@@ -25,8 +33,9 @@ const purchaseApi = createApi({
                 },
                 query: () => {
                     return {
-                        url: '/purchase/get-true-purchases/?status=O',
-                        method: 'GET'
+                        url: '/purchase/get-all-purchases/',
+                        method: 'GET',
+                        params: {status: "O"}
                     }
                 }
             }),
@@ -36,7 +45,7 @@ const purchaseApi = createApi({
                 },
                 query: (purchaseNo) => {
                     return {
-                        url: `/purchase/get-purchse/${purchaseNo}`,
+                        url: `/purchase/get-purchase/${purchaseNo}`,
                         method: 'GET'
                     }
                 }
@@ -68,6 +77,18 @@ const purchaseApi = createApi({
                     }
                 }
             }),
+            updatePurchaseStatus: builder.mutation({
+                invalidatesTags: () => {
+                    return [{type: "Purchase", id: "All"}]
+                },
+                query: (purchaseData) => {
+                    return {
+                        url: "/purchase/update-purchase-finish",
+                        method: "PUT",
+                        body: purchaseData,
+                    };
+                },
+            }),
             removePurchase: builder.mutation({
                 invalidatesTags: () => {
                     return [{type: "Purchase", id: "All"}]
@@ -86,5 +107,5 @@ const purchaseApi = createApi({
     },
 })
 
-export const { useAddPurchaseMutation, useFetchTruePurchaseQuery, useFetchPurchaseQuery, useFetchPurchaseByIdQuery, useUpdatePurchaseMutation, useRemovePurchaseMutation } = purchaseApi; 
+export const { useFetchPurchaseIdQuery, useAddPurchaseMutation, useFetchTruePurchaseQuery, useFetchPurchaseQuery, useFetchPurchaseByIdQuery, useUpdatePurchaseMutation, useUpdatePurchaseStatusMutation, useRemovePurchaseMutation } = purchaseApi; 
 export {purchaseApi};
