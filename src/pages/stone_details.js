@@ -1,5 +1,5 @@
 /* eslint-disable eqeqeq */
-import { Button, Card, CardBody, Dialog, DialogBody, Typography } from "@material-tailwind/react";
+import { Button, Card, CardBody, Dialog, DialogBody, Switch, Typography } from "@material-tailwind/react";
 import { FaCirclePlus, FaFloppyDisk, FaPencil, FaTrashCan, } from "react-icons/fa6";
 import { useEffect, useState } from "react";
 import { useFetchStoneDetailsQuery, useAddStoneDetailsMutation, useUpdateStoneDetailsMutation, useRemoveStoneDetailsMutation, useFetchUOMQuery, useFetchTrueBrightnessQuery, useFetchTrueStoneQuery, useFetchTrueGradeQuery, useFetchTrueTypeQuery, useFetchTrueSupplierQuery, useFetchPurchaseQuery, useUpdatePurchaseStatusMutation, useUpdatePurchaseMutation, useFetchTruePurchaseQuery } from "../store";
@@ -43,6 +43,8 @@ function StoneDetails() {
     const [isEdit, setIsEdit] = useState(false);
 
     const [selectedPurchase, setSelectedPurchase] = useState([]);
+
+    const [isSupplier, setIsSupplier] = useState(false);
 
     const [ alert, setAlert] = useState({
         isAlert: false,
@@ -297,6 +299,7 @@ function StoneDetails() {
             remark: tempPurchase.remark,
             paidStatus: tempPurchase.paidStatus,
             status: tempPurchase.status,
+            isComplete: tempPurchase.isComplete,
             createdBy: tempPurchase.createdBy,
             createdAt: tempPurchase.createdAt,
             updatedBy: tempPurchase.updatedBy,
@@ -312,7 +315,7 @@ function StoneDetails() {
                 }
             }),
         });
-        setPurchaseStatus(tempPurchase.status === 'F' ? true : false)
+        setPurchaseStatus(tempPurchase.isComplete)
         setIsEdit(true);
         setFormData(eData);
         setDescription({
@@ -327,7 +330,6 @@ function StoneDetails() {
 
     const submitEdit = async () => {
         if(validateForm()) {
-            let tempStatus = purchaseStatus ? 'F' : 'O';
             editStoneDetail({
                 stoneDetailCode: formData.stoneDetailCode,
                 referenceNo: formData.referenceNo,
@@ -349,15 +351,44 @@ function StoneDetails() {
             }).then((res) => {
                 console.log(res);
             });
-            if(tempStatus !== purchase.status && formData.referenceNo !== "") {
+            if(purchaseStatus !== purchase.isComplete && formData.referenceNo !== "") {
+                console.log(purchaseStatus);
                 updateStatus({
                     ...purchase,
-                    status: tempStatus,
+                    isComplete: purchaseStatus,
                     updatedBy: auth().username,
-                })
+                }).then((res) => {
+                    console.log(res);
+                });
             }
             setOpen(!open);
         }
+    };
+
+    const handleChange = async (e) => {
+        let stoneDetail = data.find((stone) => stone.stoneDetailCode == e.target.id);
+        await editStoneDetail({
+            stoneDetailCode: stoneDetail.stoneDetailCode,
+            referenceNo: stoneDetail.referenceNo,
+            supplierCode: stoneDetail.supplierCode,
+            stoneDesc: stoneDetail.stoneDesc,
+            stoneCode: stoneDetail.stoneCode,
+            typeCode: stoneDetail.typeCode,
+            brightCode: stoneDetail.brightCode,
+            gradeCode: stoneDetail.gradeCode,
+            size: stoneDetail.size,
+            sizeUnit: stoneDetail.sizeUnit,
+            qty: stoneDetail.qty,
+            weight: stoneDetail.weight,
+            unitCode: stoneDetail.unitCode,
+            remark: stoneDetail.remark,
+            isActive: e.target.checked ? true: false,
+            createdBy: stoneDetail.createdBy,
+            updatedBy: auth().username,
+        }).then((res) => {
+            console.log(res);
+        });
+
     };
 
     const handleRemove = async (id) => {
@@ -470,8 +501,11 @@ function StoneDetails() {
             width: "100px",
             cell: (row) => (
                 <div className="flex items-center gap-2">
+                    <div className="border-r border-gray-400 pr-2">
+                        <Switch color="deep-purple" defaultChecked={row.Status} id={row.Code} onChange={handleChange} />
+                    </div>
                     <Button variant="text" color="deep-purple" className="p-2" onClick={() => handleEdit(row.Code)}><FaPencil /></Button>
-                    <Button variant="text" color="red" className="p-2" onClick={() => handleDeleteBtn(row.Code)}><FaTrashCan /></Button>
+                    {/* <Button variant="text" color="red" className="p-2" onClick={() => handleDeleteBtn(row.Code)}><FaTrashCan /></Button> */}
                 </div>
             )
         },
@@ -544,8 +578,8 @@ function StoneDetails() {
                                     className="block w-full text-black p-2.5 border border-blue-gray-200 max-h-[2.5rem] rounded-md focus:border-black"
                                     value={formData.supplierCode}
                                     onChange={(e) => {
+                                        setIsSupplier(true);
                                         let selectP = truePurchaseData.filter(el => el.supplierCode === Number(e.target.value));
-                                        console.log(selectP);
                                         setSelectedPurchase(selectP);
                                         setFormData({
                                             ...formData,
@@ -577,12 +611,16 @@ function StoneDetails() {
                                     >
                                         <option value="" disabled>Select...</option>
                                         {
-                                            selectedPurchase.length === 0?
-                                            truePurchaseData?.map((purchase) => {
-                                                return <option value={purchase.invoiceNo} key={purchase.invoiceNo}>{purchase.invoiceNo} ({purchase.supplier.supplierName}, {purchase.stone.stoneDesc})</option>
-                                            }) : 
+                                            isSupplier?
                                             selectedPurchase?.map((purchase) => {
-                                                return <option value={purchase.invoiceNo} key={purchase.invoiceNo}>{purchase.invoiceNo} ({purchase.supplier.supplierName}, {purchase.stone.stoneDesc})</option>
+                                                if(!purchase.isComplete) {
+                                                    return <option value={purchase.invoiceNo} key={purchase.invoiceNo}>{purchase.invoiceNo} ({purchase.supplier.supplierName}, {purchase.stone.stoneDesc})</option>
+                                                }
+                                            }) :
+                                            truePurchaseData?.map((purchase) => {
+                                                if(!purchase.isComplete) {
+                                                    return <option value={purchase.invoiceNo} key={purchase.invoiceNo}>{purchase.invoiceNo} ({purchase.supplier.supplierName}, {purchase.stone.stoneDesc})</option>
+                                                }
                                             })
                                         }
                                     </select>

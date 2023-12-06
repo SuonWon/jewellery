@@ -412,7 +412,7 @@ function IssueList() {
     const column = [
         {
             name: 'Status',
-            width: '150px',
+            width: '120px',
             selector: row => row.status === 'O' ? 
                 <div className="bg-green-500 px-3 py-[5px] text-white rounded-xl">
                     Open
@@ -421,19 +421,20 @@ function IssueList() {
                     <div className="bg-red-500 px-3 py-[5px] text-white rounded-xl">
                         Void
                     </div> 
-                : row.status === 'F' ? 
-                    <div className="bg-blue-500 px-3 py-[5px] text-white rounded-xl">
-                        Complete
-                    </div> :
-                    <div className="bg-orange-500 px-3 py-[5px] text-white rounded-xl">
+                : <div className="bg-orange-500 px-3 py-[5px] text-white rounded-xl">
                         Closed
                     </div>,
             center: 'true'
         },
         {
             name: 'Issue No',
-            width: '200px',
-            selector: row => row.issueNo,
+            width: '130px',
+            selector: row => row.isComplete? <div className="bg-blue-500 px-3 py-[5px] text-white rounded-xl">
+                {row.issueNo}
+            </div> : <div className="bg-red-500 px-3 py-[5px] text-white rounded-xl">
+                {row.issueNo}
+            </div>,
+            center: true,
         },
         {
             name: 'Date',
@@ -524,6 +525,7 @@ function IssueList() {
             totalPrice: issueData.totalPrice.toLocaleString('en-US'),
             remark: issueData.remark,
             status: issueData.status,
+            isComplete: issueData.isComplete,
             createdAt: moment(issueData.createdAt).format("YYYY-MM-DD hh:mm:ss a"),
             createdBy: issueData.createdBy,
             updatedAt: moment(issueData.updatedAt).format("YYYY-MM-DD hh:mm:ss a"),
@@ -609,7 +611,9 @@ function IssueList() {
                                             {
                                                 stoneDetails?.length === 0 ? <option value="" disabled>There is no Data</option> :
                                                 stoneDetails?.map((stoneDetail) => {
-                                                    return <option value={stoneDetail.stoneDetailCode} key={stoneDetail.stoneDetailCode} >{stoneDetail.stoneDesc}</option>
+                                                    if(stoneDetail.isActive) {
+                                                        return <option value={stoneDetail.stoneDetailCode} key={stoneDetail.stoneDetailCode} >{stoneDetail.stoneDesc}</option>
+                                                    }
                                                 })
                                             }
                                         </select>

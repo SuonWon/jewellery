@@ -141,6 +141,7 @@ function SalesList() {
     const handleOpen = () => {
         setFormData(salesData);
         setIsEdit(false);
+        setIssueStatus(false);
         setOpen(!open);
         setTBodyData([]);
     };
@@ -159,6 +160,7 @@ function SalesList() {
                 unitPrice: tempIssue.unitPrice,
                 totalPrice: tempIssue.totalPrice,
                 status: tempIssue.status,
+                isComplete: tempIssue.isComplete,
                 remark: tempIssue.remark,
                 createdAt: tempIssue.createdAt,
                 createdBy: tempIssue.createdBy,
@@ -174,7 +176,7 @@ function SalesList() {
                     }
                 })
             })
-            setIssueStatus(tempIssue.status === 'F'? true : false);
+            setIssueStatus(tempIssue.isComplete);
         }
         setFormData({
             invoiceNo: tempData.invoiceNo,
@@ -370,7 +372,6 @@ function SalesList() {
     const handleUpdate = () => {
         if (validateForm()) {
             try {
-                let tempStatus = issueStatus? 'F' : 'O';
                 updateSales({
                     invoiceNo: formData.invoiceNo,
                     salesDate: formData.salesDate,
@@ -424,11 +425,13 @@ function SalesList() {
                     }
                     
                 });
-                if (tempStatus !== selectedIssue.status && formData.issueNo !== "") {
+                if (issueStatus !== selectedIssue.isComplete && formData.issueNo !== "") {
                     updateStatus({
                         ...selectedIssue,
-                        status: tempStatus,
+                        isComplete: issueStatus,
                         updatedBy: auth().username,
+                    }).then((res) => {
+                        console.log(res);
                     });
                     setSelectedIssue({});
                 }
@@ -592,7 +595,7 @@ function SalesList() {
                 <div className="flex items-center gap-2">
                     <Button variant="text" color="deep-purple" className="p-2" onClick={() => openPayable(row.Code, row.GrandTotal)}><FaMoneyBillTrendUp /></Button>
                     <Button variant="text" color="deep-purple" className="p-2" onClick={() => handleView(row.Code)}><FaPencil /></Button>
-                    <Button variant="text" color="red" className="p-2" onClick={() => handleDeleteBtn(row.Code)}><FaTrashCan /></Button>
+                    {/* <Button variant="text" color="red" className="p-2" onClick={() => handleDeleteBtn(row.Code)}><FaTrashCan /></Button> */}
                 </div>
             )
         },
@@ -715,10 +718,12 @@ function SalesList() {
                                             <option value="" >Select...</option>
                                             {
                                                 issueData?.map((issue) => {
-                                                    return <option value={issue.issueNo} key={issue.issueNo}>({issue.stoneDetail.stoneDesc}, {issue.issueMember.map(el => {
-                                                            return el.customer.customerName + ",";
-                                                        })})
-                                                    </option>
+                                                    if (!issue.isComplete) {
+                                                        return <option value={issue.issueNo} key={issue.issueNo}>({issue.stoneDetail.stoneDesc}, {issue.issueMember.map(el => {
+                                                                return el.customer.customerName + ",";
+                                                            })})
+                                                        </option>
+                                                    }
                                                 })
                                             }
                                         </select>
@@ -811,7 +816,9 @@ function SalesList() {
                                             {
                                                 stoneDetails?.length === 0 ? <option value="" disabled>There is no Data</option> :
                                                     stoneDetails?.map((stoneDetail) => {
-                                                        return <option value={stoneDetail.stoneDetailCode} key={stoneDetail.stoneDetailCode} >{stoneDetail.stoneDesc} ({stoneDetail.supplier.supplierName})</option>
+                                                        if (stoneDetail.isActive) {
+                                                            return <option value={stoneDetail.stoneDetailCode} key={stoneDetail.stoneDetailCode} >{stoneDetail.stoneDesc} ({stoneDetail.supplier.supplierName})</option>
+                                                        }
                                                     })
                                             }
                                         </select>
