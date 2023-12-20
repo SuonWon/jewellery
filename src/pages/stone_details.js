@@ -1,6 +1,6 @@
 /* eslint-disable eqeqeq */
 import { Button, Card, CardBody, Dialog, DialogBody, Switch, Typography } from "@material-tailwind/react";
-import { FaCirclePlus, FaFloppyDisk, FaPencil, FaTrashCan, } from "react-icons/fa6";
+import { FaCirclePlus, FaFloppyDisk, FaListCheck, FaPencil, FaTrashCan, } from "react-icons/fa6";
 import { useEffect, useState } from "react";
 import { useFetchStoneDetailsQuery, useAddStoneDetailsMutation, useUpdateStoneDetailsMutation, useRemoveStoneDetailsMutation, useFetchUOMQuery, useFetchTrueBrightnessQuery, useFetchTrueStoneQuery, useFetchTrueGradeQuery, useFetchTrueTypeQuery, useFetchTrueSupplierQuery, useFetchPurchaseQuery, useUpdatePurchaseStatusMutation, useUpdatePurchaseMutation, useFetchTruePurchaseQuery } from "../store";
 import DeleteModal from "../components/delete_modal";
@@ -10,7 +10,9 @@ import moment from "moment";
 import TableList from "../components/data_table";
 import { useAuthUser } from "react-auth-kit";
 import SuccessAlert from "../components/success_alert";
-import { focusSelect, sizeUnit } from "../const";
+import { apiUrl, focusSelect, sizeUnit } from "../const";
+import DataTable from "react-data-table-component";
+import axios from "axios";
 
 const validator = require("validator");
 
@@ -40,11 +42,15 @@ function StoneDetails() {
 
     const [openDelete, setOpenDelete] = useState(false);
 
+    const [openCombineStock, setOpenCombineStock] = useState(false);
+
     const [isEdit, setIsEdit] = useState(false);
 
     const [selectedPurchase, setSelectedPurchase] = useState([]);
 
     const [isSupplier, setIsSupplier] = useState(false);
+
+    const [isCombined, setIsCombined] = useState(false);
 
     const [ alert, setAlert] = useState({
         isAlert: false,
@@ -54,29 +60,14 @@ function StoneDetails() {
         title: ""
     });
 
+    const [selectOption, setSelectOption] = useState({
+        isSelectAll: false,
+        isUnselect: false,
+    });
+
     useEffect(() => {
         refetch();
     }, []);
-
-    // const stoneOption = stoneData?.map((stone) => {
-    //     return {value: stone.stoneCode, label: stone.stoneDesc}
-    // });
-
-    // const typeOption = typeData?.map((type) => {
-    //     return {value: type.typeCode, label: type.typeDesc}
-    // });
-
-    // const gradeOption = gradeData?.map((grade) => {
-    //     return {value: grade.gradeCode, label: grade.gradeDesc}
-    // });
-
-    // const brightOption = brightData?.map((bright) => {
-    //     return {value: bright.brightCode, label: bright.brightDesc}
-    // });
-
-    // const unitOption = unitData?.map((unit) => {
-    //     return {value: unit.unitCode, label: unit.unitCode}
-    // });
 
     const [description, setDescription] = useState({
         stoneDesc: "",
@@ -86,7 +77,7 @@ function StoneDetails() {
         sizeUnit: "လုံးစီး",
     });
 
-    const [addStoneDetail] = useAddStoneDetailsMutation();
+    const [addStoneDetail, addResult] = useAddStoneDetailsMutation();
 
     const [editStoneDetail] = useUpdateStoneDetailsMutation();
 
@@ -103,6 +94,8 @@ function StoneDetails() {
     const [ validationText, setValidationText ] = useState({});
 
     const [purchase, setPurchase] = useState({});
+
+    const [combineData, setCombineData] = useState([]);
 
     const stoneDetail = {
         stoneDesc: "",
@@ -282,40 +275,45 @@ function StoneDetails() {
     const handleEdit = async (id) => {
         let eData = data.find((stoneDetail) => stoneDetail.stoneDetailCode === id);
         let tempPurchase = purchaseData.find(res => res.invoiceNo === eData.referenceNo);
-        setPurchase({
-            invoiceNo: tempPurchase.invoiceNo,
-            purDate: tempPurchase.purDate,
-            supplierCode: tempPurchase.supplierCode,
-            stoneCode: tempPurchase.stoneCode,
-            qty: tempPurchase.qty,
-            totalWeight: tempPurchase.totalWeight,
-            unitCode: tempPurchase.unitCode,
-            unitPrice: tempPurchase.unitPrice,
-            subTotal: tempPurchase.subTotal,
-            servicePer: tempPurchase.servicePer,
-            serviceCharge: tempPurchase.serviceCharge,
-            discAmt: tempPurchase.discAmt,
-            grandTotal: tempPurchase.grandTotal,
-            remark: tempPurchase.remark,
-            paidStatus: tempPurchase.paidStatus,
-            status: tempPurchase.status,
-            isComplete: tempPurchase.isComplete,
-            createdBy: tempPurchase.createdBy,
-            createdAt: tempPurchase.createdAt,
-            updatedBy: tempPurchase.updatedBy,
-            updatedAt: tempPurchase.updatedAt,
-            deletedBy: tempPurchase.deletedBy,
-            purchaseShareDetails: tempPurchase.purchaseShareDetails.map(el => {
-                return {
-                    id: el.id,
-                    lineNo: el.lineNo,
-                    shareCode: el.shareCode,
-                    sharePercentage: el.sharePercentage,
-                    amount: el.amount,
-                }
-            }),
-        });
-        setPurchaseStatus(tempPurchase.isComplete)
+        if(tempPurchase) {
+            setPurchase({
+                invoiceNo: tempPurchase.invoiceNo,
+                purDate: tempPurchase.purDate,
+                supplierCode: tempPurchase.supplierCode,
+                stoneCode: tempPurchase.stoneCode,
+                qty: tempPurchase.qty,
+                totalWeight: tempPurchase.totalWeight,
+                unitCode: tempPurchase.unitCode,
+                unitPrice: tempPurchase.unitPrice,
+                subTotal: tempPurchase.subTotal,
+                servicePer: tempPurchase.servicePer,
+                serviceCharge: tempPurchase.serviceCharge,
+                discAmt: tempPurchase.discAmt,
+                grandTotal: tempPurchase.grandTotal,
+                remark: tempPurchase.remark,
+                paidStatus: tempPurchase.paidStatus,
+                status: tempPurchase.status,
+                isComplete: tempPurchase.isComplete,
+                createdBy: tempPurchase.createdBy,
+                createdAt: tempPurchase.createdAt,
+                updatedBy: tempPurchase.updatedBy,
+                updatedAt: tempPurchase.updatedAt,
+                deletedBy: tempPurchase.deletedBy,
+                purchaseShareDetails: tempPurchase.purchaseShareDetails.map(el => {
+                    return {
+                        id: el.id,
+                        lineNo: el.lineNo,
+                        shareCode: el.shareCode,
+                        sharePercentage: el.sharePercentage,
+                        amount: el.amount,
+                    }
+                }),
+            });
+            setPurchaseStatus(tempPurchase.isComplete);
+            setIsCombined(false);
+        } else {
+            setIsCombined(true);
+        }
         setIsEdit(true);
         setFormData(eData);
         setDescription({
@@ -399,6 +397,145 @@ function StoneDetails() {
     const handleDeleteBtn = (id) => {
         setDeleteId(id);
         setOpenDelete(!openDelete);
+    };
+
+    const openCombineModal = (id) => {
+        let temp = data.find(res => res.stoneDetailCode === id);
+        axios.get(`${apiUrl}/stone-detail/get-same-stone-details?stoneCode=${temp.stoneCode}&typeCode=${temp.typeCode}&brightCode=${temp.brightCode}&gradeCode=${temp.gradeCode}&size=${temp.size}&sizeUnit=${temp.sizeUnit}`).then((res) => {
+            setCombineData(
+                res.data.map(el => {
+                    return {
+                        stoneDetailCode: el.stoneDetailCode,
+                        referenceNo: el.referenceNo,
+                        supplierCode: el.supplierCode,
+                        supplierName: el.supplier.supplierName,
+                        stoneDesc: el.stoneDesc,
+                        stoneCode: el.stoneCode,
+                        typeCode: el.typeCode,
+                        brightCode: el.brightCode,
+                        gradeCode: el.gradeCode,
+                        size: el.size,
+                        sizeUnit: el.sizeUnit,
+                        unitCode: el.unitCode,
+                        qty: el.qty,
+                        weight: el.weight,
+                        isActive: el.isActive,
+                        remark: el.remark,
+                        createdBy: el.createdBy,
+                        createdAt: el.createdAt,
+                        selectedStone: el.stoneDetailCode === id ? true : false,
+                        isSelected: el.stoneDetailCode === id ? true : false,
+                    }
+                })
+            );
+        });
+        setSelectOption({
+            isSelectAll: false,
+            isUnselect: false
+        })
+        setOpenCombineStock(!openCombineStock);
+    };
+
+    const handleCombine = async () => {
+        let saveData = combineData.filter(res => res.isSelected);
+        if (saveData.length > 1) {
+            let combinedStone = {
+                referenceNo: "",
+                stoneDesc: "",
+                supplierCode: 0,
+                stoneCode: 0,
+                typeCode: 0,
+                brightCode: 0,
+                gradeCode: 0,
+                size: 0,
+                sizeUnit: "လုံးစီး",
+                qty: 0,
+                weight: 0,
+                unitCode: "ct",
+                remark: "",
+                isActive: true,
+                createdBy: auth().username,
+                updatedBy: "",
+            };
+            saveData.map(el => {
+                
+                if(el.selectedStone) {
+                    combinedStone = {
+                        ...combinedStone,
+                        stoneDesc: el.stoneDesc,
+                        supplierCode: el.supplierCode,
+                        stoneCode: el.stoneCode,
+                        typeCode: el.typeCode,
+                        brightCode: el.brightCode,
+                        gradeCode: el.gradeCode,
+                        size: el.size,
+                        sizeUnit: el.sizeUnit,
+                    }
+                }
+                combinedStone.referenceNo += `${el.referenceNo}, `;
+                combinedStone.qty += el.qty;
+                combinedStone.weight += el.weight;
+            });
+            await addStoneDetail(combinedStone)
+            .then((res) => {
+                console.log(res.data);
+                if(res.error == null) {
+                    console.log("Hello");
+                    saveData.map(el => {
+                        console.log(el);
+                        editStoneDetail({
+                            stoneDetailCode: el.stoneDetailCode,
+                            referenceNo: el.referenceNo,
+                            supplierCode: el.supplierCode,
+                            stoneDesc: el.stoneDesc,
+                            stoneCode: el.stoneCode,
+                            typeCode: el.typeCode,
+                            brightCode: el.brightCode,
+                            gradeCode: el.gradeCode,
+                            size: el.size,
+                            sizeUnit: el.sizeUnit,
+                            qty: el.qty,
+                            weight: el.weight,
+                            unitCode: el.unitCode,
+                            remark: el.remark,
+                            isActive: false,
+                            createdAt: el.createdAt,
+                            createdBy: el.createdBy,
+                            updatedBy: auth().username,
+                            updatedAt: moment().toISOString(),
+                        });
+                    });
+                }
+            });
+            setOpenCombineStock(!openCombineStock)
+        }else {
+            setAlert({
+                isAlert: true,
+                message: "Please select at least two items to continue.",
+                isWarning: true,
+                title: "Warning"
+            });
+            setTimeout(() => {
+                setAlert({
+                    isAlert: false,
+                    message: '',
+                    isWarning: false,
+                    title: ''
+                })
+            }, 2000);
+        }
+    };
+
+    const selectAll = () => {
+        setCombineData(
+            combineData.map(val => ({...val, isSelected: true}))
+        )
+    };
+
+    const unselectAll = () => {
+        setCombineData(
+            combineData.map(val => ({...val, isSelected: val.selectedStone? true : false}))
+        )
     };
 
     const column = [
@@ -498,12 +635,13 @@ function StoneDetails() {
         {
             name: 'Action',
             center: "true",
-            width: "100px",
+            width: "130px",
             cell: (row) => (
                 <div className="flex items-center gap-2">
                     <div className="border-r border-gray-400 pr-2">
                         <Switch color="deep-purple" defaultChecked={row.Status} id={row.Code} onChange={handleChange} />
                     </div>
+                    <Button variant="text" color="teal" className="p-2" onClick={() => openCombineModal(row.Code)} disabled={row.Status? false : true}><FaCirclePlus /></Button>
                     <Button variant="text" color="deep-purple" className="p-2" onClick={() => handleEdit(row.Code)}><FaPencil /></Button>
                     {/* <Button variant="text" color="red" className="p-2" onClick={() => handleDeleteBtn(row.Code)}><FaTrashCan /></Button> */}
                 </div>
@@ -535,6 +673,77 @@ function StoneDetails() {
         }
     });
 
+    const combineColumn = [
+        {
+            name: '',
+            center: "true",
+            width: "70px",
+            cell: (row) => (
+                <input 
+                    type="checkbox" 
+                    className="border border-blue-gray-200 w-[20px] h-[20px] py-1.5 rounded-md text-black"
+                    checked={row.isSelected}
+                    disabled={row.selectedStone}
+                    onChange={(e) => {
+                        setSelectOption({
+                            isSelectAll: false,
+                            isUnselect: false,
+                        })
+                        setCombineData(combineData.map((el) => {
+                            if (el.stoneDetailCode === row.stoneDetailCode) {
+                                el.isSelected = e.target.checked;
+                                return el;
+                            } else {
+                                return el;
+                            }
+                        }))
+                    }}
+                />
+            )
+        },
+        {
+            name: 'Quantity',
+            width: "100px",
+            selector: row => row.qty,
+            right: true,
+
+        },
+        {
+            name: 'Weight',
+            width: "150px",
+            selector: row => row.weight,
+            right: true,
+        },
+        {
+            name: 'Description',
+            width: '280px',
+            selector: row => row.description,
+        },
+        {
+            name: 'Reference No',
+            width: '150px',
+            selector: row => row.referenceNo,
+        },
+        {
+            name: 'Supplier Name',
+            width: '200px',
+            selector: row => row.supplierName,
+        },
+    ];
+
+    const tCombineData = combineData.map((stoneDetail) => {
+        return {
+            stoneDetailCode: stoneDetail.stoneDetailCode,
+            referenceNo: stoneDetail.referenceNo,
+            supplierName: stoneDetail.supplierName,
+            description: stoneDetail.stoneDesc,
+            qty: stoneDetail.qty,
+            weight: stoneDetail.weight,
+            selectedStone: stoneDetail.selectedStone,
+            isSelected: stoneDetail.isSelected,
+        }
+    });
+
     return(
         <>
         <div className="flex flex-col gap-4 relative max-w-[85%] min-w-[85%]">
@@ -544,7 +753,7 @@ function StoneDetails() {
                     alert.isAlert && <SuccessAlert title="Stone Details" message={alert.message} isError={true} />
                 }
             </div>
-            <Card className="h-auto shadow-md max-w-screen-xxl rounded-sm p-2 border-t">
+            <Card className="h-[auto] shadow-md max-w-screen-xxl rounded-sm p-2 border-t">
                 <CardBody className="rounded-sm overflow-auto p-0">
                     <TableList columns={column} data={tbodyData} />
                 </CardBody>
@@ -602,28 +811,32 @@ function StoneDetails() {
                             <div className="col-span-2 grid grid-cols-3 gap-2">
                                 <div className="col-span-2">
                                     <label className="text-black text-sm mb-2">Reference No</label>
-                                    <select 
-                                        className="block w-full text-black p-2.5 border border-blue-gray-200 max-h-[2.5rem] rounded-md focus:border-black"
-                                        value={formData.referenceNo}
-                                        onChange={(e) => {
-                                            setFormData({...formData, referenceNo: e.target.value});
-                                        }}
-                                    >
-                                        <option value="" disabled>Select...</option>
-                                        {
-                                            isSupplier?
-                                            selectedPurchase?.map((purchase) => {
-                                                if(!purchase.isComplete) {
-                                                    return <option value={purchase.invoiceNo} key={purchase.invoiceNo}>{purchase.invoiceNo} ({purchase.supplier.supplierName}, {purchase.stone.stoneDesc})</option>
-                                                }
-                                            }) :
-                                            truePurchaseData?.map((purchase) => {
-                                                if(!purchase.isComplete) {
-                                                    return <option value={purchase.invoiceNo} key={purchase.invoiceNo}>{purchase.invoiceNo} ({purchase.supplier.supplierName}, {purchase.stone.stoneDesc})</option>
-                                                }
-                                            })
-                                        }
-                                    </select>
+                                    {
+                                        isCombined? <input className="border border-blue-gray-200 text-black w-full h-[40px] p-2.5 rounded-md" value={formData.referenceNo} readOnly /> :
+                                        <select 
+                                            className="block w-full text-black p-2.5 border border-blue-gray-200 max-h-[2.5rem] rounded-md focus:border-black"
+                                            value={formData.referenceNo}
+                                            onChange={(e) => {
+                                                setFormData({...formData, referenceNo: e.target.value});
+                                            }}
+                                        >
+                                            <option value="" disabled>Select...</option>
+                                            {
+                                                isSupplier?
+                                                selectedPurchase?.map((purchase) => {
+                                                    if(!purchase.isComplete) {
+                                                        return <option value={purchase.invoiceNo} key={purchase.invoiceNo}>{purchase.invoiceNo} ({purchase.supplier.supplierName}, {purchase.stone.stoneDesc})</option>
+                                                    }
+                                                }) :
+                                                truePurchaseData?.map((purchase) => {
+                                                    if(!purchase.isComplete) {
+                                                        return <option value={purchase.invoiceNo} key={purchase.invoiceNo}>{purchase.invoiceNo} ({purchase.supplier.supplierName}, {purchase.stone.stoneDesc})</option>
+                                                    }
+                                                })
+                                            }
+                                        </select>
+
+                                    }
                                 </div>
                                 <div className="">
                                     <label className="text-black text-sm mb-2">Purchase Complete</label>
@@ -632,6 +845,7 @@ function StoneDetails() {
                                             type="checkbox" 
                                             className="border border-blue-gray-200 w-[20px] h-[20px] py-1.5 rounded-md text-black"
                                             checked={purchaseStatus}
+                                            disabled={isCombined}
                                             onChange={() => {
                                                 if (formData.referenceNo === "") {
                                                     setAlert({
@@ -894,6 +1108,80 @@ function StoneDetails() {
                 </DialogBody>
             </Dialog>
             <DeleteModal deleteId={deleteId} open={openDelete} handleDelete={handleRemove} closeModal={() => setOpenDelete(!openDelete)} />
+            <Dialog open={openCombineStock} handler={openCombineModal} size="lg">
+                <DialogBody>
+                    <ModalTitle titleName="Stock Combination" handleClick={() => setOpenCombineStock(!openCombineStock)} />
+                    {
+                        alert.isAlert? <SuccessAlert title={alert.title} message={alert.message} isWarning={alert.isWarning} /> : ""
+                    }
+                    <Card className="max-h-[500px] max-w-screen-xxl shadow-none p-2 ">
+                        <CardBody className="overflow-auto p-0">
+                            <div className="grid grid-cols-8 gap-1">
+                                <label htmlFor="selectAll" className="flex items-center justify-center gap-2 p-1 rounded-md hover:bg-gray-100" onClick={() => {
+                                    setSelectOption({
+                                        isSelectAll: true,
+                                        isUnselect: false
+                                    });
+                                    selectAll();
+                                }}>
+                                    <input 
+                                        type="checkbox" 
+                                        id="selectAll"
+                                        name="selectAll"
+                                        className="border border-blue-gray-200 w-[15px] h-[15px] py-1.5 rounded-md text-black"
+                                        checked={selectOption.isSelectAll}
+                                    />
+                                    <span className="text-sm">Select All</span>
+                                </label>
+                                <label htmlFor="unselectAll" className="flex items-center justify-center gap-2 p-1 rounded-md hover:bg-gray-100" onClick={() => {
+                                    setSelectOption({
+                                        isSelectAll: false,
+                                        isUnselect: true,
+                                    });
+                                    unselectAll();
+                                }}>
+                                    <input 
+                                        type="checkbox" 
+                                        id="unselectAll"
+                                        name="unselectAll"
+                                        className="border border-blue-gray-200 w-[15px] h-[15px] py-1.5 rounded-md text-black"
+                                        checked={selectOption.isUnselect}
+                                    />
+                                    <span className="text-sm">Unselect All</span>
+                                </label>
+                            </div>
+                            <DataTable 
+                                columns={combineColumn} 
+                                data={tCombineData} 
+                                fixedHeader
+                                fixedHeaderScrollHeight="400px"
+                                customStyles={{
+                                    rows: {
+                                        style: {
+                                            minHeight: '40px',
+                                        },
+                                    },
+                                    headCells: {
+                                        style: {
+                                            fontWeight: "bold",
+                                            fontSize: "0.9rem",
+                                            minHeight: '40px',
+                                        }
+                                    }
+                                }} 
+                            />
+                        </CardBody>
+                    </Card>
+                        <div className="flex items-center justify-end">
+                            <Button onClick={handleCombine} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2 mt-3">
+                                <FaCirclePlus className="text-base" />
+                                <Typography variant="small" className="capitalize">
+                                    Combine
+                                </Typography>
+                            </Button>
+                        </div>
+                </DialogBody>
+            </Dialog>
         </div>
 
         </>

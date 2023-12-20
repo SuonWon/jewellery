@@ -18,6 +18,7 @@ import { adjustmentApi } from "../apis/adjustmentApi";
 import { walletTransitionApi } from "../apis/walletTransitionApi";
 import { payableApi } from "../apis/payableApi";
 import { receivableApi } from "../apis/receivableApi";
+import { walletCategoryApi } from "../apis/walletCategoryApi";
 
 export const store = configureStore({
     reducer: {
@@ -40,6 +41,7 @@ export const store = configureStore({
         [walletTransitionApi.reducerPath] : walletTransitionApi.reducer,
         [payableApi.reducerPath] : payableApi.reducer,
         [receivableApi.reducerPath] : receivableApi.reducer,
+        [walletCategoryApi.reducerPath] : walletCategoryApi.reducer,
     },
     middleware: (getDefaultMiddleware) => {
         return getDefaultMiddleware()
@@ -61,7 +63,8 @@ export const store = configureStore({
             .concat(adjustmentApi.middleware)
             .concat(walletTransitionApi.middleware)
             .concat(payableApi.middleware)
-            .concat(receivableApi.middleware);
+            .concat(receivableApi.middleware)
+            .concat(walletCategoryApi.middleware);
     }
 });
 
@@ -84,3 +87,4 @@ export { useFetchAdjustmentQuery, useFetchAdjustmentByIdQuery, useAddAdjustmentM
 export { useFetchWalletQuery, useFetchWalletTransactionQuery, useFetchWalletTransactionByIdQuery, useAddWalletTransactionMutation, useUpdateWalletTransactionMutation, useRemoveWalletTransactionMutation } from "../apis/walletTransitionApi";
 export { useFetchPayableQuery, useFetchPayableByIdQuery, useAddPayableMutation, useUpdatePayableMutation, useRemovePayableMutation } from "../apis/payableApi";
 export { useFetchReceivableQuery, useFetchReceivableByIdQuery, useAddReceivableMutation, useUpdateReceivableMutation, useRemoveReceivableMutation } from "../apis/receivableApi";
+export { useFetchWalletCategoryQuery, useFetchTrueWalletCategoryQuery, useFetchWalletCategoryByIdQuery, useAddWalletCategoryMutation, useUpdateWalletCategoryMutation, useRemoveWalletCategoryMutation } from "../apis/walletCategoryApi";

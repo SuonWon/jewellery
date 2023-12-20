@@ -3,7 +3,7 @@ import { Button, Card, CardBody, Dialog, DialogBody, Typography } from "@materia
 import { FaCirclePlus, FaEye, FaFloppyDisk, FaPencil, FaPlus, FaTrashCan, } from "react-icons/fa6";
 import { useState } from "react";
 import { apiUrl, focusSelect, pause } from "../const";
-import { useAddReturnMutation, useFetchIssueQuery, useFetchReturnQuery, useFetchStoneDetailsQuery, useFetchUOMQuery, useRemoveReturnMutation, useUpdateReturnMutation } from "../store";
+import { useAddReturnMutation, useFetchIssueQuery, useFetchReturnQuery, useFetchStoneDetailsQuery, useFetchTrueSalesQuery, useFetchUOMQuery, useRemoveReturnMutation, useUpdateReturnMutation } from "../store";
 import DeleteModal from "../components/delete_modal";
 import SuccessAlert from "../components/success_alert";
 import moment from "moment";
@@ -23,6 +23,8 @@ function ReturnList() {
     const {data: unitData} = useFetchUOMQuery();
 
     const {data: issueData} = useFetchTrueIssueQuery();
+
+    const {data: salesData} = useFetchTrueSalesQuery();
 
     axios.get(apiUrl + '/return/get-id').then((res) => {
         setReturnId(res.data);
@@ -55,6 +57,7 @@ function ReturnList() {
         returnNo: "",
         returnDate: moment().format("YYYY-MM-DD"),
         referenceNo: "",
+        returnType: "I",
         stoneDetailCode: 0,
         qty: 0,
         weight: 0,
@@ -223,6 +226,7 @@ function ReturnList() {
                     returnDate: formData.returnDate,
                     referenceNo: formData.referenceNo,
                     stoneDetailCode: formData.stoneDetailCode,
+                    returnType: formData.returnType,
                     qty: formData.qty,
                     weight: formData.weight,
                     unitCode: formData.unitCode,
@@ -307,6 +311,11 @@ function ReturnList() {
             selector: row => row.referenceNo,
         },
         {
+            name: 'Type',
+            width: "120px",
+            selector: row => row.returnType === "I" ? "Issue" : "Sales",
+        },
+        {
             name: 'Stone Detail',
             width: "200px",
             selector: row => row.stoneDetail,
@@ -381,6 +390,7 @@ function ReturnList() {
             qty: returnData.qty.toLocaleString('en-US'),
             weight: returnData.weight.toLocaleString('en-US'),
             unitCode: returnData.unitCode,
+            returnType: returnData.returnType,
             unitPrice: returnData.unitPrice.toLocaleString('en-US'),
             totalPrice: returnData.totalPrice.toLocaleString('en-US'),
             Remark: returnData.remark,
@@ -429,37 +439,55 @@ function ReturnList() {
                                         value={formData.returnNo}
                                         readOnly={isEdit}
                                     />
-                                </div> : 
-                                <div className="col-span-2">
-                                    {/* Reference No */}
-                                    <label className="text-black text-sm mb-2">Reference No</label>
-                                    <select 
-                                        className="block w-full text-black border border-blue-gray-200 h-[35px] px-2.5 py-1.5 rounded-md focus:border-black"
-                                        value={formData.referenceNo}
-                                        onChange={(e) => {
-                                            let stoneDetailCode = issueData.find(el => el.issueNo === e.target.value).stoneDetailCode;
-                                            setFormData({
-                                                ...formData, 
-                                                referenceNo: e.target.value,
-                                                stoneDetailCode: stoneDetailCode,
-                                            });
-                                        }}
-                                    >
-                                        <option value="" disabled>Select...</option>
-                                        {
-                                            issueData?.map((issue) => {
-                                                return <option value={issue.issueNo} key={issue.issueNo}>({issue.stoneDetail.stoneDesc}, {issue.issueMember.map(el => {
-                                                        return el.customer.customerName + ",";
-                                                    })})
-                                                </option>
-                                            })
-                                        }
-                                    </select>
-                                    {
-                                        validationText.referenceNo && <p className="block text-[12px] text-red-500 font-sans">{validationText.referenceNo}</p>
-                                    }
-                                </div>
+                                </div> : ""
+                                
                             }
+                            {/* Return Type */}
+                            <div>
+                                <label className="text-black mb-2 text-sm">Return Type</label>
+                                <select 
+                                    className="block w-full px-2.5 py-1.5 border border-blue-gray-200 h-[35px] rounded-md focus:border-black text-black" 
+                                    value={formData.returnType} 
+                                    onChange={(e) => {
+                                        setFormData({
+                                            ...formData, 
+                                            returnType: e.target.value,
+                                        })
+                                    }}
+                                    >
+                                    <option value="I">Issue Return</option>
+                                    <option value="S">Sales Return</option>
+                                </select>
+                            </div>
+                            {/* Reference No */}
+                            {/* <div className="col-span-2">
+                                <label className="text-black text-sm mb-2">Reference No</label>
+                                <select 
+                                    className="block w-full text-black border border-blue-gray-200 h-[35px] px-2.5 py-1.5 rounded-md focus:border-black"
+                                    value={formData.referenceNo}
+                                    onChange={(e) => {
+                                        let stoneDetailCode = issueData.find(el => el.issueNo === e.target.value).stoneDetailCode;
+                                        setFormData({
+                                            ...formData, 
+                                            referenceNo: e.target.value,
+                                            stoneDetailCode: stoneDetailCode,
+                                        });
+                                    }}
+                                >
+                                    <option value="" disabled>Select...</option>
+                                    {
+                                        issueData?.map((issue) => {
+                                            return <option value={issue.issueNo} key={issue.issueNo}>({issue.stoneDetail.stoneDesc}, {issue.issueMember.map(el => {
+                                                    return el.customer.customerName + ",";
+                                                })})
+                                            </option>
+                                        })
+                                    }
+                                </select>
+                                {
+                                    validationText.referenceNo && <p className="block text-[12px] text-red-500 font-sans">{validationText.referenceNo}</p>
+                                }
+                            </div> */}
                             
                             {/* Return Date */}
                             <div className="col-start-4 col-end-4">
@@ -479,38 +507,39 @@ function ReturnList() {
                             </div>
                         </div>
                         <div className="grid grid-cols-4 gap-2 mb-3">
-                            {
-                                isEdit? 
-                                <div>
-                                    {/* Reference No */}
-                                    <label className="text-black text-sm mb-2">Reference No</label>
-                                    <select 
-                                        className="block w-full text-black border border-blue-gray-200 h-[35px] px-2.5 py-1.5 rounded-md focus:border-black"
-                                        value={formData.referenceNo}
-                                        onChange={(e) => {
-                                            let stoneDetailCode = issueData.find(el => el.issueNo === e.target.value).stoneDetailCode;
-                                            setFormData({
-                                                ...formData, 
-                                                referenceNo: e.target.value,
-                                                stoneDetailCode: stoneDetailCode,
-                                            });
-                                        }}
-                                    >
-                                        <option value="" disabled>Select...</option>
-                                        {
-                                            issueData?.map((issue) => {
-                                                return <option value={issue.issueNo} key={issue.issueNo}>({issue.stoneDetail.stoneDesc}, {issue.issueMember.map(el => {
-                                                        return el.customer.customerName + ",";
-                                                    })})
-                                                </option>
-                                            })
-                                        }
-                                    </select>
+                            <div className="col-span-2">
+                                {/* Reference No */}
+                                <label className="text-black text-sm mb-2">Reference No</label>
+                                <select 
+                                    className="block w-full text-black border border-blue-gray-200 h-[35px] px-2.5 py-1.5 rounded-md focus:border-black"
+                                    value={formData.referenceNo}
+                                    onChange={(e) => {
+                                        let stoneDetailCode = formData.returnType === "I" ? issueData.find(el => el.issueNo === e.target.value).stoneDetailCode : salesData.find(el => el.invoiceNo === e.target.value).stoneDetailCode;
+                                        setFormData({
+                                            ...formData, 
+                                            referenceNo: e.target.value,
+                                            stoneDetailCode: stoneDetailCode,
+                                        });
+                                    }}
+                                >
+                                    <option value="" disabled>Select...</option>
                                     {
-                                        validationText.referenceNo && <p className="block text-[12px] text-red-500 font-sans">{validationText.referenceNo}</p>
+                                        formData.returnType === "I" ?
+                                        issueData?.map((issue) => {
+                                            return <option value={issue.issueNo} key={issue.issueNo}>({issue.stoneDetail.stoneDesc}, {issue.issueMember.map(el => {
+                                                    return el.customer.customerName + ",";
+                                                })})
+                                            </option>
+                                        }) : salesData?.map((sales) => {
+                                            return <option value={sales.invoiceNo} key={sales.invoiceNo}>({sales.stoneDetail.stoneDesc}, {sales.customer.customerName})
+                                            </option>
+                                        })
                                     }
-                                </div> : ""
-                            }
+                                </select>
+                                {
+                                    validationText.referenceNo && <p className="block text-[12px] text-red-500 font-sans">{validationText.referenceNo}</p>
+                                }
+                            </div> 
                             {/* Stone Details */}
                             <div className="col-span-2">
                                 <label className="text-black mb-2 text-sm">Stone Details</label>
