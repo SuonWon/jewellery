@@ -1,4 +1,5 @@
 import { Card, List, ListItem, ListItemPrefix, Typography } from "@material-tailwind/react";
+import { BiCategory } from "react-icons/bi";
 import { FaRulerVertical } from "react-icons/fa6";
 import { GiCheckeredDiamond, GiCutDiamond, GiDiamondHard, GiDiamonds } from "react-icons/gi";
 import { Link } from "react-router-dom";
@@ -51,6 +52,14 @@ function Sidebar() {
                             <FaRulerVertical />
                         </ListItemPrefix>
                         Unit
+                    </ListItem>
+                </Link>
+                <Link to="home/master/walletCategory" className="text-initial">
+                    <ListItem>
+                        <ListItemPrefix>
+                            <BiCategory />
+                        </ListItemPrefix>
+                        Wallet Category
                     </ListItem>
                 </Link>
             </List>

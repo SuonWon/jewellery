@@ -3,6 +3,7 @@ import Grade from '../pages/grade';
 import Stone from '../pages/stone';
 import StoneType from '../pages/type';
 import UOM from '../pages/uom';
+import WalletCategory from '../pages/walletCategory';
 import Sidebar from './sidebar';
 import { Route, Routes } from 'react-router-dom';
 
@@ -20,6 +21,7 @@ function Setup() {
                     <Route path='home/master/type' element={<StoneType />}></Route>
                     <Route path='home/master/uom' element={<UOM />}></Route>
                     <Route path='home/master/stone' element={<Stone />}></Route>
+                    <Route path='home/master/walletCategory' element={<WalletCategory />}></Route>
                 </Routes>
             </div>
         </div>
