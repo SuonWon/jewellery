@@ -3,7 +3,7 @@ import { Button, Card, CardBody, Dialog, DialogBody, Typography } from "@materia
 import { FaCirclePlus, FaEye, FaFloppyDisk, FaPencil, FaPlus, FaTrashCan, } from "react-icons/fa6";
 import { useState } from "react";
 import { apiUrl, focusSelect, pause } from "../const";
-import { useAddReturnMutation, useFetchIssueQuery, useFetchReturnQuery, useFetchStoneDetailsQuery, useFetchTrueSalesQuery, useFetchUOMQuery, useRemoveReturnMutation, useUpdateReturnMutation } from "../store";
+import { useAddReturnMutation, useFetchIssueQuery, useFetchReturnQuery, useFetchStoneDetailsQuery, useFetchTruePurchaseQuery, useFetchTrueSalesQuery, useFetchUOMQuery, useRemoveReturnMutation, useUpdateReturnMutation } from "../store";
 import DeleteModal from "../components/delete_modal";
 import SuccessAlert from "../components/success_alert";
 import moment from "moment";
@@ -14,7 +14,7 @@ import axios from "axios";
 import { useFetchTrueIssueQuery } from "../apis/issueApi";
 const validator = require('validator');
 
-function ReturnList() {
+function ReturnList({type = 'I'}) {
 
     const { data } = useFetchReturnQuery();
 
@@ -26,9 +26,17 @@ function ReturnList() {
 
     const {data: salesData} = useFetchTrueSalesQuery();
 
+    const {data: purchaseData} = useFetchTruePurchaseQuery();
+
     axios.get(apiUrl + '/return/get-id').then((res) => {
         setReturnId(res.data);
     });
+
+    const [removeReturn, removeResult] = useRemoveReturnMutation();
+
+    const [addReturn] = useAddReturnMutation();
+
+    const [updateReturn] = useUpdateReturnMutation();
 
     const auth = useAuthUser();
 
@@ -40,13 +48,9 @@ function ReturnList() {
 
     const [openDelete, setOpenDelete] = useState(false);
 
+    const [purchaseStoneD, setPurchaseStoneD] = useState([]);
+
     const [isAlert, setIsAlert] = useState(true);
-
-    const [removeReturn, removeResult] = useRemoveReturnMutation();
-
-    const [addReturn] = useAddReturnMutation();
-
-    const [updateReturn] = useUpdateReturnMutation();
 
     const [ alert, setAlert] = useState({
         isAlert: false,
@@ -57,7 +61,7 @@ function ReturnList() {
         returnNo: "",
         returnDate: moment().format("YYYY-MM-DD"),
         referenceNo: "",
-        returnType: "I",
+        returnType: type,
         stoneDetailCode: 0,
         qty: 0,
         weight: 0,
@@ -412,7 +416,7 @@ function ReturnList() {
                 </div>
                 <div className="flex items-center py-3 bg-white gap-4 sticky top-0 z-10">
                     <Typography variant="h5">
-                        Return List
+                        {type === 'I' ? "Issue" : type === 'S' ? "Sales" : "Purchase"} Return List
                     </Typography>
                     <Button variant="gradient" size="sm" color="deep-purple" className="flex items-center gap-2" onClick={handleOpen}>
                         <FaPlus /> Create New
@@ -426,7 +430,13 @@ function ReturnList() {
                 <DeleteModal deleteId={deleteId} open={openDelete} handleDelete={handleRemove} closeModal={() => setOpenDelete(!openDelete)} />
                 <Dialog open={open} size="lg">
                     <DialogBody>
-                        <ModalTitle titleName={isEdit? "Edit Return" : "Create Return"} handleClick={() => setOpen(!open)} />
+                        <ModalTitle
+                            titleName={
+                                isEdit? `Edit ${formData.returnType === 'I' ? "Issue" : formData.returnType === 'S' ? "Sales" : "Purchase"} Return` : 
+                                `Create ${formData.returnType === 'I' ? "Issue" : formData.returnType === 'S' ? "Sales" : "Purchase"} Return`
+                            } 
+                            handleClick={() => setOpen(!open)} 
+                        />
                         <div className="grid grid-cols-4 gap-2 mb-3">
                             {
                                 isEdit? 
@@ -444,6 +454,15 @@ function ReturnList() {
                             }
                             {/* Return Type */}
                             <div>
+                            <label className="text-black text-sm mb-2">Return No</label>
+                                <input
+                                    type="text"
+                                    className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
+                                    value={formData.returnType === 'I' ? "Issue Return" : formData.returnType === 'S' ? "Sales Return" : "Purchase Return"}
+                                    readOnly
+                                />
+                            </div>
+                            {/* <div>
                                 <label className="text-black mb-2 text-sm">Return Type</label>
                                 <select 
                                     className="block w-full px-2.5 py-1.5 border border-blue-gray-200 h-[35px] rounded-md focus:border-black text-black" 
@@ -458,7 +477,7 @@ function ReturnList() {
                                     <option value="I">Issue Return</option>
                                     <option value="S">Sales Return</option>
                                 </select>
-                            </div>
+                            </div> */}
                             {/* Reference No */}
                             {/* <div className="col-span-2">
                                 <label className="text-black text-sm mb-2">Reference No</label>
@@ -514,24 +533,33 @@ function ReturnList() {
                                     className="block w-full text-black border border-blue-gray-200 h-[35px] px-2.5 py-1.5 rounded-md focus:border-black"
                                     value={formData.referenceNo}
                                     onChange={(e) => {
-                                        let stoneDetailCode = formData.returnType === "I" ? issueData.find(el => el.issueNo === e.target.value).stoneDetailCode : salesData.find(el => el.invoiceNo === e.target.value).stoneDetailCode;
-                                        setFormData({
-                                            ...formData, 
-                                            referenceNo: e.target.value,
-                                            stoneDetailCode: stoneDetailCode,
-                                        });
+                                        if (type === 'P') {
+                                            let stoneDetail = stoneDetails.filter(res => res.referenceNo === e.target.value);
+                                            console.log(stoneDetail);
+                                        } else {
+                                            let stoneDetailCode = formData.returnType === "I" ? issueData.find(el => el.issueNo === e.target.value).stoneDetailCode : salesData.find(el => el.invoiceNo === e.target.value).stoneDetailCode;
+                                            setFormData({
+                                                ...formData, 
+                                                referenceNo: e.target.value,
+                                                stoneDetailCode: stoneDetailCode,
+                                            });
+                                        }
+                                        
                                     }}
                                 >
                                     <option value="" disabled>Select...</option>
                                     {
-                                        formData.returnType === "I" ?
+                                        type === 'I' ?
                                         issueData?.map((issue) => {
                                             return <option value={issue.issueNo} key={issue.issueNo}>({issue.stoneDetail.stoneDesc}, {issue.issueMember.map(el => {
                                                     return el.customer.customerName + ",";
                                                 })})
                                             </option>
-                                        }) : salesData?.map((sales) => {
+                                        }) : type === 'S' ? salesData?.map((sales) => {
                                             return <option value={sales.invoiceNo} key={sales.invoiceNo}>({sales.stoneDetail.stoneDesc}, {sales.customer.customerName})
+                                            </option>
+                                        }) : purchaseData?.map((purchase) => {
+                                            return <option value={purchase.invoiceNo} key={purchase.invoiceNo}>({purchase.stone.stoneDesc}, {purchase.supplier.supplierName})
                                             </option>
                                         })
                                     }
@@ -555,8 +583,11 @@ function ReturnList() {
                                     >
                                     <option value="0" disabled>Select stone detail</option>
                                     {
+                                        purchaseStoneD.length === 0 ? 
                                         stoneDetails?.length === 0 ? <option value="" disabled>There is no Data</option> :
                                         stoneDetails?.map((stoneDetail) => {
+                                            return <option value={stoneDetail.stoneDetailCode} key={stoneDetail.stoneDetailCode} >{stoneDetail.stoneDesc} ({stoneDetail.supplier.supplierName})</option>
+                                        }) : purchaseStoneD?.map((stoneDetail) => {
                                             return <option value={stoneDetail.stoneDetailCode} key={stoneDetail.stoneDetailCode} >{stoneDetail.stoneDesc} ({stoneDetail.supplier.supplierName})</option>
                                         })
                                     }
@@ -693,7 +724,7 @@ function ReturnList() {
                                             Save
                                         </Typography>
                                     </Button>
-                                    <Button onClick={handleSave}  color="green" size="sm" variant="gradient" className="flex items-center gap-2">
+                                    <Button onClick={handleSave}  color="deep-purple" size="sm" variant="outlined" className="flex items-center gap-2">
                                         <FaCirclePlus className="text-base" />
                                         <Typography variant="small" className="capitalize">
                                             Save & New

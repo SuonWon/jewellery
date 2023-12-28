@@ -107,6 +107,16 @@ function PurchaseList() {
 
     const [tBodyData, setTBodyData] = useState([dShare]);
 
+    const [tBodyReturnData, setTBodyReturnData] = useState([
+        {
+            returnNo: "R-00000001",
+            amount: 300000,
+            weight: 300,
+            qty: 30
+        }
+
+    ])
+
     const [deleteId, setDeleteId] = useState('');
 
     const [validationText, setValidationText] = useState({});
@@ -752,6 +762,28 @@ function PurchaseList() {
         },
     ];
 
+    const returnColumn = [
+        {
+            name: "Return No",
+            selector: row => row.returnNo,
+        },
+        {
+            name: "Amount",
+            selector: row => row.amount,
+            right: true,
+        },
+        {
+            name: "Weight",
+            selector: row => row.weight,
+            right: true,
+        },
+        {
+            name: "Quantity",
+            selector: row => row.qty,
+            right: true
+        }
+    ];
+
     const tbodyData = data?.map((purchaseData) => {
         return {
             Code: purchaseData.invoiceNo,
@@ -1184,6 +1216,35 @@ function PurchaseList() {
                                             <DataTable 
                                             columns={shareColumn} 
                                             data={tBodyData} 
+                                            fixedHeader
+                                            fixedHeaderScrollHeight="150px"
+                                            customStyles={{
+                                                rows: {
+                                                    style: {
+                                                        minHeight: '40px',
+                                                    },
+                                                },
+                                                headCells: {
+                                                    style: {
+                                                        fontWeight: "bold",
+                                                        fontSize: "0.8rem",
+                                                        minHeight: '40px',
+                                                    }
+                                                }
+                                            }} 
+                                        />
+                                        </CardBody>
+                                    </Card>
+                                </div>
+                                {/* Return table list */}
+                                <div className="col-span-5">
+                                    <Card className="w-full shadow-sm border border-blue-gray-200 rounded-md">
+                                        <CardBody className="overflow-auto rounded-md p-0">
+                                            <DataTable 
+                                            columns={returnColumn} 
+                                            data={tBodyReturnData} 
+                                            fixedHeader
+                                            fixedHeaderScrollHeight="150px"
                                             customStyles={{
                                                 rows: {
                                                     style: {
@@ -1223,7 +1284,7 @@ function PurchaseList() {
                                             Save
                                         </Typography>
                                     </Button>
-                                    <Button onClick={handleSave} color="green" size="sm" variant="gradient" className="flex items-center gap-2">
+                                    <Button onClick={handleSave} color="deep-purple" size="sm" variant="outlined" className="flex items-center gap-2">
                                         <FaCirclePlus className="text-base" />
                                         <Typography variant="small" className="capitalize">
                                             Save & New

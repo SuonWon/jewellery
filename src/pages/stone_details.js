@@ -110,6 +110,7 @@ function StoneDetails() {
         qty: 0,
         weight: 0,
         unitCode: "ct",
+        purchasePrice: 0,
         remark: "",
         isActive: true,
         createdBy: auth().username,
@@ -578,6 +579,24 @@ function StoneDetails() {
             selector: row => row.SupplierName,
         },
         {
+            name: 'Purchase Price',
+            width: '150px',
+            selector: row => row.PurchasePrice,
+            right: true,
+        },
+        {
+            name: 'Sales Price',
+            width: '150px',
+            selector: row => row.SalesPrice,
+            right: true,
+        },
+        {
+            name: 'Profit',
+            width: '150px',
+            selector: row => row.Profit,
+            right: true,
+        },
+        {
             name: 'Size',
             width: "150",
             selector: row => row.Size,
@@ -670,6 +689,9 @@ function StoneDetails() {
             UpdatedBy: stoneDetail.updatedBy,
             Remark: stoneDetail.remark,
             Status: stoneDetail.isActive,
+            PurchasePrice: stoneDetail.purchasePrice,
+            SalesPrice: stoneDetail.salesPrice,
+            Profit: stoneDetail.profit,
         }
     });
 
@@ -1070,6 +1092,25 @@ function StoneDetails() {
                                 }
                             </div>
                             <div className="col-span-2">
+                                <div className="grid grid-cols-3 gap-2">
+                                    {/* Purchase Price */}
+                                    <div>
+                                        <label className="text-black text-sm mb-2">Purchase Price</label>
+                                        <input type="number" className="border border-blue-gray-200 w-full h-[40px] p-2.5 rounded-md text-black" value={formData.purchasePrice} onChange={(e) => setFormData({...formData, purchasePrice: parseFloat(e.target.value)})} onFocus={(e) => focusSelect(e)}/>
+                                    </div>
+                                    {/* Sales Price */}
+                                    <div>
+                                        <label className="text-black text-sm mb-2">Sales Price</label>
+                                        <input type="number" className="border border-blue-gray-200 w-full h-[40px] p-2.5 rounded-md text-black" value={0} readOnly/>
+                                    </div>
+                                    {/* Profit */}
+                                    <div>
+                                        <label className="text-black text-sm mb-2">Profit</label>
+                                        <input type="number" className="border border-blue-gray-200 w-full h-[40px] p-2.5 rounded-md text-black" value={0} readOnly/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="col-span-2">
                                 <label className="text-black text-sm mb-2">Remark</label>
                                 <textarea
                                     className="border border-blue-gray-200 w-full px-2.5 py-1.5 rounded-md text-black"
@@ -1094,7 +1135,7 @@ function StoneDetails() {
                                             Save
                                         </Typography>
                                     </Button>
-                                    <Button onClick={onSaveSubmit} color="green" size="sm" variant="gradient" className="flex items-center gap-2">
+                                    <Button onClick={onSaveSubmit} color="deep-purple" size="sm" variant="outlined" className="flex items-center gap-2">
                                         <FaCirclePlus className="text-base" />
                                         <Typography variant="small" className="capitalize">
                                             Save & New

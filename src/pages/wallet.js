@@ -1,6 +1,6 @@
 /* eslint-disable eqeqeq */
-import { Button, Card, CardBody, Dialog, DialogBody, Typography } from "@material-tailwind/react";
-import { FaCircleMinus, FaCirclePlus, FaEquals, FaFilter, FaFloppyDisk, FaPencil, FaPlus, FaTrashCan, } from "react-icons/fa6";
+import { Button, Card, CardBody, Dialog, DialogBody, IconButton, Typography } from "@material-tailwind/react";
+import { FaCircleMinus, FaCirclePlus, FaEquals, FaFilter, FaFloppyDisk, FaPencil, FaPlus, FaTrashCan, FaXmark, } from "react-icons/fa6";
 import { BiReset } from "react-icons/bi"
 import { useEffect, useState } from "react";
 import { apiUrl, focusSelect, pause } from "../const";
@@ -557,7 +557,7 @@ function Wallet({walletId}) {
                         <div className="grid grid-cols-5 gap-2 px-2">
                             {/* Wallet Code */}
                             <div>
-                                <label className="text-black text-sm mb-2">Share</label>
+                                <label className="text-black text-sm mb-2">Wallet Name</label>
                                 <select 
                                     className="block w-full text-black border border-blue-gray-200 h-[35px] px-2.5 py-1.5 rounded-md focus:border-black"
                                     value={filterForm.walletCode}
@@ -703,11 +703,19 @@ function Wallet({walletId}) {
                 <DeleteModal deleteId={deleteId} open={openDelete} handleDelete={handleRemove} closeModal={() => setOpenDelete(!openDelete)} />
                 <Dialog open={open} size="md">
                     <DialogBody>
-                        <ModalTitle titleName={isCashIn? "Add Cash In" : "Add Cash Out"} handleClick={() => setOpen(!open)} />
-                        <div className="flex items-center justify-start gap-2">
+                        {/* <ModalTitle titleName={isCashIn? "Add Cash In" : "Add Cash Out"} handleClick={() => setOpen(!open)} /> */}
+                        <div className={`mb-3 flex items-center justify-between p-4 ${isCashIn? "bg-green-500" : "bg-red-500"} text-white rounded-md`} >
+                            <Typography variant="h5">
+                                {isCashIn? "Add Cash In" : "Add Cash Out"}
+                            </Typography>
+                            <IconButton variant="text" onClick={() => setOpen(!open)}>
+                                <FaXmark className="text-base text-white"/>
+                            </IconButton>
+                        </div>
+                        {/* <div className="flex items-center justify-start gap-2">
                             <Button 
-                                variant={isCashIn? "gradient" : "outlined"}
-                                color="deep-purple"
+                                variant="gradient"
+                                color="green"
                                 className="capitalize"
                                 onClick={() => {
                                     setIsCashIn(true);
@@ -717,8 +725,8 @@ function Wallet({walletId}) {
                                 Cash In
                             </Button>
                             <Button 
-                                variant= {isCashOut? "gradient" : "outlined"}
-                                color="deep-purple"
+                                variant="gradient" 
+                                color="red"
                                 className="capitalize"
                                 onClick={() => {
                                     setIsCashIn(false);
@@ -727,7 +735,7 @@ function Wallet({walletId}) {
                             >
                                 Cash Out
                             </Button>
-                        </div>
+                        </div> */}
                         <div className="grid grid-cols-3 gap-2 mt-3">
                             {/* Date */}
                             <div className="">
@@ -868,7 +876,7 @@ function Wallet({walletId}) {
                                             Save
                                         </Typography>
                                     </Button>
-                                    <Button onClick={handleSave} color="green" size="sm" variant="gradient" className="flex items-center gap-2">
+                                    <Button onClick={handleSave} color="deep-purple" size="sm" variant="outlined" className="flex items-center gap-2">
                                         <FaCirclePlus className="text-base" />
                                         <Typography variant="small" className="capitalize">
                                             Save & New

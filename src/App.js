@@ -17,6 +17,7 @@ import Damage from "./pages/damage";
 import Wallet from "./pages/wallet";
 import Adjustment from "./pages/adjustment";
 import { useFetchWalletQuery } from "./store";
+import WalletList from "./pages/walletList";
 
 
 function App() {
@@ -79,9 +80,19 @@ function App() {
               <SalesList />
             </RequireAuth>
           }></Route>
-          <Route path="return_list" element={
+          <Route path="issue_return" element={
             <RequireAuth loginPath="/login">
-              <ReturnList />
+              <ReturnList type="I" />
+            </RequireAuth>
+          }></Route>
+          <Route path="sales_return" element={
+            <RequireAuth loginPath="/login">
+              <ReturnList type="S" />
+            </RequireAuth>
+          }></Route>
+          <Route path="purchase_return" element={
+            <RequireAuth loginPath="/login">
+              <ReturnList type="P" />
             </RequireAuth>
           }></Route>
           <Route path="stone_selection" element={
@@ -109,6 +120,11 @@ function App() {
               <Wallet 
                 walletId={walletData?.find(el => el.share.isOwner === true).id}
               />
+            </RequireAuth>
+          }></Route>
+          <Route path="wallet_list" element={
+            <RequireAuth loginPath="/login">
+              <WalletList />
             </RequireAuth>
           }></Route>
           <Route path="/login" element={<Login />}></Route>

@@ -33,6 +33,7 @@ function WalletCategory() {
     const resetData = {
         categoryCode: 0,
         categoryDesc: '',
+        isDefault: false,
         status: true,
         createdAt: moment().toISOString(),
         createdBy: auth().username,
@@ -69,6 +70,7 @@ function WalletCategory() {
             
             const saveData = {
                 categoryDesc: formData.categoryDesc,
+                isDefault: formData.isDefault,
                 status: formData.status,
                 createdAt: formData.createdAt,
                 createdBy: formData.createdBy,
@@ -217,7 +219,7 @@ function WalletCategory() {
                             </Button>
                             {
                                 !isEdit ? (
-                                    <Button onClick={handleSubmit} color="green" size="sm" variant="gradient" className="flex items-center gap-2">
+                                    <Button onClick={handleSubmit} color="deep-purple" size="sm" variant="outlined" className="flex items-center gap-2">
                                         <FaCirclePlus className="text-base" /> 
                                         <Typography variant="small" className="capitalize">
                                             Save & New

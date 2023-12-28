@@ -240,7 +240,7 @@ function Stone() {
                             </Button>
                             {
                                 !isEdit ? (
-                                    <Button onClick={handleSubmit} color="green" size="sm" variant="gradient" className="flex items-center gap-2">
+                                    <Button onClick={handleSubmit} color="deep-purple" size="sm" variant="outlined" className="flex items-center gap-2">
                                         <FaCirclePlus className="text-base" /> 
                                         <Typography variant="small" className="capitalize">
                                             Save & New

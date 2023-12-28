@@ -8,14 +8,14 @@ const walletTransitionApi = createApi({
     }),
     endpoints(builder) {
         return {
-            fetchWallet: builder.query({
-                query: () => {
-                    return {
-                        url: "/wallet/get-all-wallets",
-                        method: "GET",
-                    }
-                }
-            }),
+            // fetchWallet: builder.query({
+            //     query: () => {
+            //         return {
+            //             url: "/wallet/get-all-wallets",
+            //             method: "GET",
+            //         }
+            //     }
+            // }),
             fetchWalletTransaction: builder.query({
                 providesTags: () => {
                     return [{type: "WalletTransaction", id: "All"}]
@@ -83,5 +83,5 @@ const walletTransitionApi = createApi({
     },
 });
 
-export const { useFetchWalletQuery, useFetchWalletTransactionQuery, useFetchWalletTransactionByIdQuery, useAddWalletTransactionMutation, useUpdateWalletTransactionMutation, useRemoveWalletTransactionMutation } = walletTransitionApi;
+export const { useFetchWalletTransactionQuery, useFetchWalletTransactionByIdQuery, useAddWalletTransactionMutation, useUpdateWalletTransactionMutation, useRemoveWalletTransactionMutation } = walletTransitionApi;
 export { walletTransitionApi };
