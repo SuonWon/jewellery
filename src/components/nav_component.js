@@ -65,6 +65,11 @@ function Nav() {
                                     <FaUsers /><span>Shares</span>
                                 </MenuItem>
                             </NavLink>
+                            <NavLink to='/wallet_list'>
+                                <MenuItem className="flex items-center gap-2">
+                                    <FaWallet /> <span>Wallet</span>
+                                </MenuItem>
+                            </NavLink>
                         </MenuList>
                     </Menu>  
                     <Menu>
@@ -86,11 +91,11 @@ function Nav() {
                                     <GiDiamondTrophy /> <span>Stone Selection</span>
                                 </MenuItem>
                             </NavLink>
-                            {/* <NavLink to="#">
+                            <NavLink to="/purchase_return">
                                 <MenuItem className="flex items-center gap-2">
-                                    <FaListUl /> <span>Purchase Return List</span>
+                                    <FaArrowRotateLeft /> <span>Purchase Return List</span>
                                 </MenuItem>
-                            </NavLink> */}
+                            </NavLink>
                         </MenuList>
                     </Menu>
                     <Menu>
@@ -107,7 +112,7 @@ function Nav() {
                                     <FaBoxTissue /> <span>Issue List</span>
                                 </MenuItem>
                             </NavLink>
-                            <NavLink to="/return_list">
+                            <NavLink to="/issue_return">
                                 <MenuItem className="flex items-center gap-2">
                                     <FaArrowRotateLeft /> <span>Issue Return List</span>
                                 </MenuItem>
@@ -128,11 +133,11 @@ function Nav() {
                                     <FaMoneyBill1 /> <span>Sales List</span>
                                 </MenuItem>
                             </NavLink>
-                            {/* <NavLink to="#">
+                            <NavLink to="/sales_return">
                                 <MenuItem className="flex items-center gap-2">
-                                    <FaListUl /> <span>Sales Return List</span>
+                                    <FaArrowRotateLeft /> <span>Sales Return List</span>
                                 </MenuItem>
-                            </NavLink> */}
+                            </NavLink>
                         </MenuList>
                     </Menu>
                     <Menu>
@@ -158,7 +163,7 @@ function Nav() {
                     </Menu>
                     <NavLink to='/wallet'>
                         <Typography variant='small' className="flex justify-center items-center text-white p-2 space-x-2 hover:bg-white hover:text-black rounded-lg ">
-                            <FaWallet className='text-base' /> <span className=''>Wallet</span>
+                            <FaWallet className='text-base' /> <span className=''>Wallet Transaction</span>
                         </Typography>
                     </NavLink>
                     
