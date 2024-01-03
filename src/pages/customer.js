@@ -102,7 +102,7 @@ function Customer() {
             createdAt: customer[0].createdAt,
             createdBy: customer[0].createdBy,
             updatedAt: moment().toISOString(),
-            updatedBy: "Hello World",
+            updatedBy: "",
         }).then((res) => {
             console.log(res);
         });

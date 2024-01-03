@@ -97,7 +97,7 @@ function Supplier() {
             createdAt: supplier[0].createdAt,
             createdBy: supplier[0].createdBy,
             updatedAt: moment().toISOString(),
-            updatedBy: "Hello World",
+            updatedBy: "",
         }).then((res) => {
             console.log(res);
         });
