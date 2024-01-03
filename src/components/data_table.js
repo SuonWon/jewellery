@@ -33,10 +33,10 @@ function TableList(props) {
             <DataTable
                 {...props}
                 striped={true}
-                subHeader
-                //subHeaderComponent={props.isSearch? "" : searchBox}
-                subHeaderAlign="right"
-                subHeaderWrap
+                // subHeader
+                // subHeaderComponent={props.isSearch? "" : searchBox}
+                // subHeaderAlign="right"
+                // subHeaderWrap
                 progressPending={props.pending}
 			    progressComponent={<ListLoader />}
             />

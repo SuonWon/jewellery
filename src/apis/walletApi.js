@@ -12,10 +12,26 @@ const walletApi = createApi({
                 providesTags: () => {
                     return [{type: "Wallet", id: "All"}]
                 },
-                query: () => {
+                query: (filterData) => {
                     return {
                         url: "/wallet/get-all-wallets",
                         method: "GET",
+                        params: filterData
+                    };
+                },
+            }),
+            fetchWalletCount: builder.query({
+                providesTags: () => {
+                    return[{type: 'Wallet', id: 'All'}]
+                },
+                query: (filterData) => {
+                    const data = {
+                        search: filterData.search
+                    }
+                    return {
+                        url: "/wallet/get-count",
+                        method: 'GET',
+                        params: data
                     };
                 },
             }),
@@ -69,5 +85,5 @@ const walletApi = createApi({
     },
 });
 
-export const { useFetchWalletQuery, useFetchWalletByIdQuery, useAddWalletMutation, useUpdateWalletMutation, useRemoveWalletMutation } = walletApi;
+export const { useFetchWalletQuery, useFetchWalletByIdQuery, useAddWalletMutation, useUpdateWalletMutation, useRemoveWalletMutation, useFetchWalletCountQuery } = walletApi;
 export { walletApi };

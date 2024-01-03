@@ -13,10 +13,26 @@ const gradeApi = createApi({
                 providesTags: (result, error) => {
                     return[{type: 'Grade', id: 'All'}]
                 },
-                query: () => {
+                query: (filterData) => {
                     return {
                         url:'/grade/get-all-stone-grades',
                         method: 'GET',
+                        params: filterData
+                    };
+                },
+            }),
+            fetchGradeCount: builder.query({
+                providesTags: () => {
+                    return[{type: 'Grade', id: 'All'}]
+                },
+                query: (filterData) => {
+                    const data = {
+                        search: filterData.search
+                    }
+                    return {
+                        url: '/grade/get-count',
+                        method: 'GET',
+                        params: data
                     };
                 },
             }),
@@ -94,5 +110,5 @@ const gradeApi = createApi({
     }
 });
 
-export const { useFetchGradeQuery, useFetchTrueGradeQuery, useFetchGradeByIdQuery, useAddGradeMutation, useUpdateGradeMutation, useRemoveGradeMutation } = gradeApi;
+export const { useFetchGradeQuery, useFetchTrueGradeQuery, useFetchGradeByIdQuery, useAddGradeMutation, useUpdateGradeMutation, useRemoveGradeMutation, useFetchGradeCountQuery } = gradeApi;
 export { gradeApi };

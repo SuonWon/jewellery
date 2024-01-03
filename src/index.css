@@ -17,13 +17,13 @@
   
 /* Handle */
 ::-webkit-scrollbar-thumb {
-    background: #ddd;
+    background: #999999;
     border-radius: 5px;
 }
   
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
-    background: #ddd;
+    background: #868686;
 }
 
 input::-webkit-outer-spin-button,
@@ -38,3 +38,12 @@ input[type="number"] {
 #deleteWarning {
     display: none;
 }
+
+.pagination-bar {
+    padding-top: 10px;
+    padding-bottom: 10px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: center;
+  }

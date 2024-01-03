@@ -12,10 +12,26 @@ const walletCategoryApi = createApi({
                 providesTags: () => {
                     return [{type: "WalletCategory", id: "All"}]
                 },
-                query: () => {
+                query: (filterData) => {
                     return {
                         url: "/wallet-category/get-all-wallet-categories",
                         method: "GET",
+                        params: filterData
+                    };
+                },
+            }),
+            fetchWalletCategoryCount: builder.query({
+                providesTags: () => {
+                    return[{type: 'WalletCategory', id: 'All'}]
+                },
+                query: (filterData) => {
+                    const data = {
+                        search: filterData.search
+                    }
+                    return {
+                        url: '/wallet-category/get-count',
+                        method: 'GET',
+                        params: data
                     };
                 },
             }),
@@ -80,5 +96,5 @@ const walletCategoryApi = createApi({
     },
 });
 
-export const { useFetchWalletCategoryQuery, useFetchTrueWalletCategoryQuery, useFetchWalletCategoryByIdQuery, useAddWalletCategoryMutation, useUpdateWalletCategoryMutation, useRemoveWalletCategoryMutation } = walletCategoryApi;
+export const { useFetchWalletCategoryQuery, useFetchTrueWalletCategoryQuery, useFetchWalletCategoryByIdQuery, useAddWalletCategoryMutation, useUpdateWalletCategoryMutation, useRemoveWalletCategoryMutation, useFetchWalletCategoryCountQuery } = walletCategoryApi;
 export { walletCategoryApi };

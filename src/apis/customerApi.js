@@ -13,10 +13,26 @@ const customerApi = createApi({
                 providesTags: () => {
                     return[{type: 'Customer', id: 'All'}]
                 },
-                query: () => {
+                query: (filterData) => {
                     return {
-                        url:'/customer/get-all-customers',
+                        url:`/customer/get-all-customers`,
                         method: 'GET',
+                        params: filterData
+                    };
+                },
+            }),
+            fetchCustomerCount: builder.query({
+                providesTags: () => {
+                    return[{type: 'Customer', id: 'All'}]
+                },
+                query: (filterData) => {
+                    const data = {
+                        search: filterData.search
+                    }
+                    return {
+                        url:`/customer/get-count`,
+                        method: 'GET',
+                        params: data
                     };
                 },
             }),
@@ -114,5 +130,5 @@ const customerApi = createApi({
     }
 });
 
-export const { useFetchCustomerQuery, useFetchTrueCustomerQuery, useFetchCustomerByIdQuery, useAddCustomerMutation, useUpdateCustomerMutation, useRemoveCustomerMutation } = customerApi;
+export const { useFetchCustomerQuery, useFetchTrueCustomerQuery, useFetchCustomerByIdQuery, useAddCustomerMutation, useUpdateCustomerMutation, useRemoveCustomerMutation, useFetchCustomerCountQuery } = customerApi;
 export { customerApi };

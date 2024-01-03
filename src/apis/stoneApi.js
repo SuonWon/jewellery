@@ -13,10 +13,26 @@ const stoneApi = createApi({
                 providesTags: () => {
                     return[{type: 'Stone', id: 'All'}]
                 },
-                query: () => {
+                query: (filterData) => {
                     return {
                         url:'/stone/get-all-stones',
                         method: 'GET',
+                        params: filterData
+                    };
+                },
+            }),
+            fetchStoneCount: builder.query({
+                providesTags: () => {
+                    return[{type: 'Stone', id: 'All'}]
+                },
+                query: (filterData) => {
+                    const data = {
+                        search: filterData.search
+                    }
+                    return {
+                        url: '/stone/get-count',
+                        method: 'GET',
+                        params: data
                     };
                 },
             }),
@@ -95,5 +111,5 @@ const stoneApi = createApi({
     }
 });
 
-export const { useFetchStoneQuery, useFetchTrueStoneQuery, useFetchStoneByIdQuery, useAddStoneMutation, useUpdateStoneMutation, useRemoveStoneMutation } = stoneApi;
+export const { useFetchStoneQuery, useFetchTrueStoneQuery, useFetchStoneByIdQuery, useAddStoneMutation, useUpdateStoneMutation, useRemoveStoneMutation, useFetchStoneCountQuery } = stoneApi;
 export { stoneApi };
