@@ -1,5 +1,5 @@
 import { Route, Routes, useLocation } from "react-router-dom";
-import Login from "./Login";
+import Login from "./login";
 import Nav from "./components/nav_component";
 import Setup from "./components/setup";
 import Customer from "./pages/customer";
@@ -22,7 +22,12 @@ import WalletList from "./pages/walletList";
 
 function App() {
 
-  const {data : walletData } = useFetchWalletQuery();
+  const filterData = {
+    skip: 0,
+    take: 0,
+    search: ''
+  }
+  const {data : walletData } = useFetchWalletQuery(filterData);
 
   const currentUrl = useLocation();
 

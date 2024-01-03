@@ -1,8 +1,9 @@
 /* eslint-disable eqeqeq */
-import { Button, Card, CardBody, Dialog, DialogBody, Switch, Typography } from "@material-tailwind/react";
-import { FaCirclePlus, FaFloppyDisk, FaListCheck, FaPencil, FaTrashCan, } from "react-icons/fa6";
+import { Button, Card, CardBody, Dialog, DialogBody, Switch, Typography, Input } from "@material-tailwind/react";
+import { FaCirclePlus, FaFloppyDisk, FaListCheck, FaPencil, FaTrashCan, FaMagnifyingGlass } from "react-icons/fa6";
 import { useEffect, useState } from "react";
-import { useFetchStoneDetailsQuery, useAddStoneDetailsMutation, useUpdateStoneDetailsMutation, useRemoveStoneDetailsMutation, useFetchUOMQuery, useFetchTrueBrightnessQuery, useFetchTrueStoneQuery, useFetchTrueGradeQuery, useFetchTrueTypeQuery, useFetchTrueSupplierQuery, useFetchPurchaseQuery, useUpdatePurchaseStatusMutation, useUpdatePurchaseMutation, useFetchTruePurchaseQuery } from "../store";
+import { useFetchStoneDetailsQuery, useAddStoneDetailsMutation, useUpdateStoneDetailsMutation, useRemoveStoneDetailsMutation, useFetchUOMQuery, useFetchTrueBrightnessQuery, useFetchTrueStoneQuery, useFetchTrueGradeQuery, useFetchTrueTypeQuery, useFetchTrueSupplierQuery, useFetchPurchaseQuery, useUpdatePurchaseStatusMutation, useUpdatePurchaseMutation, useFetchTruePurchaseQuery, useFetchStoneDetailsCountQuery } from "../store";
+import Pagination from "../components/pagination";
 import DeleteModal from "../components/delete_modal";
 import SectionTitle from "../components/section_title";
 import ModalTitle from "../components/modal_title";
@@ -20,7 +21,16 @@ function StoneDetails() {
 
     const auth = useAuthUser();
 
-    const {data, refetch} = useFetchStoneDetailsQuery({ refetchOnMountOrArgChange: true });
+    const [filterData, setFilterData] = useState({
+        skip: 0,
+        take: 10,
+        search: '',
+        refetchOnMountOrArgChange: true
+    });
+
+    // const {data, refetch} = useFetchStoneDetailsQuery({ refetchOnMountOrArgChange: true });
+    const {data, refetch} = useFetchStoneDetailsQuery(filterData);
+    const {data: dataCount} = useFetchStoneDetailsCountQuery(filterData);
 
     const {data: stoneData} = useFetchTrueStoneQuery();
 
@@ -51,6 +61,8 @@ function StoneDetails() {
     const [isSupplier, setIsSupplier] = useState(false);
 
     const [isCombined, setIsCombined] = useState(false);
+
+    const [ currentPage, setCurrentPage] = useState(1);
 
     const [ alert, setAlert] = useState({
         isAlert: false,
@@ -777,7 +789,72 @@ function StoneDetails() {
             </div>
             <Card className="h-[auto] shadow-md max-w-screen-xxl rounded-sm p-2 border-t">
                 <CardBody className="rounded-sm overflow-auto p-0">
+                    <div className="flex justify-end py-2">
+                        <div className="w-72">
+                            <Input label="Search" value={filterData.search} onChange={(e) => {
+                                    setFilterData({
+                                        skip: 0,
+                                        take: 10,
+                                        search: e.target.value
+                                    });
+                                    setCurrentPage(1);
+                                }}
+                                icon={<FaMagnifyingGlass />}
+                            />
+                        </div>
+                    </div>
+                    
                     <TableList columns={column} data={tbodyData} />
+
+                    <div className="grid grid-cols-2">
+                        <div className="flex mt-7 mb-5">
+                            <p className="mr-2 mt-[6px]">Show</p>
+                            <div className="w-[80px]">
+                                <select
+                                    className="block w-full px-2.5 py-1.5 border border-blue-gray-200 h-[35px] rounded-md focus:border-black text-black"
+                                    value={filterData.take} 
+                                    onChange={(e) => {
+                                        setFilterData({
+                                            ...filterData,
+                                            skip: 0,
+                                            take: e.target.value
+                                        });
+                                        setCurrentPage(1);
+                                    }}
+                                >
+                                    <option value="10">10</option>
+                                    <option value="20">20</option>
+                                    <option value="50">50</option>
+                                    <option value="100">100</option>
+                                </select>
+                            </div>
+                            
+                            <p className="ml-2 mt-[6px]">entries</p>
+                        </div>
+                        
+                        <div className="flex justify-end">
+                            {
+                                dataCount != undefined ? (
+                                    <Pagination
+                                        className="pagination-bar"
+                                        siblingCount={1}
+                                        currentPage={currentPage}
+                                        totalCount={dataCount}
+                                        pageSize={filterData.take}
+                                        onPageChange={(page) => {
+                                            setCurrentPage(page);
+                                            setFilterData({
+                                                ...filterData,
+                                                skip: (page - 1) * filterData.take
+                                            })
+                                        }}
+                                    />
+                                ) : (<></>)
+                            }
+                        </div>
+                        
+                    </div>
+                    
                 </CardBody>
             </Card>
             <Dialog open={open} handler={openModal} size="lg">

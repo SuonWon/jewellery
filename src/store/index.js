@@ -71,24 +71,24 @@ export const store = configureStore({
     }
 });
 
-export { useAddBrightnessMutation, useFetchTrueBrightnessQuery, useFetchBrightnessByIdQuery, useFetchBrightnessQuery, useUpdateBrightnessMutation, useRemoveBrightnessMutation } from "../apis/brightnessApi";
-export { useFetchGradeQuery, useFetchTrueGradeQuery, useFetchGradeByIdQuery, useAddGradeMutation, useUpdateGradeMutation, useRemoveGradeMutation } from "../apis/gradeApi";
-export { useFetchTypeQuery, useFetchTrueTypeQuery, useFetchTypeByIdQuery, useAddTypeMutation, useUpdateTypeMutation, useRemoveTypeMutation } from "../apis/typeApi";
-export { useFetchStoneQuery, useFetchTrueStoneQuery, useFetchStoneByIdQuery, useAddStoneMutation, useUpdateStoneMutation, useRemoveStoneMutation } from "../apis/stoneApi";
+export { useAddBrightnessMutation, useFetchTrueBrightnessQuery, useFetchBrightnessByIdQuery, useFetchBrightnessQuery, useUpdateBrightnessMutation, useRemoveBrightnessMutation, useFetchBrightnessCountQuery } from "../apis/brightnessApi";
+export { useFetchGradeQuery, useFetchTrueGradeQuery, useFetchGradeByIdQuery, useAddGradeMutation, useUpdateGradeMutation, useRemoveGradeMutation, useFetchGradeCountQuery } from "../apis/gradeApi";
+export { useFetchTypeQuery, useFetchTrueTypeQuery, useFetchTypeByIdQuery, useAddTypeMutation, useUpdateTypeMutation, useRemoveTypeMutation, useFetchTypeCountQuery } from "../apis/typeApi";
+export { useFetchStoneQuery, useFetchTrueStoneQuery, useFetchStoneByIdQuery, useAddStoneMutation, useUpdateStoneMutation, useRemoveStoneMutation, useFetchStoneCountQuery } from "../apis/stoneApi";
 export { useFetchUOMQuery, useFetchUOMByIdQuery, useAddUOMMutation, useUpdateUOMMutation, useRemoveUOMMutation } from "../apis/uomApi";
-export { useFetchCustomerQuery, useFetchTrueCustomerQuery, useFetchCustomerByIdQuery, useAddCustomerMutation, useUpdateCustomerMutation, useRemoveCustomerMutation } from "../apis/customerApi";
-export { useFetchSupplierQuery, useFetchTrueSupplierQuery, useFetchSupplierByIdQuery, useAddSupplierMutation, useUpdateSupplierMutation, useRemoveSupplierMutation } from "../apis/supplierApi";
-export { useFetchStoneDetailsQuery, useFetchStoneDetailsByIdQuery, useFetchPurchaseShareQuery, useAddStoneDetailsMutation, useUpdateStoneDetailsMutation, useRemoveStoneDetailsMutation } from "../apis/stoneDetailsApi";
-export { useFetchPurchaseIdQuery, useFetchPurchaseQuery, useFetchTruePurchaseQuery, useAddPurchaseMutation, useFetchPurchaseByIdQuery, useUpdatePurchaseMutation, useUpdatePurchaseStatusMutation, useRemovePurchaseMutation } from "../apis/purchaseApi";
+export { useFetchCustomerQuery, useFetchTrueCustomerQuery, useFetchCustomerByIdQuery, useAddCustomerMutation, useUpdateCustomerMutation, useRemoveCustomerMutation, useFetchCustomerCountQuery } from "../apis/customerApi";
+export { useFetchSupplierQuery, useFetchTrueSupplierQuery, useFetchSupplierByIdQuery, useAddSupplierMutation, useUpdateSupplierMutation, useRemoveSupplierMutation, useFetchSupplierCountQuery } from "../apis/supplierApi";
+export { useFetchStoneDetailsQuery, useFetchStoneDetailsByIdQuery, useFetchPurchaseShareQuery, useAddStoneDetailsMutation, useUpdateStoneDetailsMutation, useRemoveStoneDetailsMutation, useFetchStoneDetailsCountQuery } from "../apis/stoneDetailsApi";
+export { useFetchPurchaseIdQuery, useFetchPurchaseQuery, useFetchTruePurchaseQuery, useAddPurchaseMutation, useFetchPurchaseByIdQuery, useUpdatePurchaseMutation, useUpdatePurchaseStatusMutation, useRemovePurchaseMutation, useFetchPurchaseCountQuery } from "../apis/purchaseApi";
 export { useFetchSalesQuery, useFetchTrueSalesQuery, useAddSalesMutation, useUpdateSalesMutation, useRemoveSalesMutation} from "../apis/salesApi";
 export { useFetchStoneSelectionQuery, useAddStoneSelectionMutation, useUpdateStoneSelectionMutation } from "../apis/stoneSelectionApi";
 export { useFetchReturnQuery, useAddReturnMutation, useUpdateReturnMutation, useRemoveReturnMutation } from "../apis/returnApi";
 export { useFetchIssueQuery, useAddIssueMutation, useUpdateIssueMutation, useUpdateIssueStatusMutation, useRemoveIssueMutation } from "../apis/issueApi";
-export { useFetchShareQuery, useFetchTrueShareQuery, useFetchShareByIdQuery, useAddShareMutation, useUpdateShareMutation, useRemoveShareMutation } from "../apis/shareApi";
+export { useFetchShareQuery, useFetchTrueShareQuery, useFetchShareByIdQuery, useAddShareMutation, useUpdateShareMutation, useRemoveShareMutation, useFetchShareCountQuery } from "../apis/shareApi";
 export { useFetchDamageIdQuery, useFetchDamageQuery, useFetchDamageByIdQuery, useAddDamageMutation, useUpdateDamageMutation, useRemoveDamageMutation } from "../apis/damageApi";
 export { useFetchAdjustmentQuery, useFetchAdjustmentByIdQuery, useAddAdjustmentMutation, useUpdateAdjustmentMutation, useRemoveAdjustMutation } from "../apis/adjustmentApi";
 export { useFetchWalletTransactionQuery, useFetchWalletTransactionByIdQuery, useAddWalletTransactionMutation, useUpdateWalletTransactionMutation, useRemoveWalletTransactionMutation } from "../apis/walletTransitionApi";
 export { useFetchPayableQuery, useFetchPayableByIdQuery, useFetchOwnerWalletQuery, useAddPayableMutation, useUpdatePayableMutation, useRemovePayableMutation } from "../apis/payableApi";
 export { useFetchReceivableQuery, useFetchReceivableByIdQuery, useAddReceivableMutation, useUpdateReceivableMutation, useRemoveReceivableMutation } from "../apis/receivableApi";
-export { useFetchWalletCategoryQuery, useFetchTrueWalletCategoryQuery, useFetchWalletCategoryByIdQuery, useAddWalletCategoryMutation, useUpdateWalletCategoryMutation, useRemoveWalletCategoryMutation } from "../apis/walletCategoryApi";
-export { useFetchWalletQuery, useFetchWalletByIdQuery, useAddWalletMutation, useUpdateWalletMutation, useRemoveWalletMutation } from "../apis/walletApi";
+export { useFetchWalletCategoryQuery, useFetchTrueWalletCategoryQuery, useFetchWalletCategoryByIdQuery, useAddWalletCategoryMutation, useUpdateWalletCategoryMutation, useRemoveWalletCategoryMutation, useFetchWalletCategoryCountQuery } from "../apis/walletCategoryApi";
+export { useFetchWalletQuery, useFetchWalletByIdQuery, useAddWalletMutation, useUpdateWalletMutation, useRemoveWalletMutation, useFetchWalletCountQuery } from "../apis/walletApi";

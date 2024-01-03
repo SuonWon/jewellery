@@ -1,8 +1,9 @@
 /* eslint-disable eqeqeq */
 import { Button, Card, CardBody, Dialog, DialogBody, Input, Switch, Textarea, Typography } from "@material-tailwind/react";
-import { FaCirclePlus, FaFloppyDisk, FaPencil, FaTrashCan, } from "react-icons/fa6";
+import { FaCirclePlus, FaFloppyDisk, FaPencil, FaTrashCan, FaMagnifyingGlass } from "react-icons/fa6";
 import { useState } from "react";
-import { useAddWalletCategoryMutation, useFetchWalletCategoryQuery, useRemoveWalletCategoryMutation, useUpdateWalletCategoryMutation } from "../store";
+import { useAddWalletCategoryMutation, useFetchWalletCategoryCountQuery, useFetchWalletCategoryQuery, useRemoveWalletCategoryMutation, useUpdateWalletCategoryMutation } from "../store";
+import Pagination from "../components/pagination";
 import DeleteModal from "../components/delete_modal";
 import SectionTitle from "../components/section_title";
 import ModalTitle from "../components/modal_title";
@@ -28,7 +29,14 @@ function WalletCategory() {
 
     const [isEdit, setIsEdit] = useState(false);
 
-    const {data} = useFetchWalletCategoryQuery();
+    const [filterData, setFilterData] = useState({
+        skip: 0,
+        take: 10,
+        search: ''
+    });
+
+    const {data} = useFetchWalletCategoryQuery(filterData);
+    const {data:dataCount} = useFetchWalletCategoryCountQuery(filterData);
 
     const resetData = {
         categoryCode: 0,
@@ -44,6 +52,8 @@ function WalletCategory() {
     const [deleteId, setDeleteId] = useState('');
 
     const [validationText, setValidationText] = useState({});
+
+    const [ currentPage, setCurrentPage] = useState(1);
 
     const openModal = () => {
         setIsEdit(false);
@@ -187,7 +197,72 @@ function WalletCategory() {
             <SectionTitle title="Wallet Category" handleModal={openModal} />
             <Card className="h-auto shadow-md w-[1000px] mx-1 rounded-sm p-2 border-t">
                 <CardBody className="rounded-sm overflow-auto p-0">
+                    <div className="flex justify-end py-2">
+                        <div className="w-72">
+                            <Input label="Search" value={filterData.search} onChange={(e) => {
+                                    setFilterData({
+                                        skip: 0,
+                                        take: 10,
+                                        search: e.target.value
+                                    });
+                                    setCurrentPage(1);
+                                }}
+                                icon={<FaMagnifyingGlass />}
+                            />
+                        </div>
+                    </div>
+                    
                     <TableList columns={column} data={tbodyData} />
+
+                    <div className="grid grid-cols-2">
+                        <div className="flex mt-7 mb-5">
+                            <p className="mr-2 mt-[6px]">Show</p>
+                            <div className="w-[80px]">
+                                <select
+                                    className="block w-full px-2.5 py-1.5 border border-blue-gray-200 h-[35px] rounded-md focus:border-black text-black"
+                                    value={filterData.take} 
+                                    onChange={(e) => {
+                                        setFilterData({
+                                            ...filterData,
+                                            skip: 0,
+                                            take: e.target.value
+                                        })
+                                        setCurrentPage(1);
+                                    }}
+                                >
+                                    <option value="10">10</option>
+                                    <option value="20">20</option>
+                                    <option value="50">50</option>
+                                    <option value="100">100</option>
+                                </select>
+                            </div>
+                            
+                            <p className="ml-2 mt-[6px]">entries</p>
+                        </div>
+                        
+                        <div className="flex justify-end">
+                            {
+                                dataCount != undefined ? (
+                                    <Pagination
+                                        className="pagination-bar"
+                                        siblingCount={1}
+                                        currentPage={currentPage}
+                                        totalCount={dataCount}
+                                        pageSize={filterData.take}
+                                        onPageChange={(page) => {
+                                            setCurrentPage(page);
+                                            setFilterData({
+                                                ...filterData,
+                                                skip: (page - 1) * filterData.take
+                                            })
+                                        }}
+                                    />
+                                ) : (<></>)
+                            }
+                        </div>
+                        
+                    </div>
+                    
                 </CardBody>
             </Card>
             <Dialog open={open} handler={openModal} size="sm">

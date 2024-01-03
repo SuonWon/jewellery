@@ -13,10 +13,26 @@ const stoneDetailsApi = createApi({
                 providesTags: () => {
                     return[{type: 'StoneDetails', id: 'All'}]
                 },
-                query: () => {
+                query: (filterData) => {
                     return {
                         url:'/stone-detail/get-all-stone-details',
                         method: 'GET',
+                        params: filterData
+                    };
+                },
+            }),
+            fetchStoneDetailsCount: builder.query({
+                providesTags: () => {
+                    return[{type: 'StoneDetails', id: 'All'}]
+                },
+                query: (filterData) => {
+                    const data = {
+                        search: filterData.search
+                    }
+                    return {
+                        url: '/stone-detail/get-count',
+                        method: 'GET',
+                        params: data
                     };
                 },
             }),
@@ -76,5 +92,5 @@ const stoneDetailsApi = createApi({
     }
 });
 
-export const { useFetchStoneDetailsQuery, useFetchStoneDetailsByIdQuery, useFetchPurchaseShareQuery, useAddStoneDetailsMutation, useUpdateStoneDetailsMutation, useRemoveStoneDetailsMutation } = stoneDetailsApi;
+export const { useFetchStoneDetailsQuery, useFetchStoneDetailsByIdQuery, useFetchPurchaseShareQuery, useAddStoneDetailsMutation, useUpdateStoneDetailsMutation, useRemoveStoneDetailsMutation, useFetchStoneDetailsCountQuery } = stoneDetailsApi;
 export { stoneDetailsApi };

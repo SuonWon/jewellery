@@ -1,8 +1,9 @@
 /* eslint-disable eqeqeq */
 import { Button, Card, CardBody, Dialog, DialogBody, Input, Switch, Typography } from "@material-tailwind/react";
-import { FaCirclePlus, FaFloppyDisk, FaPencil, FaTrashCan, } from "react-icons/fa6";
+import { FaCirclePlus, FaFloppyDisk, FaPencil, FaTrashCan, FaMagnifyingGlass } from "react-icons/fa6";
 import { useEffect, useState } from "react";
-import { useAddBrightnessMutation, useFetchBrightnessQuery, useRemoveBrightnessMutation, useUpdateBrightnessMutation } from "../store";
+import { useAddBrightnessMutation, useFetchBrightnessCountQuery, useFetchBrightnessQuery, useRemoveBrightnessMutation, useUpdateBrightnessMutation } from "../store";
+import Pagination from "../components/pagination";
 import DeleteModal from "../components/delete_modal";
 import SectionTitle from "../components/section_title";
 import ModalTitle from "../components/modal_title";
@@ -16,17 +17,22 @@ function Brightness() {
 
     const auth = useAuthUser();
 
-    console.log(auth().username)
-
     const [open, setOpen] = useState(false);
 
     const [openDelete, setOpenDelete] = useState(false);
 
     const [isEdit, setIsEdit] = useState(false);
 
+    const [filterData, setFilterData] = useState({
+        skip: 0,
+        take: 10,
+        search: ''
+    });
+
     const [ validationText, setValidationText ] = useState({});
 
-    const {data} = useFetchBrightnessQuery();
+    const {data} = useFetchBrightnessQuery(filterData);
+    const {data:dataCount} = useFetchBrightnessCountQuery(filterData);
 
     const [formData, setFormData] = useState({
         brightDesc: "",
@@ -42,6 +48,8 @@ function Brightness() {
     const [editBrightness] = useUpdateBrightnessMutation();
 
     const [removeBrightness] = useRemoveBrightnessMutation();
+
+    const [ currentPage, setCurrentPage] = useState(1);
 
     useEffect(() => {
         setFormData({
@@ -78,7 +86,7 @@ function Brightness() {
             updatedAt: moment().toISOString(),
             updatedBy: "",
         }).then((res) => {
-            console.log(res);
+            //console.log(res);
         });
 
     };
@@ -218,10 +226,75 @@ function Brightness() {
             <SectionTitle title="Stone Brightness" handleModal={openModal} />
             <Card className="h-auto shadow-md w-[1000px] mx-1 rounded-sm p-2 border-t">
                 <CardBody className="rounded-sm overflow-auto p-0">
+                    <div className="flex justify-end py-2">
+                        <div className="w-72">
+                            <Input label="Search" value={filterData.search} onChange={(e) => {
+                                    setFilterData({
+                                        skip: 0,
+                                        take: 10,
+                                        search: e.target.value
+                                    });
+                                    setCurrentPage(1);
+                                }}
+                                icon={<FaMagnifyingGlass />}
+                            />
+                        </div>
+                    </div>
+                    
                     <TableList columns={column} data={tbodyData} />
+
+                    <div className="grid grid-cols-2">
+                        <div className="flex mt-7 mb-5">
+                            <p className="mr-2 mt-[6px]">Show</p>
+                            <div className="w-[80px]">
+                                <select
+                                    className="block w-full px-2.5 py-1.5 border border-blue-gray-200 h-[35px] rounded-md focus:border-black text-black"
+                                    value={filterData.take} 
+                                    onChange={(e) => {
+                                        setFilterData({
+                                            ...filterData,
+                                            skip: 0,
+                                            take: e.target.value
+                                        });
+                                        setCurrentPage(1);
+                                    }}
+                                >
+                                    <option value="10">10</option>
+                                    <option value="20">20</option>
+                                    <option value="50">50</option>
+                                    <option value="100">100</option>
+                                </select>
+                            </div>
+                            
+                            <p className="ml-2 mt-[6px]">entries</p>
+                        </div>
+                        
+                        <div className="flex justify-end">
+                            {
+                                dataCount != undefined ? (
+                                    <Pagination
+                                        className="pagination-bar"
+                                        siblingCount={1}
+                                        currentPage={currentPage}
+                                        totalCount={dataCount}
+                                        pageSize={filterData.take}
+                                        onPageChange={(page) => {
+                                            setCurrentPage(page);
+                                            setFilterData({
+                                                ...filterData,
+                                                skip: (page - 1) * filterData.take
+                                            })
+                                        }}
+                                    />
+                                ) : (<></>)
+                            }
+                        </div>
+                        
+                    </div>
+                    
                 </CardBody>
             </Card>
-            <Dialog open={open} handler={openModal} size="sm">
+            <Dialog open={Boolean(open)} handler={openModal} size="sm">
                 <DialogBody>
                     <ModalTitle titleName={isEdit ? "Edit Stone Brightness" : "Stone Brightness"} handleClick={openModal} />
                     {/* {

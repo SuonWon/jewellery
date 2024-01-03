@@ -13,10 +13,26 @@ const typeApi = createApi({
                 providesTags: (result, error) => {
                     return[{type: 'Type', id: 'All'}]
                 },
-                query: () => {
+                query: (filterData) => {
                     return {
                         url:'/type/get-all-stone-types',
                         method: 'GET',
+                        params: filterData
+                    };
+                },
+            }),
+            fetchTypeCount: builder.query({
+                providesTags: () => {
+                    return[{type: 'Type', id: 'All'}]
+                },
+                query: (filterData) => {
+                    const data = {
+                        search: filterData.search
+                    }
+                    return {
+                        url: '/type/get-count',
+                        method: 'GET',
+                        params: data
                     };
                 },
             }),
@@ -94,5 +110,5 @@ const typeApi = createApi({
     }
 });
 
-export const { useFetchTypeQuery, useFetchTrueTypeQuery, useFetchTypeByIdQuery, useAddTypeMutation, useUpdateTypeMutation, useRemoveTypeMutation } = typeApi;
+export const { useFetchTypeQuery, useFetchTrueTypeQuery, useFetchTypeByIdQuery, useAddTypeMutation, useUpdateTypeMutation, useRemoveTypeMutation, useFetchTypeCountQuery } = typeApi;
 export { typeApi };

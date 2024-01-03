@@ -12,10 +12,26 @@ const shareApi = createApi({
                 providesTags: () => {
                     return [{type: "Share", id: "All"}]
                 },
-                query: () => {
+                query: (filterData) => {
                     return {
                         url: "/share/get-all-shares",
                         method: "GET",
+                        params: filterData
+                    };
+                },
+            }),
+            fetchShareCount: builder.query({
+                providesTags: () => {
+                    return[{type: 'Share', id: 'All'}]
+                },
+                query: (filterData) => {
+                    const data = {
+                        search: filterData.search
+                    }
+                    return {
+                        url:`/share/get-count`,
+                        method: 'GET',
+                        params: data
                     };
                 },
             }),
@@ -23,11 +39,10 @@ const shareApi = createApi({
                 providesTags: () => {
                     return [{type: "Share", id: "All"}]
                 },
-                query: (search = "", status = true) => {
+                query: () => {
                     return {
-                        url: "/share/get-all-shares",
-                        method: "GET",
-                        params: {search , status}
+                        url: "/share/get-true-shares",
+                        method: "GET"
                     }
                 }
             }),
@@ -82,5 +97,5 @@ const shareApi = createApi({
     },
 });
 
-export const { useFetchShareQuery, useFetchShareByIdQuery, useFetchTrueShareQuery, useAddShareMutation, useUpdateShareMutation, useRemoveShareMutation } = shareApi
+export const { useFetchShareQuery, useFetchShareByIdQuery, useFetchTrueShareQuery, useAddShareMutation, useUpdateShareMutation, useRemoveShareMutation, useFetchShareCountQuery } = shareApi
 export { shareApi };

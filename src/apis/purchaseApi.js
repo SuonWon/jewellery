@@ -1,5 +1,6 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { apiUrl, pause } from "../const";
+import moment from "moment";
 
 const purchaseApi = createApi({
     reducerPath: "purchase",
@@ -20,10 +21,12 @@ const purchaseApi = createApi({
                 providesTags: () => {
                     return [{type: 'Purchase', id: 'All'}]
                 },
-                query: () => {
+                query: (filterData) => {
+                    const query = `?skip=${filterData.skip}&take=${filterData.take}&status=${filterData.status}&isComplete=${filterData.isComplete}${filterData.start_date == null ? '' : `&start_date=${moment(filterData.start_date).toISOString()}`}${filterData.end_date == null ? '' : `&end_date=${moment(filterData.end_date).toISOString()}`}`
                     return {
-                        url: '/purchase/get-all-purchases',
-                        method: 'GET'
+                        url: '/purchase/get-all-purchases'+ query,
+                        method: 'GET',
+                        //params: filterData
                     };
                 },
             }),
@@ -32,10 +35,30 @@ const purchaseApi = createApi({
                     return [{type: 'Purchase', id: 'All'}]
                 },
                 query: () => {
+                    const data = {
+                        skip: 0,
+                        take: 0,
+                        status: 'O',
+                        isComplete: 'F'
+                    }
                     return {
-                        url: '/purchase/get-all-purchases/',
+                        url: '/purchase/get-all-purchases',
                         method: 'GET',
-                        params: {status: "O"}
+                        params: data
+                    }
+                }
+            }),
+            fetchPurchaseCount: builder.query({
+                providesTags: () => {
+                    return [{type: 'Purchase', id: 'All'}]
+                },
+                query: (filterData) => {
+
+                    const query = `?status=${filterData.status}&isComplete=${filterData.isComplete}${filterData.start_date == null ? '' : `&start_date=${moment(filterData.start_date).toISOString()}`}${filterData.end_date == null ? '' : `&end_date=${moment(filterData.end_date).toISOString()}`}`
+                    return {
+                        url: '/purchase/get-count'+query,
+                        method: 'GET',
+                        //params: data
                     }
                 }
             }),
@@ -107,5 +130,5 @@ const purchaseApi = createApi({
     },
 })
 
-export const { useFetchPurchaseIdQuery, useAddPurchaseMutation, useFetchTruePurchaseQuery, useFetchPurchaseQuery, useFetchPurchaseByIdQuery, useUpdatePurchaseMutation, useUpdatePurchaseStatusMutation, useRemovePurchaseMutation } = purchaseApi; 
+export const { useFetchPurchaseIdQuery, useAddPurchaseMutation, useFetchTruePurchaseQuery, useFetchPurchaseQuery, useFetchPurchaseByIdQuery, useUpdatePurchaseMutation, useUpdatePurchaseStatusMutation, useRemovePurchaseMutation, useFetchPurchaseCountQuery } = purchaseApi; 
 export {purchaseApi};
