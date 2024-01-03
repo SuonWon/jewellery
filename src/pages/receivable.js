@@ -7,12 +7,14 @@ import { v4 as uuidv4 } from 'uuid';
 import moment from "moment";
 import { useAuthUser } from "react-auth-kit";
 import { focusSelect } from "../const";
-import { useAddReceivableMutation, useFetchReceivableQuery, useRemoveReceivableMutation, useUpdateReceivableMutation } from "../store";
+import { useAddReceivableMutation, useFetchReceivableQuery, useFetchWalletQuery, useRemoveReceivableMutation, useUpdateReceivableMutation } from "../store";
 const validator = require('validator');
 
 function Receivable(props) {
 
     const {data} = useFetchReceivableQuery(props.invoiceNo);
+
+    const { data: walletData } = useFetchWalletQuery();
 
     const [addReceivable] = useAddReceivableMutation();
 
@@ -31,6 +33,8 @@ function Receivable(props) {
     const payInfo = {
         id: uuidv4(),
         invoiceNo: "",
+        walletName: "",
+        walletCode: "",
         receivedDate: moment().format("YYYY-MM-DD"),
         amount: 0,
         balance: 0,
@@ -68,6 +72,10 @@ function Receivable(props) {
             newErrors.type = "Type is required."
         }
 
+        if(validator.isEmpty(payForm.walletCode)) {
+            newErrors.walletName = "Wallet Name is required."
+        }
+
         setValidationText(newErrors);
 
         return Object.keys(newErrors).length === 0;
@@ -81,11 +89,13 @@ function Receivable(props) {
             id: payData.id,
             paidDate: payData.paidDate,
             invoiceNo: payData.invoiceNo,
+            walletName: payData.wallet.walletName,
+            walletCode: payData.walletCode,
             amount: payData.amount,
             balance: (props.balance - receivedAmt) + payData.amount,
             type: payData.type,
             status: payData.status,
-            remark: payData.Remark,
+            remark: payData.remark,
             createdBy: payData.createdBy,
             createdAt: payData.createdAt,
             updatedBy: payData.updatedBy,
@@ -105,11 +115,13 @@ function Receivable(props) {
                 id: payForm.id,
                 receivedDate: moment(payForm.receivedDate).toISOString(),
                 invoiceNo: props.invoiceNo,
+                walletCode: payForm.walletCode,
+                walletName: payForm.walletName,
                 amount: payForm.amount,
                 balance: 0,
                 type: payForm.type,
                 status: payForm.status,
-                Remark: payForm.remark,
+                remark: payForm.remark,
                 createdBy: payForm.createdBy,
                 updatedBy: "",
                 deletedBy: "",
@@ -138,10 +150,12 @@ function Receivable(props) {
                 receivedDate: moment(payForm.receivedDate).toISOString(),
                 invoiceNo: payForm.invoiceNo,
                 amount: payForm.amount,
+                walletCode: payForm.walletCode,
+                walletName: payForm.walletName,
                 balance: 0,
                 type: payForm.type,
                 status: payForm.status,
-                Remark: payForm.remark,
+                remark: payForm.remark,
                 createdBy: payForm.createdBy,
                 createdAt: payForm.createdAt,
                 updatedBy: auth().username,
@@ -160,6 +174,10 @@ function Receivable(props) {
             name: 'id',
             selector: row => row.id,
             omit: true,
+        },
+        {
+            name: 'Wallet Name',
+            selector: row => row.walletName,
         },
         {
             name: 'Received Date',
@@ -240,6 +258,35 @@ function Receivable(props) {
                                 />
                                 {
                                     validationText.receivedDate && <p className="block text-[12px] text-red-500 font-sans mb-2">{validationText.receivedDate}</p>
+                                }
+                            </div>
+                        </div>
+                        <div className="grid grid-cols-3 gap-2 mb-3">
+                            {/* Wallet Code */}
+                            <div className="col-span-2">
+                                <label className="text-black mb-2 text-sm">Wallet Name</label>
+                                <select
+                                    className="block w-full px-2.5 py-1.5 border border-blue-gray-200 h-[35px] rounded-md focus:border-black text-black"
+                                    value={payForm.walletCode}
+                                    onChange={(e) => {
+                                        setPayForm({
+                                            ...payForm,
+                                            walletName: e.target.selectedOptions[0].text.split(",")[1].trimStart(),
+                                            walletCode: e.target.value,
+                                        })
+                                    }}
+                                >
+                                    <option value="" disabled>Select...</option>
+                                    {
+                                        walletData.map((wallet) => {
+                                            return (
+                                                <option key={wallet.id} value={wallet.id}>{wallet.share.shareName}, {wallet.walletName}</option>
+                                            )
+                                        })
+                                    }
+                                </select>
+                                {
+                                    validationText.walletName && <p className="block text-[12px] text-red-500 font-sans mb-2">{validationText.walletName}</p>
                                 }
                             </div>
                         </div>

@@ -16,7 +16,7 @@ const validator = require('validator');
 
 function ReturnList({type = 'I'}) {
 
-    const { data } = useFetchReturnQuery();
+    const { data } = useFetchReturnQuery(type);
 
     const {data: stoneDetails} = useFetchStoneDetailsQuery();
 
@@ -317,7 +317,7 @@ function ReturnList({type = 'I'}) {
         {
             name: 'Type',
             width: "120px",
-            selector: row => row.returnType === "I" ? "Issue" : "Sales",
+            selector: row => row.returnType === 'I' ? "Issue" : row.returnType === 'S' ? "Sales" : "Purchase",
         },
         {
             name: 'Stone Detail',
@@ -535,7 +535,11 @@ function ReturnList({type = 'I'}) {
                                     onChange={(e) => {
                                         if (type === 'P') {
                                             let stoneDetail = stoneDetails.filter(res => res.referenceNo === e.target.value);
-                                            console.log(stoneDetail);
+                                            setFormData({
+                                                ...formData,
+                                                referenceNo: e.target.value,
+                                            });
+                                            setPurchaseStoneD(stoneDetail);
                                         } else {
                                             let stoneDetailCode = formData.returnType === "I" ? issueData.find(el => el.issueNo === e.target.value).stoneDetailCode : salesData.find(el => el.invoiceNo === e.target.value).stoneDetailCode;
                                             setFormData({
@@ -559,7 +563,7 @@ function ReturnList({type = 'I'}) {
                                             return <option value={sales.invoiceNo} key={sales.invoiceNo}>({sales.stoneDetail.stoneDesc}, {sales.customer.customerName})
                                             </option>
                                         }) : purchaseData?.map((purchase) => {
-                                            return <option value={purchase.invoiceNo} key={purchase.invoiceNo}>({purchase.stone.stoneDesc}, {purchase.supplier.supplierName})
+                                            return <option value={purchase.invoiceNo} key={purchase.invoiceNo}>{purchase.stone.stoneDesc}, {purchase.supplier.supplierName}
                                             </option>
                                         })
                                     }

@@ -2,7 +2,7 @@
 import { Button, Card, CardBody, Dialog, DialogBody, Typography } from "@material-tailwind/react";
 import { FaCirclePlus, FaFloppyDisk, FaMoneyBillTrendUp, FaPencil, FaPlus, FaTrashCan, } from "react-icons/fa6";
 import { useState } from "react";
-import { useAddSalesMutation, useFetchSalesQuery, useFetchStoneDetailsQuery, useFetchTrueCustomerQuery, useFetchTrueSalesQuery, useFetchUOMQuery, useRemoveSalesMutation, useUpdateIssueMutation, useUpdateIssueStatusMutation, useUpdateSalesMutation } from "../store";
+import { useAddSalesMutation, useFetchReturnQuery, useFetchSalesQuery, useFetchStoneDetailsQuery, useFetchTrueCustomerQuery, useFetchTrueSalesQuery, useFetchUOMQuery, useRemoveSalesMutation, useUpdateIssueMutation, useUpdateIssueStatusMutation, useUpdateSalesMutation } from "../store";
 import { apiUrl, focusSelect, pause } from "../const";
 import DeleteModal from "../components/delete_modal";
 import SuccessAlert from "../components/success_alert";
@@ -29,6 +29,8 @@ function SalesList() {
     const { data: stoneDetails } = useFetchStoneDetailsQuery();
 
     const { data: unitData } = useFetchUOMQuery();
+
+    const { data: returnData } = useFetchReturnQuery('S');
 
     axios.get(apiUrl + '/sales/get-id').then((res) => {
         setSalesId(res.data);
@@ -68,6 +70,8 @@ function SalesList() {
     const [open, setOpen] = useState(false);
 
     const [isEdit, setIsEdit] = useState(false);
+
+    const [tBodyReturnData, setTBodyReturnData] = useState([]);
 
     const [alert, setAlert] = useState({
         isAlert: false,
@@ -222,6 +226,7 @@ function SalesList() {
                 amount: el.amount,
             }
         }));
+        setTBodyReturnData(returnData.filter(el => el.referenceNo === id));
         setIsEdit(true);
         setOpen(!open);
     };
@@ -600,6 +605,23 @@ function SalesList() {
                     {/* <Button variant="text" color="red" className="p-2" onClick={() => handleDeleteBtn(row.Code)}><FaTrashCan /></Button> */}
                 </div>
             )
+        },
+    ];
+
+    const returnColumn = [
+        {
+            name: "Return No",
+            selector: row => row.returnNo,
+        },
+        {
+            name: "Amount",
+            selector: row => row.totalPrice.toLocaleString('en-us'),
+            right: true,
+        },
+        {
+            name: "Weight",
+            selector: row => row.weight,
+            right: true,
         },
     ];
 
@@ -1071,7 +1093,9 @@ function SalesList() {
                                         <CardBody className="overflow-auto rounded-md p-0">
                                             <DataTable 
                                             columns={shareColumn} 
-                                            data={tBodyData} 
+                                            data={tBodyData}
+                                            fixedHeader
+                                            fixedHeaderScrollHeight="150px"
                                             customStyles={{
                                                 rows: {
                                                     style: {
@@ -1087,6 +1111,36 @@ function SalesList() {
                                                 }
                                             }} 
                                             />
+                                        </CardBody>
+                                    </Card>
+                                </div>
+                                {/* Return table list */}
+                                <div className="col-span-5">
+                                    <Card className="w-full shadow-sm border border-blue-gray-200 rounded-md">
+                                        <CardBody className="overflow-auto rounded-md p-0">
+                                            <Typography variant="h6" className="px-2 ml-3 mt-2 border-l-2 border-purple-700 text-black rounded-md">
+                                                Returns
+                                            </Typography>
+                                            <DataTable 
+                                            columns={returnColumn} 
+                                            data={tBodyReturnData} 
+                                            fixedHeader
+                                            fixedHeaderScrollHeight="150px"
+                                            customStyles={{
+                                                rows: {
+                                                    style: {
+                                                        minHeight: '40px',
+                                                    },
+                                                },
+                                                headCells: {
+                                                    style: {
+                                                        fontWeight: "bold",
+                                                        fontSize: "0.8rem",
+                                                        minHeight: '40px',
+                                                    }
+                                                }
+                                            }} 
+                                        />
                                         </CardBody>
                                     </Card>
                                 </div>

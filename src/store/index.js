@@ -88,7 +88,7 @@ export { useFetchShareQuery, useFetchTrueShareQuery, useFetchShareByIdQuery, use
 export { useFetchDamageIdQuery, useFetchDamageQuery, useFetchDamageByIdQuery, useAddDamageMutation, useUpdateDamageMutation, useRemoveDamageMutation } from "../apis/damageApi";
 export { useFetchAdjustmentQuery, useFetchAdjustmentByIdQuery, useAddAdjustmentMutation, useUpdateAdjustmentMutation, useRemoveAdjustMutation } from "../apis/adjustmentApi";
 export { useFetchWalletTransactionQuery, useFetchWalletTransactionByIdQuery, useAddWalletTransactionMutation, useUpdateWalletTransactionMutation, useRemoveWalletTransactionMutation } from "../apis/walletTransitionApi";
-export { useFetchPayableQuery, useFetchPayableByIdQuery, useAddPayableMutation, useUpdatePayableMutation, useRemovePayableMutation } from "../apis/payableApi";
+export { useFetchPayableQuery, useFetchPayableByIdQuery, useFetchOwnerWalletQuery, useAddPayableMutation, useUpdatePayableMutation, useRemovePayableMutation } from "../apis/payableApi";
 export { useFetchReceivableQuery, useFetchReceivableByIdQuery, useAddReceivableMutation, useUpdateReceivableMutation, useRemoveReceivableMutation } from "../apis/receivableApi";
 export { useFetchWalletCategoryQuery, useFetchTrueWalletCategoryQuery, useFetchWalletCategoryByIdQuery, useAddWalletCategoryMutation, useUpdateWalletCategoryMutation, useRemoveWalletCategoryMutation } from "../apis/walletCategoryApi";
 export { useFetchWalletQuery, useFetchWalletByIdQuery, useAddWalletMutation, useUpdateWalletMutation, useRemoveWalletMutation } from "../apis/walletApi";

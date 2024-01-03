@@ -3,7 +3,7 @@ import { Button, Card, CardBody, Dialog, DialogBody, Typography } from "@materia
 import { FaCirclePlus, FaFloppyDisk, FaMoneyBillTrendUp, FaPencil, FaPlus, FaTrashCan, } from "react-icons/fa6";
 import { useState } from "react";
 import { apiUrl, focusSelect, pause } from "../const";
-import { useAddPurchaseMutation, useFetchTruePurchaseQuery, useFetchTrueShareQuery, useFetchTrueStoneQuery, useFetchTrueSupplierQuery, useFetchUOMQuery, useRemovePurchaseMutation, useUpdatePurchaseMutation } from "../store";
+import { useAddPurchaseMutation, useFetchReturnQuery, useFetchTruePurchaseQuery, useFetchTrueShareQuery, useFetchTrueStoneQuery, useFetchTrueSupplierQuery, useFetchUOMQuery, useRemovePurchaseMutation, useUpdatePurchaseMutation } from "../store";
 import DeleteModal from "../components/delete_modal";
 import SuccessAlert from "../components/success_alert";
 import moment from "moment";
@@ -21,6 +21,8 @@ function PurchaseList() {
 
     const { data, isLoading : dataLoad, refetch} = useFetchTruePurchaseQuery();
 
+    console.log(data?.length);
+
     const { data: supplierData } = useFetchTrueSupplierQuery();
 
     const { data: shareData } = useFetchTrueShareQuery();
@@ -28,6 +30,10 @@ function PurchaseList() {
     const { data: unitData } = useFetchUOMQuery();
 
     const { data: stoneData } = useFetchTrueStoneQuery();
+
+    const { data: returnData } = useFetchReturnQuery('P');
+
+    console.log(returnData);
 
     const auth = useAuthUser();
 
@@ -107,15 +113,7 @@ function PurchaseList() {
 
     const [tBodyData, setTBodyData] = useState([dShare]);
 
-    const [tBodyReturnData, setTBodyReturnData] = useState([
-        {
-            returnNo: "R-00000001",
-            amount: 300000,
-            weight: 300,
-            qty: 30
-        }
-
-    ])
+    const [tBodyReturnData, setTBodyReturnData] = useState([]);
 
     const [deleteId, setDeleteId] = useState('');
 
@@ -228,7 +226,8 @@ function PurchaseList() {
                     amount: el.amount
                 });
             }
-        })
+        });
+        setTBodyReturnData(returnData.filter(el => el.referenceNo === id));
         setIsEdit(true);
         setOpen(!open);
     };
@@ -768,20 +767,22 @@ function PurchaseList() {
             selector: row => row.returnNo,
         },
         {
+            name: "Stone",
+            width: "140px",
+            selector: row => row.stoneDetailCode,
+        },
+        {
             name: "Amount",
-            selector: row => row.amount,
+            width: "100px",
+            selector: row => row.totalPrice.toLocaleString('en-us'),
             right: true,
         },
         {
             name: "Weight",
+            width: "90px",
             selector: row => row.weight,
             right: true,
         },
-        {
-            name: "Quantity",
-            selector: row => row.qty,
-            right: true
-        }
     ];
 
     const tbodyData = data?.map((purchaseData) => {
@@ -1240,6 +1241,9 @@ function PurchaseList() {
                                 <div className="col-span-5">
                                     <Card className="w-full shadow-sm border border-blue-gray-200 rounded-md">
                                         <CardBody className="overflow-auto rounded-md p-0">
+                                            <Typography variant="h6" className="px-2 ml-3 mt-2 border-l-2 border-purple-700 text-black rounded-md">
+                                                Returns
+                                            </Typography>
                                             <DataTable 
                                             columns={returnColumn} 
                                             data={tBodyReturnData} 
@@ -1262,7 +1266,6 @@ function PurchaseList() {
                                         />
                                         </CardBody>
                                     </Card>
-
                                 </div>
                             </div>
                         </div>

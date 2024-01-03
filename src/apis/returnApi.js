@@ -12,10 +12,13 @@ const returnApi = createApi({
                 providesTags: () => {
                     return[{type: "Return", id: "All"}]
                 },
-                query: () => {
+                query: (type) => {
                     return {
                         url: "/return/get-all-returns",
-                        method: "GET"
+                        method: "GET",
+                        params: {
+                            returnType: type,
+                        }
                     };
                 },
             }),

@@ -29,8 +29,16 @@ const payableApi = createApi({
                 },
                 query: (payId) => {
                     return {
-                        url: `/v1/payable/get-payable/${payId}`,
+                        url: `/payable/get-payable/${payId}`,
                         method: "GET"
+                    }
+                }
+            }),
+            fetchOwnerWallet: builder.query({
+                query: () => {
+                    return {
+                        url: "/payable/get-owner-wallets",
+                        method: "GET",
                     }
                 }
             }),
@@ -74,5 +82,5 @@ const payableApi = createApi({
     },
 });
 
-export const { useFetchPayableQuery, useFetchPayableByIdQuery, useAddPayableMutation, useUpdatePayableMutation, useRemovePayableMutation } = payableApi;
+export const { useFetchPayableQuery, useFetchPayableByIdQuery, useFetchOwnerWalletQuery, useAddPayableMutation, useUpdatePayableMutation, useRemovePayableMutation } = payableApi;
 export { payableApi };

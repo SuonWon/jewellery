@@ -1,6 +1,6 @@
 import { Button, Card, CardBody, Dialog, DialogBody, Typography } from "@material-tailwind/react";
 import { FaCirclePlus, FaEye, FaFloppyDisk, FaPencil, FaPlus, FaTrashCan } from "react-icons/fa6";
-import { useAddIssueMutation, useFetchIssueQuery, useFetchStoneDetailsQuery, useFetchTrueCustomerQuery, useFetchUOMQuery, useRemoveIssueMutation, useUpdateIssueMutation } from "../store";
+import { useAddIssueMutation, useFetchIssueQuery, useFetchReturnQuery, useFetchStoneDetailsQuery, useFetchTrueCustomerQuery, useFetchUOMQuery, useRemoveIssueMutation, useUpdateIssueMutation } from "../store";
 import moment from "moment";
 import { useState } from "react";
 import SuccessAlert from "../components/success_alert";
@@ -20,6 +20,14 @@ function IssueList() {
 
     const { data } = useFetchIssueQuery();
 
+    const { data: stoneDetails } = useFetchStoneDetailsQuery();
+
+    const { data: unitData } = useFetchUOMQuery();
+
+    const { data: customerData } = useFetchTrueCustomerQuery();
+
+    const { data: returnData } = useFetchReturnQuery('I');
+
     axios.get(`${apiUrl}/issue/get-id`).then((res) => {
         setIssueId(res.data);
     });
@@ -35,12 +43,6 @@ function IssueList() {
     const [issueId, setIssueId] = useState('');
 
     const auth = useAuthUser();
-
-    const { data: stoneDetails } = useFetchStoneDetailsQuery();
-
-    const { data: unitData } = useFetchUOMQuery();
-
-    const { data: customerData } = useFetchTrueCustomerQuery();
 
     const [addIssue, addResult] = useAddIssueMutation();
 
@@ -83,6 +85,8 @@ function IssueList() {
     const [memberData, setMemberData] = useState(issueMemberData);
 
     const [tBodyData, setTBodyData] = useState([]);
+
+    const [tBodyReturnData, setTBodyReturnData] = useState([]);
 
     const [ validationText, setValidationText ] = useState({});
 
@@ -135,6 +139,7 @@ function IssueList() {
                 customerName: el.customer.customerName,
             }
         }));
+        setTBodyReturnData(returnData.filter(el => el.referenceNo === id));
         setIsEdit(true);
         setOpen(!open);
     };
@@ -513,6 +518,23 @@ function IssueList() {
         },
     ];
 
+    const returnColumn = [
+        {
+            name: "Return No",
+            selector: row => row.returnNo,
+        },
+        {
+            name: "Amount",
+            selector: row => row.totalPrice.toLocaleString('en-us'),
+            right: true,
+        },
+        {
+            name: "Weight",
+            selector: row => row.weight,
+            right: true,
+        },
+    ];
+
     const issueDataList = data?.map((issueData) => {
         return {
             issueNo: issueData.issueNo,
@@ -724,7 +746,7 @@ function IssueList() {
                                     />
                                 </div>
                             </div>
-                            <div className="col-span-2 grid grid-cols-3 gap-2 h-fit">
+                            <div className="col-span-2 grid grid-cols-3 h-fit gap-2">
                                 {/* Select Customer */}
                                 <div className="col-span-3 gap-2">
                                     <div className="w-full">
@@ -757,12 +779,14 @@ function IssueList() {
                                     </div>
                                 </div>
                                 {/* Customer table list */}
-                                <div className="col-span-3">
+                                <div className="col-span-3 mt-2">
                                     <Card className="w-full shadow-sm border border-blue-gray-200 rounded-md">
                                         <CardBody className="overflow-auto rounded-md p-0">
                                         <DataTable 
                                             columns={customerColumn} 
-                                            data={tBodyData} 
+                                            data={tBodyData}
+                                            fixedHeader
+                                            fixedHeaderScrollHeight="150px"
                                             customStyles={{
                                                 rows: {
                                                     style: {
@@ -783,6 +807,37 @@ function IssueList() {
                                     {
                                         validationText.issueMember && <p className="block text-[12px] text-red-500 font-sans mb-2">{validationText.issueMember}</p>
                                     }
+                                </div>
+                                {/* Return table list */}
+                                <div className="col-span-3 mt-2">
+                                    <Card className="w-full shadow-sm border border-blue-gray-200 rounded-md">
+                                        <CardBody className="overflow-auto rounded-md p-0">
+                                            <Typography variant="h6" className="px-2 ml-3 mt-2 border-l-2 border-purple-700 text-black rounded-md">
+                                                Returns
+                                            </Typography>
+                                            <DataTable 
+                                            columns={returnColumn} 
+                                            data={tBodyReturnData} 
+                                            fixedHeader
+                                            fixedHeaderScrollHeight="150px"
+                                            customStyles={{
+                                                rows: {
+                                                    style: {
+                                                        minHeight: '40px',
+                                                    },
+                                                },
+                                                headCells: {
+                                                    style: {
+                                                        fontWeight: "bold",
+                                                        fontSize: "0.8rem",
+                                                        minHeight: '40px',
+                                                    }
+                                                }
+                                            }} 
+                                        />
+                                        </CardBody>
+                                    </Card>
+
                                 </div>
                             </div>
                         </div>

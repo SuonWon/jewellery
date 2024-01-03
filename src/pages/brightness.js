@@ -76,7 +76,7 @@ function Brightness() {
             createdAt: bright[0].createdAt,
             createdBy: bright[0].createdBy,
             updatedAt: moment().toISOString(),
-            updatedBy: "Hello World",
+            updatedBy: "",
         }).then((res) => {
             console.log(res);
         });
