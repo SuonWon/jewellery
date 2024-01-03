@@ -164,29 +164,29 @@ function WalletList() {
             width: "200px",
             selector: row => row.updatedAt,
         },
-        {
-            name: 'Action',
-            fixed: 'right',
-            center: "true",
-            width: "150px",
-            cell: (row) => (
-                <div className="flex items-center gap-2">
-                    {/* <div className="border-r border-gray-400 pr-2">
-                        <Switch color="deep-purple" defaultChecked={row.status} id={row.categoryCode} onChange={(e) => changeStatus(e.target.checked, row.categoryCode)} />
-                    </div> */}
-                    <Button variant="text" color="deep-purple" className="p-2" onClick={() => handleEdit(row.id)}><FaPencil /></Button>
-                    <Button variant="text" color="red" className="p-2" onClick={() => {
-                        setDeleteId(row.id);
-                        setOpenDelete(true);
-                    }}><FaTrashCan /></Button>
-                </div>
-            )
-        },
+        // {
+        //     name: 'Action',
+        //     fixed: 'right',
+        //     center: "true",
+        //     width: "150px",
+        //     cell: (row) => (
+        //         <div className="flex items-center gap-2">
+        //             {/* <div className="border-r border-gray-400 pr-2">
+        //                 <Switch color="deep-purple" defaultChecked={row.status} id={row.categoryCode} onChange={(e) => changeStatus(e.target.checked, row.categoryCode)} />
+        //             </div> */}
+        //             <Button variant="text" color="deep-purple" className="p-2" onClick={() => handleEdit(row.id)}><FaPencil /></Button>
+        //             <Button variant="text" color="red" className="p-2" onClick={() => {
+        //                 setDeleteId(row.id);
+        //                 setOpenDelete(true);
+        //             }}><FaTrashCan /></Button>
+        //         </div>
+        //     )
+        // },
     ];
 
     const tbodyData = data?.map((wallet) => {
         return {
-            id: wallet.walletCode,
+            id: wallet.id,
             walletName: wallet.walletName,
             shareCode: wallet.share.shareName,
             balance: wallet.balance,

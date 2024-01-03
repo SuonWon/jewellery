@@ -4,7 +4,7 @@ import { FaCircleMinus, FaCirclePlus, FaEquals, FaFilter, FaFloppyDisk, FaPencil
 import { BiReset } from "react-icons/bi"
 import { useEffect, useState } from "react";
 import { apiUrl, focusSelect, pause } from "../const";
-import { useAddWalletTransactionMutation, useFetchWalletQuery, useFetchWalletTransactionQuery, useRemoveWalletTransactionMutation, useUpdateWalletTransactionMutation } from "../store";
+import { useAddWalletTransactionMutation, useFetchWalletCategoryQuery, useFetchWalletQuery, useFetchWalletTransactionQuery, useRemoveWalletTransactionMutation, useUpdateWalletTransactionMutation } from "../store";
 import DeleteModal from "../components/delete_modal";
 import SuccessAlert from "../components/success_alert";
 import moment from "moment";
@@ -20,6 +20,8 @@ function Wallet({walletId}) {
     const { data: walletData, refetch: refetchShare } = useFetchWalletQuery();
 
     const { data, refetch } = useFetchWalletTransactionQuery({status: true, walletCode: walletId});
+
+    const { data: walletCategory} = useFetchWalletCategoryQuery();
 
     useEffect(() => {
         refetch();
@@ -95,7 +97,7 @@ function Wallet({walletId}) {
         walletCode: "",
         date: moment().format("YYYY-MM-DD"),
         time: moment().format("hh:mm:ss"),
-        categoryCode: "Stone",
+        categoryCode: 0,
         paymentMode: "Cash",
         cashType: "",
         isSalesPruchase: false,
@@ -180,6 +182,10 @@ function Wallet({walletId}) {
 
         if (formData.walletCode === 0) {
             newErrors.stoneDetailCode = "Wallet Code is required."
+        }
+
+        if (formData.categoryCode === 0) {
+            newErrors.categoryCode = "Category Code is required."
         }
 
         setValidationText(newErrors);
@@ -576,7 +582,7 @@ function Wallet({walletId}) {
                                                 key={wallet.id}
                                                 selected={wallet.share.isOwner}
                                             >
-                                                {wallet.share.shareName}
+                                                {wallet.share.shareName}, {wallet.walletName}
                                             </option>
                                         })
                                     }
@@ -666,14 +672,17 @@ function Wallet({walletId}) {
                                     className="block w-full text-black border border-blue-gray-200 h-[35px] px-2.5 py-1.5 rounded-md focus:border-black"
                                     value={filterForm.category}
                                     onChange={(e) => {
-                                        setFilterForm({...filterForm, category: e.target.value});
+                                        setFilterForm({...filterForm, category: Number(e.target.value)});
                                     }}
                                 >
                                     <option value="">All</option>
-                                    <option value="Stone">Stone</option>
-                                    <option value="Home">Home</option>
-                                    {/* <option value="Sales">Sales</option>
-                                    <option value="Purchase">Purchase</option> */}
+                                    {
+                                        walletCategory?.map(category => {
+                                            return (
+                                                <option key={category.categoryCode} value={category.categoryCode}>{category.categoryDesc}</option>
+                                            )
+                                        })
+                                    }
                                 </select>
                             </div>
                             <div className="flex items-end gap-2">
@@ -769,6 +778,31 @@ function Wallet({walletId}) {
                                     validationText.time && <p className="block text-[12px] text-red-500 font-sans">{validationText.time}</p>
                                 }
                             </div>
+                        </div>
+                        <div className="grid grid-cols-3 gap-2">
+                            {/* Wallet Code */}
+                            <div className="col-span-2">
+                                <label className="text-black text-sm mb-2">Share</label>
+                                <select 
+                                    className="block w-full text-black border border-blue-gray-200 h-[35px] px-2.5 py-1.5 rounded-md focus:border-black"
+                                    value={formData.walletCode}
+                                    onChange={(e) => {
+                                        setFormData({...formData, walletCode: e.target.value});
+                                    }}
+                                >
+                                    <option value="" disabled>Select...</option>
+                                    {
+                                        walletData?.map((wallet) => {
+                                            return <option value={wallet.id} key={wallet.id}>{wallet.share.shareName}, {wallet.walletName}</option>
+                                        })
+                                    }
+                                </select>
+                                {
+                                    validationText.referenceNo && <p className="block text-[12px] text-red-500 font-sans">{validationText.referenceNo}</p>
+                                }
+                            </div>
+                        </div>
+                        <div className="grid grid-cols-3 gap-2">
                             {/* Payment method */}
                             <div>
                                 <label className="text-black text-sm mb-2">Payment Method</label>
@@ -782,29 +816,6 @@ function Wallet({walletId}) {
                                     <option value="Cash">Cash</option>
                                     <option value="Bank">Bank</option>
                                 </select>
-                            </div>
-                        </div>
-                        <div className="grid grid-cols-3 gap-2">
-                            {/* Wallet Code */}
-                            <div>
-                                <label className="text-black text-sm mb-2">Share</label>
-                                <select 
-                                    className="block w-full text-black border border-blue-gray-200 h-[35px] px-2.5 py-1.5 rounded-md focus:border-black"
-                                    value={formData.walletCode}
-                                    onChange={(e) => {
-                                        setFormData({...formData, walletCode: e.target.value});
-                                    }}
-                                >
-                                    <option value="" disabled>Select...</option>
-                                    {
-                                        walletData?.map((wallet) => {
-                                            return <option value={wallet.id} key={wallet.id}>{wallet.share.shareName}</option>
-                                        })
-                                    }
-                                </select>
-                                {
-                                    validationText.referenceNo && <p className="block text-[12px] text-red-500 font-sans">{validationText.referenceNo}</p>
-                                }
                             </div>
                             {/* Amount */}
                             <div>
@@ -829,11 +840,17 @@ function Wallet({walletId}) {
                                     className="block w-full text-black border border-blue-gray-200 h-[35px] px-2.5 py-1.5 rounded-md focus:border-black"
                                     value={formData.categoryCode}
                                     onChange={(e) => {
-                                        setFormData({...formData, categoryCode: e.target.value});
+                                        setFormData({...formData, categoryCode: Number(e.target.value)});
                                     }}
                                 >
-                                    <option value="Stone">Stone</option>
-                                    <option value="Home">Home</option>
+                                    <option value="" disabled>Select...</option>
+                                    {
+                                        walletCategory?.map(category => {
+                                            return (
+                                                <option key={category.categoryCode} value={category.categoryCode}>{category.categoryDesc}</option>
+                                            )
+                                        })
+                                    }
                                 </select>
                             </div>
                             {/* <div>
