@@ -12,9 +12,10 @@ const issueApi = createApi({
                 providesTags: () => {
                     return [{type: "Issue", id: "All"}]
                 },
-                query: () => {
+                query: (filterData) => {
+                    const query = `?skip=${filterData.skip}&take=${filterData.take}&status=${filterData.status}&isComplete=${filterData.isComplete}${filterData.search_word == '' ? '' : `&search_word=${filterData.search_word}`}${filterData.start_date == null ? '' : `&start_date=${filterData.start_date}`}${filterData.end_date == null ? '' : `&end_date=${filterData.end_date}`}`;
                     return {
-                        url: "/issue/get-all-issue",
+                        url: "/issue/get-all-issue" + query,
                         method: "GET",
                     };
                 },
@@ -25,11 +26,22 @@ const issueApi = createApi({
                 },
                 query: () => {
                     return {
-                        url: `/issue/get-all-issue`,
-                        method: "GET",
-                        params: {status: "O"}
+                        url: `/issue/get-true-issue`,
+                        method: "GET"
                     }
                 }
+            }),
+            fetchIssueCount: builder.query({
+                providesTags: () => {
+                    return [{type: "Issue", id: "All"}]
+                },
+                query: (filterData) => {
+                    const query = `?status=${filterData.status}&isComplete=${filterData.isComplete}${filterData.search_word == '' ? '' : `&search_word=${filterData.search_word}`}${filterData.start_date == null ? '' : `&start_date=${filterData.start_date}`}${filterData.end_date == null ? '' : `&end_date=${filterData.end_date}`}`;
+                    return {
+                        url: "/issue/get-count" + query,
+                        method: "GET",
+                    };
+                },
             }),
             fetchIssueById: builder.query({
                 providesTags: () => {
@@ -95,5 +107,5 @@ const issueApi = createApi({
     },
 });
 
-export const { useFetchIssueQuery, useFetchIssueByIdQuery, useFetchTrueIssueQuery, useAddIssueMutation, useUpdateIssueMutation, useUpdateIssueStatusMutation, useRemoveIssueMutation } = issueApi;
+export const { useFetchIssueQuery, useFetchIssueByIdQuery, useFetchTrueIssueQuery, useAddIssueMutation, useUpdateIssueMutation, useUpdateIssueStatusMutation, useRemoveIssueMutation, useFetchIssueCountQuery } = issueApi;
 export { issueApi }

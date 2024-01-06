@@ -12,13 +12,11 @@ const returnApi = createApi({
                 providesTags: () => {
                     return[{type: "Return", id: "All"}]
                 },
-                query: (type) => {
+                query: (filterData) => {
+                    const query = `?skip=${filterData.skip}&take=${filterData.take}&status=${filterData.status}&return_type=${filterData.return_type}${filterData.search_word == '' ? '' : `&search_word=${filterData.search_word}`}${filterData.start_date == null ? '' : `&start_date=${filterData.start_date}`}${filterData.end_date == null ? '' : `&end_date=${filterData.end_date}`}`;
                     return {
-                        url: "/return/get-all-returns",
+                        url: "/return/get-all-returns" + query,
                         method: "GET",
-                        params: {
-                            returnType: type,
-                        }
                     };
                 },
             }),
@@ -29,6 +27,29 @@ const returnApi = createApi({
                 query: (returnId) => {
                     return {
                         url: `/return/get-return/${returnId}`,
+                        method: "GET",
+                    };
+                },
+            }),
+            fetchReturnCount: builder.query({
+                providesTags: () => {
+                    return[{type: "Return", id: "All"}]
+                },
+                query: (filterData) => {
+                    const query = `?status=${filterData.status}&return_type=${filterData.return_type}${filterData.search_word == '' ? '' : `&search_word=${filterData.search_word}`}${filterData.start_date == null ? '' : `&start_date=${filterData.start_date}`}${filterData.end_date == null ? '' : `&end_date=${filterData.end_date}`}`;
+                    return {
+                        url: "/return/get-count" + query,
+                        method: "GET",
+                    };
+                },
+            }),
+            fetchReturnByInvoice: builder.query({
+                providesTags: () => {
+                    return [{ type: 'Return', id: 'All' }];
+                },
+                query: (invoice) => {
+                    return {
+                        url: `/return/get-return-by-invoice/${invoice}`,
                         method: "GET",
                     };
                 },
@@ -73,5 +94,5 @@ const returnApi = createApi({
     },
 });
 
-export const { useFetchReturnQuery, useFetchReturnByIdQuery, useAddReturnMutation, useUpdateReturnMutation, useRemoveReturnMutation } = returnApi;
+export const { useFetchReturnQuery, useFetchReturnByIdQuery, useAddReturnMutation, useUpdateReturnMutation, useRemoveReturnMutation, useFetchReturnCountQuery, useFetchReturnByInvoiceQuery } = returnApi;
 export { returnApi };

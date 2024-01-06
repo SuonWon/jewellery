@@ -12,9 +12,10 @@ const adjustmentApi = createApi({
                 providesTags: () => {
                     return [{type: "Adjustment", id: "All"}]
                 },
-                query: () => {
+                query: (filterData) => {
+                    const query = `?skip=${filterData.skip}&take=${filterData.take}&status=${filterData.status}${filterData.search_word == '' ? '' : `&search_word=${filterData.search_word}`}${filterData.start_date == null ? '' : `&start_date=${filterData.start_date}`}${filterData.end_date == null ? '' : `&end_date=${filterData.end_date}`}`;
                     return {
-                        url: "/adjustment/get-all-adjustments",
+                        url: "/adjustment/get-all-adjustments" + query,
                         method: "GET"
                     };
                 },
@@ -26,6 +27,18 @@ const adjustmentApi = createApi({
                 query: (adjustId) => {
                     return {
                         url: `/adjustment/get-adjustment/${adjustId}`,
+                        method: "GET"
+                    };
+                },
+            }),
+            fetchAdjustmentCount: builder.query({
+                providesTags: () => {
+                    return [{type: "Adjustment", id: "All"}]
+                },
+                query: (filterData) => {
+                    const query = `?status=${filterData.status}${filterData.search_word == '' ? '' : `&search_word=${filterData.search_word}`}${filterData.start_date == null ? '' : `&start_date=${filterData.start_date}`}${filterData.end_date == null ? '' : `&end_date=${filterData.end_date}`}`;
+                    return {
+                        url: "/adjustment/get-count" + query,
                         method: "GET"
                     };
                 },
@@ -71,5 +84,5 @@ const adjustmentApi = createApi({
 });
 
 
-export const { useFetchAdjustmentQuery, useFetchAdjustmentByIdQuery, useAddAdjustmentMutation, useUpdateAdjustmentMutation, useRemoveAdjustMutation } = adjustmentApi;
+export const { useFetchAdjustmentQuery, useFetchAdjustmentByIdQuery, useAddAdjustmentMutation, useUpdateAdjustmentMutation, useRemoveAdjustMutation, useFetchAdjustmentCountQuery } = adjustmentApi;
 export { adjustmentApi };
