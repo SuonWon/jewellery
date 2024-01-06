@@ -1,5 +1,5 @@
 import { Route, Routes, useLocation } from "react-router-dom";
-import Login from "./Login";
+import Login from "./login";
 import Nav from "./components/nav_component";
 import Setup from "./components/setup";
 import Customer from "./pages/customer";
