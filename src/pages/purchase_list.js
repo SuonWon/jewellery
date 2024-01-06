@@ -3,7 +3,7 @@ import { Button, Card, CardBody, Dialog, DialogBody, Typography, Input } from "@
 import { FaCirclePlus, FaFloppyDisk, FaMoneyBillTrendUp, FaPencil, FaPlus, FaTrashCan, FaMagnifyingGlass } from "react-icons/fa6";
 import { useState } from "react";
 import { apiUrl, focusSelect, pause } from "../const";
-import { useAddPurchaseMutation, useFetchPurchaseCountQuery, useFetchPurchaseQuery, useFetchReturnQuery, useFetchTrueShareQuery, useFetchTrueStoneQuery, useFetchTrueSupplierQuery, useFetchUOMQuery, useRemovePurchaseMutation, useUpdatePurchaseMutation } from "../store";
+import { useAddPurchaseMutation, useFetchPurchaseCountQuery, useFetchPurchaseQuery, useFetchReturnByInvoiceQuery, useFetchReturnQuery, useFetchTrueShareQuery, useFetchTrueStoneQuery, useFetchTrueSupplierQuery, useFetchUOMQuery, useRemovePurchaseMutation, useUpdatePurchaseMutation } from "../store";
 import Pagination from "../components/pagination";
 import DeleteModal from "../components/delete_modal";
 import SuccessAlert from "../components/success_alert";
@@ -26,14 +26,13 @@ function PurchaseList() {
         status: 'A',
         isComplete: 'A',
         search_word: '',
+        paidStatus: 'A',
         start_date: null,
         end_date: null
     });
 
     const { data, isLoading : dataLoad, refetch} = useFetchPurchaseQuery(filterData);
     const { data:dataCount} = useFetchPurchaseCountQuery(filterData);
-
-    console.log(data?.length);
 
     const { data: supplierData } = useFetchTrueSupplierQuery();
 
@@ -43,9 +42,8 @@ function PurchaseList() {
 
     const { data: stoneData } = useFetchTrueStoneQuery();
 
-    const { data: returnData } = useFetchReturnQuery('P');
-
-    console.log(returnData);
+    // const { data: returnData } = useFetchReturnQuery('P');
+    const { data: returnData } = useFetchReturnByInvoiceQuery('1111111111')
 
     const auth = useAuthUser();
 
@@ -842,7 +840,7 @@ function PurchaseList() {
                 </div>
                 <Card className="h-auto shadow-md max-w-screen-xxl rounded-sm p-2 border-t">
                     <CardBody className="rounded-sm overflow-auto p-0">
-                        <div className="grid grid-cols-5 gap-2 py-2">
+                        <div className="grid grid-cols-6 gap-2 py-2">
                             <div>
                                 <label className="text-black text-sm mb-2">Status</label>
                                 <select 
@@ -855,6 +853,7 @@ function PurchaseList() {
                                             take: 10,
                                             status: e.target.value
                                         })
+                                        setCurrentPage(1);
                                     }}
                                 >
                                     <option value="A">All</option>
@@ -873,13 +872,35 @@ function PurchaseList() {
                                             ...filterData,
                                             skip: 0,
                                             take: 10,
-                                            status: e.target.value
+                                            isComplete: e.target.value
                                         })
+                                        setCurrentPage(1);
                                     }}
                                 >
                                     <option value="A">All</option>
                                     <option value="F">In Progress</option>
                                     <option value="T">Complete</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label className="text-black text-sm mb-2">Paid Status</label>
+                                <select 
+                                    className="block w-full text-black border border-blue-gray-200 h-[35px] px-2.5 py-1.5 rounded-md focus:border-black"
+                                    value={filterData.paidStatus}
+                                    onChange={(e) => {
+                                        setFilterData({
+                                            ...filterData,
+                                            skip: 0,
+                                            take: 10,
+                                            paidStatus: e.target.value
+                                        })
+                                        setCurrentPage(1);
+                                    }}
+                                >
+                                    <option value="A">All</option>
+                                    <option value="PAID">Paid</option>
+                                    <option value="PARTIAL">Partial</option>
+                                    <option value="UNPAID">Unpaid</option>
                                 </select>
                             </div>
                             <div className="">
@@ -889,39 +910,40 @@ function PurchaseList() {
                                     value={filterData.start_date == null ? '' : filterData.start_date}
                                     className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
                                     onChange={(e) => {
-                                        if (filterData.start_date !== "") {
-                                            if(moment(e.target.value) > moment(filterData.start_date)) {
-                                                console.log(e.target.value)
-                                                // setAlert({
-                                                //     isAlert: true,
-                                                //     message: "Start Date cannot be greater than End Date.",
-                                                //     isWarning: true,
-                                                //     title: "Warning"
-                                                // });
-                                                // setTimeout(() => {
-                                                //     setAlert({
-                                                //         isAlert: false,
-                                                //         message: '',
-                                                //         isWarning: false,
-                                                //         title: ''
-                                                //     })
-                                                // }, 2000);
-                                            } else {
-                                                setFilterData({
-                                                    ...filterData,
-                                                    skip: 0,
-                                                    take: 10,
-                                                    start_date: e.target.value,
-                                                });
-                                            }
-                                        } else {
+                                        // if (filterData.start_date !== "") {
+                                        //     if(moment(e.target.value) > moment(filterData.start_date)) {
+                                        //         console.log(e.target.value)
+                                        //         // setAlert({
+                                        //         //     isAlert: true,
+                                        //         //     message: "Start Date cannot be greater than End Date.",
+                                        //         //     isWarning: true,
+                                        //         //     title: "Warning"
+                                        //         // });
+                                        //         // setTimeout(() => {
+                                        //         //     setAlert({
+                                        //         //         isAlert: false,
+                                        //         //         message: '',
+                                        //         //         isWarning: false,
+                                        //         //         title: ''
+                                        //         //     })
+                                        //         // }, 2000);
+                                        //     } else {
+                                        //         setFilterData({
+                                        //             ...filterData,
+                                        //             skip: 0,
+                                        //             take: 10,
+                                        //             start_date: e.target.value,
+                                        //         });
+                                        //     }
+                                        // } else {
                                             setFilterData({
                                                 ...filterData,
                                                 skip: 0,
                                                 take: 10,
                                                 start_date: e.target.value,
                                             });
-                                        }
+                                            setCurrentPage(1);
+                                        // }
                                     }}
                                 />
                             </div>
@@ -932,34 +954,31 @@ function PurchaseList() {
                                     value={filterData.end_date == null ? '' : filterData.end_date}
                                     className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
                                     onChange={(e) => {
-                                        if(filterData.end_date === "" || moment(e.target.value) < moment(filterData.end_date)) {
-                                            // setAlert({
-                                            //     isAlert: true,
-                                            //     message: "Start Date cannot be greater than End Date.",
-                                            //     isWarning: true,
-                                            //     title: "Warning"
-                                            // });
-                                            // setTimeout(() => {
-                                            //     setAlert({
-                                            //         isAlert: false,
-                                            //         message: '',
-                                            //         isWarning: false,
-                                            //         title: ''
-                                            //     })
-                                            // }, 2000);
+                                        // if(filterData.end_date === "" || moment(e.target.value) < moment(filterData.end_date)) {
+                                        //     // setAlert({
+                                        //     //     isAlert: true,
+                                        //     //     message: "Start Date cannot be greater than End Date.",
+                                        //     //     isWarning: true,
+                                        //     //     title: "Warning"
+                                        //     // });
+                                        //     // setTimeout(() => {
+                                        //     //     setAlert({
+                                        //     //         isAlert: false,
+                                        //     //         message: '',
+                                        //     //         isWarning: false,
+                                        //     //         title: ''
+                                        //     //     })
+                                        //     // }, 2000);
                                             
-                                            return; 
-                                        }
+                                        //     return; 
+                                        // }
                                         setFilterData({
                                             ...filterData,
                                             skip: 0,
                                             take: 10,
                                             end_date: e.target.value,
                                         });
-                                        // setFilterForm({
-                                        //     ...filterForm,
-                                        //     endDate: e.target.value,
-                                        // });
+                                        setCurrentPage(1);
                                     }}
                                 />
                             </div>
@@ -971,6 +990,7 @@ function PurchaseList() {
                                     className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
                                     value={filterData.search} onChange={(e) => {
                                         setFilterData({
+                                            ...filterData,
                                             skip: 0,
                                             take: 10,
                                             search_word: e.target.value
@@ -983,54 +1003,54 @@ function PurchaseList() {
                     
                         <TableList columns={column} data={tbodyData} pending={dataLoad} />
 
-                    <div className="grid grid-cols-2">
-                        <div className="flex mt-7 mb-5">
-                            <p className="mr-2 mt-[6px]">Show</p>
-                            <div className="w-[80px]">
-                                <select
-                                    className="block w-full px-2.5 py-1.5 border border-blue-gray-200 h-[35px] rounded-md focus:border-black text-black"
-                                    value={filterData.take} 
-                                    onChange={(e) => {
-                                        setFilterData({
-                                            ...filterData,
-                                            skip: 0,
-                                            take: e.target.value
-                                        });
-                                        setCurrentPage(1);
-                                    }}
-                                >
-                                    <option value="10">10</option>
-                                    <option value="20">20</option>
-                                    <option value="50">50</option>
-                                    <option value="100">100</option>
-                                </select>
-                            </div>
-                            
-                            <p className="ml-2 mt-[6px]">entries</p>
-                        </div>
-                        
-                        <div className="flex justify-end">
-                            {
-                                dataCount != undefined ? (
-                                    <Pagination
-                                        className="pagination-bar"
-                                        siblingCount={1}
-                                        currentPage={currentPage}
-                                        totalCount={dataCount}
-                                        pageSize={filterData.take}
-                                        onPageChange={(page) => {
-                                            setCurrentPage(page);
+                        <div className="grid grid-cols-2">
+                            <div className="flex mt-7 mb-5">
+                                <p className="mr-2 mt-[6px]">Show</p>
+                                <div className="w-[80px]">
+                                    <select
+                                        className="block w-full px-2.5 py-1.5 border border-blue-gray-200 h-[35px] rounded-md focus:border-black text-black"
+                                        value={filterData.take} 
+                                        onChange={(e) => {
                                             setFilterData({
                                                 ...filterData,
-                                                skip: (page - 1) * filterData.take
-                                            })
+                                                skip: 0,
+                                                take: e.target.value
+                                            });
+                                            setCurrentPage(1);
                                         }}
-                                    />
-                                ) : (<></>)
-                            }
+                                    >
+                                        <option value="10">10</option>
+                                        <option value="20">20</option>
+                                        <option value="50">50</option>
+                                        <option value="100">100</option>
+                                    </select>
+                                </div>
+                                
+                                <p className="ml-2 mt-[6px]">entries</p>
+                            </div>
+                            
+                            <div className="flex justify-end">
+                                {
+                                    dataCount != undefined ? (
+                                        <Pagination
+                                            className="pagination-bar"
+                                            siblingCount={1}
+                                            currentPage={currentPage}
+                                            totalCount={dataCount}
+                                            pageSize={filterData.take}
+                                            onPageChange={(page) => {
+                                                setCurrentPage(page);
+                                                setFilterData({
+                                                    ...filterData,
+                                                    skip: (page - 1) * filterData.take
+                                                })
+                                            }}
+                                        />
+                                    ) : (<></>)
+                                }
+                            </div>
+                            
                         </div>
-                        
-                    </div>
                     
                     </CardBody>
                 </Card>

@@ -28,6 +28,15 @@ function StoneDetails() {
         refetchOnMountOrArgChange: true
     });
 
+    const purchaseFilter = {
+        skip: 0,
+        take: 0,
+        status: 'O',
+        isComplete: 'F',
+        paidStatus: 'A',
+        search_word: ''
+    }
+
     // const {data, refetch} = useFetchStoneDetailsQuery({ refetchOnMountOrArgChange: true });
     const {data, refetch} = useFetchStoneDetailsQuery(filterData);
     const {data: dataCount} = useFetchStoneDetailsCountQuery(filterData);
@@ -44,7 +53,7 @@ function StoneDetails() {
 
     const {data: supplierData} = useFetchTrueSupplierQuery();
 
-    const {data: purchaseData} = useFetchPurchaseQuery();
+    const {data: purchaseData} = useFetchPurchaseQuery(purchaseFilter);
 
     const {data: truePurchaseData} = useFetchTruePurchaseQuery();
 
