@@ -27,6 +27,7 @@ function Share() {
     });
 
     const {data} = useFetchShareQuery(filterData);
+    
     const {data:dataCount} = useFetchShareCountQuery(filterData); 
 
     const [addShare, addResult] = useAddShareMutation();
@@ -225,7 +226,10 @@ function Share() {
             cell: (row) => (
                 <div className="flex items-center gap-2">
                     <div className="border-r border-gray-400 pr-2">
-                        <Switch color="deep-purple" defaultChecked={row.status} id={row.code} onChange={handleChange} />
+                        <div class="custom-checkbox">
+                            <input class="input-checkbox" checked={row.status} id={row.code} type="checkbox" onChange={handleChange} />
+                            <label for={row.code}></label>
+                        </div>
                     </div>
                     <Button 
                         variant="text" color="deep-purple" 

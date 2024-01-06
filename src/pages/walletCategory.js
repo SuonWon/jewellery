@@ -167,7 +167,10 @@ function WalletCategory() {
             cell: (row) => (
                 <div className="flex items-center gap-2">
                     <div className="border-r border-gray-400 pr-2">
-                        <Switch color="deep-purple" defaultChecked={row.status} id={row.categoryCode} onChange={(e) => changeStatus(e.target.checked, row.categoryCode)} />
+                        <div class="custom-checkbox">
+                            <input class="input-checkbox" checked={row.status} id={row.categoryCode} type="checkbox" onChange={(e) => changeStatus(e.target.checked, row.categoryCode)} />
+                            <label for={row.categoryCode}></label>
+                        </div>
                     </div>
                     <Button variant="text" color="deep-purple" className="p-2" onClick={() => handleEdit(row.categoryCode)}><FaPencil /></Button>
                     <Button variant="text" color="red" className="p-2" onClick={() => {

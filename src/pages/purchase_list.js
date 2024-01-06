@@ -3,7 +3,7 @@ import { Button, Card, CardBody, Dialog, DialogBody, Typography, Input } from "@
 import { FaCirclePlus, FaFloppyDisk, FaMoneyBillTrendUp, FaPencil, FaPlus, FaTrashCan, FaMagnifyingGlass } from "react-icons/fa6";
 import { useState } from "react";
 import { apiUrl, focusSelect, pause } from "../const";
-import { useAddPurchaseMutation, useFetchPurchaseCountQuery, useFetchPurchaseQuery, useFetchTruePurchaseQuery, useFetchTrueShareQuery, useFetchTrueStoneQuery, useFetchTrueSupplierQuery, useFetchUOMQuery, useRemovePurchaseMutation, useUpdatePurchaseMutation } from "../store";
+import { useAddPurchaseMutation, useFetchPurchaseCountQuery, useFetchPurchaseQuery, useFetchReturnQuery, useFetchTrueShareQuery, useFetchTrueStoneQuery, useFetchTrueSupplierQuery, useFetchUOMQuery, useRemovePurchaseMutation, useUpdatePurchaseMutation } from "../store";
 import Pagination from "../components/pagination";
 import DeleteModal from "../components/delete_modal";
 import SuccessAlert from "../components/success_alert";

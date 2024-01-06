@@ -4,7 +4,7 @@ import { FaCircleMinus, FaCirclePlus, FaEquals, FaFilter, FaFloppyDisk, FaPencil
 import { BiReset } from "react-icons/bi"
 import { useEffect, useState } from "react";
 import { apiUrl, focusSelect, pause } from "../const";
-import { useAddWalletTransactionMutation, useFetchWalletCategoryQuery, useFetchWalletQuery, useFetchWalletTransactionQuery, useRemoveWalletTransactionMutation, useUpdateWalletTransactionMutation } from "../store";
+import { useAddWalletTransactionMutation, useFetchShareQuery, useFetchTrueShareQuery, useFetchTrueWalletCategoryQuery, useFetchTrueWalletQuery, useFetchWalletCategoryQuery, useFetchWalletQuery, useFetchWalletTransactionQuery, useRemoveWalletTransactionMutation, useUpdateWalletTransactionMutation } from "../store";
 import DeleteModal from "../components/delete_modal";
 import SuccessAlert from "../components/success_alert";
 import moment from "moment";
@@ -17,11 +17,13 @@ const validator = require('validator');
 
 function Wallet({walletId}) {
 
-    const { data: walletData, refetch: refetchShare } = useFetchWalletQuery();
+    const { data: walletData, refetch: refetchShare } = useFetchTrueWalletQuery();
 
     const { data, refetch } = useFetchWalletTransactionQuery({status: true, walletCode: walletId});
 
-    const { data: walletCategory} = useFetchWalletCategoryQuery();
+    const { data: walletCategory} = useFetchTrueWalletCategoryQuery();
+
+    const { data: shareData } = useFetchTrueShareQuery();
 
     useEffect(() => {
         refetch();
@@ -44,11 +46,14 @@ function Wallet({walletId}) {
 
     const [isFilter, setIsFilter] = useState(false);
 
+    const [openDateModal, setOpenDateModal] = useState(false);
+
     const [filterData, setFilterData] = useState([]);
 
     const [filterForm, setFilterForm] = useState({
         status: true,
         walletCode: walletId,
+        shareCode: 0,
         startDate: "",
         endDate: "",
         category: "",
@@ -574,7 +579,7 @@ function Wallet({walletId}) {
                                         })
                                     }}
                                 >
-                                    <option value="" disabled>Select...</option>
+                                    <option value="" disabled>All</option>
                                     {
                                         walletData?.map((wallet) => {
                                             return <option 
@@ -588,8 +593,174 @@ function Wallet({walletId}) {
                                     }
                                 </select>
                             </div>
+                            {/* Share Code */}
+                            <div>
+                                <label className="text-black text-sm mb-2">Share Name</label>
+                                <select 
+                                    className="block w-full text-black border border-blue-gray-200 h-[35px] px-2.5 py-1.5 rounded-md focus:border-black"
+                                    value={filterForm.shareCode}
+                                    onChange={(e) => {
+                                        setFilterForm({
+                                            ...filterForm,
+                                            shareCode: Number(e.target.value),
+                                        })
+                                    }}
+                                >
+                                    <option value="0" disabled>All</option>
+                                    {
+                                        shareData?.map((share) => {
+                                            return <option 
+                                                value={share.shareCode} 
+                                                key={share.shareCode}
+                                            >
+                                                {share.shareName}
+                                            </option>
+                                        })
+                                    }
+                                </select>
+                            </div>
                             {/* Start Date */}
-                            <div className="">
+                            {/* <div className="">
+                                <label className="text-black mb-2 text-sm">Start Date</label>
+                                <input
+                                    type="date"
+                                    value={filterForm.startDate}
+                                    className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
+                                    onChange={(e) => {
+                                        if (filterForm.endDate !== "") {
+                                            if(moment(e.target.value) > moment(filterForm.endDate)) {
+                                                console.log(e.target.value)
+                                                setAlert({
+                                                    isAlert: true,
+                                                    message: "Start Date cannot be greater than End Date.",
+                                                    isWarning: true,
+                                                    title: "Warning"
+                                                });
+                                                setTimeout(() => {
+                                                    setAlert({
+                                                        isAlert: false,
+                                                        message: '',
+                                                        isWarning: false,
+                                                        title: ''
+                                                    })
+                                                }, 2000);
+                                            } else {
+                                                setFilterForm({
+                                                    ...filterForm,
+                                                    startDate: e.target.value,
+                                                });
+                                            }
+                                        } else {
+                                            setFilterForm({
+                                                ...filterForm,
+                                                startDate: e.target.value,
+                                            });
+                                        }
+                                    }}
+                                />
+                            </div> */}
+                            {/* End Date */}
+                            {/* <div className="">
+                                <label className="text-black mb-2 text-sm">End Date</label>
+                                <input
+                                    type="date"
+                                    value={filterForm.endDate}
+                                    className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
+                                    onChange={(e) => {
+                                        if(filterForm.startDate === "" || moment(e.target.value) < moment(filterForm.startDate)) {
+                                            setAlert({
+                                                isAlert: true,
+                                                message: "Start Date cannot be greater than End Date.",
+                                                isWarning: true,
+                                                title: "Warning"
+                                            });
+                                            setTimeout(() => {
+                                                setAlert({
+                                                    isAlert: false,
+                                                    message: '',
+                                                    isWarning: false,
+                                                    title: ''
+                                                })
+                                            }, 2000);
+                                            
+                                            return; 
+                                        }
+                                        setFilterForm({
+                                            ...filterForm,
+                                            endDate: e.target.value,
+                                        });
+                                        // setFilterForm({
+                                        //     ...filterForm,
+                                        //     endDate: e.target.value,
+                                        // });
+                                    }}
+                                />
+                            </div> */}
+                            {/* Wallet Category */}
+                            <div>
+                                <label className="text-black text-sm mb-2">Category</label>
+                                <select 
+                                    className="block w-full text-black border border-blue-gray-200 h-[35px] px-2.5 py-1.5 rounded-md focus:border-black"
+                                    value={filterForm.category}
+                                    onChange={(e) => {
+                                        setFilterForm({...filterForm, category: Number(e.target.value)});
+                                    }}
+                                >
+                                    <option value="">All</option>
+                                    {
+                                        walletCategory?.map(category => {
+                                            return (
+                                                <option key={category.categoryCode} value={category.categoryCode}>{category.categoryDesc}</option>
+                                            )
+                                        })
+                                    }
+                                </select>
+                            </div>
+                            <div className="flex items-end gap-2">
+                                <Button 
+                                    className="flex items-center gap-2 bg-main capitalize py-2 px-3" 
+                                    onClick={() => {
+                                        setFilterForm({
+                                            ...filterForm,
+                                            startDate: "",
+                                            endDate: "",
+                                        });
+                                        setOpenDateModal(!openDateModal);    
+                                    }}
+                                >
+                                    <FaFilter /> <span>Date Range</span>
+                                </Button>
+                                {/* <Button className="flex items-center gap-2 bg-main capitalize py-2 px-3" onClick={handleFilter}>
+                                    <FaFilter /> <span>Filter</span>
+                                </Button> */}
+                                <Button variant="filled" className="flex items-center capitalize gap-2 py-2 px-3" 
+                                    onClick={() => {
+                                        setIsFilter(false);
+                                        setFilterForm({
+                                            status: true,
+                                            walletCode: walletId,
+                                            shareCode: 0,
+                                            startDate: "",
+                                            endDate: "",
+                                            category: "",
+                                        });
+                                        refetch();
+                                    }}
+                                >
+                                    <BiReset /> <span>Reset</span>
+                                </Button>
+                            </div>
+                        </div>
+                        <TableList columns={column} data={tbodyData} isSearch={true} />
+                    </CardBody>
+                </Card>
+                <DeleteModal deleteId={deleteId} open={openDelete} handleDelete={handleRemove} closeModal={() => setOpenDelete(!openDelete)} />
+                <Dialog open={openDateModal}>
+                    <DialogBody>
+                        <ModalTitle titleName="Date Range" handleClick={() => setOpenDateModal(!openDateModal)} />
+                        <div className="grid grid-cols-2 gap-2 mt-3">
+                            {/* Start Date */}
+                            <div>
                                 <label className="text-black mb-2 text-sm">Start Date</label>
                                 <input
                                     type="date"
@@ -629,7 +800,7 @@ function Wallet({walletId}) {
                                 />
                             </div>
                             {/* End Date */}
-                            <div className="">
+                            <div>
                                 <label className="text-black mb-2 text-sm">End Date</label>
                                 <input
                                     type="date"
@@ -665,51 +836,14 @@ function Wallet({walletId}) {
                                     }}
                                 />
                             </div>
-                            {/* Wallet Category */}
-                            <div>
-                                <label className="text-black text-sm mb-2">Category</label>
-                                <select 
-                                    className="block w-full text-black border border-blue-gray-200 h-[35px] px-2.5 py-1.5 rounded-md focus:border-black"
-                                    value={filterForm.category}
-                                    onChange={(e) => {
-                                        setFilterForm({...filterForm, category: Number(e.target.value)});
-                                    }}
-                                >
-                                    <option value="">All</option>
-                                    {
-                                        walletCategory?.map(category => {
-                                            return (
-                                                <option key={category.categoryCode} value={category.categoryCode}>{category.categoryDesc}</option>
-                                            )
-                                        })
-                                    }
-                                </select>
-                            </div>
-                            <div className="flex items-end gap-2">
+                            <div className="col-start-2 flex justify-end mt-3">
                                 <Button className="flex items-center gap-2 bg-main capitalize py-2 px-3" onClick={handleFilter}>
-                                    <FaFilter /> <span>Filter</span>
-                                </Button>
-                                <Button variant="filled" className="flex items-center capitalize gap-2 py-2 px-3" 
-                                    onClick={() => {
-                                        setIsFilter(false);
-                                        setFilterForm({
-                                            status: true,
-                                            walletCode: walletId,
-                                            startDate: "",
-                                            endDate: "",
-                                            category: "",
-                                        });
-                                        refetch();
-                                    }}
-                                >
-                                    <BiReset /> <span>Reset</span>
+                                    Confirm
                                 </Button>
                             </div>
                         </div>
-                        <TableList columns={column} data={tbodyData} isSearch={true} />
-                    </CardBody>
-                </Card>
-                <DeleteModal deleteId={deleteId} open={openDelete} handleDelete={handleRemove} closeModal={() => setOpenDelete(!openDelete)} />
+                    </DialogBody>
+                </Dialog>
                 <Dialog open={open} size="md">
                     <DialogBody>
                         {/* <ModalTitle titleName={isCashIn? "Add Cash In" : "Add Cash Out"} handleClick={() => setOpen(!open)} /> */}

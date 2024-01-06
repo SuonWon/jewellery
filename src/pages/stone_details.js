@@ -670,7 +670,10 @@ function StoneDetails() {
             cell: (row) => (
                 <div className="flex items-center gap-2">
                     <div className="border-r border-gray-400 pr-2">
-                        <Switch color="deep-purple" defaultChecked={row.Status} id={row.Code} onChange={handleChange} />
+                        <div class="custom-checkbox">
+                            <input class="input-checkbox" checked={row.Status} id={row.Code} type="checkbox" onChange={handleChange} />
+                            <label for={row.Code}></label>
+                        </div>
                     </div>
                     <Button variant="text" color="teal" className="p-2" onClick={() => openCombineModal(row.Code)} disabled={row.Status? false : true}><FaCirclePlus /></Button>
                     <Button variant="text" color="deep-purple" className="p-2" onClick={() => handleEdit(row.Code)}><FaPencil /></Button>
