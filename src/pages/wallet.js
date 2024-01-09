@@ -4,7 +4,8 @@ import { FaCircleMinus, FaCirclePlus, FaEquals, FaFilter, FaFloppyDisk, FaPencil
 import { BiReset } from "react-icons/bi"
 import { useEffect, useState } from "react";
 import { apiUrl, focusSelect, pause } from "../const";
-import { useAddWalletTransactionMutation, useFetchShareQuery, useFetchTrueShareQuery, useFetchTrueWalletCategoryQuery, useFetchTrueWalletQuery, useFetchWalletCategoryQuery, useFetchWalletQuery, useFetchWalletTransactionQuery, useRemoveWalletTransactionMutation, useUpdateWalletTransactionMutation } from "../store";
+import { useAddWalletTransactionMutation, useFetchShareQuery, useFetchTrueShareQuery, useFetchTrueWalletCategoryQuery, useFetchTrueWalletQuery, useFetchWalletCategoryQuery, useFetchWalletQuery, useFetchWalletTransactionCountQuery, useFetchWalletTransactionQuery, useRemoveWalletTransactionMutation, useUpdateWalletTransactionMutation } from "../store";
+import Pagination from "../components/pagination";
 import DeleteModal from "../components/delete_modal";
 import SuccessAlert from "../components/success_alert";
 import moment from "moment";
@@ -17,9 +18,21 @@ const validator = require('validator');
 
 function Wallet({walletId}) {
 
+    const [filterForm, setFilterForm] = useState({
+        skip: 0,
+        take: 10,
+        status: true,
+        walletName: "",
+        shareCode: 0,
+        startDate: "",
+        endDate: "",
+        category: "",
+    })
+
     const { data: walletData, refetch: refetchShare } = useFetchTrueWalletQuery();
 
-    const { data, refetch } = useFetchWalletTransactionQuery({status: true, walletCode: walletId});
+    const { data, refetch } = useFetchWalletTransactionQuery(filterForm);
+    const { data:dataCount } = useFetchWalletTransactionCountQuery(filterForm);
 
     const { data: walletCategory} = useFetchTrueWalletCategoryQuery();
 
@@ -50,20 +63,13 @@ function Wallet({walletId}) {
 
     const [filterData, setFilterData] = useState([]);
 
-    const [filterForm, setFilterForm] = useState({
-        status: true,
-        walletCode: walletId,
-        shareCode: 0,
-        startDate: "",
-        endDate: "",
-        category: "",
-    })
-
     const [removeTransaction, removeResult] = useRemoveWalletTransactionMutation();
 
     const [addTransaction] = useAddWalletTransactionMutation();
 
     const [updateTransaction] = useUpdateWalletTransactionMutation();
+
+    const [currentPage, setCurrentPage] = useState(1);
 
     const [ alert, setAlert] = useState({
         isAlert: false,
@@ -752,6 +758,56 @@ function Wallet({walletId}) {
                             </div>
                         </div>
                         <TableList columns={column} data={tbodyData} isSearch={true} />
+
+                        <div className="grid grid-cols-2">
+                            <div className="flex mt-7 mb-5">
+                                <p className="mr-2 mt-[6px]">Show</p>
+                                <div className="w-[80px]">
+                                    <select
+                                        className="block w-full px-2.5 py-1.5 border border-blue-gray-200 h-[35px] rounded-md focus:border-black text-black"
+                                        value={filterData.take} 
+                                        onChange={(e) => {
+                                            setFilterData({
+                                                ...filterData,
+                                                skip: 0,
+                                                take: e.target.value
+                                            });
+                                            setCurrentPage(1);
+                                        }}
+                                    >
+                                        <option value="10">10</option>
+                                        <option value="20">20</option>
+                                        <option value="50">50</option>
+                                        <option value="100">100</option>
+                                    </select>
+                                </div>
+                                
+                                <p className="ml-2 mt-[6px]">entries</p>
+                            </div>
+                            
+                            <div className="flex justify-end">
+                                {
+                                    dataCount != undefined ? (
+                                        <Pagination
+                                            className="pagination-bar"
+                                            siblingCount={1}
+                                            currentPage={currentPage}
+                                            totalCount={dataCount}
+                                            pageSize={filterForm.take}
+                                            onPageChange={(page) => {
+                                                setCurrentPage(page);
+                                                setFilterForm({
+                                                    ...filterForm,
+                                                    skip: (page - 1) * filterForm.take
+                                                })
+                                            }}
+                                        />
+                                    ) : (<></>)
+                                }
+                            </div>
+                            
+                        </div>
+                    
                     </CardBody>
                 </Card>
                 <DeleteModal deleteId={deleteId} open={openDelete} handleDelete={handleRemove} closeModal={() => setOpenDelete(!openDelete)} />

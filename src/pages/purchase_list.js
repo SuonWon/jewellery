@@ -866,7 +866,7 @@ function PurchaseList() {
                                 <label className="text-black text-sm mb-2">Selection Complete</label>
                                 <select 
                                     className="block w-full text-black border border-blue-gray-200 h-[35px] px-2.5 py-1.5 rounded-md focus:border-black"
-                                    value={filterData.status}
+                                    value={filterData.isComplete}
                                     onChange={(e) => {
                                         setFilterData({
                                             ...filterData,

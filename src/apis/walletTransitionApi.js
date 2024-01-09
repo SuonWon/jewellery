@@ -20,10 +20,26 @@ const walletTransitionApi = createApi({
                 providesTags: () => {
                     return [{type: "WalletTransaction", id: "All"}]
                 },
-                query: (walletData) => {
-                    console.log(walletData);
+                query: (filterData) => {
+                    const query = `?skip=${filterData.skip}&take=${filterData.take}&status=true${filterData.shareCode == '' ? '' : `&shareCode=${filterData.shareCode}`}${filterData.walletName == '' ? '' : `&walletName=${filterData.walletName}`}${filterData.category == '' ? '' : `&walletName=${filterData.category}`}${filterData.start_date == null ? '' : `&start_date=${filterData.start_date}`}${filterData.end_date == null ? '' : `&end_date=${filterData.end_date}`}`;
                     return {
-                        url: `/transaction/get-all-transactions?status=true&walletCode=${walletData.walletCode}`,
+                        url: `/transaction/get-all-transactions${query}`,
+                        // params: {
+                        //     status: walletData.status,
+                        //     walletCode: walletData.walletCode
+                        // },
+                        method: "GET",
+                    };
+                },
+            }),
+            fetchWalletTransactionCount: builder.query({
+                providesTags: () => {
+                    return [{type: "WalletTransaction", id: "All"}]
+                },
+                query: (filterData) => {
+                    const query = `?status=true${filterData.shareCode == '' ? '' : `&shareCode=${filterData.shareCode}`}${filterData.walletName == '' ? '' : `&walletName=${filterData.walletName}`}${filterData.category == '' ? '' : `&walletName=${filterData.category}`}${filterData.start_date == null ? '' : `&start_date=${filterData.start_date}`}${filterData.end_date == null ? '' : `&end_date=${filterData.end_date}`}`;
+                    return {
+                        url: `/transaction/get-count${query}`,
                         // params: {
                         //     status: walletData.status,
                         //     walletCode: walletData.walletCode
@@ -83,5 +99,5 @@ const walletTransitionApi = createApi({
     },
 });
 
-export const { useFetchWalletTransactionQuery, useFetchWalletTransactionByIdQuery, useAddWalletTransactionMutation, useUpdateWalletTransactionMutation, useRemoveWalletTransactionMutation } = walletTransitionApi;
+export const { useFetchWalletTransactionQuery, useFetchWalletTransactionByIdQuery, useAddWalletTransactionMutation, useUpdateWalletTransactionMutation, useRemoveWalletTransactionMutation, useFetchWalletTransactionCountQuery } = walletTransitionApi;
 export { walletTransitionApi };
