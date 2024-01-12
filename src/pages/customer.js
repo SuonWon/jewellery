@@ -112,6 +112,7 @@ function Customer() {
     const openModal = () => {
         setIsEdit(false);
         resetData();
+        setValidationText([]);
         setOpen(!open);
     };
 
@@ -149,6 +150,7 @@ function Customer() {
         let eData = data.filter((customer) => customer.customerCode === id);
         setIsEdit(true);
         setFormData(eData[0]);
+        setValidationText([]);
         setOpen(!open);
     };
 
@@ -374,30 +376,156 @@ function Customer() {
             <Dialog open={Boolean(open)} handler={openModal} size="lg">
                 <DialogBody>
                     <ModalTitle titleName={isEdit ? "Edit Customer" : "Customer"} handleClick={openModal} />
-                    <form  className="flex flex-col items-end p-3 gap-4">
+                    <form  className="flex flex-col p-3 gap-2">
                         <div className="grid grid-cols-3 gap-2 w-full">
                             <div>
-                                <Input label="Name" value={formData.customerName} onChange={(e) => setFormData({...formData, customerName: e.target.value})} />
+                                <label className="text-black text-sm mb-2">Name</label>
+                                <input
+                                    type="text"
+                                    className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
+                                    value={formData.customerName}
+                                    onChange={(e) => {
+                                        setFormData({
+                                            ...formData, 
+                                            customerName: e.target.value,
+                                        });
+                                    }}
+                                />
                                 {
                                     validationText.customerName && <p className="block text-[12px] text-red-500 font-sans mb-2">{validationText.customerName}</p>
                                 }
                             </div>
-                            <Input label="NRC No" value={formData.nrcNo} onChange={(e) => setFormData({...formData, nrcNo: e.target.value})} />
-                            <Input label="Company Name" value={formData.companyName} onChange={(e) => setFormData({...formData, companyName: e.target.value})} />
+                            <div>
+                                <label className="text-black text-sm mb-2">NRC No</label>
+                                <input
+                                    type="text"
+                                    className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
+                                    value={formData.nrcNo}
+                                    onChange={(e) => {
+                                        setFormData({
+                                            ...formData, 
+                                            nrcNo: e.target.value,
+                                        });
+                                    }}
+                                />
+                            </div>
+                            <div>
+                                <label className="text-black text-sm mb-2">Company Name</label>
+                                <input
+                                    type="text"
+                                    className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
+                                    value={formData.companyName}
+                                    onChange={(e) => {
+                                        setFormData({
+                                            ...formData, 
+                                            companyName: e.target.value,
+                                        });
+                                    }}
+                                />
+                            </div>
                         </div>
                         <div className="grid grid-cols-4 gap-2 w-full">
-                            <Input label="Contact No" value={formData.contactNo} onChange={(e) => setFormData({...formData, contactNo: e.target.value})} />
-                            <Input label="Office No" value={formData.officeNo} onChange={(e) => setFormData({...formData, officeNo: e.target.value})} />
+                            <div>
+                                <label className="text-black text-sm mb-2">Contact No</label>
+                                <input
+                                    type="text"
+                                    className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
+                                    value={formData.contactNo}
+                                    onChange={(e) => {
+                                        setFormData({
+                                            ...formData, 
+                                            contactNo: e.target.value,
+                                        });
+                                    }}
+                                />
+                            </div>
+                            <div>
+                                <label className="text-black text-sm mb-2">Office No</label>
+                                <input
+                                    type="text"
+                                    className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
+                                    value={formData.officeNo}
+                                    onChange={(e) => {
+                                        setFormData({
+                                            ...formData, 
+                                            officeNo: e.target.value,
+                                        });
+                                    }}
+                                />
+                            </div>
                             <div className="col-span-2">
-                                <Input label="Street" value={formData.street} onChange={(e) => setFormData({...formData, street: e.target.value})} />
+                                <label className="text-black text-sm mb-2">Street</label>
+                                <input
+                                    type="text"
+                                    className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
+                                    value={formData.street}
+                                    onChange={(e) => {
+                                        setFormData({
+                                            ...formData, 
+                                            street: e.target.value,
+                                        });
+                                    }}
+                                />
                             </div>
                         </div>
                         <div className="grid grid-cols-3 gap-2 w-full">
-                            <Input label="Township" value={formData.township} onChange={(e) => setFormData({...formData, township: e.target.value})} />
-                            <Input label="City" value={formData.city} onChange={(e) => setFormData({...formData, city: e.target.value})} />
-                            <Input label="Region" value={formData.region} onChange={(e) => setFormData({...formData, region: e.target.value})} />
+                            <div>
+                                <label className="text-black text-sm mb-2">Township</label>
+                                <input
+                                    type="text"
+                                    className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
+                                    value={formData.township}
+                                    onChange={(e) => {
+                                        setFormData({
+                                            ...formData, 
+                                            township: e.target.value,
+                                        });
+                                    }}
+                                />
+                            </div>
+                            <div>
+                                <label className="text-black text-sm mb-2">City</label>
+                                <input
+                                    type="text"
+                                    className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
+                                    value={formData.city}
+                                    onChange={(e) => {
+                                        setFormData({
+                                            ...formData, 
+                                            city: e.target.value,
+                                        });
+                                    }}
+                                />
+                            </div>
+                            <div>
+                                <label className="text-black text-sm mb-2">Region</label>
+                                <input
+                                    type="text"
+                                    className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
+                                    value={formData.region}
+                                    onChange={(e) => {
+                                        setFormData({
+                                            ...formData, 
+                                            region: e.target.value,
+                                        });
+                                    }}
+                                />
+                            </div>
                         </div>
-                        <Textarea label="Remark" rows={1} value={formData.remark} onChange={(e) => setFormData({...formData, remark: e.target.value})} />
+                        <div>
+                            <label className="text-black text-sm mb-2">Remark</label>
+                            <textarea
+                                type="text"
+                                className="border border-blue-gray-200 w-full px-2.5 py-1.5 rounded-md text-black"
+                                value={formData.remark}
+                                onChange={(e) => {
+                                    setFormData({
+                                        ...formData, 
+                                        remark: e.target.value,
+                                    });
+                                }}
+                            />
+                        </div>
                         <div className="flex items-center justify-end mt-6 gap-2">
                             {
                                 isEdit ? 

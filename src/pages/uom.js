@@ -44,13 +44,12 @@ function UOM() {
     const openModal = () => {
         setIsEdit(false);
         setOpen(!open);
-
         setUnitData({
             unitCode: '',
             unitDesc: '',
             createdAt: moment().toISOString(),
             createdBy: auth().username,
-        })
+        });
         setValidationText({});
     };
 
@@ -168,15 +167,18 @@ function UOM() {
             
                     <div  className="flex flex-col items-end p-3">
                         <div className="grid grid-cols-2 gap-2 w-full">
+                            {/* Code */}
                             <div>
-                                <Input 
-                                    label="Code"
+                                <label className="text-black text-sm mb-2">Code</label>
+                                <input
+                                    type="text"
+                                    className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
                                     value={unitData.unitCode}
                                     onChange={(e) => {
                                         setUnitData({
-                                            ...unitData,
-                                            unitCode: e.target.value
-                                        })
+                                            ...unitData, 
+                                            unitCode: e.target.value,
+                                        });
                                     }}
                                     readOnly={isEdit}
                                 />
@@ -184,23 +186,24 @@ function UOM() {
                                     validationText.code && <p className="block text-[12px] text-red-500 font-sans mb-2">{validationText.code}</p>
                                 }
                             </div>
-                            
+                            {/* Code */}
                             <div>
-                                <Input 
-                                    label="Description" 
+                                <label className="text-black text-sm mb-2">Description</label>
+                                <input
+                                    type="text"
+                                    className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
                                     value={unitData.unitDesc}
                                     onChange={(e) => {
                                         setUnitData({
-                                            ...unitData,
-                                            unitDesc: e.target.value
-                                        })
-                                    }} 
+                                            ...unitData, 
+                                            unitDesc: e.target.value,
+                                        });
+                                    }}
                                 />
                                 {
                                     validationText.desc && <p className="block text-[12px] text-red-500 font-sans mb-2">{validationText.desc}</p>
                                 }
                             </div>
-                            
                         </div>
                             <div className="flex items-center justify-end mt-6 gap-2">
                             <Button onClick={() => handleSubmit(false)} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2">

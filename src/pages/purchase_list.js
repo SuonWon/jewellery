@@ -32,6 +32,7 @@ function PurchaseList() {
     });
 
     const { data, isLoading : dataLoad, refetch} = useFetchPurchaseQuery(filterData);
+    
     const { data:dataCount} = useFetchPurchaseCountQuery(filterData);
 
     const { data: supplierData } = useFetchTrueSupplierQuery();

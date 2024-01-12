@@ -303,48 +303,52 @@ function Brightness() {
                     {/* {
                         addResult.isSuccess && isAlert && <SuccessAlert message="Save successful." handleAlert={() => setIsAlert(false)} />
                     } */}
-                    {
-                        isEdit ? (
-                            <form  className="flex flex-col items-end p-3">
-                                {/* <Switch label="Active" color="deep-purple" defaultChecked /> */}
-                                <Input label="Description" value={formData.brightDesc} onChange={(e) => setFormData({...formData, brightDesc: e.target.value})} />
+                        <div  className="flex flex-col p-3">
+                            {/* <Switch label="Active" color="deep-purple" defaultChecked /> */}
+                            {/* <Input label="Description" value={formData.brightDesc} onChange={(e) => setFormData({...formData, brightDesc: e.target.value})} /> */}
+                            {/* Description */}
+                            <div>
+                                <label className="text-black text-sm mb-2">Description</label>
+                                <input
+                                    type="text"
+                                    className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
+                                    value={formData.brightDesc}
+                                    onChange={(e) => {
+                                        setFormData({
+                                            ...formData, 
+                                            brightDesc: e.target.value,
+                                        });
+                                    }}
+                                />
                                 {
                                     validationText.brightDesc && <p className="block text-[12px] text-red-500 font-sans mb-2">{validationText.brightDesc}</p>
                                 }
-
-                                <div className="flex items-center justify-end mt-6 gap-2">
-                                    <Button onClick={submitEdit} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2">
+                            </div>
+                            <div className="flex items-center justify-end mt-6 gap-2">
+                                {
+                                    isEdit ? <Button onClick={submitEdit} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2">
                                         <FaFloppyDisk className="text-base" /> 
                                         <Typography variant="small" className="capitalize">
                                             Update
                                         </Typography>
-                                    </Button>
-                                </div>
-                            </form>
-                        ) : (
-                            <form  className="flex flex-col items-end p-3">
-                                {/* <Switch label="Active" color="deep-purple" defaultChecked /> */}
-                                <Input label="Description" value={formData.brightDesc} onChange={(e) => setFormData({...formData, brightDesc: e.target.value})} />
-                                {
-                                    validationText.brightDesc && <p className="block text-[12px] text-red-500 font-sans mb-2">{validationText.brightDesc}</p>
+                                    </Button> : 
+                                    <>
+                                        <Button onClick={onSubmit} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2">
+                                            <FaFloppyDisk className="text-base" /> 
+                                            <Typography variant="small" className="capitalize">
+                                                Save
+                                            </Typography>
+                                        </Button>
+                                        <Button onClick={onSaveSubmit} color="deep-purple" size="sm" variant="outlined" className="flex items-center gap-2">
+                                            <FaCirclePlus className="text-base" /> 
+                                            <Typography variant="small" className="capitalize">
+                                                Save & New
+                                            </Typography>
+                                        </Button>
+                                    </>
                                 }
-                                <div className="flex items-center justify-end mt-6 gap-2">
-                                    <Button onClick={onSubmit} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2">
-                                        <FaFloppyDisk className="text-base" /> 
-                                        <Typography variant="small" className="capitalize">
-                                            Save
-                                        </Typography>
-                                    </Button>
-                                    <Button onClick={onSaveSubmit} color="deep-purple" size="sm" variant="outlined" className="flex items-center gap-2">
-                                        <FaCirclePlus className="text-base" /> 
-                                        <Typography variant="small" className="capitalize">
-                                            Save & New
-                                        </Typography>
-                                    </Button>
-                                </div>
-                            </form>
-                        )
-                    }
+                            </div>
+                        </div>
                      
                 </DialogBody>                      
             </Dialog>

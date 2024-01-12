@@ -7,14 +7,14 @@ import { v4 as uuidv4 } from 'uuid';
 import moment from "moment";
 import { useAuthUser } from "react-auth-kit";
 import { focusSelect } from "../const";
-import { useAddPayableMutation, useFetchPayableQuery, useFetchWalletQuery, useRemovePayableMutation, useUpdatePayableMutation } from "../store";
+import { useAddPayableMutation, useFetchPayableQuery, useFetchTrueWalletQuery, useFetchWalletQuery, useRemovePayableMutation, useUpdatePayableMutation } from "../store";
 const validator = require('validator');
 
 function Payable(props) {
 
     const {data} = useFetchPayableQuery(props.invoiceNo);
 
-    const {data : walletData } = useFetchWalletQuery();
+    const {data : walletData } = useFetchTrueWalletQuery();
 
     const [addPayable] = useAddPayableMutation();
 
@@ -280,7 +280,7 @@ function Payable(props) {
                                 >
                                     <option value="" disabled>Select...</option>
                                     {
-                                        walletData.map((wallet) => {
+                                        walletData?.map((wallet) => {
                                             return (
                                                 <option key={wallet.id} value={wallet.id}>{wallet.share.shareName}, {wallet.walletName}</option>
                                             )

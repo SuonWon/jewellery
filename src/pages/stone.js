@@ -283,32 +283,41 @@ function Stone() {
                 <DialogBody>
                     <ModalTitle titleName={isEdit ? "Edit Stone" : "Stone"} handleClick={openModal} />
 
-                    <div  className="flex flex-col items-end p-3 gap-4">
+                    <div  className="flex flex-col p-3 gap-2">
                         {/* <Switch label="Active" color="deep-purple" defaultChecked /> */}
-                        <Input 
-                            label="Description" 
-                            value={stone.stoneDesc}
-                            onChange={(e) => {
-                                setStone({
-                                    ...stone,
-                                    stoneDesc: e.target.value
-                                })
-                            }} 
-                        />
-                        {
-                            validationText.desc && <p className="block text-[12px] text-red-500 font-sans mb-2">{validationText.desc}</p>
-                        }
-                        <Textarea 
-                            label="Remark" rows={2} 
-                            value={stone.remark}
-                            onChange={(e) => {
-                                setStone({
-                                    ...stone,
-                                    remark: e.target.value
-                                })
-                            }} 
-                        />
-                       
+                        {/* Description */}
+                        <div>
+                            <label className="text-black text-sm mb-2">Description</label>
+                            <input
+                                type="text"
+                                className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
+                                value={stone.stoneDesc}
+                                onChange={(e) => {
+                                    setStone({
+                                        ...stone, 
+                                        stoneDesc: e.target.value,
+                                    });
+                                }}
+                            />
+                            {
+                                validationText.desc && <p className="block text-[12px] text-red-500 font-sans mb-2">{validationText.desc}</p>
+                            }
+                        </div>
+                        {/* Remark */}
+                        <div>
+                            <label className="text-black text-sm mb-2">Remark</label>
+                            <textarea
+                                type="text"
+                                className="border border-blue-gray-200 w-full px-2.5 py-1.5 rounded-md text-black"
+                                value={stone.remark}
+                                onChange={(e) => {
+                                    setStone({
+                                        ...stone, 
+                                        remark: e.target.value,
+                                    });
+                                }}
+                            />
+                        </div>
                         <div className="flex items-center justify-end mt-6 gap-2">
                             <Button onClick={() => handleSubmit(false)} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2">
                                 <FaFloppyDisk className="text-base" /> 

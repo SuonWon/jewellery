@@ -91,4 +91,4 @@ export { useFetchWalletTransactionQuery, useFetchWalletTransactionByIdQuery, use
 export { useFetchPayableQuery, useFetchPayableByIdQuery, useFetchOwnerWalletQuery, useAddPayableMutation, useUpdatePayableMutation, useRemovePayableMutation } from "../apis/payableApi";
 export { useFetchReceivableQuery, useFetchReceivableByIdQuery, useAddReceivableMutation, useUpdateReceivableMutation, useRemoveReceivableMutation } from "../apis/receivableApi";
 export { useFetchWalletCategoryQuery, useFetchTrueWalletCategoryQuery, useFetchWalletCategoryByIdQuery, useAddWalletCategoryMutation, useUpdateWalletCategoryMutation, useRemoveWalletCategoryMutation, useFetchWalletCategoryCountQuery } from "../apis/walletCategoryApi";
-export { useFetchWalletQuery, useFetchTrueWalletQuery, useFetchWalletByIdQuery, useAddWalletMutation, useUpdateWalletMutation, useRemoveWalletMutation, useFetchWalletCountQuery } from "../apis/walletApi";
+export { useFetchWalletQuery, useFetchTrueWalletQuery, useFetchWalletByIdQuery, useFetchWalletNamesQuery, useAddWalletMutation, useUpdateWalletMutation, useRemoveWalletMutation, useFetchWalletCountQuery } from "../apis/walletApi";
