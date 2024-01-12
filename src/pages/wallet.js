@@ -4,11 +4,11 @@ import { FaCircleMinus, FaCirclePlus, FaEquals, FaFilter, FaFloppyDisk, FaPencil
 import { BiReset } from "react-icons/bi"
 import { useEffect, useState } from "react";
 import { apiUrl, focusSelect, pause } from "../const";
-import { useAddWalletTransactionMutation, useFetchShareQuery, useFetchTrueShareQuery, useFetchTrueWalletCategoryQuery, useFetchTrueWalletQuery, useFetchWalletCategoryQuery, useFetchWalletQuery, useFetchWalletTransactionCountQuery, useFetchWalletTransactionQuery, useRemoveWalletTransactionMutation, useUpdateWalletTransactionMutation } from "../store";
+import { useAddWalletTransactionMutation, useFetchShareQuery, useFetchTrueShareQuery, useFetchTrueWalletCategoryQuery, useFetchTrueWalletQuery, useFetchWalletCategoryQuery, useFetchWalletNamesQuery, useFetchWalletQuery, useFetchWalletTransactionCountQuery, useFetchWalletTransactionQuery, useRemoveWalletTransactionMutation, useUpdateWalletTransactionMutation } from "../store";
 import Pagination from "../components/pagination";
 import DeleteModal from "../components/delete_modal";
 import SuccessAlert from "../components/success_alert";
-import moment from "moment";
+import moment, { months } from "moment";
 import TableList from "../components/data_table";
 import { useAuthUser } from "react-auth-kit";
 import ModalTitle from "../components/modal_title";
@@ -24,14 +24,17 @@ function Wallet({walletId}) {
         status: true,
         walletName: "",
         shareCode: 0,
-        startDate: "",
-        endDate: "",
         category: "",
     })
 
     const { data: walletData, refetch: refetchShare } = useFetchTrueWalletQuery();
 
+    const { data: walletNames } = useFetchWalletNamesQuery();
+
     const { data, refetch } = useFetchWalletTransactionQuery(filterForm);
+
+    console.log(data);
+
     const { data:dataCount } = useFetchWalletTransactionCountQuery(filterForm);
 
     const { data: walletCategory} = useFetchTrueWalletCategoryQuery();
@@ -71,6 +74,11 @@ function Wallet({walletId}) {
 
     const [currentPage, setCurrentPage] = useState(1);
 
+    const [dateRange, setDateRange] = useState({
+        startDate: "",
+        endDate: ""
+    });
+
     const [ alert, setAlert] = useState({
         isAlert: false,
         message: '',
@@ -78,6 +86,8 @@ function Wallet({walletId}) {
         isError: false,
         title: ""
     });
+
+    console.log(filterForm)
 
     let totalCashIn = 0;
     let totalCashOut = 0;
@@ -362,6 +372,25 @@ function Wallet({walletId}) {
         }
     };
 
+    const confirmDateRange = () => {
+        console.log(dateRange);
+        if (dateRange.startDate !== "" && dateRange.endDate === "") {
+            setFilterForm({
+                ...filterForm,
+                start_date: moment(dateRange.startDate).toISOString(),
+                end_date:  moment().toISOString(),
+            });
+        }
+        if (dateRange.startDate !== "" && dateRange.endDate !== "") {
+            setFilterForm({
+                ...filterForm,
+                start_date: moment(dateRange.startDate).toISOString(),
+                end_date: moment(dateRange.endDate).toISOString()
+            })
+        }
+        setOpenDateModal(!openDateModal);
+    }
+
     const handleFilter = () => {
         setIsFilter(true);
         console.log(filterForm);
@@ -399,6 +428,11 @@ function Wallet({walletId}) {
             selector: row => moment(row.date).format('DD-MMM-YYYY hh:mm a'),
         },
         {
+            name: 'Wallet Name',
+            width: "150px",
+            selector: row => row.walletName,
+        },
+        {
             name: 'Share',
             width: "150px",
             selector: row => row.shareName,
@@ -411,7 +445,7 @@ function Wallet({walletId}) {
         {
             name: 'Category',
             width: "120px",
-            selector: row => row.categoryCode,
+            selector: row => row.categoryName,
             center: true
         },
         {
@@ -458,30 +492,34 @@ function Wallet({walletId}) {
         },
     ];
 
-    const tbodyData = isFilter? filterData.map((wallet) => {
+    const tbodyData = isFilter? filterData.map((el) => {
         return {
-            id: wallet.id,
-            walletCode: wallet.walletCode,
-            date: moment(wallet.date).format("YYYY-MM-DD hh:mm:ss"),
-            shareName: wallet.wallet.share.shareName,
-            cashType: wallet.cashType,
-            categoryCode: wallet.categoryCode,
-            isSalesPruchase: wallet.isSalesPruchase,
-            paymentMode: wallet.paymentMode,
-            amount: wallet.amount.toLocaleString('en-US'),
-            remark: wallet.remark,
-            createdAt: moment(wallet.createdAt).format("YYYY-MM-DD hh:mm:ss a"),
-            createdBy: wallet.createdBy,
-            updatedAt: moment(wallet.updatedAt).format("YYYY-MM-DD hh:mm:ss a"),
-            updatedBy: wallet.updatedBy,
-            status: wallet.status,
+            id: el.id,
+            walletCode: el.walletCode,
+            walletName: el.wallet.walletName,
+            date: moment(el.date).format("YYYY-MM-DD hh:mm:ss"),
+            shareName: el.wallet.share.shareName,
+            cashType: el.cashType,
+            categoryCode: el.categoryCode,
+            categoryName: el.category.categoryDesc,
+            isSalesPruchase: el.isSalesPruchase,
+            paymentMode: el.paymentMode,
+            amount: el.amount.toLocaleString('en-US'),
+            remark: el.remark,
+            createdAt: moment(el.createdAt).format("YYYY-MM-DD hh:mm:ss a"),
+            createdBy: el.createdBy,
+            updatedAt: moment(el.updatedAt).format("YYYY-MM-DD hh:mm:ss a"),
+            updatedBy: el.updatedBy,
+            status: el.status,
         }
     }) : data?.map((wallet) => {
         return {
             id: wallet.id,
             walletCode: wallet.walletCode,
+            walletName: wallet.wallet.walletName,
             date: moment(wallet.date).format("YYYY-MM-DD hh:mm:ss"),
             shareName: wallet.wallet.share.shareName,
+            categoryName: wallet.category.categoryDesc,
             cashType: wallet.cashType,
             categoryCode: wallet.categoryCode,
             paymentMode: wallet.paymentMode,
@@ -577,23 +615,23 @@ function Wallet({walletId}) {
                                 <label className="text-black text-sm mb-2">Wallet Name</label>
                                 <select 
                                     className="block w-full text-black border border-blue-gray-200 h-[35px] px-2.5 py-1.5 rounded-md focus:border-black"
-                                    value={filterForm.walletCode}
+                                    value={filterForm.walletName}
                                     onChange={(e) => {
                                         setFilterForm({
                                             ...filterForm,
-                                            walletCode: e.target.value,
-                                        })
+                                            walletName: e.target.value,
+                                        });
+                                        setCurrentPage(1);
                                     }}
                                 >
-                                    <option value="" disabled>All</option>
+                                    <option value="">All</option>
                                     {
-                                        walletData?.map((wallet) => {
+                                        walletNames?.map((el) => {
                                             return <option 
-                                                value={wallet.id} 
-                                                key={wallet.id}
-                                                selected={wallet.share.isOwner}
+                                                value={el.walletName} 
+                                                key={el.walletName}
                                             >
-                                                {wallet.share.shareName}, {wallet.walletName}
+                                                {el.walletName}
                                             </option>
                                         })
                                     }
@@ -609,10 +647,11 @@ function Wallet({walletId}) {
                                         setFilterForm({
                                             ...filterForm,
                                             shareCode: Number(e.target.value),
-                                        })
+                                        });
+                                        setCurrentPage(1);
                                     }}
                                 >
-                                    <option value="0" disabled>All</option>
+                                    <option value="">All</option>
                                     {
                                         shareData?.map((share) => {
                                             return <option 
@@ -709,7 +748,9 @@ function Wallet({walletId}) {
                                     className="block w-full text-black border border-blue-gray-200 h-[35px] px-2.5 py-1.5 rounded-md focus:border-black"
                                     value={filterForm.category}
                                     onChange={(e) => {
+                                        console.log(e.target.value)
                                         setFilterForm({...filterForm, category: Number(e.target.value)});
+                                        setCurrentPage(1);
                                     }}
                                 >
                                     <option value="">All</option>
@@ -814,17 +855,20 @@ function Wallet({walletId}) {
                 <Dialog open={openDateModal}>
                     <DialogBody>
                         <ModalTitle titleName="Date Range" handleClick={() => setOpenDateModal(!openDateModal)} />
+                        {
+                            alert.isAlert? <SuccessAlert title={alert.title} message={alert.message} isWarning={alert.isWarning} /> : ""
+                        }
                         <div className="grid grid-cols-2 gap-2 mt-3">
                             {/* Start Date */}
                             <div>
                                 <label className="text-black mb-2 text-sm">Start Date</label>
                                 <input
                                     type="date"
-                                    value={filterForm.startDate}
+                                    value={dateRange.startDate}
                                     className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
                                     onChange={(e) => {
-                                        if (filterForm.endDate !== "") {
-                                            if(moment(e.target.value) > moment(filterForm.endDate)) {
+                                        if (dateRange.endDate !== "") {
+                                            if(moment(e.target.value) > moment(dateRange.endDate)) {
                                                 console.log(e.target.value)
                                                 setAlert({
                                                     isAlert: true,
@@ -841,14 +885,14 @@ function Wallet({walletId}) {
                                                     })
                                                 }, 2000);
                                             } else {
-                                                setFilterForm({
-                                                    ...filterForm,
+                                                setDateRange({
+                                                    ...dateRange,
                                                     startDate: e.target.value,
                                                 });
                                             }
                                         } else {
-                                            setFilterForm({
-                                                ...filterForm,
+                                            setDateRange({
+                                                ...dateRange,
                                                 startDate: e.target.value,
                                             });
                                         }
@@ -860,10 +904,10 @@ function Wallet({walletId}) {
                                 <label className="text-black mb-2 text-sm">End Date</label>
                                 <input
                                     type="date"
-                                    value={filterForm.endDate}
+                                    value={dateRange.endDate}
                                     className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
                                     onChange={(e) => {
-                                        if(filterForm.startDate === "" || moment(e.target.value) < moment(filterForm.startDate)) {
+                                        if(dateRange.startDate === "" || moment(e.target.value) < moment(dateRange.startDate)) {
                                             setAlert({
                                                 isAlert: true,
                                                 message: "Start Date cannot be greater than End Date.",
@@ -881,8 +925,8 @@ function Wallet({walletId}) {
                                             
                                             return; 
                                         }
-                                        setFilterForm({
-                                            ...filterForm,
+                                        setDateRange({
+                                            ...dateRange,
                                             endDate: e.target.value,
                                         });
                                         // setFilterForm({
@@ -893,7 +937,7 @@ function Wallet({walletId}) {
                                 />
                             </div>
                             <div className="col-start-2 flex justify-end mt-3">
-                                <Button className="flex items-center gap-2 bg-main capitalize py-2 px-3" onClick={handleFilter}>
+                                <Button className="flex items-center gap-2 bg-main capitalize py-2 px-3" onClick={confirmDateRange}>
                                     Confirm
                                 </Button>
                             </div>

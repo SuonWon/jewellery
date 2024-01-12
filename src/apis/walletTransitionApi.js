@@ -21,7 +21,7 @@ const walletTransitionApi = createApi({
                     return [{type: "WalletTransaction", id: "All"}]
                 },
                 query: (filterData) => {
-                    const query = `?skip=${filterData.skip}&take=${filterData.take}&status=true${filterData.shareCode == '' ? '' : `&shareCode=${filterData.shareCode}`}${filterData.walletName == '' ? '' : `&walletName=${filterData.walletName}`}${filterData.category == '' ? '' : `&walletName=${filterData.category}`}${filterData.start_date == null ? '' : `&start_date=${filterData.start_date}`}${filterData.end_date == null ? '' : `&end_date=${filterData.end_date}`}`;
+                    const query = `?skip=${filterData.skip}&take=${filterData.take}&status=true${filterData.shareCode == '' ? '' : `&shareCode=${filterData.shareCode}`}${filterData.walletName == '' ? '' : `&walletName=${filterData.walletName}`}${filterData.category == '' ? '' : `&category=${filterData.category}`}${filterData.start_date == null ? '' : `&start_date=${filterData.start_date}`}${filterData.end_date == null ? '' : `&end_date=${filterData.end_date}`}`;
                     return {
                         url: `/transaction/get-all-transactions${query}`,
                         // params: {

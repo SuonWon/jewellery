@@ -57,6 +57,14 @@ const walletApi = createApi({
                     };
                 },
             }),
+            fetchWalletNames: builder.query({
+                query: () => {
+                    return {
+                        url: "/wallet/get-wallet-name-group-by",
+                        method: "GET",
+                    }
+                }
+            }),
             addWallet: builder.mutation({
                 invalidatesTags: () => {
                     return [{type: "Wallet", id: "All"}]
@@ -96,5 +104,5 @@ const walletApi = createApi({
     },
 });
 
-export const { useFetchWalletQuery, useFetchWalletByIdQuery, useFetchTrueWalletQuery, useAddWalletMutation, useUpdateWalletMutation, useRemoveWalletMutation, useFetchWalletCountQuery } = walletApi;
+export const { useFetchWalletQuery, useFetchWalletByIdQuery, useFetchTrueWalletQuery, useFetchWalletNamesQuery, useAddWalletMutation, useUpdateWalletMutation, useRemoveWalletMutation, useFetchWalletCountQuery } = walletApi;
 export { walletApi };

@@ -23,6 +23,7 @@ function WalletList() {
     });
 
     const {data} = useFetchWalletQuery(filterData);
+    
     const {data:dataCount} = useFetchWalletCountQuery(filterData);
 
     const {data: shareData} = useFetchTrueShareQuery();
