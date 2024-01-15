@@ -13,6 +13,10 @@ import { useAuthUser } from "react-auth-kit";
 import ModalTitle from "../components/modal_title";
 import axios from "axios";
 import { useFetchTrueIssueQuery } from "../apis/issueApi";
+import Cookies from "js-cookie";
+
+const token = 'Bearer ' + Cookies.get('_auth');
+
 const validator = require('validator');
 
 function ReturnList({type = 'I'}) {
@@ -40,7 +44,11 @@ function ReturnList({type = 'I'}) {
 
     const {data: purchaseData} = useFetchTruePurchaseQuery();
 
-    axios.get(apiUrl + '/return/get-id').then((res) => {
+    axios.get(apiUrl + '/return/get-id', {
+        headers: {
+            "Authorization": token
+        }
+    }).then((res) => {
         setReturnId(res.data);
     });
 

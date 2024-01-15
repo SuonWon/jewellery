@@ -1,5 +1,8 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { apiUrl } from "../const";
+import Cookies from "js-cookie";
+
+const token = 'Bearer ' + Cookies.get('_auth');
 
 const issueApi = createApi({
     reducerPath: "issue",
@@ -17,6 +20,9 @@ const issueApi = createApi({
                     return {
                         url: "/issue/get-all-issue" + query,
                         method: "GET",
+                        headers: {
+                            "Authorization": token
+                        },
                     };
                 },
             }),
@@ -27,7 +33,10 @@ const issueApi = createApi({
                 query: () => {
                     return {
                         url: `/issue/get-true-issue`,
-                        method: "GET"
+                        method: "GET",
+                        headers: {
+                            "Authorization": token
+                        },
                     }
                 }
             }),
@@ -40,6 +49,9 @@ const issueApi = createApi({
                     return {
                         url: "/issue/get-count" + query,
                         method: "GET",
+                        headers: {
+                            "Authorization": token
+                        },
                     };
                 },
             }),
@@ -51,6 +63,9 @@ const issueApi = createApi({
                     return {
                         url: `/issue/get-issue/${issueId}`,
                         method: "GET",
+                        headers: {
+                            "Authorization": token
+                        },
                     };
                 },
             }),
@@ -62,6 +77,9 @@ const issueApi = createApi({
                     return {
                         url: "/issue/create-issue",
                         method: "POST",
+                        headers: {
+                            "Authorization": token
+                        },
                         body: issueData,
                     };
                 },
@@ -75,6 +93,9 @@ const issueApi = createApi({
                     return {
                         url: "/issue/update-issue",
                         method: "PUT",
+                        headers: {
+                            "Authorization": token
+                        },
                         body: issueData,
                     };
                 },
@@ -87,6 +108,9 @@ const issueApi = createApi({
                     return {
                         url: "/issue/update-issue-finish",
                         method: "PUT",
+                        headers: {
+                            "Authorization": token
+                        },
                         body: issueData,
                     };
                 },
@@ -99,6 +123,9 @@ const issueApi = createApi({
                     return {
                         url: "/issue/delete-issue",
                         method: "PUT",
+                        headers: {
+                            "Authorization": token
+                        },
                         body: issueData,
                     };
                 }

@@ -1,6 +1,8 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { apiUrl } from "../const";
+import Cookies from "js-cookie";
 
+const token = 'Bearer ' + Cookies.get('_auth');
 
 const uomApi = createApi({
     reducerPath: "unit",
@@ -17,6 +19,9 @@ const uomApi = createApi({
                     return {
                         url:'/unit/get-all-units',
                         method: 'GET',
+                        headers: {
+                            "Authorization": token
+                        },
                     };
                 },
             }),
@@ -24,7 +29,10 @@ const uomApi = createApi({
                 query: (unitCode) => {
                     return {
                         url: `/unit/get-unit/${unitCode}`,
-                        method: 'GET'
+                        method: 'GET',
+                        headers: {
+                            "Authorization": token
+                        }
                     };
                 },
             }),
@@ -37,6 +45,9 @@ const uomApi = createApi({
                     return {
                         url: '/unit/create-unit',
                         method: 'POST',
+                        headers: {
+                            "Authorization": token
+                        },
                         body: {
                             unitCode: unitData.unitCode,
                             unitDesc: unitData.unitDesc,
@@ -55,6 +66,9 @@ const uomApi = createApi({
                 query: (unitData) => {
                     return {
                         url: `/unit/update-unit`,
+                        headers: {
+                            "Authorization": token
+                        },
                         body: {
                             unitCode: unitData.unitCode,
                             unitDesc: unitData.unitDesc,
@@ -74,7 +88,10 @@ const uomApi = createApi({
                 query: (unitCode) => {
                     return {
                         url: `/unit/delete-unit/${unitCode}`,
-                        method: 'DELETE'
+                        method: 'DELETE',
+                        headers: {
+                            "Authorization": token
+                        }
                     };
                 },
             }),

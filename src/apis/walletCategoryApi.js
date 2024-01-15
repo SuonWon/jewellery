@@ -1,5 +1,8 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { apiUrl } from "../const";
+import Cookies from "js-cookie";
+
+const token = 'Bearer ' + Cookies.get('_auth');
 
 const walletCategoryApi = createApi({
     reducerPath: "walletCategory",
@@ -16,6 +19,9 @@ const walletCategoryApi = createApi({
                     return {
                         url: "/wallet-category/get-all-wallet-categories",
                         method: "GET",
+                        headers: {
+                            "Authorization": token
+                        },
                         params: filterData
                     };
                 },
@@ -31,6 +37,9 @@ const walletCategoryApi = createApi({
                     return {
                         url: '/wallet-category/get-count',
                         method: 'GET',
+                        headers: {
+                            "Authorization": token
+                        },
                         params: data
                     };
                 },
@@ -42,7 +51,10 @@ const walletCategoryApi = createApi({
                 query: () => {
                     return {
                         url: "/wallet-category/get-true-wallet-categories",
-                        method: "GET"
+                        method: "GET",
+                        headers: {
+                            "Authorization": token
+                        }
                     }
                 }
             }),
@@ -54,6 +66,9 @@ const walletCategoryApi = createApi({
                     return {
                         url: `/wallet-category/get-wallet-category/${id}`,
                         method: "GET",
+                        headers: {
+                            "Authorization": token
+                        },
                     };
                 },
             }),
@@ -65,6 +80,9 @@ const walletCategoryApi = createApi({
                     return {
                         url: "/wallet-category/create-wallet-category",
                         method: "POST",
+                        headers: {
+                            "Authorization": token
+                        },
                         body: queryData,
                     };
                 },
@@ -77,6 +95,9 @@ const walletCategoryApi = createApi({
                     return {
                         url: "/wallet-category/update-wallet-category",
                         method: "PUT",
+                        headers: {
+                            "Authorization": token
+                        },
                         body: queryData,
                     };
                 },
@@ -89,6 +110,9 @@ const walletCategoryApi = createApi({
                     return {
                         url: `/wallet-category/delete-wallet-category/${id}`,
                         method: "DELETE",
+                        headers: {
+                            "Authorization": token
+                        },
                     };
                 },
             }),

@@ -14,6 +14,10 @@ import { useAuthUser } from "react-auth-kit";
 import ModalTitle from "../components/modal_title";
 import { v4 as uuidv4 } from 'uuid';
 import axios from "axios";
+import Cookies from "js-cookie";
+
+const token = 'Bearer ' + Cookies.get('_auth');
+
 const validator = require('validator');
 
 function Wallet({walletId}) {
@@ -150,7 +154,11 @@ function Wallet({walletId}) {
             deletedBy: auth().username
         }).then((res) => { console.log(res) });
         if(isFilter) {
-            axios.get(`${apiUrl}/transaction/get-all-transactions?status=true&walletCode=${removeData.walletCode}`).then((res) => {
+            axios.get(`${apiUrl}/transaction/get-all-transactions?status=true&walletCode=${removeData.walletCode}`, {
+                headers: {
+                    "Authorization": token
+                }
+            }).then((res) => {
                 setFilterData(res.data);
                 console.log(res.data);
             });
@@ -404,7 +412,11 @@ function Wallet({walletId}) {
         if (filterForm.category !== "") {
             url+=`&category=${filterForm.category}`;
         }
-        axios.get(url).then((res) => {
+        axios.get(url, {
+            headers: {
+                "Authorization": token
+            }
+        }).then((res) => {
             setFilterData(res.data);
         });
     }

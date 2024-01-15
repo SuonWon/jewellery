@@ -1,5 +1,8 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { apiUrl } from "../const";
+import Cookies from "js-cookie";
+
+const token = 'Bearer ' + Cookies.get('_auth');
 
 const returnApi = createApi({
     reducerPath: "return",
@@ -17,6 +20,9 @@ const returnApi = createApi({
                     return {
                         url: "/return/get-all-returns" + query,
                         method: "GET",
+                        headers: {
+                            "Authorization": token
+                        },
                     };
                 },
             }),
@@ -28,6 +34,9 @@ const returnApi = createApi({
                     return {
                         url: `/return/get-return/${returnId}`,
                         method: "GET",
+                        headers: {
+                            "Authorization": token
+                        },
                     };
                 },
             }),
@@ -40,6 +49,9 @@ const returnApi = createApi({
                     return {
                         url: "/return/get-count" + query,
                         method: "GET",
+                        headers: {
+                            "Authorization": token
+                        },
                     };
                 },
             }),
@@ -51,6 +63,9 @@ const returnApi = createApi({
                     return {
                         url: `/return/get-return-by-invoice/${invoice}`,
                         method: "GET",
+                        headers: {
+                            "Authorization": token
+                        },
                     };
                 },
             }),
@@ -62,6 +77,9 @@ const returnApi = createApi({
                     return {
                         url: "/return/create-return",
                         method: "POST",
+                        headers: {
+                            "Authorization": token
+                        },
                         body: returnData,
                     };
                 },
@@ -74,6 +92,9 @@ const returnApi = createApi({
                     return{
                         url: "/return/update-return",
                         method: "PUT",
+                        headers: {
+                            "Authorization": token
+                        },
                         body: returnData,
                     };
                 },
@@ -86,6 +107,9 @@ const returnApi = createApi({
                     return{
                         url: "/return/delete-return",
                         method: "PUT",
+                        headers: {
+                            "Authorization": token
+                        },
                         body: returnData,
                     }
                 }

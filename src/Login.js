@@ -55,18 +55,19 @@ function Login() {
         if(validateForm()) {
             axios.post(apiUrl + '/auth/login', formData)
             .then((res) => {
+                console.log(res.data.access_token);
                 const newErrors = {}
                 if(res.data !== '') {
                     if(signIn(
                         {
-                            token : res.data.token,
+                            token : res.data.access_token,
                             tokenType : "Bearer",
                             authState : res.data,
                             expiresIn : 3200,
                         }
-                    )) {
+                    ))
                         navigate("/master");
-                    }
+                    
                 }
                 else {
                     console.log("reach");

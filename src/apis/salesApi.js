@@ -1,7 +1,8 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { apiUrl } from "../const";
+import Cookies from "js-cookie";
 
-
+const token = 'Bearer ' + Cookies.get('_auth');
 
 const salesApi = createApi({
     reducerPath: "sales",
@@ -18,7 +19,10 @@ const salesApi = createApi({
                     const query = `?skip=${filterData.skip}&take=${filterData.take}&status=${filterData.status}${filterData.search_word == '' ? '' : `&search_word=${filterData.search_word}`}${filterData.start_date == null ? '' : `&start_date=${filterData.start_date}`}${filterData.end_date == null ? '' : `&end_date=${filterData.end_date}`}`;
                     return {
                         url: '/sales/get-all-sales'  + query,
-                        method: 'GET'
+                        method: 'GET',
+                        headers: {
+                            "Authorization": token
+                        }
                     }
                 }
             }),
@@ -29,7 +33,10 @@ const salesApi = createApi({
                 query: () => {
                     return {
                         url: '/sales/get-true-sales',
-                        method: 'GET'
+                        method: 'GET',
+                        headers: {
+                            "Authorization": token
+                        }
                     }
                 }
             }),
@@ -41,7 +48,10 @@ const salesApi = createApi({
                     const query = `?status=${filterData.status}${filterData.search_word == '' ? '' : `&search_word=${filterData.search_word}`}${filterData.start_date == null ? '' : `&start_date=${filterData.start_date}`}${filterData.end_date == null ? '' : `&end_date=${filterData.end_date}`}`;
                     return {
                         url: '/sales/get-count' + query,
-                        method: 'GET'
+                        method: 'GET',
+                        headers: {
+                            "Authorization": token
+                        }
                     }
                 }
             }),
@@ -53,6 +63,9 @@ const salesApi = createApi({
                     return {
                         url: "/sales/create-sales",
                         method: 'POST',
+                        headers: {
+                            "Authorization": token
+                        },
                         body: salesData
                     }
                 }
@@ -65,6 +78,9 @@ const salesApi = createApi({
                     return {
                         url: "/sales/update-sales",
                         method: "PUT",
+                        headers: {
+                            "Authorization": token
+                        },
                         body: salesData,
                     }
                 }
@@ -77,6 +93,9 @@ const salesApi = createApi({
                     return {
                         url: "/sales/delete-sales",
                         method: 'PUT',
+                        headers: {
+                            "Authorization": token
+                        },
                         body: salesData,
                     };
                 },

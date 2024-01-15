@@ -12,6 +12,10 @@ import TableList from "../components/data_table";
 import { useAuthUser } from "react-auth-kit";
 import ModalTitle from "../components/modal_title";
 import axios from "axios";
+import Cookies from "js-cookie";
+
+const token = 'Bearer ' + Cookies.get('_auth');
+
 const validator = require('validator');
 
 function Damage() {
@@ -34,7 +38,11 @@ function Damage() {
 
     const {data: purchaseData} = useFetchTruePurchaseQuery();
 
-    axios.get(apiUrl + '/damage/get-id').then((res) => {
+    axios.get(apiUrl + '/damage/get-id', {
+        headers: {
+            "Authorization": token
+        }
+    }).then((res) => {
         setDamageId(res.data);
     });
 

@@ -14,6 +14,10 @@ import { v4 as uuidv4 } from 'uuid';
 import { useAuthUser } from "react-auth-kit";
 import DataTable from "react-data-table-component";
 import axios from "axios";
+import Cookies from "js-cookie";
+
+const token = 'Bearer ' + Cookies.get('_auth');
+
 const validator = require('validator');
 
 
@@ -41,7 +45,11 @@ function IssueList() {
     // const { data: returnData } = useFetchReturnQuery('I');
     const { data: returnData } = useFetchReturnByInvoiceQuery('1111111111')
 
-    axios.get(`${apiUrl}/issue/get-id`).then((res) => {
+    axios.get(`${apiUrl}/issue/get-id`, {
+        headers: {
+            "Authorization": token
+        }
+    }).then((res) => {
         setIssueId(res.data);
     });
 

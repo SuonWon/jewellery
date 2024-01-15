@@ -1,6 +1,8 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { apiUrl } from "../const";
+import Cookies from "js-cookie";
 
+const token = 'Bearer ' + Cookies.get('_auth');
 
 const gradeApi = createApi({
     reducerPath: "grade",
@@ -17,6 +19,9 @@ const gradeApi = createApi({
                     return {
                         url:'/grade/get-all-stone-grades',
                         method: 'GET',
+                        headers: {
+                            "Authorization": token
+                        },
                         params: filterData
                     };
                 },
@@ -32,6 +37,9 @@ const gradeApi = createApi({
                     return {
                         url: '/grade/get-count',
                         method: 'GET',
+                        headers: {
+                            "Authorization": token
+                        },
                         params: data
                     };
                 },
@@ -43,7 +51,10 @@ const gradeApi = createApi({
                 query: () => {
                     return {
                         url: '/grade/get-true-stone-grades',
-                        method: 'GET'
+                        method: 'GET',
+                        headers: {
+                            "Authorization": token
+                        },
                     }
                 }
             }),
@@ -51,7 +62,10 @@ const gradeApi = createApi({
                 query: (gradeCode) => {
                     return {
                         url: `/grade/get-stone-grade/${gradeCode}`,
-                        method: 'GET'
+                        method: 'GET',
+                        headers: {
+                            "Authorization": token
+                        },
                     };
                 },
             }),
@@ -63,6 +77,9 @@ const gradeApi = createApi({
                     return {
                         url: '/grade/create-stone-grade',
                         method: 'POST',
+                        headers: {
+                            "Authorization": token
+                        },
                         body: {
                             gradeCode: gradeData.gradeCode,
                             gradeDesc: gradeData.gradeDesc,
@@ -82,6 +99,9 @@ const gradeApi = createApi({
                 query: (gradeData) => {
                     return {
                         url: `/grade/update-stone-grade`,
+                        headers: {
+                            "Authorization": token
+                        },
                         body: {
                             gradeCode: gradeData.gradeCode,
                             gradeDesc: gradeData.gradeDesc,
@@ -102,7 +122,10 @@ const gradeApi = createApi({
                 query: (gradeCode) => {
                     return {
                         url: `/grade/delete-stone-grade/${gradeCode}`,
-                        method: 'DELETE'
+                        method: 'DELETE',
+                        headers: {
+                            "Authorization": token
+                        },
                     };
                 },
             }),

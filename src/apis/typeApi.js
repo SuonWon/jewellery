@@ -1,6 +1,8 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { apiUrl } from "../const";
+import Cookies from "js-cookie";
 
+const token = 'Bearer ' + Cookies.get('_auth');
 
 const typeApi = createApi({
     reducerPath: "stoneType",
@@ -17,6 +19,9 @@ const typeApi = createApi({
                     return {
                         url:'/type/get-all-stone-types',
                         method: 'GET',
+                        headers: {
+                            "Authorization": token
+                        },
                         params: filterData
                     };
                 },
@@ -32,6 +37,9 @@ const typeApi = createApi({
                     return {
                         url: '/type/get-count',
                         method: 'GET',
+                        headers: {
+                            "Authorization": token
+                        },
                         params: data
                     };
                 },
@@ -43,7 +51,10 @@ const typeApi = createApi({
                 query: () => {
                     return {
                         url: '/type/get-true-stone-types',
-                        method: 'GET'
+                        method: 'GET',
+                        headers: {
+                            "Authorization": token
+                        }
                     }
                 }
             }),
@@ -51,7 +62,10 @@ const typeApi = createApi({
                 query: (typeCode) => {
                     return {
                         url: `/type/get-stone-type/${typeCode}`,
-                        method: 'GET'
+                        method: 'GET',
+                        headers: {
+                            "Authorization": token
+                        }
                     };
                 },
             }),
@@ -63,6 +77,9 @@ const typeApi = createApi({
                     return {
                         url: '/type/create-stone-type',
                         method: 'POST',
+                        headers: {
+                            "Authorization": token
+                        },
                         body: {
                             typeCode: typeData.typeCode,
                             typeDesc: typeData.typeDesc,
@@ -82,6 +99,9 @@ const typeApi = createApi({
                 query: (typeData) => {
                     return {
                         url: `/type/update-stone-type`,
+                        headers: {
+                            "Authorization": token
+                        },
                         body: {
                             typeCode: typeData.typeCode,
                             typeDesc: typeData.typeDesc,
@@ -102,7 +122,10 @@ const typeApi = createApi({
                 query: (typeCode) => {
                     return {
                         url: `/type/delete-stone-type/${typeCode}`,
-                        method: 'DELETE'
+                        method: 'DELETE',
+                        headers: {
+                            "Authorization": token
+                        }
                     };
                 },
             }),

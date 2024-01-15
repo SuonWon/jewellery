@@ -16,6 +16,10 @@ import DataTable from "react-data-table-component";
 import axios from "axios";
 import Payable from "./payable";
 import ButtonLoader from "../components/buttonLoader";
+import Cookies from "js-cookie";
+
+const token = 'Bearer ' + Cookies.get('_auth');
+
 const validator = require('validator');
 
 function PurchaseList() {
@@ -155,7 +159,11 @@ function PurchaseList() {
     };
 
     const handleOpen = () => {
-        axios.get(`${apiUrl}/share/get-owner`).then((res) => {
+        axios.get(`${apiUrl}/share/get-owner`, {
+            headers: {
+                "Authorization": token
+            }
+        }).then((res) => {
             setTBodyData([
                 {
                     ...dShare,
@@ -292,7 +300,11 @@ function PurchaseList() {
     const handleSubmit = async () => {
         if (validateForm()) {
             let purchaseInvoiceNo = "";
-            await axios.get(`${apiUrl}/purchase/get-id`).then((res) => {
+            await axios.get(`${apiUrl}/purchase/get-id`, {
+                headers: {
+                    "Authorization": token
+                }
+            }).then((res) => {
                 purchaseInvoiceNo = res.data
             });
             console.log(purchaseInvoiceNo);
@@ -357,7 +369,11 @@ function PurchaseList() {
     const handleSave = async () => {
         if (validateForm()) {
             let purchaseInvoiceNo = "";
-            await axios.get(`${apiUrl}/purchase/get-id`).then((res) => {
+            await axios.get(`${apiUrl}/purchase/get-id`, {
+                headers: {
+                    "Authorization": token
+                }
+            }).then((res) => {
                 purchaseInvoiceNo = res.data
             });
             try {
@@ -398,7 +414,11 @@ function PurchaseList() {
                 });
                 setFormData(purchaseData);
                 setTBodyData([]);
-                axios.get(`${apiUrl}/share/get-owner`).then((res) => {
+                axios.get(`${apiUrl}/share/get-owner`, {
+                    headers: {
+                        "Authorization": token
+                    }
+                }).then((res) => {
                     setTBodyData([
                         {
                             ...dShare,

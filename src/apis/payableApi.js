@@ -1,5 +1,8 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { apiUrl } from "../const";
+import Cookies from "js-cookie";
+
+const token = 'Bearer ' + Cookies.get('_auth');
 
 const payableApi = createApi({
     reducerPath: "payable",
@@ -16,6 +19,9 @@ const payableApi = createApi({
                     return {
                         url: `/payable/get-payables`,
                         method: "GET",
+                        headers: {
+                            "Authorization": token
+                        },
                         params: {
                             invoiceNo: invoiceNo,
                             status: "O"
@@ -30,7 +36,10 @@ const payableApi = createApi({
                 query: (payId) => {
                     return {
                         url: `/payable/get-payable/${payId}`,
-                        method: "GET"
+                        method: "GET",
+                        headers: {
+                            "Authorization": token
+                        },
                     }
                 }
             }),
@@ -39,6 +48,9 @@ const payableApi = createApi({
                     return {
                         url: "/payable/get-owner-wallets",
                         method: "GET",
+                        headers: {
+                            "Authorization": token
+                        },
                     }
                 }
             }),
@@ -50,6 +62,9 @@ const payableApi = createApi({
                     return {
                         url: "/payable/create-payable",
                         method: "POST",
+                        headers: {
+                            "Authorization": token
+                        },
                         body: payData,
                     };
                 },
@@ -62,6 +77,9 @@ const payableApi = createApi({
                     return {
                         url: "/payable/update-payable",
                         method: "PUT",
+                        headers: {
+                            "Authorization": token
+                        },
                         body: payData,
                     };
                 },
@@ -74,6 +92,9 @@ const payableApi = createApi({
                     return {
                         url: "/payable/delete-payable",
                         method: "PUT",
+                        headers: {
+                            "Authorization": token
+                        },
                         body: payData,
                     };
                 },

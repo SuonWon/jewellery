@@ -1,6 +1,8 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { apiUrl } from "../const";
+import Cookies from "js-cookie";
 
+const token = 'Bearer ' + Cookies.get('_auth');
 
 const brightnessApi = createApi({
     reducerPath: "brightness",
@@ -17,7 +19,10 @@ const brightnessApi = createApi({
                     return {
                         url:'/brightness/get-all-stone-brightnesses',
                         method: 'GET',
-                        params: filterData
+                        params: filterData,
+                        headers: {
+                            "Authorization": token
+                        }
                     };
                 },
             }),
@@ -32,7 +37,10 @@ const brightnessApi = createApi({
                     return {
                         url: '/brightness/get-count',
                         method: 'GET',
-                        params: data
+                        params: data,
+                        headers: {
+                            "Authorization": token
+                        }
                     };
                 },
             }),
@@ -44,6 +52,9 @@ const brightnessApi = createApi({
                     return {
                         url: '/brightness/get-true-stone-brightnesses',
                         method: 'GET',
+                        headers: {
+                            "Authorization": token
+                        }
                     }
                 }
             }),
@@ -51,7 +62,10 @@ const brightnessApi = createApi({
                 query: (brightCode) => {
                     return {
                         url: `/brightness/get-stone-brightness/${brightCode}`,
-                        method: 'GET'
+                        method: 'GET',
+                        headers: {
+                            "Authorization": token
+                        }
                     };
                 },
             }),
@@ -63,6 +77,9 @@ const brightnessApi = createApi({
                     return {
                         url: '/brightness/create-stone-brightness',
                         method: 'POST',
+                        headers: {
+                            "Authorization": token
+                        },
                         body: {
                             brightCode: brightData.brightCode,
                             brightDesc: brightData.brightDesc,
@@ -82,6 +99,10 @@ const brightnessApi = createApi({
                 query: (brightData) => {
                     return {
                         url: `/brightness/update-stone-brightness`,
+                        method: 'PUT',
+                        headers: {
+                            "Authorization": token
+                        },
                         body: {
                             brightCode: brightData.brightCode,
                             brightDesc: brightData.brightDesc,
@@ -91,7 +112,6 @@ const brightnessApi = createApi({
                             updatedAt: brightData.updatedAt,
                             updatedBy: brightData.updatedBy,
                         },
-                        method: 'PUT',
                     };
                 },
             }),
@@ -102,7 +122,10 @@ const brightnessApi = createApi({
                 query: (brightCode) => {
                     return {
                         url: `/brightness/delete-stone-brightness/${brightCode}`,
-                        method: 'DELETE'
+                        method: 'DELETE',
+                        headers: {
+                            "Authorization": token
+                        },
                     };
                 },
             }),

@@ -1,5 +1,8 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { apiUrl } from "../const";
+import Cookies from "js-cookie";
+
+const token = 'Bearer ' + Cookies.get('_auth');
 
 const receivableApi = createApi({
     reducerPath: "receivable",
@@ -16,6 +19,9 @@ const receivableApi = createApi({
                     return {
                         url: `/receivable/get-receivable`,
                         method: "GET",
+                        headers: {
+                            "Authorization": token
+                        },
                         params: {
                             invoiceNo: invoiceNo,
                             status: "O"
@@ -31,6 +37,9 @@ const receivableApi = createApi({
                     return {
                         url: `/receivable/get-receivable/${receiveId}`,
                         method: "GET",
+                        headers: {
+                            "Authorization": token
+                        },
                     };
                 },
             }),
@@ -42,6 +51,9 @@ const receivableApi = createApi({
                     return {
                         url: "/receivable/create-receivable",
                         method: "POST",
+                        headers: {
+                            "Authorization": token
+                        },
                         body: receiveData,
                     };
                 },
@@ -54,6 +66,9 @@ const receivableApi = createApi({
                     return {
                         url: "/receivable/update-receivable",
                         method: "PUT",
+                        headers: {
+                            "Authorization": token
+                        },
                         body: receiveData,
                     };
                 },
@@ -66,6 +81,9 @@ const receivableApi = createApi({
                     return {
                         url: "/receivable/delete-receivable",
                         method: "PUT",
+                        headers: {
+                            "Authorization": token
+                        },
                         body: receiveData,
                     };
                 },

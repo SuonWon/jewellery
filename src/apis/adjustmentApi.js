@@ -1,5 +1,8 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { apiUrl } from "../const";
+import Cookies from "js-cookie";
+
+const token = 'Bearer ' + Cookies.get('_auth');
 
 const adjustmentApi = createApi({
     reducerPath: "adjustment",
@@ -16,7 +19,10 @@ const adjustmentApi = createApi({
                     const query = `?skip=${filterData.skip}&take=${filterData.take}&status=${filterData.status}${filterData.search_word == '' ? '' : `&search_word=${filterData.search_word}`}${filterData.start_date == null ? '' : `&start_date=${filterData.start_date}`}${filterData.end_date == null ? '' : `&end_date=${filterData.end_date}`}`;
                     return {
                         url: "/adjustment/get-all-adjustments" + query,
-                        method: "GET"
+                        method: "GET",
+                        headers: {
+                            "Authorization": token
+                        }
                     };
                 },
             }),
@@ -27,7 +33,10 @@ const adjustmentApi = createApi({
                 query: (adjustId) => {
                     return {
                         url: `/adjustment/get-adjustment/${adjustId}`,
-                        method: "GET"
+                        method: "GET",
+                        headers: {
+                            "Authorization": token
+                        }
                     };
                 },
             }),
@@ -39,7 +48,10 @@ const adjustmentApi = createApi({
                     const query = `?status=${filterData.status}${filterData.search_word == '' ? '' : `&search_word=${filterData.search_word}`}${filterData.start_date == null ? '' : `&start_date=${filterData.start_date}`}${filterData.end_date == null ? '' : `&end_date=${filterData.end_date}`}`;
                     return {
                         url: "/adjustment/get-count" + query,
-                        method: "GET"
+                        method: "GET",
+                        headers: {
+                            "Authorization": token
+                        }
                     };
                 },
             }),
@@ -51,6 +63,9 @@ const adjustmentApi = createApi({
                     return {
                         url: "/adjustment/create-adjustment",
                         method: "POST",
+                        headers: {
+                            "Authorization": token
+                        },
                         body: adjustData,
                     };
                 },
@@ -63,6 +78,9 @@ const adjustmentApi = createApi({
                     return {
                         url: "/adjustment/update-adjustment",
                         method: "PUT",
+                        headers: {
+                            "Authorization": token
+                        },
                         body: adjustData
                     };
                 },
@@ -75,6 +93,9 @@ const adjustmentApi = createApi({
                     return {
                         url: "/adjustment/delete-adjustment",
                         method: "PUT",
+                        headers: {
+                            "Authorization": token
+                        },
                         body: adjustData
                     };
                 },

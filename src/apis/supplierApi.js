@@ -1,6 +1,8 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { apiUrl } from "../const";
+import Cookies from "js-cookie";
 
+const token = 'Bearer ' + Cookies.get('_auth');
 
 const supplierApi = createApi({
     reducerPath: "supplier",
@@ -17,6 +19,9 @@ const supplierApi = createApi({
                     return {
                         url:'/supplier/get-all-suppliers',
                         method: 'GET',
+                        headers: {
+                            "Authorization": token
+                        },
                         params: filterData
                     };
                 },
@@ -32,6 +37,9 @@ const supplierApi = createApi({
                     return {
                         url:`/supplier/get-count`,
                         method: 'GET',
+                        headers: {
+                            "Authorization": token
+                        },
                         params: data
                     };
                 },
@@ -43,7 +51,10 @@ const supplierApi = createApi({
                 query: (supplierCode) => {
                     return {
                         url: `/supplier/get-supplier/${supplierCode}`,
-                        method: 'GET'
+                        method: 'GET',
+                        headers: {
+                            "Authorization": token
+                        }
                     };
                 },
             }),
@@ -54,7 +65,10 @@ const supplierApi = createApi({
                 query: () => {
                     return {
                         url: '/supplier/get-true-suppliers',
-                        method: 'GET'
+                        method: 'GET',
+                        headers: {
+                            "Authorization": token
+                        }
                     };
                 },
             }),
@@ -66,6 +80,9 @@ const supplierApi = createApi({
                     return {
                         url: '/supplier/create-supplier',
                         method: 'POST',
+                        headers: {
+                            "Authorization": token
+                        },
                         body: {
                             supplierName: supplierData.supplierName,
                             contactName: supplierData.contactName,
@@ -92,6 +109,9 @@ const supplierApi = createApi({
                 query: (supplierData) => {
                     return {
                         url: `/supplier/update-supplier`,
+                        headers: {
+                            "Authorization": token
+                        },
                         body: {
                             supplierCode: supplierData.supplierCode,
                             supplierName: supplierData.supplierName,
@@ -120,7 +140,10 @@ const supplierApi = createApi({
                 query: (supplierCode) => {
                     return {
                         url: `/supplier/delete-supplier/${supplierCode}`,
-                        method: 'DELETE'
+                        method: 'DELETE',
+                        headers: {
+                            "Authorization": token
+                        }
                     };
                 },
             }),

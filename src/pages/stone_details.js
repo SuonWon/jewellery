@@ -14,6 +14,9 @@ import SuccessAlert from "../components/success_alert";
 import { apiUrl, focusSelect, sizeUnit } from "../const";
 import DataTable from "react-data-table-component";
 import axios from "axios";
+import Cookies from "js-cookie";
+
+const token = 'Bearer ' + Cookies.get('_auth');
 
 const validator = require("validator");
 
@@ -423,7 +426,11 @@ function StoneDetails() {
 
     const openCombineModal = (id) => {
         let temp = data.find(res => res.stoneDetailCode === id);
-        axios.get(`${apiUrl}/stone-detail/get-same-stone-details?stoneCode=${temp.stoneCode}&typeCode=${temp.typeCode}&brightCode=${temp.brightCode}&gradeCode=${temp.gradeCode}&size=${temp.size}&sizeUnit=${temp.sizeUnit}`).then((res) => {
+        axios.get(`${apiUrl}/stone-detail/get-same-stone-details?stoneCode=${temp.stoneCode}&typeCode=${temp.typeCode}&brightCode=${temp.brightCode}&gradeCode=${temp.gradeCode}&size=${temp.size}&sizeUnit=${temp.sizeUnit}`, {
+            headers: {
+                "Authorization": token
+            }
+        }).then((res) => {
             setCombineData(
                 res.data.map(el => {
                     return {

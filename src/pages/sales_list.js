@@ -17,6 +17,10 @@ import axios from "axios";
 import DataTable from "react-data-table-component";
 import Receivable from "./receivable";
 import { useFetchTrueIssueQuery } from "../apis/issueApi";
+import Cookies from "js-cookie";
+
+const token = 'Bearer ' + Cookies.get('_auth');
+
 const validator = require('validator');
 
 function SalesList() {
@@ -44,7 +48,11 @@ function SalesList() {
 
     const { data: returnData } = useFetchReturnByInvoiceQuery('1111111111');
 
-    axios.get(apiUrl + '/sales/get-id').then((res) => {
+    axios.get(apiUrl + '/sales/get-id', {
+        headers: {
+            "Authorization": token
+        }
+    }).then((res) => {
         setSalesId(res.data);
     });
 
@@ -896,7 +904,11 @@ function SalesList() {
                                                         issueNo: e.target.value,
                                                         stoneDetailCode: stoneDetailCode
                                                     });
-                                                    axios.get(`${apiUrl}/stone-detail/get-purchase-share/${refNo}`).then((res) => {
+                                                    axios.get(`${apiUrl}/stone-detail/get-purchase-share/${refNo}`, {
+                                                        headers: {
+                                                            "Authorization": token
+                                                        }
+                                                    }).then((res) => {
                                                         setTBodyData(
                                                             res.data.map(el => {
                                                                 return {
@@ -1001,7 +1013,11 @@ function SalesList() {
                                                     stoneDetailCode: e.target.value,
                                                 });
                                                 let refNo = stoneDetails.find(el => el.stoneDetailCode === e.target.value).referenceNo;
-                                                axios.get(`${apiUrl}/stone-detail/get-purchase-share/${refNo}`).then((res) => {
+                                                axios.get(`${apiUrl}/stone-detail/get-purchase-share/${refNo}`, {
+                                                    headers: {
+                                                        "Authorization": token
+                                                    }
+                                                }).then((res) => {
                                                     setTBodyData(
                                                         res.data.map(el => {
                                                             return {

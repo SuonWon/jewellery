@@ -1,6 +1,8 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { apiUrl } from "../const";
+import Cookies from "js-cookie";
 
+const token = 'Bearer ' + Cookies.get('_auth');
 
 const stoneApi = createApi({
     reducerPath: "stone",
@@ -17,6 +19,9 @@ const stoneApi = createApi({
                     return {
                         url:'/stone/get-all-stones',
                         method: 'GET',
+                        headers: {
+                            "Authorization": token
+                        },
                         params: filterData
                     };
                 },
@@ -32,6 +37,9 @@ const stoneApi = createApi({
                     return {
                         url: '/stone/get-count',
                         method: 'GET',
+                        headers: {
+                            "Authorization": token
+                        },
                         params: data
                     };
                 },
@@ -43,7 +51,10 @@ const stoneApi = createApi({
                 query: () => {
                     return {
                         url: '/stone/get-true-stones',
-                        method: 'GET'
+                        method: 'GET',
+                        headers: {
+                            "Authorization": token
+                        }
                     }
                 }
             }),
@@ -51,7 +62,10 @@ const stoneApi = createApi({
                 query: (stoneCode) => {
                     return {
                         url: `/stone/get-stone/${stoneCode}`,
-                        method: 'GET'
+                        method: 'GET',
+                        headers: {
+                            "Authorization": token
+                        }
                     };
                 },
             }),
@@ -63,6 +77,9 @@ const stoneApi = createApi({
                     return {
                         url: '/stone/create-stone',
                         method: 'POST',
+                        headers: {
+                            "Authorization": token
+                        },
                         body: {
                             stoneDesc: stoneData.stoneDesc,
                             remark: stoneData.remark,
@@ -82,6 +99,9 @@ const stoneApi = createApi({
                 query: (stoneData) => {
                     return {
                         url: `/stone/update-stone`,
+                        headers: {
+                            "Authorization": token
+                        },
                         body: {
                             stoneCode: stoneData.stoneCode,
                             stoneDesc: stoneData.stoneDesc,
@@ -103,7 +123,10 @@ const stoneApi = createApi({
                 query: (stoneCode) => {
                     return {
                         url: `/stone/delete-stone/${stoneCode}`,
-                        method: 'DELETE'
+                        method: 'DELETE',
+                        headers: {
+                            "Authorization": token
+                        }
                     };
                 },
             }),

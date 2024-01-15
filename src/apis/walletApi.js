@@ -1,5 +1,8 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { apiUrl } from "../const";
+import Cookies from "js-cookie";
+
+const token = 'Bearer ' + Cookies.get('_auth');
 
 const walletApi = createApi({
     reducerPath: "wallet",
@@ -16,6 +19,9 @@ const walletApi = createApi({
                     return {
                         url: "/wallet/get-all-wallets",
                         method: "GET",
+                        headers: {
+                            "Authorization": token
+                        },
                         params: filterData
                     };
                 },
@@ -31,6 +37,9 @@ const walletApi = createApi({
                     return {
                         url: "/wallet/get-count",
                         method: 'GET',
+                        headers: {
+                            "Authorization": token
+                        },
                         params: data
                     };
                 },
@@ -43,6 +52,9 @@ const walletApi = createApi({
                     return {
                         url: `/wallet/get-wallet/${walletCode}`,
                         method: "GET",
+                        headers: {
+                            "Authorization": token
+                        },
                     };
                 },
             }),
@@ -54,6 +66,9 @@ const walletApi = createApi({
                     return {
                         url: "/wallet/get-true-wallets",
                         method: "GET",
+                        headers: {
+                            "Authorization": token
+                        },
                     };
                 },
             }),
@@ -73,6 +88,9 @@ const walletApi = createApi({
                     return {
                         url: "/wallet/create-wallet",
                         method: "POST",
+                        headers: {
+                            "Authorization": token
+                        },
                         body: walletData,
                     };
                 },
@@ -85,6 +103,9 @@ const walletApi = createApi({
                     return {
                         url: "/wallet/update-wallet",
                         method: "PUT",
+                        headers: {
+                            "Authorization": token
+                        },
                         body: walletData,
                     };
                 },
@@ -96,7 +117,10 @@ const walletApi = createApi({
                 query: (walletId) => {
                     return {
                         url: `/wallet/delete-wallet/${walletId}`,
-                        method: "DELETE"
+                        method: "DELETE",
+                        headers: {
+                            "Authorization": token
+                        }
                     };
                 },
             }),

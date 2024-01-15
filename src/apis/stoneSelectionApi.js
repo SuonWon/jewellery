@@ -1,5 +1,8 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { apiUrl } from "../const";
+import Cookies from "js-cookie";
+
+const token = 'Bearer ' + Cookies.get('_auth');
 
 const stoneSelectionApi = createApi({
     reducerPath: "stoneSelection",
@@ -16,6 +19,9 @@ const stoneSelectionApi = createApi({
                     return {
                         url: "/stone-selection/get-all-stone-selection",
                         method: "GET",
+                        headers: {
+                            "Authorization": token
+                        },
                     };
                 },
             }),
@@ -27,6 +33,9 @@ const stoneSelectionApi = createApi({
                     return {
                         url: `/stone-selection/get-stone-selection/${selectionId}`,
                         method: "GET",
+                        headers: {
+                            "Authorization": token
+                        },
                     };
                 },
             }),
@@ -38,6 +47,9 @@ const stoneSelectionApi = createApi({
                     return {
                         url: "/stone-selection/create-stone-selection",
                         method: "POST",
+                        headers: {
+                            "Authorization": token
+                        },
                         body: selectionData,
                     };
                 },
@@ -50,6 +62,9 @@ const stoneSelectionApi = createApi({
                     return {
                         url: "/stone-selection/update-stone-selection",
                         method: "PUT",
+                        headers: {
+                            "Authorization": token
+                        },
                         body: selectionData,
                     };
                 },
@@ -62,6 +77,9 @@ const stoneSelectionApi = createApi({
                     return {
                         url: `/stone-selection/update-stone-selection${selectionId}`,
                         method: "DELETE",
+                        headers: {
+                            "Authorization": token
+                        },
                     };
                 },
             })

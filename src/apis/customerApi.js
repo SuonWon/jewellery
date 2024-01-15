@@ -1,6 +1,8 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { apiUrl } from "../const";
+import Cookies from "js-cookie";
 
+const token = 'Bearer ' + Cookies.get('_auth');
 
 const customerApi = createApi({
     reducerPath: "customer",
@@ -17,6 +19,9 @@ const customerApi = createApi({
                     return {
                         url:`/customer/get-all-customers`,
                         method: 'GET',
+                        headers: {
+                            "Authorization": token
+                        },
                         params: filterData
                     };
                 },
@@ -32,6 +37,9 @@ const customerApi = createApi({
                     return {
                         url:`/customer/get-count`,
                         method: 'GET',
+                        headers: {
+                            "Authorization": token
+                        },
                         params: data
                     };
                 },
@@ -43,7 +51,10 @@ const customerApi = createApi({
                 query: (customerCode) => {
                     return {
                         url: `/customer/get-customer/${customerCode}`,
-                        method: 'GET'
+                        method: 'GET',
+                        headers: {
+                            "Authorization": token
+                        },
                     };
                 },
             }),
@@ -54,7 +65,10 @@ const customerApi = createApi({
                 query: () => {
                     return {
                         url: `/customer/get-true-customers`,
-                        method: 'GET'
+                        method: 'GET',
+                        headers: {
+                            "Authorization": token
+                        },
                     };
                 },
             }),
@@ -66,6 +80,9 @@ const customerApi = createApi({
                     return {
                         url: '/customer/create-customer',
                         method: 'POST',
+                        headers: {
+                            "Authorization": token
+                        },
                         body: {
                             customerName: customerData.customerName,
                             nrcNo: customerData.nrcNo,
@@ -93,6 +110,9 @@ const customerApi = createApi({
                 query: (customerData) => {
                     return {
                         url: `/customer/update-customer`,
+                        headers: {
+                            "Authorization": token
+                        },
                         body: {
                             customerCode: customerData.customerCode,
                             customerName: customerData.customerName,
@@ -122,7 +142,10 @@ const customerApi = createApi({
                 query: (customerCode) => {
                     return {
                         url: `/customer/delete-customer/${customerCode}`,
-                        method: 'DELETE'
+                        method: 'DELETE',
+                        headers: {
+                            "Authorization": token
+                        },
                     };
                 },
             }),

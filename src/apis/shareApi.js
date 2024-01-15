@@ -1,5 +1,8 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { apiUrl } from "../const";
+import Cookies from "js-cookie";
+
+const token = 'Bearer ' + Cookies.get('_auth');
 
 const shareApi = createApi({
     reducerPath: "share",
@@ -16,6 +19,9 @@ const shareApi = createApi({
                     return {
                         url: "/share/get-all-shares",
                         method: "GET",
+                        headers: {
+                            "Authorization": token
+                        },
                         params: filterData
                     };
                 },
@@ -31,6 +37,9 @@ const shareApi = createApi({
                     return {
                         url:`/share/get-count`,
                         method: 'GET',
+                        headers: {
+                            "Authorization": token
+                        },
                         params: data
                     };
                 },
@@ -42,7 +51,10 @@ const shareApi = createApi({
                 query: () => {
                     return {
                         url: "/share/get-true-shares",
-                        method: "GET"
+                        method: "GET",
+                        headers: {
+                            "Authorization": token
+                        }
                     }
                 }
             }),
@@ -55,6 +67,9 @@ const shareApi = createApi({
                     return {
                         url: `/share/get-share/${shareId}`,
                         method: "GET",
+                        headers: {
+                            "Authorization": token
+                        },
                     };
                 },
             }),
@@ -66,6 +81,9 @@ const shareApi = createApi({
                     return {
                         url: "/share/create-share",
                         method: "POST",
+                        headers: {
+                            "Authorization": token
+                        },
                         body: shareData,
                     };
                 },
@@ -78,6 +96,9 @@ const shareApi = createApi({
                     return {
                         url: "/share/update-share",
                         method: "PUT",
+                        headers: {
+                            "Authorization": token
+                        },
                         body: shareData,
                     };
                 },
@@ -90,6 +111,9 @@ const shareApi = createApi({
                     return {
                         url: `/share/delete-share/${shareId}`,
                         method: "DELETE",
+                        headers: {
+                            "Authorization": token
+                        },
                     };
                 }, 
             })

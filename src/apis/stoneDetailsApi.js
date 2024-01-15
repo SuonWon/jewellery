@@ -1,6 +1,8 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { apiUrl } from "../const";
+import Cookies from "js-cookie";
 
+const token = 'Bearer ' + Cookies.get('_auth');
 
 const stoneDetailsApi = createApi({
     reducerPath: "stoneDetails",
@@ -17,6 +19,9 @@ const stoneDetailsApi = createApi({
                     return {
                         url:'/stone-detail/get-all-stone-details',
                         method: 'GET',
+                        headers: {
+                            "Authorization": token
+                        },
                         params: filterData
                     };
                 },
@@ -32,6 +37,9 @@ const stoneDetailsApi = createApi({
                     return {
                         url: '/stone-detail/get-count',
                         method: 'GET',
+                        headers: {
+                            "Authorization": token
+                        },
                         params: data
                     };
                 },
@@ -43,7 +51,10 @@ const stoneDetailsApi = createApi({
                 query: () => {
                     return {
                         url: '/stone-detail/get-active-stone-details',
-                        method: 'GET'
+                        method: 'GET',
+                        headers: {
+                            "Authorization": token
+                        }
                     };
                 },
             }),
@@ -52,6 +63,9 @@ const stoneDetailsApi = createApi({
                     return {
                         url: "/stone-detail/get-purchase-share/{purchaseId}",
                         method: 'GET',
+                        headers: {
+                            "Authorization": token
+                        },
                     };
                 },
             }),
@@ -59,7 +73,10 @@ const stoneDetailsApi = createApi({
                 query: (stoneDetailCode) => {
                     return {
                         url: `/stone-detail/get-stone-detail/${stoneDetailCode}`,
-                        method: 'GET'
+                        method: 'GET',
+                        headers: {
+                            "Authorization": token
+                        }
                     };
                 },
             }),
@@ -72,6 +89,9 @@ const stoneDetailsApi = createApi({
                     return {
                         url: '/stone-detail/create-stone-detail',
                         method: 'POST',
+                        headers: {
+                            "Authorization": token
+                        },
                         body: stoneDetailsData,
                     };
                 },
@@ -83,6 +103,9 @@ const stoneDetailsApi = createApi({
                 query: (stoneDetailsData) => {
                     return {
                         url: `/stone-detail/update-stone-detail`,
+                        headers: {
+                            "Authorization": token
+                        },
                         body: stoneDetailsData,
                         method: 'PUT',
                     };
@@ -95,7 +118,10 @@ const stoneDetailsApi = createApi({
                 query: (stoneDetailCode) => {
                     return {
                         url: `/stone-detail/delete-stone-detail/${stoneDetailCode}`,
-                        method: 'DELETE'
+                        method: 'DELETE',
+                        headers: {
+                            "Authorization": token
+                        }
                     };
                 },
             }),
