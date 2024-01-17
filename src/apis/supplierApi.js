@@ -2,12 +2,19 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { apiUrl } from "../const";
 import Cookies from "js-cookie";
 
-const token = 'Bearer ' + Cookies.get('_auth');
+//const token = 'Bearer ' + Cookies.get('_auth');
 
 const supplierApi = createApi({
     reducerPath: "supplier",
     baseQuery: fetchBaseQuery({
         baseUrl: apiUrl,
+        prepareHeaders: (headers, { getState }) => {
+            const token = getState().user.token;
+            if (token) {
+                headers.set('Authorization', `Bearer ${token}`);
+            }
+            return headers;
+        }
     }),
     endpoints(builder) {
         return {
@@ -19,9 +26,9 @@ const supplierApi = createApi({
                     return {
                         url:'/supplier/get-all-suppliers',
                         method: 'GET',
-                        headers: {
-                            "Authorization": token
-                        },
+                        // headers: {
+                        //     "Authorization": token
+                        // },
                         params: filterData
                     };
                 },
@@ -37,9 +44,9 @@ const supplierApi = createApi({
                     return {
                         url:`/supplier/get-count`,
                         method: 'GET',
-                        headers: {
-                            "Authorization": token
-                        },
+                        // headers: {
+                        //     "Authorization": token
+                        // },
                         params: data
                     };
                 },
@@ -52,9 +59,9 @@ const supplierApi = createApi({
                     return {
                         url: `/supplier/get-supplier/${supplierCode}`,
                         method: 'GET',
-                        headers: {
-                            "Authorization": token
-                        }
+                        // headers: {
+                        //     "Authorization": token
+                        // },
                     };
                 },
             }),
@@ -66,9 +73,9 @@ const supplierApi = createApi({
                     return {
                         url: '/supplier/get-true-suppliers',
                         method: 'GET',
-                        headers: {
-                            "Authorization": token
-                        }
+                        // headers: {
+                        //     "Authorization": token
+                        // },
                     };
                 },
             }),
@@ -80,9 +87,9 @@ const supplierApi = createApi({
                     return {
                         url: '/supplier/create-supplier',
                         method: 'POST',
-                        headers: {
-                            "Authorization": token
-                        },
+                        // headers: {
+                        //     "Authorization": token
+                        // },
                         body: {
                             supplierName: supplierData.supplierName,
                             contactName: supplierData.contactName,
@@ -109,9 +116,9 @@ const supplierApi = createApi({
                 query: (supplierData) => {
                     return {
                         url: `/supplier/update-supplier`,
-                        headers: {
-                            "Authorization": token
-                        },
+                        // headers: {
+                        //     "Authorization": token
+                        // },
                         body: {
                             supplierCode: supplierData.supplierCode,
                             supplierName: supplierData.supplierName,
@@ -141,9 +148,9 @@ const supplierApi = createApi({
                     return {
                         url: `/supplier/delete-supplier/${supplierCode}`,
                         method: 'DELETE',
-                        headers: {
-                            "Authorization": token
-                        }
+                        // headers: {
+                        //     "Authorization": token
+                        // },
                     };
                 },
             }),

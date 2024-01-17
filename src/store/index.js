@@ -20,9 +20,15 @@ import { payableApi } from "../apis/payableApi";
 import { receivableApi } from "../apis/receivableApi";
 import { walletCategoryApi } from "../apis/walletCategoryApi";
 import { walletApi } from "../apis/walletApi";
+import { systemUserApi } from "../apis/systemUserApi";
+import { systemRoleApi } from "../apis/systemRoleApi";
+import userReducer from "./userSlice";
+import { setupListeners } from "@reduxjs/toolkit/dist/query";
 
 export const store = configureStore({
     reducer: {
+        user: userReducer,
+        userToken: "HiHi",
         [brightnessApi.reducerPath] : brightnessApi.reducer,
         [gradeApi.reducerPath] : gradeApi.reducer,
         [typeApi.reducerPath] : typeApi.reducer,
@@ -44,6 +50,8 @@ export const store = configureStore({
         [receivableApi.reducerPath] : receivableApi.reducer,
         [walletCategoryApi.reducerPath] : walletCategoryApi.reducer,
         [walletApi.reducerPath] : walletApi.reducer,
+        [systemUserApi.reducerPath] : systemUserApi.reducer,
+        [systemRoleApi.reducerPath] : systemRoleApi.reducer,
     },
     middleware: (getDefaultMiddleware) => {
         return getDefaultMiddleware()
@@ -67,9 +75,13 @@ export const store = configureStore({
             .concat(payableApi.middleware)
             .concat(receivableApi.middleware)
             .concat(walletCategoryApi.middleware)
-            .concat(walletApi.middleware);
+            .concat(walletApi.middleware)
+            .concat(systemUserApi.middleware)
+            .concat(systemRoleApi.middleware);
     }
 });
+
+setupListeners(store.dispatch);
 
 export { useAddBrightnessMutation, useFetchTrueBrightnessQuery, useFetchBrightnessByIdQuery, useFetchBrightnessQuery, useUpdateBrightnessMutation, useRemoveBrightnessMutation, useFetchBrightnessCountQuery } from "../apis/brightnessApi";
 export { useFetchGradeQuery, useFetchTrueGradeQuery, useFetchGradeByIdQuery, useAddGradeMutation, useUpdateGradeMutation, useRemoveGradeMutation, useFetchGradeCountQuery } from "../apis/gradeApi";
@@ -92,3 +104,5 @@ export { useFetchPayableQuery, useFetchPayableByIdQuery, useFetchOwnerWalletQuer
 export { useFetchReceivableQuery, useFetchReceivableByIdQuery, useAddReceivableMutation, useUpdateReceivableMutation, useRemoveReceivableMutation } from "../apis/receivableApi";
 export { useFetchWalletCategoryQuery, useFetchTrueWalletCategoryQuery, useFetchWalletCategoryByIdQuery, useAddWalletCategoryMutation, useUpdateWalletCategoryMutation, useRemoveWalletCategoryMutation, useFetchWalletCategoryCountQuery } from "../apis/walletCategoryApi";
 export { useFetchWalletQuery, useFetchTrueWalletQuery, useFetchWalletByIdQuery, useFetchWalletNamesQuery, useAddWalletMutation, useUpdateWalletMutation, useRemoveWalletMutation, useFetchWalletCountQuery } from "../apis/walletApi";
+export { useFetchTrueUsersQuery, useFetchUserByIdQuery, useFetchUserRoleQuery, useFetchUsersCountQuery, useFetchUsersQuery, useAddUserMutation, useUpdateUserMutation, useRemoveUserMutation } from "../apis/systemUserApi";
+export { useFetchRoleByIdQuery, useFetchRolesCountQuery, useFetchRolesQuery, useAddRoleMutation, useUpdateRoleMutation } from "../apis/systemRoleApi";

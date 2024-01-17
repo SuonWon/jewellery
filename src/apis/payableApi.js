@@ -2,12 +2,19 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { apiUrl } from "../const";
 import Cookies from "js-cookie";
 
-const token = 'Bearer ' + Cookies.get('_auth');
+//const token = 'Bearer ' + Cookies.get('_auth');
 
 const payableApi = createApi({
     reducerPath: "payable",
     baseQuery: fetchBaseQuery({
         baseUrl: apiUrl,
+        prepareHeaders: (headers, { getState }) => {
+            const token = getState().user.token;
+            if (token) {
+                headers.set('Authorization', `Bearer ${token}`);
+            }
+            return headers;
+        }
     }),
     endpoints(builder) {
         return {
@@ -19,9 +26,9 @@ const payableApi = createApi({
                     return {
                         url: `/payable/get-payables`,
                         method: "GET",
-                        headers: {
-                            "Authorization": token
-                        },
+                        // headers: {
+                        //     "Authorization": token
+                        // },
                         params: {
                             invoiceNo: invoiceNo,
                             status: "O"
@@ -37,9 +44,9 @@ const payableApi = createApi({
                     return {
                         url: `/payable/get-payable/${payId}`,
                         method: "GET",
-                        headers: {
-                            "Authorization": token
-                        },
+                        // headers: {
+                        //     "Authorization": token
+                        // },
                     }
                 }
             }),
@@ -48,9 +55,9 @@ const payableApi = createApi({
                     return {
                         url: "/payable/get-owner-wallets",
                         method: "GET",
-                        headers: {
-                            "Authorization": token
-                        },
+                        // headers: {
+                        //     "Authorization": token
+                        // },
                     }
                 }
             }),
@@ -62,9 +69,9 @@ const payableApi = createApi({
                     return {
                         url: "/payable/create-payable",
                         method: "POST",
-                        headers: {
-                            "Authorization": token
-                        },
+                        // headers: {
+                        //     "Authorization": token
+                        // },
                         body: payData,
                     };
                 },
@@ -77,9 +84,9 @@ const payableApi = createApi({
                     return {
                         url: "/payable/update-payable",
                         method: "PUT",
-                        headers: {
-                            "Authorization": token
-                        },
+                        // headers: {
+                        //     "Authorization": token
+                        // },
                         body: payData,
                     };
                 },
@@ -92,9 +99,9 @@ const payableApi = createApi({
                     return {
                         url: "/payable/delete-payable",
                         method: "PUT",
-                        headers: {
-                            "Authorization": token
-                        },
+                        // headers: {
+                        //     "Authorization": token
+                        // },
                         body: payData,
                     };
                 },

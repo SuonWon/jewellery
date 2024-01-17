@@ -20,7 +20,7 @@ const token = 'Bearer ' + Cookies.get('_auth');
 
 const validator = require('validator');
 
-function Wallet({walletId}) {
+function Wallet() {
 
     const [filterForm, setFilterForm] = useState({
         skip: 0,
@@ -797,7 +797,7 @@ function Wallet({walletId}) {
                                         setIsFilter(false);
                                         setFilterForm({
                                             status: true,
-                                            walletCode: walletId,
+                                            walletCode: "",
                                             shareCode: 0,
                                             startDate: "",
                                             endDate: "",

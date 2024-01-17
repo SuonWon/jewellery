@@ -2,12 +2,19 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { apiUrl } from "../const";
 import Cookies from "js-cookie";
 
-const token = 'Bearer ' + Cookies.get('_auth');
+//const token = 'Bearer ' + Cookies.get('_auth');
 
 const damageApi = createApi({
     reducerPath: "damage",
     baseQuery: fetchBaseQuery({
         baseUrl: apiUrl,
+        prepareHeaders: (headers, { getState }) => {
+            const token = getState().user.token;
+            if (token) {
+                headers.set('Authorization', `Bearer ${token}`);
+            }
+            return headers;
+        }
     }),
     endpoints(builder) {
         return {
@@ -16,9 +23,9 @@ const damageApi = createApi({
                     return {
                         url: "/damage/get-id",
                         method: "GET",
-                        headers: {
-                            "Authorization": token
-                        },
+                        // headers: {
+                        //     "Authorization": token
+                        // },
                     }
                 }
             }),
@@ -31,9 +38,9 @@ const damageApi = createApi({
                     return {
                         url: "/damage/get-all-damages" + query,
                         method: "GET",
-                        headers: {
-                            "Authorization": token
-                        },
+                        // headers: {
+                        //     "Authorization": token
+                        // },
                     };
                 },
             }),
@@ -46,9 +53,9 @@ const damageApi = createApi({
                     return {
                         url: "/damage/get-count" + query,
                         method: "GET",
-                        headers: {
-                            "Authorization": token
-                        },
+                        // headers: {
+                        //     "Authorization": token
+                        // },
                     };
                 },
             }),
@@ -60,9 +67,9 @@ const damageApi = createApi({
                     return {
                         url: `/damage/get-damage/${damageId}`,
                         method: "GET",
-                        headers: {
-                            "Authorization": token
-                        },
+                        // headers: {
+                        //     "Authorization": token
+                        // },
                     };
                 },
             }),
@@ -74,9 +81,9 @@ const damageApi = createApi({
                     return {
                         url: "/damage/create-damage",
                         method: "POST",
-                        headers: {
-                            "Authorization": token
-                        },
+                        // headers: {
+                        //     "Authorization": token
+                        // },
                         body: damageData,
                     };
                 },
@@ -89,9 +96,9 @@ const damageApi = createApi({
                     return {
                         url: "/damage/update-damage",
                         method: "PUT",
-                        headers: {
-                            "Authorization": token
-                        },
+                        // headers: {
+                        //     "Authorization": token
+                        // },
                         body: damageData
                     };
                 },
@@ -104,9 +111,9 @@ const damageApi = createApi({
                     return {
                         url: "/damage/delete-damage",
                         method: "PUT",
-                        headers: {
-                            "Authorization": token
-                        },
+                        // headers: {
+                        //     "Authorization": token
+                        // },
                         body: damageData,
                     };
                 },

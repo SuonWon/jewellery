@@ -8,6 +8,13 @@ const stoneSelectionApi = createApi({
     reducerPath: "stoneSelection",
     baseQuery: fetchBaseQuery({
         baseUrl: apiUrl,
+        prepareHeaders: (headers, { getState }) => {
+            const token = getState().user.token;
+            if (token) {
+                headers.set('Authorization', `Bearer ${token}`);
+            }
+            return headers;
+        }
     }),
     endpoints(builder) {
         return {
@@ -19,9 +26,9 @@ const stoneSelectionApi = createApi({
                     return {
                         url: "/stone-selection/get-all-stone-selection",
                         method: "GET",
-                        headers: {
-                            "Authorization": token
-                        },
+                        // headers: {
+                        //     "Authorization": token
+                        // },
                     };
                 },
             }),
@@ -33,9 +40,9 @@ const stoneSelectionApi = createApi({
                     return {
                         url: `/stone-selection/get-stone-selection/${selectionId}`,
                         method: "GET",
-                        headers: {
-                            "Authorization": token
-                        },
+                        // headers: {
+                        //     "Authorization": token
+                        // },
                     };
                 },
             }),
@@ -47,9 +54,9 @@ const stoneSelectionApi = createApi({
                     return {
                         url: "/stone-selection/create-stone-selection",
                         method: "POST",
-                        headers: {
-                            "Authorization": token
-                        },
+                        // headers: {
+                        //     "Authorization": token
+                        // },
                         body: selectionData,
                     };
                 },
@@ -62,9 +69,9 @@ const stoneSelectionApi = createApi({
                     return {
                         url: "/stone-selection/update-stone-selection",
                         method: "PUT",
-                        headers: {
-                            "Authorization": token
-                        },
+                        // headers: {
+                        //     "Authorization": token
+                        // },
                         body: selectionData,
                     };
                 },
@@ -77,9 +84,9 @@ const stoneSelectionApi = createApi({
                     return {
                         url: `/stone-selection/update-stone-selection${selectionId}`,
                         method: "DELETE",
-                        headers: {
-                            "Authorization": token
-                        },
+                        // headers: {
+                        //     "Authorization": token
+                        // },
                     };
                 },
             })
