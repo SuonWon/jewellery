@@ -1,13 +1,21 @@
 import { GoPerson, GoLock } from "react-icons/go";
 import { useSignIn } from 'react-auth-kit';
-import { useState } from "react";
+import { useContext, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { apiUrl } from "./const";
+import { setToken } from "./store/userSlice";
+import { useDispatch } from "react-redux";
+import { AuthContent } from "./context/authContext";
+
 
 const validator = require('validator');
 
 function Login() {
+
+    const {permissions, setPermissions} = useContext(AuthContent)
+
+    const dispatch = useDispatch();
 
     const signIn = useSignIn();
 
@@ -17,6 +25,7 @@ function Login() {
         username: "", 
         password: ""
     });
+
     const [ showPassword, setShowPassword ] = useState(false);
 
     const [validationText, setValidationText] = useState({});
@@ -55,18 +64,22 @@ function Login() {
         if(validateForm()) {
             axios.post(apiUrl + '/auth/login', formData)
             .then((res) => {
-                console.log(res.data.access_token);
+                dispatch(setToken({token: res.data.access_token}));
                 const newErrors = {}
                 if(res.data !== '') {
+                    setPermissions(res.data.systemRole.permissions);
                     if(signIn(
                         {
                             token : res.data.access_token,
                             tokenType : "Bearer",
-                            authState : res.data,
-                            expiresIn : 3200,
+                            authState : {
+                                username: res.data.username,
+                                fullName: res.data.fullName,
+                            },
+                            expiresIn : 6400,
                         }
                     ))
-                        navigate("/master");
+                    navigate("/master");
                     
                 }
                 else {

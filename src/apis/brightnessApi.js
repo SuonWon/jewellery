@@ -1,13 +1,21 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { apiUrl } from "../const";
 import Cookies from "js-cookie";
+import { useAuthUser } from "react-auth-kit";
 
-const token = 'Bearer ' + Cookies.get('_auth');
+//const token = 'Bearer ' + Cookies.get('_auth');
 
 const brightnessApi = createApi({
     reducerPath: "brightness",
     baseQuery: fetchBaseQuery({
         baseUrl: apiUrl,
+        prepareHeaders: (headers, { getState }) => {
+            const token = getState().user.token;
+            if (token) {
+                headers.set('Authorization', `Bearer ${token}`);
+            }
+            return headers;
+        }
     }),
     endpoints(builder) {
         return {
@@ -20,9 +28,9 @@ const brightnessApi = createApi({
                         url:'/brightness/get-all-stone-brightnesses',
                         method: 'GET',
                         params: filterData,
-                        headers: {
-                            "Authorization": token
-                        }
+                        // headers: {
+                        //     "Authorization": token
+                        // }
                     };
                 },
             }),
@@ -38,9 +46,9 @@ const brightnessApi = createApi({
                         url: '/brightness/get-count',
                         method: 'GET',
                         params: data,
-                        headers: {
-                            "Authorization": token
-                        }
+                        // headers: {
+                        //     "Authorization": token
+                        // }
                     };
                 },
             }),
@@ -52,9 +60,9 @@ const brightnessApi = createApi({
                     return {
                         url: '/brightness/get-true-stone-brightnesses',
                         method: 'GET',
-                        headers: {
-                            "Authorization": token
-                        }
+                        // headers: {
+                        //     "Authorization": token
+                        // }
                     }
                 }
             }),
@@ -63,9 +71,9 @@ const brightnessApi = createApi({
                     return {
                         url: `/brightness/get-stone-brightness/${brightCode}`,
                         method: 'GET',
-                        headers: {
-                            "Authorization": token
-                        }
+                        // headers: {
+                        //     "Authorization": token
+                        // }
                     };
                 },
             }),
@@ -77,9 +85,9 @@ const brightnessApi = createApi({
                     return {
                         url: '/brightness/create-stone-brightness',
                         method: 'POST',
-                        headers: {
-                            "Authorization": token
-                        },
+                        // headers: {
+                        //     "Authorization": token
+                        // },
                         body: {
                             brightCode: brightData.brightCode,
                             brightDesc: brightData.brightDesc,
@@ -100,9 +108,9 @@ const brightnessApi = createApi({
                     return {
                         url: `/brightness/update-stone-brightness`,
                         method: 'PUT',
-                        headers: {
-                            "Authorization": token
-                        },
+                        // headers: {
+                        //     "Authorization": token
+                        // },
                         body: {
                             brightCode: brightData.brightCode,
                             brightDesc: brightData.brightDesc,
@@ -123,9 +131,9 @@ const brightnessApi = createApi({
                     return {
                         url: `/brightness/delete-stone-brightness/${brightCode}`,
                         method: 'DELETE',
-                        headers: {
-                            "Authorization": token
-                        },
+                        // headers: {
+                        //     "Authorization": token
+                        // },
                     };
                 },
             }),

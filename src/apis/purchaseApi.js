@@ -3,12 +3,19 @@ import { apiUrl, pause } from "../const";
 import moment from "moment";
 import Cookies from "js-cookie";
 
-const token = 'Bearer ' + Cookies.get('_auth');
+//const token = 'Bearer ' + Cookies.get('_auth');
 
 const purchaseApi = createApi({
     reducerPath: "purchase",
     baseQuery: fetchBaseQuery({
         baseUrl: apiUrl,
+        prepareHeaders: (headers, { getState }) => {
+            const token = getState().user.token;
+            if (token) {
+                headers.set('Authorization', `Bearer ${token}`);
+            }
+            return headers;
+        }
     }),
     endpoints(builder) {
         return {
@@ -17,9 +24,9 @@ const purchaseApi = createApi({
                     return {
                         url: '/purchase/get-id',
                         method: 'GET',
-                        headers: {
-                            "Authorization": token
-                        },
+                        // headers: {
+                        //     "Authorization": token
+                        // },
                     };
                 },
             }),
@@ -32,9 +39,9 @@ const purchaseApi = createApi({
                     return {
                         url: '/purchase/get-all-purchases'+ query,
                         method: 'GET',
-                        headers: {
-                            "Authorization": token
-                        },
+                        // headers: {
+                        //     "Authorization": token
+                        // },
                     };
                 },
             }),
@@ -52,9 +59,9 @@ const purchaseApi = createApi({
                     return {
                         url: '/purchase/get-all-purchases',
                         method: 'GET',
-                        headers: {
-                            "Authorization": token
-                        },
+                        // headers: {
+                        //     "Authorization": token
+                        // },
                         params: data
                     }
                 }
@@ -69,9 +76,9 @@ const purchaseApi = createApi({
                     return {
                         url: '/purchase/get-count'+query,
                         method: 'GET',
-                        headers: {
-                            "Authorization": token
-                        },
+                        // headers: {
+                        //     "Authorization": token
+                        // },
                     }
                 }
             }),
@@ -83,9 +90,9 @@ const purchaseApi = createApi({
                     return {
                         url: `/purchase/get-purchase/${purchaseNo}`,
                         method: 'GET',
-                        headers: {
-                            "Authorization": token
-                        },
+                        // headers: {
+                        //     "Authorization": token
+                        // },
                     }
                 }
             }),
@@ -97,9 +104,9 @@ const purchaseApi = createApi({
                     return {
                         url: '/purchase/create-purchase',
                         method: 'POST',
-                        headers: {
-                            "Authorization": token
-                        },
+                        // headers: {
+                        //     "Authorization": token
+                        // },
                         body: {
                             ...purchaseData,
                             purchaseDetails: purchaseData.purchaseDetail
@@ -115,9 +122,9 @@ const purchaseApi = createApi({
                     return {
                         url: '/purchase/update-purchase',
                         method: 'PUT',
-                        headers: {
-                            "Authorization": token
-                        },
+                        // headers: {
+                        //     "Authorization": token
+                        // },
                         body: purchaseData
                     }
                 }
@@ -130,9 +137,9 @@ const purchaseApi = createApi({
                     return {
                         url: "/purchase/update-purchase-finish",
                         method: "PUT",
-                        headers: {
-                            "Authorization": token
-                        },
+                        // headers: {
+                        //     "Authorization": token
+                        // },
                         body: purchaseData,
                     };
                 },
@@ -145,9 +152,9 @@ const purchaseApi = createApi({
                     return {
                         url: '/purchase/delete-purchase',
                         method: 'PUT',
-                        headers: {
-                            "Authorization": token
-                        },
+                        // headers: {
+                        //     "Authorization": token
+                        // },
                         body: {
                             ...purchaseData
                         }

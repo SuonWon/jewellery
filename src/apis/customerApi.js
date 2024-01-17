@@ -2,12 +2,17 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { apiUrl } from "../const";
 import Cookies from "js-cookie";
 
-const token = 'Bearer ' + Cookies.get('_auth');
-
 const customerApi = createApi({
     reducerPath: "customer",
     baseQuery: fetchBaseQuery({
         baseUrl: apiUrl,
+        prepareHeaders: (headers, { getState }) => {
+            const token = getState().user.token;
+            if (token) {
+                headers.set('Authorization', `Bearer ${token}`);
+            }
+            return headers;
+        }
     }),
     endpoints(builder) {
         return {
@@ -19,9 +24,9 @@ const customerApi = createApi({
                     return {
                         url:`/customer/get-all-customers`,
                         method: 'GET',
-                        headers: {
-                            "Authorization": token
-                        },
+                        // headers: {
+                        //     "Authorization": token
+                        // },
                         params: filterData
                     };
                 },
@@ -37,9 +42,9 @@ const customerApi = createApi({
                     return {
                         url:`/customer/get-count`,
                         method: 'GET',
-                        headers: {
-                            "Authorization": token
-                        },
+                        // headers: {
+                        //     "Authorization": token
+                        // },
                         params: data
                     };
                 },
@@ -52,9 +57,9 @@ const customerApi = createApi({
                     return {
                         url: `/customer/get-customer/${customerCode}`,
                         method: 'GET',
-                        headers: {
-                            "Authorization": token
-                        },
+                        // headers: {
+                        //     "Authorization": token
+                        // },
                     };
                 },
             }),
@@ -66,9 +71,9 @@ const customerApi = createApi({
                     return {
                         url: `/customer/get-true-customers`,
                         method: 'GET',
-                        headers: {
-                            "Authorization": token
-                        },
+                        // headers: {
+                        //     "Authorization": token
+                        // },
                     };
                 },
             }),
@@ -80,9 +85,9 @@ const customerApi = createApi({
                     return {
                         url: '/customer/create-customer',
                         method: 'POST',
-                        headers: {
-                            "Authorization": token
-                        },
+                        // headers: {
+                        //     "Authorization": token
+                        // },
                         body: {
                             customerName: customerData.customerName,
                             nrcNo: customerData.nrcNo,
@@ -110,9 +115,9 @@ const customerApi = createApi({
                 query: (customerData) => {
                     return {
                         url: `/customer/update-customer`,
-                        headers: {
-                            "Authorization": token
-                        },
+                        // headers: {
+                        //     "Authorization": token
+                        // },
                         body: {
                             customerCode: customerData.customerCode,
                             customerName: customerData.customerName,
@@ -143,9 +148,9 @@ const customerApi = createApi({
                     return {
                         url: `/customer/delete-customer/${customerCode}`,
                         method: 'DELETE',
-                        headers: {
-                            "Authorization": token
-                        },
+                        // headers: {
+                        //     "Authorization": token
+                        // },
                     };
                 },
             }),

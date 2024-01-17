@@ -2,12 +2,19 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { apiUrl } from "../const";
 import Cookies from "js-cookie";
 
-const token = 'Bearer ' + Cookies.get('_auth');
+//const token = 'Bearer ' + Cookies.get('_auth');
 
 const gradeApi = createApi({
     reducerPath: "grade",
     baseQuery: fetchBaseQuery({
         baseUrl: apiUrl,
+        prepareHeaders: (headers, { getState }) => {
+            const token = getState().user.token;
+            if (token) {
+                headers.set('Authorization', `Bearer ${token}`);
+            }
+            return headers;
+        }
     }),
     endpoints(builder) {
         return {
@@ -19,9 +26,9 @@ const gradeApi = createApi({
                     return {
                         url:'/grade/get-all-stone-grades',
                         method: 'GET',
-                        headers: {
-                            "Authorization": token
-                        },
+                        // headers: {
+                        //     "Authorization": token
+                        // },
                         params: filterData
                     };
                 },
@@ -37,9 +44,9 @@ const gradeApi = createApi({
                     return {
                         url: '/grade/get-count',
                         method: 'GET',
-                        headers: {
-                            "Authorization": token
-                        },
+                        // headers: {
+                        //     "Authorization": token
+                        // },
                         params: data
                     };
                 },
@@ -52,9 +59,9 @@ const gradeApi = createApi({
                     return {
                         url: '/grade/get-true-stone-grades',
                         method: 'GET',
-                        headers: {
-                            "Authorization": token
-                        },
+                        // headers: {
+                        //     "Authorization": token
+                        // },
                     }
                 }
             }),
@@ -63,9 +70,9 @@ const gradeApi = createApi({
                     return {
                         url: `/grade/get-stone-grade/${gradeCode}`,
                         method: 'GET',
-                        headers: {
-                            "Authorization": token
-                        },
+                        // headers: {
+                        //     "Authorization": token
+                        // },
                     };
                 },
             }),
@@ -77,9 +84,9 @@ const gradeApi = createApi({
                     return {
                         url: '/grade/create-stone-grade',
                         method: 'POST',
-                        headers: {
-                            "Authorization": token
-                        },
+                        // headers: {
+                        //     "Authorization": token
+                        // },
                         body: {
                             gradeCode: gradeData.gradeCode,
                             gradeDesc: gradeData.gradeDesc,
@@ -99,9 +106,9 @@ const gradeApi = createApi({
                 query: (gradeData) => {
                     return {
                         url: `/grade/update-stone-grade`,
-                        headers: {
-                            "Authorization": token
-                        },
+                        // headers: {
+                        //     "Authorization": token
+                        // },
                         body: {
                             gradeCode: gradeData.gradeCode,
                             gradeDesc: gradeData.gradeDesc,
@@ -123,9 +130,9 @@ const gradeApi = createApi({
                     return {
                         url: `/grade/delete-stone-grade/${gradeCode}`,
                         method: 'DELETE',
-                        headers: {
-                            "Authorization": token
-                        },
+                        // headers: {
+                        //     "Authorization": token
+                        // },
                     };
                 },
             }),

@@ -2,12 +2,19 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { apiUrl } from "../const";
 import Cookies from "js-cookie";
 
-const token = 'Bearer ' + Cookies.get('_auth');
+//const token = 'Bearer ' + Cookies.get('_auth');
 
 const walletTransitionApi = createApi({
     reducerPath: "walletTransition",
     baseQuery: fetchBaseQuery({
         baseUrl: apiUrl,
+        prepareHeaders: (headers, { getState }) => {
+            const token = getState().user.token;
+            if (token) {
+                headers.set('Authorization', `Bearer ${token}`);
+            }
+            return headers;
+        }
     }),
     endpoints(builder) {
         return {
@@ -32,9 +39,9 @@ const walletTransitionApi = createApi({
                         //     walletCode: walletData.walletCode
                         // },
                         method: "GET",
-                        headers: {
-                            "Authorization": token
-                        },
+                        // headers: {
+                        //     "Authorization": token
+                        // },
                     };
                 },
             }),
@@ -51,9 +58,9 @@ const walletTransitionApi = createApi({
                         //     walletCode: walletData.walletCode
                         // },
                         method: "GET",
-                        headers: {
-                            "Authorization": token
-                        },
+                        // headers: {
+                        //     "Authorization": token
+                        // },
                     };
                 },
             }),
@@ -65,9 +72,9 @@ const walletTransitionApi = createApi({
                     return {
                         url: `/transaction/get-transaction/${transactionId}`,
                         method: "GET",
-                        headers: {
-                            "Authorization": token
-                        },
+                        // headers: {
+                        //     "Authorization": token
+                        // },
                     };
                 },
             }),
@@ -79,9 +86,9 @@ const walletTransitionApi = createApi({
                     return {
                         url: "/transaction/create-transaction",
                         method: "POST",
-                        headers: {
-                            "Authorization": token
-                        },
+                        // headers: {
+                        //     "Authorization": token
+                        // },
                         body: transactionData,
                     };
                 },
@@ -94,9 +101,9 @@ const walletTransitionApi = createApi({
                     return {
                         url: "/transaction/update-transaction",
                         method: "PUT",
-                        headers: {
-                            "Authorization": token
-                        },
+                        // headers: {
+                        //     "Authorization": token
+                        // },
                         body: transactionData,
                     };
                 },
@@ -109,9 +116,9 @@ const walletTransitionApi = createApi({
                     return {
                         url: "/transaction/delete-transaction",
                         method: "PUT",
-                        headers: {
-                            "Authorization": token
-                        },
+                        // headers: {
+                        //     "Authorization": token
+                        // },
                         body: transactionData,
                     };
                 },

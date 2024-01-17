@@ -2,12 +2,19 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { apiUrl } from "../const";
 import Cookies from "js-cookie";
 
-const token = 'Bearer ' + Cookies.get('_auth');
+//const token = 'Bearer ' + Cookies.get('_auth');
 
 const uomApi = createApi({
     reducerPath: "unit",
     baseQuery: fetchBaseQuery({
         baseUrl: apiUrl,
+        prepareHeaders: (headers, { getState }) => {
+            const token = getState().user.token;
+            if (token) {
+                headers.set('Authorization', `Bearer ${token}`);
+            }
+            return headers;
+        }
     }),
     endpoints(builder) {
         return {
@@ -19,9 +26,9 @@ const uomApi = createApi({
                     return {
                         url:'/unit/get-all-units',
                         method: 'GET',
-                        headers: {
-                            "Authorization": token
-                        },
+                        // headers: {
+                        //     "Authorization": token
+                        // },
                     };
                 },
             }),
@@ -30,9 +37,9 @@ const uomApi = createApi({
                     return {
                         url: `/unit/get-unit/${unitCode}`,
                         method: 'GET',
-                        headers: {
-                            "Authorization": token
-                        }
+                        // headers: {
+                        //     "Authorization": token
+                        // },
                     };
                 },
             }),
@@ -45,9 +52,9 @@ const uomApi = createApi({
                     return {
                         url: '/unit/create-unit',
                         method: 'POST',
-                        headers: {
-                            "Authorization": token
-                        },
+                        // headers: {
+                        //     "Authorization": token
+                        // },
                         body: {
                             unitCode: unitData.unitCode,
                             unitDesc: unitData.unitDesc,
@@ -66,9 +73,9 @@ const uomApi = createApi({
                 query: (unitData) => {
                     return {
                         url: `/unit/update-unit`,
-                        headers: {
-                            "Authorization": token
-                        },
+                        // headers: {
+                        //     "Authorization": token
+                        // },
                         body: {
                             unitCode: unitData.unitCode,
                             unitDesc: unitData.unitDesc,
@@ -89,9 +96,9 @@ const uomApi = createApi({
                     return {
                         url: `/unit/delete-unit/${unitCode}`,
                         method: 'DELETE',
-                        headers: {
-                            "Authorization": token
-                        }
+                        // headers: {
+                        //     "Authorization": token
+                        // },
                     };
                 },
             }),

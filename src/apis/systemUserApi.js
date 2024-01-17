@@ -4,8 +4,8 @@ import Cookies from "js-cookie";
 
 //const token = 'Bearer ' + Cookies.get('_auth');
 
-const walletCategoryApi = createApi({
-    reducerPath: "walletCategory",
+const systemUserApi = createApi({
+    reducerPath: "systemUser",
     baseQuery: fetchBaseQuery({
         baseUrl: apiUrl,
         prepareHeaders: (headers, { getState }) => {
@@ -18,108 +18,116 @@ const walletCategoryApi = createApi({
     }),
     endpoints(builder) {
         return {
-            fetchWalletCategory: builder.query({
+            fetchUsersCount: builder.query({
                 providesTags: () => {
-                    return [{type: "WalletCategory", id: "All"}]
+                    return [{type: "SystemUser", id: "All"}];
                 },
                 query: (filterData) => {
                     return {
-                        url: "/wallet-category/get-all-wallet-categories",
+                        url: "/system-user/get-count",
                         method: "GET",
+                        params: filterData,
                         // headers: {
                         //     "Authorization": token
-                        // },
-                        params: filterData
+                        // }
                     };
                 },
             }),
-            fetchWalletCategoryCount: builder.query({
+            fetchUsers: builder.query({
                 providesTags: () => {
-                    return[{type: 'WalletCategory', id: 'All'}]
+                    return [{type: "SystemUser", id: "All"}];
                 },
                 query: (filterData) => {
-                    const data = {
-                        search: filterData.search
-                    }
                     return {
-                        url: '/wallet-category/get-count',
-                        method: 'GET',
+                        url: "/system-user/get-all-system-users",
+                        method: "GET",
+                        params: filterData,
                         // headers: {
                         //     "Authorization": token
-                        // },
-                        params: data
+                        // }
                     };
                 },
             }),
-            fetchTrueWalletCategory: builder.query({
+            fetchTrueUsers: builder.query({
                 providesTags: () => {
-                    return [{type: "WalletCategory", id: "All"}]
+                    return [{type: "SystemUser", id: "All"}];
                 },
                 query: () => {
                     return {
-                        url: "/wallet-category/get-true-wallet-categories",
+                        url: "/system-user/get-true-system-users",
                         method: "GET",
                         // headers: {
                         //     "Authorization": token
-                        // },
-                    }
-                }
+                        // }
+                    };
+                },
             }),
-            fetchWalletCategoryById: builder.query({
+            fetchUserById: builder.query({
                 providesTags: () => {
-                    return [{type: "WalletCategory", id: "Single"}]
+                    return [{type: "SystemUser", id: "All"}];
                 },
-                query: (id) => {
+                query: (username) => {
                     return {
-                        url: `/wallet-category/get-wallet-category/${id}`,
+                        url: `/system-user/get-system-user/${username}`,
                         method: "GET",
                         // headers: {
                         //     "Authorization": token
-                        // },
+                        // }
                     };
                 },
             }),
-            addWalletCategory: builder.mutation({
-                invalidatesTags: () => {
-                    return [{type: "WalletCategory", id: "All"}]
-                },
-                query: (queryData) => {
+            fetchUserRole: builder.query({
+                query: (username) => {
                     return {
-                        url: "/wallet-category/create-wallet-category",
+                        url: `/system-user/get-user-role/${username}`,
+                        method: "GET",
+                        // headers: {
+                        //     "Authorization": token
+                        // }
+                    };
+                },
+            }),
+            addUser: builder.mutation({
+                invalidatesTags: () => {
+                    return [{type: "SystemUser", id: "All"}]
+                },
+                query: (userData) => {
+                    return {
+                        url: "/system-user/create-system-user",
                         method: "POST",
+                        body: userData,
                         // headers: {
                         //     "Authorization": token
-                        // },
-                        body: queryData,
+                        // }
                     };
                 },
             }),
-            updateWalletCategory: builder.mutation({
+            updateUser: builder.mutation({
                 invalidatesTags: () => {
-                    return [{type: "WalletCategory", id: "All"}]
+                    return [{type: "SystemUser", id: "All"}]
                 },
-                query: (queryData) => {
+                query: (userData) => {
                     return {
-                        url: "/wallet-category/update-wallet-category",
+                        url: "/system-user/update-system-user",
                         method: "PUT",
+                        body: userData,
                         // headers: {
                         //     "Authorization": token
-                        // },
-                        body: queryData,
+                        // }
                     };
                 },
             }),
-            removeWalletCategory: builder.mutation({
+            removeUser: builder.mutation({
                 invalidatesTags: () => {
-                    return [{type: "WalletCategory", id: "All"}]
+                    return [{type: "SystemUser", id: "All"}]
                 },
-                query: (id) => {
+                query: (username) => {
                     return {
-                        url: `/wallet-category/delete-wallet-category/${id}`,
+                        url: `/system-user/delete-system-user/${username}`,
                         method: "DELETE",
                         // headers: {
                         //     "Authorization": token
-                        // },
+                        // }
                     };
                 },
             }),
@@ -127,5 +135,5 @@ const walletCategoryApi = createApi({
     },
 });
 
-export const { useFetchWalletCategoryQuery, useFetchTrueWalletCategoryQuery, useFetchWalletCategoryByIdQuery, useAddWalletCategoryMutation, useUpdateWalletCategoryMutation, useRemoveWalletCategoryMutation, useFetchWalletCategoryCountQuery } = walletCategoryApi;
-export { walletCategoryApi };
+export const { useFetchTrueUsersQuery, useFetchUserByIdQuery, useFetchUserRoleQuery, useFetchUsersCountQuery, useFetchUsersQuery, useAddUserMutation, useUpdateUserMutation, useRemoveUserMutation } = systemUserApi;
+export { systemUserApi };

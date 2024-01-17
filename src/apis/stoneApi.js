@@ -2,12 +2,19 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { apiUrl } from "../const";
 import Cookies from "js-cookie";
 
-const token = 'Bearer ' + Cookies.get('_auth');
+//const token = 'Bearer ' + Cookies.get('_auth');
 
 const stoneApi = createApi({
     reducerPath: "stone",
     baseQuery: fetchBaseQuery({
         baseUrl: apiUrl,
+        prepareHeaders: (headers, { getState }) => {
+            const token = getState().user.token;
+            if (token) {
+                headers.set('Authorization', `Bearer ${token}`);
+            }
+            return headers;
+        }
     }),
     endpoints(builder) {
         return {
@@ -19,9 +26,9 @@ const stoneApi = createApi({
                     return {
                         url:'/stone/get-all-stones',
                         method: 'GET',
-                        headers: {
-                            "Authorization": token
-                        },
+                        // headers: {
+                        //     "Authorization": token
+                        // },
                         params: filterData
                     };
                 },
@@ -37,9 +44,9 @@ const stoneApi = createApi({
                     return {
                         url: '/stone/get-count',
                         method: 'GET',
-                        headers: {
-                            "Authorization": token
-                        },
+                        // headers: {
+                        //     "Authorization": token
+                        // },
                         params: data
                     };
                 },
@@ -52,9 +59,9 @@ const stoneApi = createApi({
                     return {
                         url: '/stone/get-true-stones',
                         method: 'GET',
-                        headers: {
-                            "Authorization": token
-                        }
+                        // headers: {
+                        //     "Authorization": token
+                        // },
                     }
                 }
             }),
@@ -63,9 +70,9 @@ const stoneApi = createApi({
                     return {
                         url: `/stone/get-stone/${stoneCode}`,
                         method: 'GET',
-                        headers: {
-                            "Authorization": token
-                        }
+                        // headers: {
+                        //     "Authorization": token
+                        // },
                     };
                 },
             }),
@@ -77,9 +84,9 @@ const stoneApi = createApi({
                     return {
                         url: '/stone/create-stone',
                         method: 'POST',
-                        headers: {
-                            "Authorization": token
-                        },
+                        // headers: {
+                        //     "Authorization": token
+                        // },
                         body: {
                             stoneDesc: stoneData.stoneDesc,
                             remark: stoneData.remark,
@@ -99,9 +106,9 @@ const stoneApi = createApi({
                 query: (stoneData) => {
                     return {
                         url: `/stone/update-stone`,
-                        headers: {
-                            "Authorization": token
-                        },
+                        // headers: {
+                        //     "Authorization": token
+                        // },
                         body: {
                             stoneCode: stoneData.stoneCode,
                             stoneDesc: stoneData.stoneDesc,
@@ -124,9 +131,9 @@ const stoneApi = createApi({
                     return {
                         url: `/stone/delete-stone/${stoneCode}`,
                         method: 'DELETE',
-                        headers: {
-                            "Authorization": token
-                        }
+                        // headers: {
+                        //     "Authorization": token
+                        // },
                     };
                 },
             }),

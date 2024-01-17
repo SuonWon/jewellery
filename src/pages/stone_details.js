@@ -899,6 +899,7 @@ function StoneDetails() {
                             </div> */}
                         </div>
                         <div className="grid grid-cols-3 gap-2">
+                            {/* Supplier Name */}
                             <div>
                                 <label className="text-black text-sm mb-2">Supplier Name</label>
                                 <select 
@@ -926,6 +927,7 @@ function StoneDetails() {
                                     validationText.supplierCode && <p className="block text-[12px] text-red-500 font-sans">{validationText.supplierCode}</p>
                                 }
                             </div>
+                            {/* Reference No */}
                             <div className="col-span-2 grid grid-cols-3 gap-2">
                                 <div className="col-span-2">
                                     <label className="text-black text-sm mb-2">Reference No</label>

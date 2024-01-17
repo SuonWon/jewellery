@@ -107,3 +107,9 @@ input[type="number"] {
     width: 50px;
     height: 10px;
 }
+
+.nav-link:hover,
+.nav-link:focus {
+    outline: none;
+    border: none;
+}

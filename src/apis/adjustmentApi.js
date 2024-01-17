@@ -2,12 +2,17 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { apiUrl } from "../const";
 import Cookies from "js-cookie";
 
-const token = 'Bearer ' + Cookies.get('_auth');
-
 const adjustmentApi = createApi({
     reducerPath: "adjustment",
     baseQuery: fetchBaseQuery({
         baseUrl: apiUrl,
+        prepareHeaders: (headers, { getState }) => {
+            const token = getState().user.token;
+            if (token) {
+                headers.set('Authorization', `Bearer ${token}`);
+            }
+            return headers;
+        }
     }),
     endpoints(builder) {
         return {
@@ -20,9 +25,9 @@ const adjustmentApi = createApi({
                     return {
                         url: "/adjustment/get-all-adjustments" + query,
                         method: "GET",
-                        headers: {
-                            "Authorization": token
-                        }
+                        // headers: {
+                        //     "Authorization": token
+                        // }
                     };
                 },
             }),
@@ -34,9 +39,9 @@ const adjustmentApi = createApi({
                     return {
                         url: `/adjustment/get-adjustment/${adjustId}`,
                         method: "GET",
-                        headers: {
-                            "Authorization": token
-                        }
+                        // headers: {
+                        //     "Authorization": token
+                        // }
                     };
                 },
             }),
@@ -49,9 +54,9 @@ const adjustmentApi = createApi({
                     return {
                         url: "/adjustment/get-count" + query,
                         method: "GET",
-                        headers: {
-                            "Authorization": token
-                        }
+                        // headers: {
+                        //     "Authorization": token
+                        // }
                     };
                 },
             }),
@@ -63,9 +68,9 @@ const adjustmentApi = createApi({
                     return {
                         url: "/adjustment/create-adjustment",
                         method: "POST",
-                        headers: {
-                            "Authorization": token
-                        },
+                        // headers: {
+                        //     "Authorization": token
+                        // },
                         body: adjustData,
                     };
                 },
@@ -78,9 +83,9 @@ const adjustmentApi = createApi({
                     return {
                         url: "/adjustment/update-adjustment",
                         method: "PUT",
-                        headers: {
-                            "Authorization": token
-                        },
+                        // headers: {
+                        //     "Authorization": token
+                        // },
                         body: adjustData
                     };
                 },
@@ -93,9 +98,9 @@ const adjustmentApi = createApi({
                     return {
                         url: "/adjustment/delete-adjustment",
                         method: "PUT",
-                        headers: {
-                            "Authorization": token
-                        },
+                        // headers: {
+                        //     "Authorization": token
+                        // },
                         body: adjustData
                     };
                 },

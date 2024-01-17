@@ -1,7 +1,7 @@
 /* eslint-disable eqeqeq */
 import { Button, Card, CardBody, Dialog, DialogBody, Input, Switch, Typography } from "@material-tailwind/react";
 import { FaCirclePlus, FaFloppyDisk, FaPencil, FaTrashCan, FaMagnifyingGlass } from "react-icons/fa6";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useAddBrightnessMutation, useFetchBrightnessCountQuery, useFetchBrightnessQuery, useRemoveBrightnessMutation, useUpdateBrightnessMutation } from "../store";
 import Pagination from "../components/pagination";
 import DeleteModal from "../components/delete_modal";
@@ -10,12 +10,19 @@ import ModalTitle from "../components/modal_title";
 import moment from "moment";
 import TableList from "../components/data_table";
 import { useAuthUser } from "react-auth-kit";
+import { AuthContent } from "../context/authContext";
 
 const validator = require("validator");
 
 function Brightness() {
 
     const auth = useAuthUser();
+
+    // console.log(auth())
+
+    const {permissions, setPermissions} = useContext(AuthContent);
+
+    // console.log(permissions);
 
     const [open, setOpen] = useState(false);
 

@@ -1,5 +1,5 @@
 import { Button, Menu, MenuHandler, MenuItem, MenuList, Typography } from "@material-tailwind/react";
-import { FaArrowRightFromBracket, FaBoxesPacking, FaCartShopping, FaChartPie, FaChevronDown, FaDatabase, FaBoxOpen, FaListUl, FaMoneyBill1, FaSliders, FaUsers, FaWallet, FaArrowRotateLeft, FaPlusMinus } from "react-icons/fa6";
+import { FaArrowRightFromBracket, FaBoxesPacking, FaCartShopping, FaChartPie, FaChevronDown, FaDatabase, FaBoxOpen, FaListUl, FaMoneyBill1, FaSliders, FaUsers, FaWallet, FaArrowRotateLeft, FaPlusMinus, FaUser, FaLayerGroup } from "react-icons/fa6";
 import { GiDiamondTrophy } from "react-icons/gi";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useAuthUser, useSignOut } from "react-auth-kit";
@@ -41,32 +41,32 @@ function Nav() {
                             </Typography>
                         </MenuHandler>
                         <MenuList className="z-[99999] bg-main text-white">
-                            <NavLink to='/master'>
+                            <NavLink className="nav-link" to='/master'>
                                 <MenuItem className="flex items-center gap-2">
                                     <FaDatabase /><span>Master Data</span>
                                 </MenuItem>
                             </NavLink>
-                            <NavLink to='/stone_details'>
+                            <NavLink className="nav-link" to='/stone_details'>
                                 <MenuItem className="flex items-center gap-2">
                                     <GiDiamondTrophy /><span>Stone Selection</span>
                                 </MenuItem>
                             </NavLink>
-                            <NavLink to='/supplier'>
+                            <NavLink className="nav-link" to='/supplier'>
                                 <MenuItem className="flex items-center gap-2">
                                     <FaUsers /><span>Suppliers</span>
                                 </MenuItem>
                             </NavLink>
-                            <NavLink to='/customer'>
+                            <NavLink className="nav-link" to='/customer'>
                                 <MenuItem className="flex items-center gap-2">
                                     <FaUsers /><span>Customers</span>
                                 </MenuItem>
                             </NavLink>
-                            <NavLink to='/share'>
+                            <NavLink className="nav-link" to='/share'>
                                 <MenuItem className="flex items-center gap-2">
                                     <FaUsers /><span>Shares</span>
                                 </MenuItem>
                             </NavLink>
-                            <NavLink to='/wallet_list'>
+                            <NavLink className="nav-link" to='/wallet_list'>
                                 <MenuItem className="flex items-center gap-2">
                                     <FaWallet /> <span>Wallet</span>
                                 </MenuItem>
@@ -82,17 +82,17 @@ function Nav() {
                             </Typography>
                         </MenuHandler>
                         <MenuList className="z-[99999] bg-main text-white">
-                            <NavLink to="/purchase_list">
+                            <NavLink className="nav-link" to="/purchase_list">
                                 <MenuItem className="flex items-center gap-2">
                                     <FaCartShopping /> <span>Purchase List</span>
                                 </MenuItem>
                             </NavLink>
-                            <NavLink to="/stone_details">
+                            <NavLink className="nav-link" to="/stone_details">
                                 <MenuItem className="flex items-center gap-2">
                                     <GiDiamondTrophy /> <span>Stone Selection</span>
                                 </MenuItem>
                             </NavLink>
-                            <NavLink to="/purchase_return">
+                            <NavLink className="nav-link" to="/purchase_return">
                                 <MenuItem className="flex items-center gap-2">
                                     <FaArrowRotateLeft /> <span>Purchase Return List</span>
                                 </MenuItem>
@@ -108,12 +108,12 @@ function Nav() {
                             </Typography>
                         </MenuHandler>
                         <MenuList className="z-[99999] bg-main text-white">
-                            <NavLink to="/issue_list">
+                            <NavLink className="nav-link" to="/issue_list">
                                 <MenuItem className="flex items-center gap-2">
                                     <FaBoxOpen /> <span>Issue List</span>
                                 </MenuItem>
                             </NavLink>
-                            <NavLink to="/issue_return">
+                            <NavLink className="nav-link" to="/issue_return">
                                 <MenuItem className="flex items-center gap-2">
                                     <FaArrowRotateLeft /> <span>Issue Return List</span>
                                 </MenuItem>
@@ -129,12 +129,12 @@ function Nav() {
                             </Typography>
                         </MenuHandler>
                         <MenuList className="z-[99999] bg-main text-white">
-                            <NavLink to="/sales_list">
+                            <NavLink className="nav-link" to="/sales_list">
                                 <MenuItem className="flex items-center gap-2">
                                     <FaMoneyBill1 /> <span>Sales List</span>
                                 </MenuItem>
                             </NavLink>
-                            <NavLink to="/sales_return">
+                            <NavLink className="nav-link" to="/sales_return">
                                 <MenuItem className="flex items-center gap-2">
                                     <FaArrowRotateLeft /> <span>Sales Return List</span>
                                 </MenuItem>
@@ -150,19 +150,19 @@ function Nav() {
                             </Typography>
                         </MenuHandler>
                         <MenuList className="z-[99999] bg-main text-white">
-                            <NavLink to="/damage">
+                            <NavLink className="nav-link" to="/damage">
                                 <MenuItem className="flex items-center gap-2">
                                     <FaListUl /> <span>Damage List</span>
                                 </MenuItem>
                             </NavLink>
-                            <NavLink to="/adjustment">
+                            <NavLink className="nav-link" to="/adjustment">
                                 <MenuItem className="flex items-center gap-2">
                                     <FaPlusMinus /> <span>Adjustment List</span>
                                 </MenuItem>
                             </NavLink>
                         </MenuList>
                     </Menu>
-                    <NavLink to='/wallet'>
+                    <NavLink className="nav-link" to='/wallet'>
                         <Typography variant='small' className="flex justify-center items-center text-white p-2 space-x-2 hover:bg-white hover:text-black rounded-lg ">
                             <FaWallet className='text-base' /> <span className=''>Wallet Transaction</span>
                         </Typography>
@@ -179,6 +179,16 @@ function Nav() {
                             </Button>
                         </MenuHandler>
                         <MenuList  className="z-[99999] bg-main text-white">
+                            <NavLink className="nav-link" to="/system_user">
+                                <MenuItem className="flex items-center gap-2">
+                                    <FaUser /> <span>System User</span>
+                                </MenuItem>
+                            </NavLink>
+                            <NavLink className="nav-link" to="/system_role">
+                                <MenuItem className="flex items-center gap-2">
+                                    <FaLayerGroup /> <span>System Role</span>
+                                </MenuItem>
+                            </NavLink>
                             <MenuItem className='flex items-center gap-2 cursor-pointer' onClick={handleLogout}>
                                 <FaArrowRightFromBracket /> <span>Logout</span>
                             </MenuItem>

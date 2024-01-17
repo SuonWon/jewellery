@@ -2,12 +2,19 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { apiUrl } from "../const";
 import Cookies from "js-cookie";
 
-const token = 'Bearer ' + Cookies.get('_auth');
+//const token = 'Bearer ' + Cookies.get('_auth');
 
 const walletApi = createApi({
     reducerPath: "wallet",
     baseQuery: fetchBaseQuery({
         baseUrl: apiUrl,
+        prepareHeaders: (headers, { getState }) => {
+            const token = getState().user.token;
+            if (token) {
+                headers.set('Authorization', `Bearer ${token}`);
+            }
+            return headers;
+        }
     }),
     endpoints(builder) {
         return {
@@ -19,9 +26,9 @@ const walletApi = createApi({
                     return {
                         url: "/wallet/get-all-wallets",
                         method: "GET",
-                        headers: {
-                            "Authorization": token
-                        },
+                        // headers: {
+                        //     "Authorization": token
+                        // },
                         params: filterData
                     };
                 },
@@ -37,9 +44,9 @@ const walletApi = createApi({
                     return {
                         url: "/wallet/get-count",
                         method: 'GET',
-                        headers: {
-                            "Authorization": token
-                        },
+                        // headers: {
+                        //     "Authorization": token
+                        // },
                         params: data
                     };
                 },
@@ -52,9 +59,9 @@ const walletApi = createApi({
                     return {
                         url: `/wallet/get-wallet/${walletCode}`,
                         method: "GET",
-                        headers: {
-                            "Authorization": token
-                        },
+                        // headers: {
+                        //     "Authorization": token
+                        // },
                     };
                 },
             }),
@@ -66,9 +73,9 @@ const walletApi = createApi({
                     return {
                         url: "/wallet/get-true-wallets",
                         method: "GET",
-                        headers: {
-                            "Authorization": token
-                        },
+                        // headers: {
+                        //     "Authorization": token
+                        // },
                     };
                 },
             }),
@@ -88,9 +95,9 @@ const walletApi = createApi({
                     return {
                         url: "/wallet/create-wallet",
                         method: "POST",
-                        headers: {
-                            "Authorization": token
-                        },
+                        // headers: {
+                        //     "Authorization": token
+                        // },
                         body: walletData,
                     };
                 },
@@ -103,9 +110,9 @@ const walletApi = createApi({
                     return {
                         url: "/wallet/update-wallet",
                         method: "PUT",
-                        headers: {
-                            "Authorization": token
-                        },
+                        // headers: {
+                        //     "Authorization": token
+                        // },
                         body: walletData,
                     };
                 },
@@ -118,9 +125,9 @@ const walletApi = createApi({
                     return {
                         url: `/wallet/delete-wallet/${walletId}`,
                         method: "DELETE",
-                        headers: {
-                            "Authorization": token
-                        }
+                        // headers: {
+                        //     "Authorization": token
+                        // },
                     };
                 },
             }),
