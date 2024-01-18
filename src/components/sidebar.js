@@ -7,59 +7,66 @@ import { Link } from "react-router-dom";
 function Sidebar() {
 
     return (
-        <Card className="max-w-[18rem] h-screen px-4 py-1 shadow-none border rounded-none">
+        <Card className="w-full h-full py-1 shadow-none border rounded-none xl:px-4">
             <div className="mb-2 px-4 py-3">
                 <Typography color="blue-gray" variant="h5">
-                    Master Data
+                    <span className="hidden xl:block">Master Data</span>
+                    <span className="block xl:hidden">MD</span>
                 </Typography>
             </div>
-            <List>
+            <List className="w-full">
                 <Link to="home/master/brightness" className="text-initial">
-                    <ListItem>
+                    <ListItem className="w-fit">
                         <ListItemPrefix>
                             <GiCheckeredDiamond />
                         </ListItemPrefix>
-                        Stone Brightness
+                        <span className="hidden xl:block">Stone Brightness</span>
+                        <span className="block xl:hidden">SB</span>
                     </ListItem>
                 </Link>
                 <Link to="home/master/grade" className="text-initial">
-                    <ListItem >
+                    <ListItem className="w-fit">
                         <ListItemPrefix>
                             <GiDiamonds />
                         </ListItemPrefix>
-                        Stone Grade
+                        <span className="hidden xl:block">Stone Grade</span>
+                        <span className="block xl:hidden">SG</span>
                     </ListItem>
                 </Link>
                 <Link to="home/master/type" className="text-initial">
-                    <ListItem>
+                    <ListItem className="w-fit">
                         <ListItemPrefix>
                             <GiDiamondHard />
                         </ListItemPrefix>
-                        Stone Type
+                        <span className="hidden xl:block">Stone Type</span>
+                        <span className="block xl:hidden">ST</span>
                     </ListItem>
                 </Link>
                 <Link to="home/master/stone" className="text-initial">
-                    <ListItem>
+                    <ListItem className="w-fit">
                         <ListItemPrefix>
                             <GiCutDiamond />
                         </ListItemPrefix>
-                        Stone
+                        <span className="hidden xl:block">Stone</span>
+                        <span className="block xl:hidden">S</span>
                     </ListItem>
                 </Link>
                 <Link to="home/master/uom" className="text-initial">
-                    <ListItem>
+                    <ListItem className="w-fit">
                         <ListItemPrefix>
                             <FaRulerVertical />
                         </ListItemPrefix>
-                        Unit
+                        <span className="hidden xl:block">Stone Unit</span>
+                        <span className="block xl:hidden">SU</span>
                     </ListItem>
                 </Link>
                 <Link to="home/master/walletCategory" className="text-initial">
-                    <ListItem>
+                    <ListItem className="w-fit">
                         <ListItemPrefix>
                             <BiCategory />
                         </ListItemPrefix>
-                        Wallet Category
+                        <span className="hidden xl:block">Wallet Category</span>
+                        <span className="block xl:hidden">WC</span>
                     </ListItem>
                 </Link>
             </List>
