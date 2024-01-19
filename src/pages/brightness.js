@@ -221,7 +221,7 @@ function Brightness() {
     });
 
     return(
-        <div className="flex flex-col gap-4 px-2 relative">
+        <div className="flex flex-col gap-4 px-4 relative w-full">
             <div className="w-78 absolute top-0 right-0 z-[9999]">
                 {/* {
                     addResult.isSuccess && isAlert && <SuccessAlert message="Save successful." handleAlert={() => setIsAlert(false)} />
@@ -234,7 +234,7 @@ function Brightness() {
                 } */}
             </div>
             <SectionTitle title="Stone Brightness" handleModal={openModal} />
-            <Card className="h-auto shadow-md w-[1000px] mx-1 rounded-sm p-2 border-t">
+            <Card className="h-auto shadow-md min-w-[100%] max-w-[100%] mx-1 rounded-sm p-2 border-t">
                 <CardBody className="rounded-sm overflow-auto p-0">
                     <div className="flex justify-end py-2">
                         <div className="w-72">

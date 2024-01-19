@@ -152,8 +152,10 @@ function SystemRole() {
         setFormData(eData);
         setPermissionData(eData.permissions.map((el) => {
             return {
+                permissionCode: el.permissionCode,
+                roleCode: el.roleCode,
                 moduleName: el.moduleName,
-                moduleCheck: false,
+                moduleCheck: el.view && el.create && el.update && el.delete ? true : false,
                 view: el.view,
                 create: el.create,
                 update: el.update,
@@ -166,13 +168,24 @@ function SystemRole() {
 
     const submitEdit = async () => {
         editRole({
+            roleCode: formData.roleCode,
             roleDesc: formData.roleDesc,
             remark: formData.remark,
-            permissions: formData.permission,
             createdAt: formData.createdAt,
             createdBy: formData.createdBy,
             updatedAt: moment().toISOString(),
             updatedBy: auth().username,
+            permissions: permissionData.map((el) => {
+                return {
+                    permissionCode: el.permissionCode,
+                    roleCode: el.roleCode,
+                    moduleName: el.moduleName,
+                    view: el.view,
+                    create: el.create,
+                    update: el.update,
+                    delete: el.delete,
+                }
+            }),
         }).then((res) => {
             console.log(res);
         });
@@ -228,7 +241,7 @@ function SystemRole() {
                     >
                         <FaPencil />
                     </Button>
-                    <Button 
+                    {/* <Button 
                         variant="text" 
                         color="red" 
                         className="p-2" 
@@ -236,7 +249,7 @@ function SystemRole() {
                         disabled={row.isOwner}
                     >
                         <FaTrashCan />
-                    </Button>
+                    </Button> */}
                 </div>
             )
         },

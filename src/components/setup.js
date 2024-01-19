@@ -11,9 +11,11 @@ import { Route, Routes } from 'react-router-dom';
 function Setup() {
     return (
 
-        <div className='flex justify-center'>
-            <Sidebar />
-            <div className='flex overflow-auto' style={{maxHeight: 'calc(100vh - 60px)'}}>
+        <div className='grid grid-cols-10 gap-2 xl:grid-cols-7'>
+            <div className='w-full col-span-1 xl:col-start-2 '>
+                <Sidebar />
+            </div>
+            <div className='col-span-8 flex xl:col-span-5' >
                 <Routes>
                     <Route index element={<Brightness />}></Route>
                     <Route path='home/master/grade' element={<Grade />}></Route>
