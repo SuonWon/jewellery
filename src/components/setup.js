@@ -12,11 +12,11 @@ function Setup() {
 
     return (
 
-        <div className='grid grid-cols-10 gap-2 xl:grid-cols-7'>
-            <div className='w-full col-span-1 xl:col-start-2 '>
+        <div className='grid grid-cols-10 gap-2 xl:grid-cols-9 2xl:grid-cols-11 w-full'>
+            <div className='w-full xl:col-span-2'>
                 <Sidebar />
             </div>
-            <div className='col-span-8 flex xl:col-span-5' >
+            <div className='col-span-9 flex xl:col-span-7 2xl:col-span-9'>
                 <Routes>
                     <Route index element={<Brightness />}></Route>
                     <Route path='grade' element={<Grade />}></Route>

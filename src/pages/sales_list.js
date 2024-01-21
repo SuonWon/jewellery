@@ -37,6 +37,9 @@ function SalesList() {
         setSalesPermission(permissions[12]);
         setReceivablePermission(permissions[23]);
 
+        console.log(permissions[12]);
+        console.log(permissions[23]);
+
         if(salesPermission?.view == false) {
             navigate('/supplier');
         }
@@ -636,17 +639,17 @@ function SalesList() {
             width: "100px",
             cell: (row) => (
                 <div className="flex items-center gap-2">
-                    {
+                    {/* {
                         receivablePermission?.view ? (
                             <Button variant="text" color="deep-purple" className="p-2" onClick={() => openPayable(row.Code, row.GrandTotal)}><FaMoneyBillTrendUp /></Button>
                         ) : null
-                    }
+                    } */}
                     <Button variant="text" color="deep-purple" className="p-2" onClick={() => handleView(row.Code)}><FaPencil /></Button>
-                    {
-                        salesPermission?.delete ? (
+                    {/* {
+                        salesPermission?.delete ? ( */}
                             {/* <Button variant="text" color="red" className="p-2" onClick={() => handleDeleteBtn(row.Code)}><FaTrashCan /></Button> */}
-                        ) : null
-                    }
+                        {/* ) : null
+                    } */}
                 </div>
             )
         },
@@ -718,7 +721,7 @@ function SalesList() {
                     </div>
                     <Card className="h-auto shadow-md max-w-screen-xxl rounded-sm p-2 border-t">
                         <CardBody className="rounded-sm overflow-auto p-0">
-                            <div className="grid grid-cols-6 gap-2 py-2">
+                            <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-2 py-2">
                                 <div>
                                     <label className="text-black text-sm mb-2">Status</label>
                                     <select 

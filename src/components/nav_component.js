@@ -13,6 +13,8 @@ function Nav() {
 
     const { permissions } = useContext(AuthContent);
 
+    console.log(permissions);
+
     const logOut = useSignOut();
 
     const navigate = useNavigate();

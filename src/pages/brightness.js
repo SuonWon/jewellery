@@ -239,7 +239,7 @@ function Brightness() {
     });
 
     return(
-        <div>
+        <>
             {
                 brightness != null && brightness != undefined ? (
                     <div className="flex flex-col gap-4 px-4 relative w-full">
@@ -255,7 +255,7 @@ function Brightness() {
                             } */}
                         </div>
                         <SectionTitle title="Stone Brightness" handleModal={openModal} permission={brightness?.create}/>
-                        <Card className="h-auto shadow-md w-[1000px] mx-1 rounded-sm p-2 border-t">
+                        <Card className="h-auto shadow-md min-w-[100%] max-w-[100%] mx-1 rounded-sm p-2 border-t">
                             <CardBody className="rounded-sm overflow-auto p-0">
                                 <div className="flex justify-end py-2">
                                     <div className="w-72">
@@ -388,7 +388,7 @@ function Brightness() {
                     </div>
                 ) : null
             }
-        </div>
+        </>
     );
 
 }
