@@ -473,13 +473,16 @@ function Payable(props) {
                                             </Button>
                                         </>
                                     ): null
-                                ) : 
-                                props.balance === paidAmt ? "" : <Button onClick={handleSubmit} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2">
-                                    <FaFloppyDisk className="text-base" />
-                                    <Typography variant="small" className="capitalize">
-                                        Save
-                                    </Typography>
-                                </Button>
+                                ) : (
+                                    payablePermission?.create ? (
+                                        props.balance === paidAmt ? "" : <Button onClick={handleSubmit} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2">
+                                            <FaFloppyDisk className="text-base" />
+                                            <Typography variant="small" className="capitalize">
+                                                Save
+                                            </Typography>
+                                        </Button>
+                                    ) : null
+                                )
                             }
                         </div> 
                     </DialogBody>   

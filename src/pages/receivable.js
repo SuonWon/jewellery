@@ -467,13 +467,16 @@ function Receivable(props) {
                                             </Button>
                                         </>
                                     ) : null
-                                ) : 
-                                props.balance === receivedAmt ? "" : <Button onClick={handleSubmit} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2">
-                                    <FaFloppyDisk className="text-base" />
-                                    <Typography variant="small" className="capitalize">
-                                        Save
-                                    </Typography>
-                                </Button>
+                                ) : (
+                                    receivablePermission?.create ? (
+                                        props.balance === receivedAmt ? "" : <Button onClick={handleSubmit} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2">
+                                            <FaFloppyDisk className="text-base" />
+                                            <Typography variant="small" className="capitalize">
+                                                Save
+                                            </Typography>
+                                        </Button>
+                                    ) : null
+                                )
                             }
                         </div> 
                     </DialogBody>         
