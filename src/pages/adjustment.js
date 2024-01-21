@@ -32,7 +32,7 @@ function Adjustment() {
         setAdjPermission(permissions[17]);
 
         if(adjPermission?.view == false) {
-            navigate('/supplier');
+            navigate('/403');
         }
     }, [permissions])
 
@@ -468,7 +468,7 @@ function Adjustment() {
                     </div>
                     <Card className="h-auto shadow-md max-w-screen-xxl rounded-sm p-2 border-t">
                         <CardBody className="rounded-sm overflow-auto p-0">
-                            <div className="grid grid-cols-6 gap-2 py-2">
+                            <div className="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-5 gap-2 py-2">
                                 <div>
                                     <label className="text-black text-sm mb-2">Status</label>
                                     <select 

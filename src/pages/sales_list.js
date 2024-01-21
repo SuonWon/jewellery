@@ -41,7 +41,7 @@ function SalesList() {
         console.log(permissions[23]);
 
         if(salesPermission?.view == false) {
-            navigate('/supplier');
+            navigate('/403');
         }
     }, [permissions])
     

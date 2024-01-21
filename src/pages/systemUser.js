@@ -29,7 +29,7 @@ function SystemUser() {
         setUserPermission(permissions[19]);
 
         if(userPermission?.view == false) {
-            navigate('/supplier');
+            navigate('/403');
         }
     }, [permissions])
 

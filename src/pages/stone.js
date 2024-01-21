@@ -30,7 +30,7 @@ function Stone() {
         setStonePermission(permissions[0]);
 
         if(stonePermission?.view == false) {
-            navigate('./supplier');
+            navigate('/403');
         }
     }, [stonePermission])
 

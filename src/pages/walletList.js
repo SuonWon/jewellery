@@ -28,7 +28,7 @@ function WalletList() {
         setWalletPermission(permissions[8]);
 
         if(walletPermission?.view == false) {
-            navigate('/supplier');
+            navigate('/403');
         }
     }, [permissions])
 

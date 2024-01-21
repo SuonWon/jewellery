@@ -22,78 +22,72 @@ function Sidebar() {
             <List className="w-full w-min-full">
                 {
                     permissions[3]?.view ? (
-                        <Link to="brightness" className="text-initial">
+                        <Link to="brightness" className="text-initial w-fit">
                             <ListItem className="w-fit">
-                                <ListItemPrefix>
+                                <ListItemPrefix className="mr-0 xl:mr-4">
                                     <GiCheckeredDiamond />
                                 </ListItemPrefix>
                                 <span className="hidden xl:block">Stone Brightness</span>
-                                <span className="block xl:hidden">SB</span>
                             </ListItem>
                         </Link>
                     ) : null
                 }
                 {
                     permissions[2]?.view ? (
-                        <Link to="grade" className="text-initial">
+                        <Link to="grade" className="text-initial w-fit">
                             <ListItem className="w-fit">
-                                <ListItemPrefix>
+                                <ListItemPrefix className="mr-0 xl:mr-4">
                                     <GiDiamonds />
                                 </ListItemPrefix>
                                 <span className="hidden xl:block">Stone Grade</span>
-                                <span className="block xl:hidden">SG</span>
                             </ListItem>
                         </Link>
                     ) : null
                 }
                 {
                     permissions[1]?.view ? (
-                        <Link to="type" className="text-initial">
+                        <Link to="type" className="text-initial w-fit">
                             <ListItem className="w-fit">
-                                <ListItemPrefix>
+                                <ListItemPrefix className="mr-0 xl:mr-4">
                                     <GiDiamondHard />
                                 </ListItemPrefix>
                                 <span className="hidden xl:block">Stone Type</span>
-                                <span className="block xl:hidden">ST</span>
                             </ListItem>
                         </Link>
                     ) : null
                 }
                 {
                     permissions[0]?.view ? (
-                        <Link to="stone" className="text-initial">
+                        <Link to="stone" className="text-initial w-fit">
                             <ListItem className="w-fit">
-                                <ListItemPrefix>
+                                <ListItemPrefix className="mr-0 xl:mr-4">
                                     <GiCutDiamond />
                                 </ListItemPrefix>
                                 <span className="hidden xl:block">Stone</span>
-                                <span className="block xl:hidden">S</span>
                             </ListItem>
                         </Link>
                     ) : null
                 }
                 {
                     permissions[4]?.view ? (
-                        <Link to="uom" className="text-initial">
+                        <Link to="uom" className="text-initial w-fit">
                             <ListItem className="w-fit">
-                                <ListItemPrefix>
+                                <ListItemPrefix className="mr-0 xl:mr-4">
                                     <FaRulerVertical />
                                 </ListItemPrefix>
                                 <span className="hidden xl:block">Stone Unit</span>
-                                <span className="block xl:hidden">SU</span>
                             </ListItem>
                         </Link>
                     ) : null
                 }
                 {
                     permissions[5]?.view ? (
-                        <Link to="walletCategory" className="text-initial">
+                        <Link to="walletCategory" className="text-initial w-fit" >
                             <ListItem className="w-fit">
-                                <ListItemPrefix>
+                                <ListItemPrefix className="mr-0 xl:mr-4">
                                     <BiCategory />
                                 </ListItemPrefix>
                                 <span className="hidden xl:block">Wallet Category</span>
-                                <span className="block xl:hidden">WC</span>
                             </ListItem>
                         </Link>
                     ) : null

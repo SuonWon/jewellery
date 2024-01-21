@@ -30,7 +30,7 @@ function Brightness() {
         setBrightness(permissions[3]);
 
         if(brightness?.view == false) {
-            navigate('/supplier');
+            navigate('/403');
         }
     }, [brightness])
 
