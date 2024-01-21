@@ -29,7 +29,7 @@ function StoneType() {
     useEffect(() => {
         setTypePermission(permissions[1])
         if(typePermission?.view == false) {
-            navigate('/supplier');
+            navigate('/403');
         }
     }, [typePermission])
 

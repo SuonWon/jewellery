@@ -26,7 +26,7 @@ function Share() {
         setSharePermission(permissions[10]);
 
         if(sharePermission?.view == false) {
-            navigate('/supplier');
+            navigate('/403');
         }
     }, [permissions])
 

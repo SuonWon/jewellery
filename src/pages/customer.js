@@ -30,7 +30,7 @@ function Customer() {
         setCustomerPermission(permissions[6]);
 
         if(customerPermission?.view == false) {
-            navigate('/supplier');
+            navigate('/403');
         }
     }, [permissions])
 

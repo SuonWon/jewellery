@@ -34,7 +34,7 @@ function Wallet() {
         setWalletPermission(permissions[21]);
 
         if(walletPermission?.view == false) {
-            navigate('/supplier');
+            navigate('/403');
         }
     }, [permissions])
 

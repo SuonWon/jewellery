@@ -28,7 +28,7 @@ function SystemRole() {
         setRolePermission(permissions[20]);
 
         if(rolePermission?.view == false) {
-            navigate('/supplier');
+            navigate('/403');
         }
     }, [permissions])
 

@@ -36,7 +36,7 @@ function StoneDetails() {
         setSelectionPermission(permissions[9]);
 
         if(selectionPermission?.view == false) {
-            navigate('/supplier');
+            navigate('/403');
         }
     }, [selectionPermission])
 

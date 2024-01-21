@@ -30,7 +30,7 @@ function Grade() {
         setGradePermission(permissions[2]);
 
         if(gradePermission?.view == false) {
-            navigate('/supplier');
+            navigate('/403');
         }
     }, [gradePermission])
 
