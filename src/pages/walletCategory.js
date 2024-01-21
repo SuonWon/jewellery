@@ -1,7 +1,7 @@
 /* eslint-disable eqeqeq */
 import { Button, Card, CardBody, Dialog, DialogBody, Input, Switch, Textarea, Typography } from "@material-tailwind/react";
 import { FaCirclePlus, FaFloppyDisk, FaPencil, FaTrashCan, FaMagnifyingGlass } from "react-icons/fa6";
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useAddWalletCategoryMutation, useFetchWalletCategoryCountQuery, useFetchWalletCategoryQuery, useRemoveWalletCategoryMutation, useUpdateWalletCategoryMutation } from "../store";
 import Pagination from "../components/pagination";
 import DeleteModal from "../components/delete_modal";
@@ -10,6 +10,8 @@ import ModalTitle from "../components/modal_title";
 import moment from "moment";
 import TableList from "../components/data_table";
 import { useAuthUser } from "react-auth-kit";
+import { AuthContent } from "../context/authContext";
+import { useNavigate } from "react-router-dom";
 
 const validator = require('validator');
 
@@ -22,6 +24,20 @@ function WalletCategory() {
     const [removeCategory] = useRemoveWalletCategoryMutation();
 
     const auth = useAuthUser();
+
+    const { permissions } = useContext(AuthContent);
+
+    const [catePermission, setCatePermission] = useState(null);
+
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        setCatePermission(permissions[5]);
+
+        if(catePermission?.view == false) {
+            navigate('./supplier');
+        }
+    }, [catePermission])
 
     const [open, setOpen] = useState(false);
 
@@ -166,17 +182,25 @@ function WalletCategory() {
             width: "150px",
             cell: (row) => (
                 <div className="flex items-center gap-2">
-                    <div className="border-r border-gray-400 pr-2">
-                        <div class="custom-checkbox">
-                            <input class="input-checkbox" checked={row.status} id={row.categoryCode} type="checkbox" onChange={(e) => changeStatus(e.target.checked, row.categoryCode)} />
-                            <label for={row.categoryCode}></label>
-                        </div>
-                    </div>
+                    {
+                        catePermission?.update ? (
+                            <div className="border-r border-gray-400 pr-2">
+                                <div class="custom-checkbox">
+                                    <input class="input-checkbox" checked={row.status} id={row.categoryCode} type="checkbox" onChange={(e) => changeStatus(e.target.checked, row.categoryCode)} />
+                                    <label for={row.categoryCode}></label>
+                                </div>
+                            </div>
+                        ) : null
+                    }
                     <Button variant="text" color="deep-purple" className="p-2" onClick={() => handleEdit(row.categoryCode)}><FaPencil /></Button>
-                    <Button variant="text" color="red" className="p-2" onClick={() => {
-                        setDeleteId(row.categoryCode);
-                        setOpenDelete(true);
-                    }}><FaTrashCan /></Button>
+                    {
+                        catePermission?.delete ? (
+                            <Button variant="text" color="red" className="p-2" onClick={() => {
+                                setDeleteId(row.categoryCode);
+                                setOpenDelete(true);
+                            }}><FaTrashCan /></Button>
+                        ) : null
+                    }
                 </div>
             )
         },
@@ -197,7 +221,7 @@ function WalletCategory() {
 
     return(
         <div className="flex flex-col gap-4 px-2 relative">
-            <SectionTitle title="Wallet Category" handleModal={openModal} />
+            <SectionTitle title="Wallet Category" handleModal={openModal} permission={catePermission?.create}/>
             <Card className="h-auto shadow-md w-[1000px] mx-1 rounded-sm p-2 border-t">
                 <CardBody className="rounded-sm overflow-auto p-0">
                     <div className="flex justify-end py-2">
@@ -292,23 +316,33 @@ function WalletCategory() {
                             }
                         </div>
                         <div className="flex items-center justify-end mt-6 gap-2">
-                            <Button onClick={() => handleSubmit(false)} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2">
-                                <FaFloppyDisk className="text-base" /> 
-                                <Typography variant="small" className="capitalize">
-                                    { isEdit ? 'Update' : 'Save'}
-                                </Typography>
-                            </Button>
                             {
                                 !isEdit ? (
-                                    <Button onClick={handleSubmit} color="deep-purple" size="sm" variant="outlined" className="flex items-center gap-2">
-                                        <FaCirclePlus className="text-base" /> 
-                                        <Typography variant="small" className="capitalize">
-                                            Save & New
-                                        </Typography>
-                                    </Button>
-                                ) : null
+                                    <>
+                                        <Button onClick={() => handleSubmit(false)} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2">
+                                            <FaFloppyDisk className="text-base" /> 
+                                            <Typography variant="small" className="capitalize">
+                                                Save
+                                            </Typography>
+                                        </Button>
+                                        <Button onClick={handleSubmit} color="deep-purple" size="sm" variant="outlined" className="flex items-center gap-2">
+                                            <FaCirclePlus className="text-base" /> 
+                                            <Typography variant="small" className="capitalize">
+                                                Save & New
+                                            </Typography>
+                                        </Button>
+                                    </>
+                                ) : (
+                                    catePermission?.update ? (
+                                        <Button onClick={() => handleSubmit(false)} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2">
+                                            <FaFloppyDisk className="text-base" /> 
+                                            <Typography variant="small" className="capitalize">
+                                                Update
+                                            </Typography>
+                                        </Button>
+                                    ) : null
+                                )
                             }
-                            
                         </div>
                     </div>
                         

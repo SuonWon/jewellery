@@ -33,8 +33,6 @@ function App() {
 
   const [permissions, setPermissions] = useState([]);
 
-  console.log(permissions);
-
   const filterData = {
     skip: 0,
     take: 0,
@@ -50,7 +48,6 @@ function App() {
         headers: {
           "Authorization": `Bearer ${Cookies.get('_auth')}`}
       }).then((res) => {
-        console.log('hello')
         setPermissions(res.data.permissions);
       })
     }

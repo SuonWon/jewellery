@@ -1,7 +1,7 @@
 /* eslint-disable eqeqeq */
 import { Button, Card, CardBody, Dialog, DialogBody, Typography } from "@material-tailwind/react";
 import { FaCirclePlus, FaFloppyDisk, FaMoneyBillTrendUp, FaPencil, FaPlus, FaTrashCan, } from "react-icons/fa6";
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useAddSalesMutation, useFetchActiveStoneDetailsQuery, useFetchReturnByInvoiceQuery, useFetchReturnQuery, useFetchSalesCountQuery, useFetchSalesQuery, useFetchStoneDetailsQuery, useFetchTrueCustomerQuery, useFetchTrueSalesQuery, useFetchUOMQuery, useRemoveSalesMutation, useUpdateIssueMutation, useUpdateIssueStatusMutation, useUpdateSalesMutation } from "../store";
 import Pagination from "../components/pagination";
 import { apiUrl, focusSelect, pause } from "../const";
@@ -18,6 +18,7 @@ import DataTable from "react-data-table-component";
 import Receivable from "./receivable";
 import { useFetchTrueIssueQuery } from "../apis/issueApi";
 import Cookies from "js-cookie";
+import { AuthContent } from "../context/authContext";
 
 const token = 'Bearer ' + Cookies.get('_auth');
 
@@ -25,6 +26,22 @@ const validator = require('validator');
 
 function SalesList() {
 
+    const {permissions} = useContext(AuthContent);
+    
+    const [salesPermission, setSalesPermission] = useState(null);
+    const [receivablePermission, setReceivablePermission] = useState(null);
+
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        setSalesPermission(permissions[12]);
+        setReceivablePermission(permissions[23]);
+
+        if(salesPermission?.view == false) {
+            navigate('/supplier');
+        }
+    }, [permissions])
+    
     const [filterData, setFilterData] = useState({
         skip: 0,
         take: 10,
@@ -83,8 +100,6 @@ function SalesList() {
         balance: 0,
      });
 
-    const navigate = useNavigate();
-
     const [isAlert, setIsAlert] = useState(false);
 
     const [open, setOpen] = useState(false);
@@ -139,6 +154,7 @@ function SalesList() {
             ...payData,
             invoiceNo: invoiceNo,
             balance: Number(balance.replace(/,/g, "")),
+            receivablePermission: receivablePermission
         });
         setPayOpen(!payOpen);
     }
@@ -620,9 +636,17 @@ function SalesList() {
             width: "100px",
             cell: (row) => (
                 <div className="flex items-center gap-2">
-                    <Button variant="text" color="deep-purple" className="p-2" onClick={() => openPayable(row.Code, row.GrandTotal)}><FaMoneyBillTrendUp /></Button>
+                    {
+                        receivablePermission?.view ? (
+                            <Button variant="text" color="deep-purple" className="p-2" onClick={() => openPayable(row.Code, row.GrandTotal)}><FaMoneyBillTrendUp /></Button>
+                        ) : null
+                    }
                     <Button variant="text" color="deep-purple" className="p-2" onClick={() => handleView(row.Code)}><FaPencil /></Button>
-                    {/* <Button variant="text" color="red" className="p-2" onClick={() => handleDeleteBtn(row.Code)}><FaTrashCan /></Button> */}
+                    {
+                        salesPermission?.delete ? (
+                            {/* <Button variant="text" color="red" className="p-2" onClick={() => handleDeleteBtn(row.Code)}><FaTrashCan /></Button> */}
+                        ) : null
+                    }
                 </div>
             )
         },
@@ -672,238 +696,353 @@ function SalesList() {
 
     return (
         <>
-            <div className="flex flex-col gap-4 relative max-w-[85%] min-w-[85%]">
-                <div className="w-78 absolute top-0 right-0 z-[9999]">
-                    {
-                        isAlert && <SuccessAlert title="Sales" message="Delete successful." handleAlert={() => setIsAlert(false)} />
-                    }
-                </div>
-                <div className="flex items-center py-3 bg-white gap-4 sticky top-0 z-10">
-                    <Typography variant="h5">
-                        Sales List
-                    </Typography>
-                    <Button variant="gradient" size="sm" color="deep-purple" className="flex items-center gap-2" onClick={handleOpen}>
-                        <FaPlus /> Create New
-                    </Button>
-                </div>
-                <Card className="h-auto shadow-md max-w-screen-xxl rounded-sm p-2 border-t">
-                    <CardBody className="rounded-sm overflow-auto p-0">
-                        <div className="grid grid-cols-6 gap-2 py-2">
-                            <div>
-                                <label className="text-black text-sm mb-2">Status</label>
-                                <select 
-                                    className="block w-full text-black border border-blue-gray-200 h-[35px] px-2.5 py-1.5 rounded-md focus:border-black"
-                                    value={filterData.status}
-                                    onChange={(e) => {
-                                        setFilterData({
-                                            ...filterData,
-                                            skip: 0,
-                                            take: 10,
-                                            status: e.target.value
-                                        })
-                                        setCurrentPage(1);
-                                    }}
-                                >
-                                    <option value="A">All</option>
-                                    <option value="O">Open</option>
-                                    <option value="C">Close</option>
-                                    <option value="V">Void</option>
-                                </select>
-                            </div>
-                            <div className="">
-                                <label className="text-black mb-2 text-sm">Start Date</label>
-                                <input
-                                    type="date"
-                                    value={filterData.start_date == null ? '' : filterData.start_date}
-                                    className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
-                                    onChange={(e) => {
-                                        // if (filterData.start_date !== "") {
-                                        //     if(moment(e.target.value) > moment(filterData.start_date)) {
-                                        //         console.log(e.target.value)
-                                        //         // setAlert({
-                                        //         //     isAlert: true,
-                                        //         //     message: "Start Date cannot be greater than End Date.",
-                                        //         //     isWarning: true,
-                                        //         //     title: "Warning"
-                                        //         // });
-                                        //         // setTimeout(() => {
-                                        //         //     setAlert({
-                                        //         //         isAlert: false,
-                                        //         //         message: '',
-                                        //         //         isWarning: false,
-                                        //         //         title: ''
-                                        //         //     })
-                                        //         // }, 2000);
-                                        //     } else {
-                                        //         setFilterData({
-                                        //             ...filterData,
-                                        //             skip: 0,
-                                        //             take: 10,
-                                        //             start_date: e.target.value,
-                                        //         });
-                                        //     }
-                                        // } else {
-                                            setFilterData({
-                                                ...filterData,
-                                                skip: 0,
-                                                take: 10,
-                                                start_date: e.target.value,
-                                            });
-                                            setCurrentPage(1);
-                                        // }
-                                    }}
-                                />
-                            </div>
-                            <div className="">
-                                <label className="text-black mb-2 text-sm">End Date</label>
-                                <input
-                                    type="date"
-                                    value={filterData.end_date == null ? '' : filterData.end_date}
-                                    className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
-                                    onChange={(e) => {
-                                        // if(filterData.end_date === "" || moment(e.target.value) < moment(filterData.end_date)) {
-                                        //     // setAlert({
-                                        //     //     isAlert: true,
-                                        //     //     message: "Start Date cannot be greater than End Date.",
-                                        //     //     isWarning: true,
-                                        //     //     title: "Warning"
-                                        //     // });
-                                        //     // setTimeout(() => {
-                                        //     //     setAlert({
-                                        //     //         isAlert: false,
-                                        //     //         message: '',
-                                        //     //         isWarning: false,
-                                        //     //         title: ''
-                                        //     //     })
-                                        //     // }, 2000);
-                                            
-                                        //     return; 
-                                        // }
-                                        setFilterData({
-                                            ...filterData,
-                                            skip: 0,
-                                            take: 10,
-                                            end_date: e.target.value,
-                                        });
-                                        setCurrentPage(1);
-                                    }}
-                                />
-                            </div>
-                            <div>
-                                <label className="text-black mb-2 text-sm">Search</label>
-                                <input
-                                    placeholder="Search" 
-                                    type="text" 
-                                    className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
-                                    value={filterData.search} onChange={(e) => {
-                                        setFilterData({
-                                            ...filterData,
-                                            skip: 0,
-                                            take: 10,
-                                            search_word: e.target.value
-                                        });
-                                        setCurrentPage(1);
-                                    }}
-                                />
-                            </div>
-                        </div>
-                    
-                        <TableList columns={column} data={tbodyData} />
-
-                        <div className="grid grid-cols-2">
-                            <div className="flex mt-7 mb-5">
-                                <p className="mr-2 mt-[6px]">Show</p>
-                                <div className="w-[80px]">
-                                    <select
-                                        className="block w-full px-2.5 py-1.5 border border-blue-gray-200 h-[35px] rounded-md focus:border-black text-black"
-                                        value={filterData.take} 
+        {
+            salesPermission != null && salesPermission != undefined ? (
+                <div className="flex flex-col gap-4 relative max-w-[85%] min-w-[85%]">
+                    <div className="w-78 absolute top-0 right-0 z-[9999]">
+                        {
+                            isAlert && <SuccessAlert title="Sales" message="Delete successful." handleAlert={() => setIsAlert(false)} />
+                        }
+                    </div>
+                    <div className="flex items-center py-3 bg-white gap-4 sticky top-0 z-10">
+                        <Typography variant="h5">
+                            Sales List
+                        </Typography>
+                        {
+                            salesPermission?.create ? (
+                                <Button variant="gradient" size="sm" color="deep-purple" className="flex items-center gap-2" onClick={handleOpen}>
+                                    <FaPlus /> Create New
+                                </Button>
+                            ) : null
+                        }
+                    </div>
+                    <Card className="h-auto shadow-md max-w-screen-xxl rounded-sm p-2 border-t">
+                        <CardBody className="rounded-sm overflow-auto p-0">
+                            <div className="grid grid-cols-6 gap-2 py-2">
+                                <div>
+                                    <label className="text-black text-sm mb-2">Status</label>
+                                    <select 
+                                        className="block w-full text-black border border-blue-gray-200 h-[35px] px-2.5 py-1.5 rounded-md focus:border-black"
+                                        value={filterData.status}
                                         onChange={(e) => {
                                             setFilterData({
                                                 ...filterData,
                                                 skip: 0,
-                                                take: e.target.value
-                                            });
+                                                take: 10,
+                                                status: e.target.value
+                                            })
                                             setCurrentPage(1);
                                         }}
                                     >
-                                        <option value="10">10</option>
-                                        <option value="20">20</option>
-                                        <option value="50">50</option>
-                                        <option value="100">100</option>
+                                        <option value="A">All</option>
+                                        <option value="O">Open</option>
+                                        <option value="C">Close</option>
+                                        <option value="V">Void</option>
                                     </select>
                                 </div>
-                                
-                                <p className="ml-2 mt-[6px]">entries</p>
-                            </div>
-                            
-                            <div className="flex justify-end">
-                                {
-                                    dataCount != undefined ? (
-                                        <Pagination
-                                            className="pagination-bar"
-                                            siblingCount={1}
-                                            currentPage={currentPage}
-                                            totalCount={dataCount}
-                                            pageSize={filterData.take}
-                                            onPageChange={(page) => {
-                                                setCurrentPage(page);
+                                <div className="">
+                                    <label className="text-black mb-2 text-sm">Start Date</label>
+                                    <input
+                                        type="date"
+                                        value={filterData.start_date == null ? '' : filterData.start_date}
+                                        className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
+                                        onChange={(e) => {
+                                            // if (filterData.start_date !== "") {
+                                            //     if(moment(e.target.value) > moment(filterData.start_date)) {
+                                            //         console.log(e.target.value)
+                                            //         // setAlert({
+                                            //         //     isAlert: true,
+                                            //         //     message: "Start Date cannot be greater than End Date.",
+                                            //         //     isWarning: true,
+                                            //         //     title: "Warning"
+                                            //         // });
+                                            //         // setTimeout(() => {
+                                            //         //     setAlert({
+                                            //         //         isAlert: false,
+                                            //         //         message: '',
+                                            //         //         isWarning: false,
+                                            //         //         title: ''
+                                            //         //     })
+                                            //         // }, 2000);
+                                            //     } else {
+                                            //         setFilterData({
+                                            //             ...filterData,
+                                            //             skip: 0,
+                                            //             take: 10,
+                                            //             start_date: e.target.value,
+                                            //         });
+                                            //     }
+                                            // } else {
                                                 setFilterData({
                                                     ...filterData,
-                                                    skip: (page - 1) * filterData.take
-                                                })
-                                            }}
-                                        />
-                                    ) : (<></>)
-                                }
-                            </div>
-                            
-                        </div>
-                    
-                    </CardBody>
-                </Card>
-                <DeleteModal deleteId={deleteId} open={openDelete} handleDelete={handleRemove} closeModal={() => setOpenDelete(!openDelete)} />
-                <Dialog open={open} size="xl">
-                    <DialogBody>
-                        <ModalTitle titleName="Sales" handleClick={() => setOpen(!open)} />
-                        {
-                            alert.isAlert? <SuccessAlert title={alert.title} message={alert.message} isWarning={alert.isWarning} /> : ""
-                        }
-                        <div className="grid grid-cols-5 gap-2 mb-3">
-                            <div className="col-span-3">
-                                <div className="grid grid-cols-3 mb-3">
-                                    {/* Sales Date */}
-                                    <div className="">
-                                        <label className="text-black mb-2 text-sm">Sales Date</label>
-                                        <input
-                                            type="date"
-                                            className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
-                                            value={moment(formData.salesDate).format("YYYY-MM-DD")}
-                                            onChange={(e) => setFormData({
-                                                ...formData,
-                                                salesDate: e.target.value
-                                            })}
-                                        />
-                                        {
-                                            validationText.salesDate && <p className="block text-[12px] text-red-500 font-sans mb-2">{validationText.salesDate}</p>
-                                        }
-                                    </div>
+                                                    skip: 0,
+                                                    take: 10,
+                                                    start_date: e.target.value,
+                                                });
+                                                setCurrentPage(1);
+                                            // }
+                                        }}
+                                    />
                                 </div>
-                                <div className="grid grid-cols-4 gap-2 mb-3">
-                                    {/* Issue No */}
-                                    <div className="col-span-3">
-                                        <label className="text-black text-sm mb-2">Issue No</label>
+                                <div className="">
+                                    <label className="text-black mb-2 text-sm">End Date</label>
+                                    <input
+                                        type="date"
+                                        value={filterData.end_date == null ? '' : filterData.end_date}
+                                        className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
+                                        onChange={(e) => {
+                                            // if(filterData.end_date === "" || moment(e.target.value) < moment(filterData.end_date)) {
+                                            //     // setAlert({
+                                            //     //     isAlert: true,
+                                            //     //     message: "Start Date cannot be greater than End Date.",
+                                            //     //     isWarning: true,
+                                            //     //     title: "Warning"
+                                            //     // });
+                                            //     // setTimeout(() => {
+                                            //     //     setAlert({
+                                            //     //         isAlert: false,
+                                            //     //         message: '',
+                                            //     //         isWarning: false,
+                                            //     //         title: ''
+                                            //     //     })
+                                            //     // }, 2000);
+                                                
+                                            //     return; 
+                                            // }
+                                            setFilterData({
+                                                ...filterData,
+                                                skip: 0,
+                                                take: 10,
+                                                end_date: e.target.value,
+                                            });
+                                            setCurrentPage(1);
+                                        }}
+                                    />
+                                </div>
+                                <div>
+                                    <label className="text-black mb-2 text-sm">Search</label>
+                                    <input
+                                        placeholder="Search" 
+                                        type="text" 
+                                        className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
+                                        value={filterData.search} onChange={(e) => {
+                                            setFilterData({
+                                                ...filterData,
+                                                skip: 0,
+                                                take: 10,
+                                                search_word: e.target.value
+                                            });
+                                            setCurrentPage(1);
+                                        }}
+                                    />
+                                </div>
+                            </div>
+                        
+                            <TableList columns={column} data={tbodyData} />
+    
+                            <div className="grid grid-cols-2">
+                                <div className="flex mt-7 mb-5">
+                                    <p className="mr-2 mt-[6px]">Show</p>
+                                    <div className="w-[80px]">
                                         <select
-                                            className="block w-full text-black border border-blue-gray-200 h-[35px] px-2.5 py-1.5 rounded-md focus:border-black"
-                                            value={formData.issueNo}
+                                            className="block w-full px-2.5 py-1.5 border border-blue-gray-200 h-[35px] rounded-md focus:border-black text-black"
+                                            value={filterData.take} 
                                             onChange={(e) => {
-                                                if (e.target.value !== "") {
-                                                    let stoneDetailCode = issueData.find(el => el.issueNo === e.target.value).stoneDetailCode;
-                                                    let refNo = stoneDetails.find(el => el.stoneDetailCode === stoneDetailCode).referenceNo;
-                                                    setFormData({ 
-                                                        ...formData, 
-                                                        issueNo: e.target.value,
-                                                        stoneDetailCode: stoneDetailCode
+                                                setFilterData({
+                                                    ...filterData,
+                                                    skip: 0,
+                                                    take: e.target.value
+                                                });
+                                                setCurrentPage(1);
+                                            }}
+                                        >
+                                            <option value="10">10</option>
+                                            <option value="20">20</option>
+                                            <option value="50">50</option>
+                                            <option value="100">100</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <p className="ml-2 mt-[6px]">entries</p>
+                                </div>
+                                
+                                <div className="flex justify-end">
+                                    {
+                                        dataCount != undefined ? (
+                                            <Pagination
+                                                className="pagination-bar"
+                                                siblingCount={1}
+                                                currentPage={currentPage}
+                                                totalCount={dataCount}
+                                                pageSize={filterData.take}
+                                                onPageChange={(page) => {
+                                                    setCurrentPage(page);
+                                                    setFilterData({
+                                                        ...filterData,
+                                                        skip: (page - 1) * filterData.take
+                                                    })
+                                                }}
+                                            />
+                                        ) : (<></>)
+                                    }
+                                </div>
+                                
+                            </div>
+                        
+                        </CardBody>
+                    </Card>
+                    <DeleteModal deleteId={deleteId} open={openDelete} handleDelete={handleRemove} closeModal={() => setOpenDelete(!openDelete)} />
+                    <Dialog open={open} size="xl">
+                        <DialogBody>
+                            <ModalTitle titleName="Sales" handleClick={() => setOpen(!open)} />
+                            {
+                                alert.isAlert? <SuccessAlert title={alert.title} message={alert.message} isWarning={alert.isWarning} /> : ""
+                            }
+                            <div className="grid grid-cols-5 gap-2 mb-3">
+                                <div className="col-span-3">
+                                    <div className="grid grid-cols-3 mb-3">
+                                        {/* Sales Date */}
+                                        <div className="">
+                                            <label className="text-black mb-2 text-sm">Sales Date</label>
+                                            <input
+                                                type="date"
+                                                className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
+                                                value={moment(formData.salesDate).format("YYYY-MM-DD")}
+                                                onChange={(e) => setFormData({
+                                                    ...formData,
+                                                    salesDate: e.target.value
+                                                })}
+                                            />
+                                            {
+                                                validationText.salesDate && <p className="block text-[12px] text-red-500 font-sans mb-2">{validationText.salesDate}</p>
+                                            }
+                                        </div>
+                                    </div>
+                                    <div className="grid grid-cols-4 gap-2 mb-3">
+                                        {/* Issue No */}
+                                        <div className="col-span-3">
+                                            <label className="text-black text-sm mb-2">Issue No</label>
+                                            <select
+                                                className="block w-full text-black border border-blue-gray-200 h-[35px] px-2.5 py-1.5 rounded-md focus:border-black"
+                                                value={formData.issueNo}
+                                                onChange={(e) => {
+                                                    if (e.target.value !== "") {
+                                                        let stoneDetailCode = issueData.find(el => el.issueNo === e.target.value).stoneDetailCode;
+                                                        let refNo = stoneDetails.find(el => el.stoneDetailCode === stoneDetailCode).referenceNo;
+                                                        setFormData({ 
+                                                            ...formData, 
+                                                            issueNo: e.target.value,
+                                                            stoneDetailCode: stoneDetailCode
+                                                        });
+                                                        axios.get(`${apiUrl}/stone-detail/get-purchase-share/${refNo}`, {
+                                                            headers: {
+                                                                "Authorization": token
+                                                            }
+                                                        }).then((res) => {
+                                                            setTBodyData(
+                                                                res.data.map(el => {
+                                                                    return {
+                                                                        id: el.id,
+                                                                        invoiceNo: el.invoiceNo,
+                                                                        lineNo: el.lineNo,
+                                                                        shareCode: el.shareCode,
+                                                                        shareName: el.shareName,
+                                                                        sharePercentage: el.sharePercentage,
+                                                                        amount: 0,
+                                                                    }
+                                                                })
+                                                            );
+                                                        });
+                                                    } else {
+                                                        setFormData({
+                                                            ...formData,
+                                                            issueNo: "",
+                                                            stoneDetailCode: "",
+                                                        });
+                                                        setTBodyData([]);
+                                                    }
+                                                }}
+                                            >
+                                                <option value="" >Select...</option>
+                                                {
+                                                    issueData?.map((issue) => {
+                                                        if (!issue.isComplete) {
+                                                            return <option value={issue.issueNo} key={issue.issueNo}>({issue.stoneDetail.stoneDesc}, {issue.issueMember.map(el => {
+                                                                    return el.customer.customerName + ",";
+                                                                })})
+                                                            </option>
+                                                        }
+                                                    })
+                                                }
+                                            </select>
+                                        </div>
+                                        <div className="">
+                                            <label className="text-black text-sm mb-2">Issue Complete</label>
+                                            <div className="w-full">
+                                                <input 
+                                                    type="checkbox" 
+                                                    className="border border-blue-gray-200 w-[20px] h-[20px] py-1.5 rounded-md text-black"
+                                                    checked={issueStatus}
+                                                    onChange={() => {
+                                                        if (formData.issueNo === "") {
+                                                            setAlert({
+                                                                isAlert: true,
+                                                                message: "Please select issue no.",
+                                                                isWarning: true,
+                                                                title: "Warning"
+                                                            })
+                                                            setTimeout(() => {
+                                                                setAlert({
+                                                                    isAlert: false,
+                                                                    message: '',
+                                                                    isWarning: false,
+                                                                    title: '',
+                                                                })
+                                                            }, 2000);
+                                                        } else {
+                                                            setIssueStatus(!issueStatus);
+                                                        }
+                                                    }}
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="grid grid-cols-3 gap-2 mb-3">
+                                        {/* Customer Name */}
+                                        <div className="">
+                                            <label className="text-black mb-2 text-sm">Customer Name</label>
+                                            <select
+                                                className="block w-full px-2.5 py-1.5 border border-blue-gray-200 h-[35px] rounded-md focus:border-black text-black"
+                                                value={formData.customerCode}
+                                                onChange={(e) => setFormData({
+                                                    ...formData,
+                                                    customerCode: Number(e.target.value)
+                                                })}
+                                            >
+                                                <option value="0" disabled>Select Customer</option>
+                                                {
+                                                    customerData?.map((customer) => {
+                                                        return <option value={customer.customerCode} key={customer.customerCode} >{customer.customerName}</option>
+                                                    })
+                                                }
+                                            </select>
+                                            {
+                                                validationText.customer && <p className="block text-[12px] text-red-500 font-sans mb-2">{validationText.customer}</p>
+                                            }
+                                        </div>
+                                        {/* Stone Details */}
+                                        <div className="col-span-2">
+                                            <label className="text-black mb-2 text-sm">Stone Details</label>
+                                            <select
+                                                className="block w-full px-2.5 py-1.5 border border-blue-gray-200 h-[35px] rounded-md focus:border-black text-black"
+                                                value={formData.stoneDetailCode}
+                                                onChange={(e) => {
+                                                    console.log(e.target.value);
+                                                    setFormData({
+                                                        ...formData,
+                                                        stoneDetailCode: e.target.value,
                                                     });
+                                                    let refNo = stoneDetails.find(el => el.stoneDetailCode === e.target.value).referenceNo;
                                                     axios.get(`${apiUrl}/stone-detail/get-purchase-share/${refNo}`, {
                                                         headers: {
                                                             "Authorization": token
@@ -923,321 +1062,63 @@ function SalesList() {
                                                             })
                                                         );
                                                     });
-                                                } else {
-                                                    setFormData({
-                                                        ...formData,
-                                                        issueNo: "",
-                                                        stoneDetailCode: "",
-                                                    });
-                                                    setTBodyData([]);
-                                                }
-                                            }}
-                                        >
-                                            <option value="" >Select...</option>
-                                            {
-                                                issueData?.map((issue) => {
-                                                    if (!issue.isComplete) {
-                                                        return <option value={issue.issueNo} key={issue.issueNo}>({issue.stoneDetail.stoneDesc}, {issue.issueMember.map(el => {
-                                                                return el.customer.customerName + ",";
-                                                            })})
-                                                        </option>
-                                                    }
-                                                })
-                                            }
-                                        </select>
-                                    </div>
-                                    <div className="">
-                                        <label className="text-black text-sm mb-2">Issue Complete</label>
-                                        <div className="w-full">
-                                            <input 
-                                                type="checkbox" 
-                                                className="border border-blue-gray-200 w-[20px] h-[20px] py-1.5 rounded-md text-black"
-                                                checked={issueStatus}
-                                                onChange={() => {
-                                                    if (formData.issueNo === "") {
-                                                        setAlert({
-                                                            isAlert: true,
-                                                            message: "Please select issue no.",
-                                                            isWarning: true,
-                                                            title: "Warning"
-                                                        })
-                                                        setTimeout(() => {
-                                                            setAlert({
-                                                                isAlert: false,
-                                                                message: '',
-                                                                isWarning: false,
-                                                                title: '',
-                                                            })
-                                                        }, 2000);
-                                                    } else {
-                                                        setIssueStatus(!issueStatus);
-                                                    }
-                                                }}
-                                            />
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="grid grid-cols-3 gap-2 mb-3">
-                                    {/* Customer Name */}
-                                    <div className="">
-                                        <label className="text-black mb-2 text-sm">Customer Name</label>
-                                        <select
-                                            className="block w-full px-2.5 py-1.5 border border-blue-gray-200 h-[35px] rounded-md focus:border-black text-black"
-                                            value={formData.customerCode}
-                                            onChange={(e) => setFormData({
-                                                ...formData,
-                                                customerCode: Number(e.target.value)
-                                            })}
-                                        >
-                                            <option value="0" disabled>Select Customer</option>
-                                            {
-                                                customerData?.map((customer) => {
-                                                    return <option value={customer.customerCode} key={customer.customerCode} >{customer.customerName}</option>
-                                                })
-                                            }
-                                        </select>
-                                        {
-                                            validationText.customer && <p className="block text-[12px] text-red-500 font-sans mb-2">{validationText.customer}</p>
-                                        }
-                                    </div>
-                                    {/* Stone Details */}
-                                    <div className="col-span-2">
-                                        <label className="text-black mb-2 text-sm">Stone Details</label>
-                                        <select
-                                            className="block w-full px-2.5 py-1.5 border border-blue-gray-200 h-[35px] rounded-md focus:border-black text-black"
-                                            value={formData.stoneDetailCode}
-                                            onChange={(e) => {
-                                                console.log(e.target.value);
-                                                setFormData({
-                                                    ...formData,
-                                                    stoneDetailCode: e.target.value,
-                                                });
-                                                let refNo = stoneDetails.find(el => el.stoneDetailCode === e.target.value).referenceNo;
-                                                axios.get(`${apiUrl}/stone-detail/get-purchase-share/${refNo}`, {
-                                                    headers: {
-                                                        "Authorization": token
-                                                    }
-                                                }).then((res) => {
-                                                    setTBodyData(
-                                                        res.data.map(el => {
-                                                            return {
-                                                                id: el.id,
-                                                                invoiceNo: el.invoiceNo,
-                                                                lineNo: el.lineNo,
-                                                                shareCode: el.shareCode,
-                                                                shareName: el.shareName,
-                                                                sharePercentage: el.sharePercentage,
-                                                                amount: 0,
-                                                            }
-                                                        })
-                                                    );
-                                                });
-                                            }}
-                                        >
-                                            <option value="" disabled>Select stone detail</option>
-                                            {
-                                                stoneDetails?.length === 0 ? <option value="" disabled>There is no Data</option> :
-                                                    stoneDetails?.map((stoneDetail) => {
-                                                        if (stoneDetail.isActive) {
-                                                            return <option value={stoneDetail.stoneDetailCode} key={stoneDetail.stoneDetailCode} >{stoneDetail.stoneDesc} ({stoneDetail.supplier.supplierName})</option>
-                                                        }
-                                                    })
-                                            }
-                                        </select>
-                                        {
-                                            validationText.stoneDetailCode && <p className="block text-[12px] text-red-500 font-sans mb-2">{validationText.stoneDetailCode}</p>
-                                        }
-                                    </div>
-                                </div>
-                                <div className="grid grid-cols-6 gap-2 mb-3">
-                                    <div className="col-span-3 gap-2 grid grid-cols-3">
-                                        {/* Qty */}
-                                        <div>
-                                            <label className="text-black text-sm mb-2">Qty</label>
-                                            <input
-                                                type="number"
-                                                className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
-                                                value={formData.qty}
-                                                onChange={(e) => {
-                                                    setFormData({
-                                                        ...formData,
-                                                        qty: parseFloat(e.target.value),
-                                                    });
-                                                }}
-                                                onFocus={(e) => focusSelect(e)}
-                                            />
-                                        </div>
-                                        {/* Weight */}
-                                        <div>
-                                            <label className="text-black text-sm mb-2">Weight</label>
-                                            <input
-                                                type="number"
-                                                className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
-                                                value={formData.weight}
-                                                onChange={(e) => {
-                                                    let weight = parseFloat(e.target.value);
-                                                    let totalP = formData.unitPrice * weight;
-                                                    let totalA = (totalP + formData.serviceCharge) - formData.discAmt;
-                                                    setFormData({
-                                                        ...formData,
-                                                        weight: weight,
-                                                        subTotal: totalP,
-                                                        serviceCharge: formData.servicePer > 0 ? (formData.servicePer / 100) * totalP : formData.serviceCharge,
-                                                        grandTotal: totalA,
-                                                    });
-                                                    let newTbody = tBodyData.map(el => {
-                                                        return {
-                                                            ...el,
-                                                            amount: (el.sharePercentage / 100) * totalA,
-                                                        }
-                                                    });
-                                                    setTBodyData(newTbody);
-                                                }}
-                                                onFocus={(e) => focusSelect(e)}
-                                            />
-                                        </div>
-                                        {/* Unit */}
-                                        <div>
-                                            <label className="text-black text-sm mb-2">Unit</label>
-                                            <select
-                                                className="block w-full px-2.5 py-1.5 border border-blue-gray-200 h-[35px] rounded-md focus:border-black text-black"
-                                                value={formData.unitCode}
-                                                onChange={(e) => {
-                                                    setFormData({
-                                                        ...formData,
-                                                        unitCode: e.target.value,
-                                                    });
                                                 }}
                                             >
-                                                <option value="" disabled>Select Unit</option>
+                                                <option value="" disabled>Select stone detail</option>
                                                 {
-                                                    unitData?.map((unit) => {
-                                                        return <option value={unit.unitCode} key={unit.unitCode} >{unit.unitCode}</option>
-                                                    })
+                                                    stoneDetails?.length === 0 ? <option value="" disabled>There is no Data</option> :
+                                                        stoneDetails?.map((stoneDetail) => {
+                                                            if (stoneDetail.isActive) {
+                                                                return <option value={stoneDetail.stoneDetailCode} key={stoneDetail.stoneDetailCode} >{stoneDetail.stoneDesc} ({stoneDetail.supplier.supplierName})</option>
+                                                            }
+                                                        })
                                                 }
                                             </select>
                                             {
-                                                validationText.unitCode && <p className="block text-[12px] text-red-500 font-sans mb-2">{validationText.unitCode}</p>
+                                                validationText.stoneDetailCode && <p className="block text-[12px] text-red-500 font-sans mb-2">{validationText.stoneDetailCode}</p>
                                             }
                                         </div>
                                     </div>
-                                    <div className="col-span-3 gap-2 grid grid-cols-2">
-                                        {/* Unit Price */}
-                                        <div>
-                                            <label className="text-black text-sm mb-2">Unit Price</label>
-                                            <input
-                                                type="number"
-                                                className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
-                                                value={formData.unitPrice}
-                                                onChange={(e) => {
-                                                    let price = parseFloat(e.target.value);
-                                                    let totalP = formData.weight * price;
-                                                    let totalA = (totalP + formData.serviceCharge) - formData.discAmt;
-                                                    setFormData({
-                                                        ...formData,
-                                                        unitPrice: price,
-                                                        subTotal: totalP,
-                                                        serviceCharge: formData.servicePer > 0 ? (formData.servicePer / 100) * totalP : formData.serviceCharge,
-                                                        grandTotal: totalA,
-
-                                                    });
-                                                    let newTbody = tBodyData.map(el => {
-                                                        return {
-                                                            ...el,
-                                                            amount: (el.sharePercentage / 100) * totalA,
-                                                        }
-                                                    });
-                                                    setTBodyData(newTbody);
-                                                }}
-                                                onFocus={(e) => focusSelect(e)}
-                                            />
-                                        </div>
-                                        {/* Sub Total */}
-                                        <div>
-                                            <label className="text-black text-sm mb-2">Sub Total</label>
-                                            <input
-                                                type="text"
-                                                className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black text-right"
-                                                value={formData.subTotal.toLocaleString('en-US')}
-                                                readOnly
-                                            />
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="grid grid-cols-6 gap-2">
-                                    {/* Remark */}
-                                    <div className="grid col-span-3 h-fit">
-                                        <label className="text-black text-sm">Remark</label>
-                                        <textarea
-                                            className="border border-blue-gray-200 w-full px-2.5 py-1.5 rounded-md text-black"
-                                            value={formData.remark}
-                                            rows="2"
-                                            onChange={(e) => {
-                                                setFormData({
-                                                    ...formData,
-                                                    remark: e.target.value
-                                                });
-                                            }}
-                                        />
-                                    </div>
-                                    <div className="grid col-span-3 grid-cols-2 gap-2">
-                                        {/* Service Charge */}
-                                        <div className="grid grid-cols-2">
-                                            <div className="col-start-2">
-                                                <label className="text-black text-sm mb-2">Charge (%)</label>
+                                    <div className="grid grid-cols-6 gap-2 mb-3">
+                                        <div className="col-span-3 gap-2 grid grid-cols-3">
+                                            {/* Qty */}
+                                            <div>
+                                                <label className="text-black text-sm mb-2">Qty</label>
                                                 <input
                                                     type="number"
                                                     className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
-                                                    value={formData.servicePer}
+                                                    value={formData.qty}
                                                     onChange={(e) => {
-                                                        let percentage = parseFloat(e.target.value);
-                                                        if (percentage < 100 && percentage > 0) {
-                                                            let serviceCharge = (percentage / 100) * formData.subTotal
-                                                            setFormData({
-                                                                ...formData,
-                                                                servicePer: percentage,
-                                                                serviceCharge: serviceCharge,
-                                                                grandTotal: (formData.subTotal + serviceCharge) - formData.discAmt
-                                                            });
-                                                            let newTbody = tBodyData.map(el => {
-                                                                return {
-                                                                    ...el,
-                                                                    amount: (el.sharePercentage / 100) * ((formData.subTotal + serviceCharge) - formData.discAmt),
-                                                                }
-                                                            });
-                                                            setTBodyData(newTbody);
-                                                        } else {
-                                                            setFormData({
-                                                                ...formData,
-                                                                servicePer: 0,
-                                                            })
-                                                        }
+                                                        setFormData({
+                                                            ...formData,
+                                                            qty: parseFloat(e.target.value),
+                                                        });
                                                     }}
                                                     onFocus={(e) => focusSelect(e)}
                                                 />
                                             </div>
-                                        </div>
-                                        <div className="grid gap-y-2">
-                                            {/* Service Charge */}
+                                            {/* Weight */}
                                             <div>
-                                                <label className="text-black text-sm mb-2">Service Charge</label>
+                                                <label className="text-black text-sm mb-2">Weight</label>
                                                 <input
                                                     type="number"
                                                     className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
-                                                    value={formData.serviceCharge}
+                                                    value={formData.weight}
                                                     onChange={(e) => {
-                                                        let charge = parseFloat(e.target.value);
-                                                        let totalA = charge + formData.subTotal;
+                                                        let weight = parseFloat(e.target.value);
+                                                        let totalP = formData.unitPrice * weight;
+                                                        let totalA = (totalP + formData.serviceCharge) - formData.discAmt;
                                                         setFormData({
                                                             ...formData,
-                                                            serviceCharge: charge,
-                                                            servicePer: charge > 0 ? 0 : formData.servicePer,
-                                                            grandTotal: totalA - formData.discAmt,
+                                                            weight: weight,
+                                                            subTotal: totalP,
+                                                            serviceCharge: formData.servicePer > 0 ? (formData.servicePer / 100) * totalP : formData.serviceCharge,
+                                                            grandTotal: totalA,
                                                         });
                                                         let newTbody = tBodyData.map(el => {
                                                             return {
                                                                 ...el,
-                                                                amount: (el.sharePercentage / 100) * (totalA - formData.discAmt),
+                                                                amount: (el.sharePercentage / 100) * totalA,
                                                             }
                                                         });
                                                         setTBodyData(newTbody);
@@ -1245,24 +1126,55 @@ function SalesList() {
                                                     onFocus={(e) => focusSelect(e)}
                                                 />
                                             </div>
-                                            {/* Discount Amount */}
+                                            {/* Unit */}
                                             <div>
-                                                <label className="text-black text-sm mb-2">Discount Amount</label>
+                                                <label className="text-black text-sm mb-2">Unit</label>
+                                                <select
+                                                    className="block w-full px-2.5 py-1.5 border border-blue-gray-200 h-[35px] rounded-md focus:border-black text-black"
+                                                    value={formData.unitCode}
+                                                    onChange={(e) => {
+                                                        setFormData({
+                                                            ...formData,
+                                                            unitCode: e.target.value,
+                                                        });
+                                                    }}
+                                                >
+                                                    <option value="" disabled>Select Unit</option>
+                                                    {
+                                                        unitData?.map((unit) => {
+                                                            return <option value={unit.unitCode} key={unit.unitCode} >{unit.unitCode}</option>
+                                                        })
+                                                    }
+                                                </select>
+                                                {
+                                                    validationText.unitCode && <p className="block text-[12px] text-red-500 font-sans mb-2">{validationText.unitCode}</p>
+                                                }
+                                            </div>
+                                        </div>
+                                        <div className="col-span-3 gap-2 grid grid-cols-2">
+                                            {/* Unit Price */}
+                                            <div>
+                                                <label className="text-black text-sm mb-2">Unit Price</label>
                                                 <input
                                                     type="number"
                                                     className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
-                                                    value={formData.discAmt}
+                                                    value={formData.unitPrice}
                                                     onChange={(e) => {
-                                                        let discAmt = parseFloat(e.target.value);
+                                                        let price = parseFloat(e.target.value);
+                                                        let totalP = formData.weight * price;
+                                                        let totalA = (totalP + formData.serviceCharge) - formData.discAmt;
                                                         setFormData({
                                                             ...formData,
-                                                            discAmt: discAmt,
-                                                            grandTotal: (formData.subTotal + formData.serviceCharge) - discAmt
+                                                            unitPrice: price,
+                                                            subTotal: totalP,
+                                                            serviceCharge: formData.servicePer > 0 ? (formData.servicePer / 100) * totalP : formData.serviceCharge,
+                                                            grandTotal: totalA,
+    
                                                         });
                                                         let newTbody = tBodyData.map(el => {
                                                             return {
                                                                 ...el,
-                                                                amount: (el.sharePercentage / 100) * ((formData.subTotal + formData.serviceCharge) - discAmt),
+                                                                amount: (el.sharePercentage / 100) * totalA,
                                                             }
                                                         });
                                                         setTBodyData(newTbody);
@@ -1270,116 +1182,239 @@ function SalesList() {
                                                     onFocus={(e) => focusSelect(e)}
                                                 />
                                             </div>
-                                            {/* Grand Total */}
+                                            {/* Sub Total */}
                                             <div>
-                                                <label className="text-black text-sm mb-2">Grand Total</label>
+                                                <label className="text-black text-sm mb-2">Sub Total</label>
                                                 <input
                                                     type="text"
                                                     className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black text-right"
-                                                    value={formData.grandTotal.toLocaleString('en-US')}
+                                                    value={formData.subTotal.toLocaleString('en-US')}
                                                     readOnly
                                                 />
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                            </div>
-                            <div className="col-span-2 grid grid-cols-5 gap-2 h-fit">
-                                {/* Customer table list */}
-                                <div className="col-span-5">
-                                    <Card className="w-full shadow-sm border border-blue-gray-200 rounded-md">
-                                        <CardBody className="overflow-auto rounded-md p-0">
-                                            <DataTable 
-                                            columns={shareColumn} 
-                                            data={tBodyData}
-                                            fixedHeader
-                                            fixedHeaderScrollHeight="150px"
-                                            customStyles={{
-                                                rows: {
-                                                    style: {
-                                                        minHeight: '40px',
-                                                    },
-                                                },
-                                                headCells: {
-                                                    style: {
-                                                        fontWeight: "bold",
-                                                        fontSize: "0.8rem",
-                                                        minHeight: '40px',
-                                                    }
-                                                }
-                                            }} 
+                                    <div className="grid grid-cols-6 gap-2">
+                                        {/* Remark */}
+                                        <div className="grid col-span-3 h-fit">
+                                            <label className="text-black text-sm">Remark</label>
+                                            <textarea
+                                                className="border border-blue-gray-200 w-full px-2.5 py-1.5 rounded-md text-black"
+                                                value={formData.remark}
+                                                rows="2"
+                                                onChange={(e) => {
+                                                    setFormData({
+                                                        ...formData,
+                                                        remark: e.target.value
+                                                    });
+                                                }}
                                             />
-                                        </CardBody>
-                                    </Card>
+                                        </div>
+                                        <div className="grid col-span-3 grid-cols-2 gap-2">
+                                            {/* Service Charge */}
+                                            <div className="grid grid-cols-2">
+                                                <div className="col-start-2">
+                                                    <label className="text-black text-sm mb-2">Charge (%)</label>
+                                                    <input
+                                                        type="number"
+                                                        className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
+                                                        value={formData.servicePer}
+                                                        onChange={(e) => {
+                                                            let percentage = parseFloat(e.target.value);
+                                                            if (percentage < 100 && percentage > 0) {
+                                                                let serviceCharge = (percentage / 100) * formData.subTotal
+                                                                setFormData({
+                                                                    ...formData,
+                                                                    servicePer: percentage,
+                                                                    serviceCharge: serviceCharge,
+                                                                    grandTotal: (formData.subTotal + serviceCharge) - formData.discAmt
+                                                                });
+                                                                let newTbody = tBodyData.map(el => {
+                                                                    return {
+                                                                        ...el,
+                                                                        amount: (el.sharePercentage / 100) * ((formData.subTotal + serviceCharge) - formData.discAmt),
+                                                                    }
+                                                                });
+                                                                setTBodyData(newTbody);
+                                                            } else {
+                                                                setFormData({
+                                                                    ...formData,
+                                                                    servicePer: 0,
+                                                                })
+                                                            }
+                                                        }}
+                                                        onFocus={(e) => focusSelect(e)}
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div className="grid gap-y-2">
+                                                {/* Service Charge */}
+                                                <div>
+                                                    <label className="text-black text-sm mb-2">Service Charge</label>
+                                                    <input
+                                                        type="number"
+                                                        className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
+                                                        value={formData.serviceCharge}
+                                                        onChange={(e) => {
+                                                            let charge = parseFloat(e.target.value);
+                                                            let totalA = charge + formData.subTotal;
+                                                            setFormData({
+                                                                ...formData,
+                                                                serviceCharge: charge,
+                                                                servicePer: charge > 0 ? 0 : formData.servicePer,
+                                                                grandTotal: totalA - formData.discAmt,
+                                                            });
+                                                            let newTbody = tBodyData.map(el => {
+                                                                return {
+                                                                    ...el,
+                                                                    amount: (el.sharePercentage / 100) * (totalA - formData.discAmt),
+                                                                }
+                                                            });
+                                                            setTBodyData(newTbody);
+                                                        }}
+                                                        onFocus={(e) => focusSelect(e)}
+                                                    />
+                                                </div>
+                                                {/* Discount Amount */}
+                                                <div>
+                                                    <label className="text-black text-sm mb-2">Discount Amount</label>
+                                                    <input
+                                                        type="number"
+                                                        className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
+                                                        value={formData.discAmt}
+                                                        onChange={(e) => {
+                                                            let discAmt = parseFloat(e.target.value);
+                                                            setFormData({
+                                                                ...formData,
+                                                                discAmt: discAmt,
+                                                                grandTotal: (formData.subTotal + formData.serviceCharge) - discAmt
+                                                            });
+                                                            let newTbody = tBodyData.map(el => {
+                                                                return {
+                                                                    ...el,
+                                                                    amount: (el.sharePercentage / 100) * ((formData.subTotal + formData.serviceCharge) - discAmt),
+                                                                }
+                                                            });
+                                                            setTBodyData(newTbody);
+                                                        }}
+                                                        onFocus={(e) => focusSelect(e)}
+                                                    />
+                                                </div>
+                                                {/* Grand Total */}
+                                                <div>
+                                                    <label className="text-black text-sm mb-2">Grand Total</label>
+                                                    <input
+                                                        type="text"
+                                                        className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black text-right"
+                                                        value={formData.grandTotal.toLocaleString('en-US')}
+                                                        readOnly
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                                {/* Return table list */}
-                                <div className="col-span-5">
-                                    <Card className="w-full shadow-sm border border-blue-gray-200 rounded-md">
-                                        <CardBody className="overflow-auto rounded-md p-0">
-                                            <Typography variant="h6" className="px-2 ml-3 mt-2 border-l-2 border-purple-700 text-black rounded-md">
-                                                Returns
-                                            </Typography>
-                                            <DataTable 
-                                            columns={returnColumn} 
-                                            data={tBodyReturnData} 
-                                            fixedHeader
-                                            fixedHeaderScrollHeight="150px"
-                                            customStyles={{
-                                                rows: {
-                                                    style: {
-                                                        minHeight: '40px',
+                                <div className="col-span-2 grid grid-cols-5 gap-2 h-fit">
+                                    {/* Customer table list */}
+                                    <div className="col-span-5">
+                                        <Card className="w-full shadow-sm border border-blue-gray-200 rounded-md">
+                                            <CardBody className="overflow-auto rounded-md p-0">
+                                                <DataTable 
+                                                columns={shareColumn} 
+                                                data={tBodyData}
+                                                fixedHeader
+                                                fixedHeaderScrollHeight="150px"
+                                                customStyles={{
+                                                    rows: {
+                                                        style: {
+                                                            minHeight: '40px',
+                                                        },
                                                     },
-                                                },
-                                                headCells: {
-                                                    style: {
-                                                        fontWeight: "bold",
-                                                        fontSize: "0.8rem",
-                                                        minHeight: '40px',
+                                                    headCells: {
+                                                        style: {
+                                                            fontWeight: "bold",
+                                                            fontSize: "0.8rem",
+                                                            minHeight: '40px',
+                                                        }
                                                     }
-                                                }
-                                            }} 
-                                        />
-                                        </CardBody>
-                                    </Card>
+                                                }} 
+                                                />
+                                            </CardBody>
+                                        </Card>
+                                    </div>
+                                    {/* Return table list */}
+                                    <div className="col-span-5">
+                                        <Card className="w-full shadow-sm border border-blue-gray-200 rounded-md">
+                                            <CardBody className="overflow-auto rounded-md p-0">
+                                                <Typography variant="h6" className="px-2 ml-3 mt-2 border-l-2 border-purple-700 text-black rounded-md">
+                                                    Returns
+                                                </Typography>
+                                                <DataTable 
+                                                columns={returnColumn} 
+                                                data={tBodyReturnData} 
+                                                fixedHeader
+                                                fixedHeaderScrollHeight="150px"
+                                                customStyles={{
+                                                    rows: {
+                                                        style: {
+                                                            minHeight: '40px',
+                                                        },
+                                                    },
+                                                    headCells: {
+                                                        style: {
+                                                            fontWeight: "bold",
+                                                            fontSize: "0.8rem",
+                                                            minHeight: '40px',
+                                                        }
+                                                    }
+                                                }} 
+                                            />
+                                            </CardBody>
+                                        </Card>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-
-                        <div className="flex items-center justify-end mt-6 gap-2">
-                            {
-                                isEdit? 
-                                <Button onClick={handleUpdate} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2">
-                                    <FaFloppyDisk className="text-base" />
-                                    <Typography variant="small" className="capitalize">
-                                        Update
-                                    </Typography>
-                                </Button> :
-                                <>
-                                    <Button onClick={handleSubmit} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2">
-                                        <FaFloppyDisk className="text-base" />
-                                        <Typography variant="small" className="capitalize">
-                                            Save
-                                        </Typography>
-                                    </Button>
-                                    <Button onClick={handleSave} color="deep-purple" size="sm" variant="outlined" className="flex items-center gap-2">
-                                        <FaCirclePlus className="text-base" />
-                                        <Typography variant="small" className="capitalize">
-                                            Save & New
-                                        </Typography>
-                                    </Button>
-                                </>
-                            }
-                        </div>
-                    </DialogBody>
-                </Dialog>
-                {
-                    payOpen? <Receivable payOpen={payOpen} invoiceNo={payData.invoiceNo} balance={payData.balance} 
-                    closePay={() => {
-                        refetch();
-                        setPayOpen(!payOpen);
-                    }} /> : <div></div>
-                }
-            </div>
+    
+                            <div className="flex items-center justify-end mt-6 gap-2">
+                                {
+                                    isEdit? (
+                                        salesPermission?.update ? (
+                                            <Button onClick={handleUpdate} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2">
+                                                <FaFloppyDisk className="text-base" />
+                                                <Typography variant="small" className="capitalize">
+                                                    Update
+                                                </Typography>
+                                            </Button>
+                                        ) : null
+                                    ) :
+                                    <>
+                                        <Button onClick={handleSubmit} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2">
+                                            <FaFloppyDisk className="text-base" />
+                                            <Typography variant="small" className="capitalize">
+                                                Save
+                                            </Typography>
+                                        </Button>
+                                        <Button onClick={handleSave} color="deep-purple" size="sm" variant="outlined" className="flex items-center gap-2">
+                                            <FaCirclePlus className="text-base" />
+                                            <Typography variant="small" className="capitalize">
+                                                Save & New
+                                            </Typography>
+                                        </Button>
+                                    </>
+                                }
+                            </div>
+                        </DialogBody>
+                    </Dialog>
+                    {
+                        payOpen? <Receivable payOpen={payOpen} invoiceNo={payData.invoiceNo} balance={payData.balance} 
+                        closePay={() => {
+                            refetch();
+                            setPayOpen(!payOpen);
+                        }} /> : <div></div>
+                    }
+                </div>
+            ) : <div>Loading...</div>
+        }
 
         </>
     );

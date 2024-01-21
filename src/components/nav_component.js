@@ -3,12 +3,15 @@ import { FaArrowRightFromBracket, FaBoxesPacking, FaCartShopping, FaChartPie, Fa
 import { GiDiamondTrophy } from "react-icons/gi";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useAuthUser, useSignOut } from "react-auth-kit";
-import { useState } from "react";
+import { useContext, useState } from "react";
+import { AuthContent } from "../context/authContext";
 
 
 function Nav() {
 
     const auth = useAuthUser();
+
+    const { permissions } = useContext(AuthContent);
 
     const logOut = useSignOut();
 
@@ -22,6 +25,18 @@ function Nav() {
         navigate('/login');
 
     }
+
+    const isSetupTrue = permissions[0]?.view || permissions[1]?.view || permissions[2]?.view || permissions[3]?.view || permissions[4]?.view || permissions[5]?.view || permissions[6]?.view || permissions[7]?.view || permissions[8]?.view || permissions[9]?.view || permissions[10]?.view;
+
+    const isPurchaseTrue = permissions[11]?.view || permissions[15]?.view || permissions[9]?.view;
+
+    const isSalesTrue = permissions[12]?.view || permissions[14]?.view;
+
+    const isIssueTrue = permissions[13]?.view || permissions[16]?.view;
+
+    const isStockTrue = permissions[17]?.view || permissions[18]?.view;
+
+    const isMasterTrue = permissions[0]?.view || permissions[1]?.view || permissions[2]?.view || permissions[3]?.view || permissions[4]?.view || permissions[5]?.view;
 
     return(
         <div className='flex flex-col sticky top-0 z-[9999]'>
@@ -42,146 +57,235 @@ function Nav() {
                         </Typography>
                     </NavLink>
                     {/* Setup */}
-                    <Menu>
-                        <MenuHandler>
-                            <Typography variant='small' className="flex justify-center items-center p-2 text-white space-x-2 hover:bg-white hover:text-black rounded-lg cursor-pointer">
-                                <FaSliders className='text-base' /> 
-                                <span className=''>Setup</span>
-                                <FaChevronDown className='text-xs' />
-                            </Typography>
-                        </MenuHandler>
-                        <MenuList className="z-[99999] bg-main text-white">
-                            <NavLink className="nav-link" to='/master'>
-                                <MenuItem className="flex items-center gap-2">
-                                    <FaDatabase /><span>Master Data</span>
-                                </MenuItem>
-                            </NavLink>
-                            <NavLink className="nav-link" to='/stone_details'>
-                                <MenuItem className="flex items-center gap-2">
-                                    <GiDiamondTrophy /><span>Stone Selection</span>
-                                </MenuItem>
-                            </NavLink>
-                            <NavLink className="nav-link" to='/supplier'>
-                                <MenuItem className="flex items-center gap-2">
-                                    <FaUsers /><span>Suppliers</span>
-                                </MenuItem>
-                            </NavLink>
-                            <NavLink className="nav-link" to='/customer'>
-                                <MenuItem className="flex items-center gap-2">
-                                    <FaUsers /><span>Customers</span>
-                                </MenuItem>
-                            </NavLink>
-                            <NavLink className="nav-link" to='/share'>
-                                <MenuItem className="flex items-center gap-2">
-                                    <FaUsers /><span>Shares</span>
-                                </MenuItem>
-                            </NavLink>
-                            <NavLink className="nav-link" to='/wallet_list'>
-                                <MenuItem className="flex items-center gap-2">
-                                    <FaWallet /> <span>Wallet</span>
-                                </MenuItem>
-                            </NavLink>
-                        </MenuList>
-                    </Menu> 
+                    {
+                        isSetupTrue ? (
+                            <Menu>
+                                <MenuHandler>
+                                    <Typography variant='small' className="flex justify-center items-center p-2 text-white space-x-2 hover:bg-white hover:text-black rounded-lg cursor-pointer">
+                                        <FaSliders className='text-base' /> 
+                                        <span className=''>Setup</span>
+                                        <FaChevronDown className='text-xs' />
+                                    </Typography>
+                                </MenuHandler>
+                                <MenuList className="z-[99999] bg-main text-white">
+                                    {
+                                        isMasterTrue ? (
+                                            <NavLink className="nav-link" to='/master'>
+                                                <MenuItem className="flex items-center gap-2">
+                                                    <FaDatabase /><span>Master Data</span>
+                                                </MenuItem>
+                                            </NavLink> 
+                                        ) : null
+                                    }
+                                    {
+                                        permissions[9]?.view ? (
+                                            <NavLink className="nav-link" to='/stone_details'>
+                                                <MenuItem className="flex items-center gap-2">
+                                                    <GiDiamondTrophy /><span>Stone Selection</span>
+                                                </MenuItem>
+                                            </NavLink>
+                                        ): null
+                                    }
+                                    {
+                                        permissions[7]?.view ? (
+                                            <NavLink className="nav-link" to='/supplier'>
+                                                <MenuItem className="flex items-center gap-2">
+                                                    <FaUsers /><span>Suppliers</span>
+                                                </MenuItem>
+                                            </NavLink>
+                                        ) : null
+                                    }
+                                    {
+                                        permissions[6]?.view ? (
+                                            <NavLink className="nav-link" to='/customer'>
+                                                <MenuItem className="flex items-center gap-2">
+                                                    <FaUsers /><span>Customers</span>
+                                                </MenuItem>
+                                            </NavLink>
+                                        ) : null
+                                    }
+                                    {
+                                        permissions[10]?.view ? (
+                                            <NavLink className="nav-link" to='/share'>
+                                                <MenuItem className="flex items-center gap-2">
+                                                    <FaUsers /><span>Shares</span>
+                                                </MenuItem>
+                                            </NavLink>
+                                        ) : null
+                                    }
+                                    {
+                                        permissions[8]?.view ? (
+                                            <NavLink className="nav-link" to='/wallet_list'>
+                                                <MenuItem className="flex items-center gap-2">
+                                                    <FaWallet /> <span>Wallet</span>
+                                                </MenuItem>
+                                            </NavLink>
+                                        ) : null
+                                    }
+                                </MenuList>
+                            </Menu> 
+                        ) : null
+                    }
+                    
                     {/* Purchase */}
-                    <Menu>
-                        <MenuHandler>
-                            <Typography variant='small' className="flex justify-center items-center p-2 text-white space-x-2 hover:bg-white hover:text-black rounded-lg cursor-pointer">
-                                <FaCartShopping className='text-base' /> 
-                                    <span>Purchase</span>
-                                <FaChevronDown className='text-xs' />
-                            </Typography>
-                        </MenuHandler>
-                        <MenuList className="z-[99999] bg-main text-white">
-                            <NavLink className="nav-link" to="/purchase_list">
-                                <MenuItem className="flex items-center gap-2">
-                                    <FaCartShopping /> <span>Purchase List</span>
-                                </MenuItem>
-                            </NavLink>
-                            <NavLink className="nav-link" to="/stone_details">
-                                <MenuItem className="flex items-center gap-2">
-                                    <GiDiamondTrophy /> <span>Stone Selection</span>
-                                </MenuItem>
-                            </NavLink>
-                            <NavLink className="nav-link" to="/purchase_return">
-                                <MenuItem className="flex items-center gap-2">
-                                    <FaArrowRotateLeft /> <span>Purchase Return List</span>
-                                </MenuItem>
-                            </NavLink>
-                        </MenuList>
-                    </Menu>
+                    {
+                        isPurchaseTrue ? (
+                            <Menu>
+                                <MenuHandler>
+                                    <Typography variant='small' className="flex justify-center items-center p-2 text-white space-x-2 hover:bg-white hover:text-black rounded-lg cursor-pointer">
+                                        <FaCartShopping className='text-base' /> 
+                                            <span>Purchase</span>
+                                        <FaChevronDown className='text-xs' />
+                                    </Typography>
+                                </MenuHandler>
+                                <MenuList className="z-[99999] bg-main text-white">
+                                    {
+                                        permissions[11]?.view ? (
+                                            <NavLink className="nav-link" to="/purchase_list">
+                                                <MenuItem className="flex items-center gap-2">
+                                                    <FaCartShopping /> <span>Purchase List</span>
+                                                </MenuItem>
+                                            </NavLink>
+                                        ) : null
+                                    }
+                                    {
+                                        permissions[9]?.view ? (
+                                            <NavLink className="nav-link" to="/stone_details">
+                                                <MenuItem className="flex items-center gap-2">
+                                                    <GiDiamondTrophy /> <span>Stone Selection</span>
+                                                </MenuItem>
+                                            </NavLink>
+                                        ) : null
+                                    }
+                                    {
+                                        permissions[15]?.view ? (
+                                            <NavLink className="nav-link" to="/purchase_return">
+                                                <MenuItem className="flex items-center gap-2">
+                                                    <FaArrowRotateLeft /> <span>Purchase Return List</span>
+                                                </MenuItem>
+                                            </NavLink>
+                                        ) : null
+                                    }
+                                </MenuList>
+                            </Menu>
+                        ) : null
+                    }
+                    
                     {/* Issue */}
-                    <Menu>
-                        <MenuHandler>
-                            <Typography variant='small' className="flex justify-center items-center p-2 text-white space-x-2 hover:bg-white hover:text-black rounded-lg cursor-pointer">
-                                <FaBoxOpen className='text-base' /> 
-                                    <span className=''>Issues</span>
-                                <FaChevronDown className='text-xs' />
-                            </Typography>
-                        </MenuHandler>
-                        <MenuList className="z-[99999] bg-main text-white">
-                            <NavLink className="nav-link" to="/issue_list">
-                                <MenuItem className="flex items-center gap-2">
-                                    <FaBoxOpen /> <span>Issue List</span>
-                                </MenuItem>
-                            </NavLink>
-                            <NavLink className="nav-link" to="/issue_return">
-                                <MenuItem className="flex items-center gap-2">
-                                    <FaArrowRotateLeft /> <span>Issue Return List</span>
-                                </MenuItem>
-                            </NavLink>
-                        </MenuList>
-                    </Menu>
+                    {
+                        isIssueTrue ? (
+                            <Menu>
+                                <MenuHandler>
+                                    <Typography variant='small' className="flex justify-center items-center p-2 text-white space-x-2 hover:bg-white hover:text-black rounded-lg cursor-pointer">
+                                        <FaBoxOpen className='text-base' /> 
+                                            <span className=''>Issues</span>
+                                        <FaChevronDown className='text-xs' />
+                                    </Typography>
+                                </MenuHandler>
+                                <MenuList className="z-[99999] bg-main text-white">
+                                    {
+                                        permissions[13]?.view ? (
+                                            <NavLink className="nav-link" to="/issue_list">
+                                                <MenuItem className="flex items-center gap-2">
+                                                    <FaBoxOpen /> <span>Issue List</span>
+                                                </MenuItem>
+                                            </NavLink>
+                                        ) : null
+                                    }
+                                    {
+                                        permissions[16]?.view ? (
+                                            <NavLink className="nav-link" to="/issue_return">
+                                                <MenuItem className="flex items-center gap-2">
+                                                    <FaArrowRotateLeft /> <span>Issue Return List</span>
+                                                </MenuItem>
+                                            </NavLink>
+                                        ) : null
+                                    }
+                                </MenuList>
+                            </Menu>
+                        ) : null
+                    }
+
                     {/* Sales */}
-                    <Menu>
-                        <MenuHandler>
-                            <Typography variant='small' className="flex justify-center items-center p-2 text-white space-x-2 hover:bg-white hover:text-black rounded-lg cursor-pointer">
-                                <FaMoneyBill1 className='text-base' /> 
-                                    <span className=''>Sales</span>
-                                <FaChevronDown className='text-xs' />
-                            </Typography>
-                        </MenuHandler>
-                        <MenuList className="z-[99999] bg-main text-white">
-                            <NavLink className="nav-link" to="/sales_list">
-                                <MenuItem className="flex items-center gap-2">
-                                    <FaMoneyBill1 /> <span>Sales List</span>
-                                </MenuItem>
-                            </NavLink>
-                            <NavLink className="nav-link" to="/sales_return">
-                                <MenuItem className="flex items-center gap-2">
-                                    <FaArrowRotateLeft /> <span>Sales Return List</span>
-                                </MenuItem>
-                            </NavLink>
-                        </MenuList>
-                    </Menu>
+                    {
+                        isSalesTrue ? (
+                            <Menu>
+                                <MenuHandler>
+                                    <Typography variant='small' className="flex justify-center items-center p-2 text-white space-x-2 hover:bg-white hover:text-black rounded-lg cursor-pointer">
+                                        <FaMoneyBill1 className='text-base' /> 
+                                            <span className=''>Sales</span>
+                                        <FaChevronDown className='text-xs' />
+                                    </Typography>
+                                </MenuHandler>
+                                <MenuList className="z-[99999] bg-main text-white">
+                                    {
+                                        permissions[12]?.view ? (
+                                            <NavLink className="nav-link" to="/sales_list">
+                                                <MenuItem className="flex items-center gap-2">
+                                                    <FaMoneyBill1 /> <span>Sales List</span>
+                                                </MenuItem>
+                                            </NavLink>
+                                        ) : null
+                                    }
+                                    {
+                                        permissions[14]?.view ? (
+                                            <NavLink className="nav-link" to="/sales_return">
+                                                <MenuItem className="flex items-center gap-2">
+                                                    <FaArrowRotateLeft /> <span>Sales Return List</span>
+                                                </MenuItem>
+                                            </NavLink>
+                                        ) : null
+                                    }
+                                </MenuList>
+                            </Menu>
+                        ) : null
+                    }
+
                     {/* Stock */}
-                    <Menu>
-                        <MenuHandler>
-                            <Typography variant='small' className="flex justify-center items-center p-2 text-white space-x-2 hover:bg-white hover:text-black rounded-lg cursor-pointer">
-                                <FaBoxesPacking className='text-base' /> 
-                                    <span>Stock</span>
-                                <FaChevronDown className='text-xs' />
-                            </Typography>
-                        </MenuHandler>
-                        <MenuList className="z-[99999] bg-main text-white">
-                            <NavLink className="nav-link" to="/damage">
-                                <MenuItem className="flex items-center gap-2">
-                                    <FaListUl /> <span>Damage List</span>
-                                </MenuItem>
-                            </NavLink>
-                            <NavLink className="nav-link" to="/adjustment">
-                                <MenuItem className="flex items-center gap-2">
-                                    <FaPlusMinus /> <span>Adjustment List</span>
-                                </MenuItem>
-                            </NavLink>
-                        </MenuList>
-                    </Menu>
+                    {
+                        isStockTrue ? (
+                            <Menu>
+                                <MenuHandler>
+                                    <Typography variant='small' className="flex justify-center items-center p-2 text-white space-x-2 hover:bg-white hover:text-black rounded-lg cursor-pointer">
+                                        <FaBoxesPacking className='text-base' /> 
+                                            <span>Stock</span>
+                                        <FaChevronDown className='text-xs' />
+                                    </Typography>
+                                </MenuHandler>
+                                <MenuList className="z-[99999] bg-main text-white">
+                                    {
+                                        permissions[18]?.view ? (
+                                            <NavLink className="nav-link" to="/damage">
+                                                <MenuItem className="flex items-center gap-2">
+                                                    <FaListUl /> <span>Damage List</span>
+                                                </MenuItem>
+                                            </NavLink>
+                                        ) : null
+                                    }
+                                    {
+                                        permissions[17]?.view ? (
+                                            <NavLink className="nav-link" to="/adjustment">
+                                                <MenuItem className="flex items-center gap-2">
+                                                    <FaPlusMinus /> <span>Adjustment List</span>
+                                                </MenuItem>
+                                            </NavLink>
+                                        ) : null
+                                    }
+                                </MenuList>
+                            </Menu>
+                        ) : null
+                    }
+
                     {/* Wallet */}
-                    <NavLink className="nav-link" to='/wallet'>
-                        <Typography variant='small' className="flex justify-center items-center text-white p-2 space-x-2 hover:bg-white hover:text-black rounded-lg ">
-                            <FaWallet className='text-base' /> <span className=''>Wallet Transaction</span>
-                        </Typography>
-                    </NavLink> 
+                    {
+                        permissions[21]?.view ? (
+                            <NavLink className="nav-link" to='/wallet'>
+                                <Typography variant='small' className="flex justify-center items-center text-white p-2 space-x-2 hover:bg-white hover:text-black rounded-lg ">
+                                    <FaWallet className='text-base' /> <span className=''>Wallet Transaction</span>
+                                </Typography>
+                            </NavLink> 
+                        ) : null
+                    }
                 </div>
                 <div className='flex justify-end '>
                     <Menu>
@@ -193,22 +297,31 @@ function Nav() {
                             </Button>
                         </MenuHandler>
                         <MenuList  className="z-[99999] bg-main text-white">
-                            <NavLink className="nav-link" to="/system_user">
-                                <MenuItem className="flex items-center gap-2">
-                                    <FaUser /> <span>System User</span>
-                                </MenuItem>
-                            </NavLink>
-                            <NavLink className="nav-link" to="/system_role">
-                                <MenuItem className="flex items-center gap-2">
-                                    <FaLayerGroup /> <span>System Role</span>
-                                </MenuItem>
-                            </NavLink>
+                            {
+                                permissions[19]?.view ? (
+                                    <NavLink className="nav-link" to="/system_user">
+                                        <MenuItem className="flex items-center gap-2">
+                                            <FaUser /> <span>System User</span>
+                                        </MenuItem>
+                                    </NavLink>
+                                ) : null
+                            }
+                            {
+                                permissions[20]?.view ? (
+                                    <NavLink className="nav-link" to="/system_role">
+                                        <MenuItem className="flex items-center gap-2">
+                                            <FaLayerGroup /> <span>System Role</span>
+                                        </MenuItem>
+                                    </NavLink>
+                                ) : null
+                            }
                             <MenuItem className='flex items-center gap-2 cursor-pointer' onClick={handleLogout}>
                                 <FaArrowRightFromBracket /> <span>Logout</span>
                             </MenuItem>
                         </MenuList>
                     </Menu>
                 </div>
+
                 <Drawer open={open} onClose={() => setOpen(!open)} className="">
                     <div className="mb-3 flex items-center justify-between p-2 bg-main">
                         <Typography variant="h5" color="white" className="px-4">
@@ -229,212 +342,301 @@ function Nav() {
                             </ListItem>
                         </NavLink>
                         {/* Setup */}
-                        <Menu 
-                            animate={{
-                                mount: { y: 0 },
-                                unmount: { y: -10 },
-                            }}
-                        >
-                            <MenuHandler>
-                                <ListItem className="flex justify-between items-center">
-                                    <div className="flex items-center">
-                                        <ListItemPrefix>
-                                            <FaSliders />
-                                        </ListItemPrefix>
-                                        Setup
-                                    </div>
-                                    <ListItemPrefix>
-                                        <FaChevronDown />
-                                    </ListItemPrefix>
-                                    {/* <ListItemSuffix>
-                                    <Chip
-                                        value="5"
-                                        size="sm"
-                                        color="green"
-                                        className="rounded-full"
-                                    />
-                                    </ListItemSuffix> */}
-                                </ListItem>
-                            </MenuHandler>
-                            <MenuList className="z-[99999] bg-white text-black w-[290px]">
-                                <NavLink className="nav-link" to='/master'>
-                                    <MenuItem className="flex items-center gap-2">
-                                        <FaDatabase /><span>Master Data</span>
-                                    </MenuItem>
-                                </NavLink>
-                                <NavLink className="nav-link" to='/stone_details'>
-                                    <MenuItem className="flex items-center gap-2">
-                                        <GiDiamondTrophy /><span>Stone Selection</span>
-                                    </MenuItem>
-                                </NavLink>
-                                <NavLink className="nav-link" to='/supplier'>
-                                    <MenuItem className="flex items-center gap-2">
-                                        <FaUsers /><span>Suppliers</span>
-                                    </MenuItem>
-                                </NavLink>
-                                <NavLink className="nav-link" to='/customer'>
-                                    <MenuItem className="flex items-center gap-2">
-                                        <FaUsers /><span>Customers</span>
-                                    </MenuItem>
-                                </NavLink>
-                                <NavLink className="nav-link" to='/share'>
-                                    <MenuItem className="flex items-center gap-2">
-                                        <FaUsers /><span>Shares</span>
-                                    </MenuItem>
-                                </NavLink>
-                                <NavLink className="nav-link" to='/wallet_list'>
-                                    <MenuItem className="flex items-center gap-2">
-                                        <FaWallet /> <span>Wallet</span>
-                                    </MenuItem>
-                                </NavLink>
-                            </MenuList>
-                        </Menu>
+                        {
+                            isSetupTrue ? (
+                                <Menu 
+                                    animate={{
+                                        mount: { y: 0 },
+                                        unmount: { y: -10 },
+                                    }}
+                                >
+                                    <MenuHandler>
+                                        <ListItem className="flex justify-between items-center">
+                                            <div className="flex items-center">
+                                                <ListItemPrefix>
+                                                    <FaSliders />
+                                                </ListItemPrefix>
+                                                Setup
+                                            </div>
+                                            <ListItemPrefix>
+                                                <FaChevronDown />
+                                            </ListItemPrefix>
+                                            {/* <ListItemSuffix>
+                                            <Chip
+                                                value="5"
+                                                size="sm"
+                                                color="green"
+                                                className="rounded-full"
+                                            />
+                                            </ListItemSuffix> */}
+                                        </ListItem>
+                                    </MenuHandler>
+                                    <MenuList className="z-[99999] bg-white text-black w-[290px]">
+                                        {
+                                            isMasterTrue ? (
+                                                <NavLink className="nav-link" to='/master'>
+                                                    <MenuItem className="flex items-center gap-2">
+                                                        <FaDatabase /><span>Master Data</span>
+                                                    </MenuItem>
+                                                </NavLink> 
+                                            ) : null
+                                        }
+                                        {
+                                            permissions[9]?.view ? (
+                                                <NavLink className="nav-link" to='/stone_details'>
+                                                    <MenuItem className="flex items-center gap-2">
+                                                        <GiDiamondTrophy /><span>Stone Selection</span>
+                                                    </MenuItem>
+                                                </NavLink>
+                                            ): null
+                                        }
+                                        {
+                                            permissions[7]?.view ? (
+                                                <NavLink className="nav-link" to='/supplier'>
+                                                    <MenuItem className="flex items-center gap-2">
+                                                        <FaUsers /><span>Suppliers</span>
+                                                    </MenuItem>
+                                                </NavLink>
+                                            ) : null
+                                        }
+                                        {
+                                            permissions[6]?.view ? (
+                                                <NavLink className="nav-link" to='/customer'>
+                                                    <MenuItem className="flex items-center gap-2">
+                                                        <FaUsers /><span>Customers</span>
+                                                    </MenuItem>
+                                                </NavLink>
+                                            ) : null
+                                        }
+                                        {
+                                            permissions[10]?.view ? (
+                                                <NavLink className="nav-link" to='/share'>
+                                                    <MenuItem className="flex items-center gap-2">
+                                                        <FaUsers /><span>Shares</span>
+                                                    </MenuItem>
+                                                </NavLink>
+                                            ) : null
+                                        }
+                                        {
+                                            permissions[8]?.view ? (
+                                                <NavLink className="nav-link" to='/wallet_list'>
+                                                    <MenuItem className="flex items-center gap-2">
+                                                        <FaWallet /> <span>Wallet</span>
+                                                    </MenuItem>
+                                                </NavLink>
+                                            ) : null
+                                        }
+                                    </MenuList>
+                                </Menu>
+                            ) : null
+                        }
+
                         {/* Purchase */}
-                        <Menu 
-                            animate={{
-                                mount: { y: 0 },
-                                unmount: { y: -10 },
-                            }}
-                        >
-                            <MenuHandler>
-                                <ListItem className="flex justify-between items-center">
-                                    <div className="flex items-center">
-                                        <ListItemPrefix>
-                                            <FaCartShopping />
-                                        </ListItemPrefix>
-                                        Purchase
-                                    </div>
-                                    <ListItemPrefix>
-                                        <FaChevronDown />
-                                    </ListItemPrefix>
-                                </ListItem>
-                            </MenuHandler>
-                            <MenuList className="z-[99999] bg-white text-black w-[290px]">
-                                <NavLink className="nav-link" to="/purchase_list">
-                                    <MenuItem className="flex items-center gap-2">
-                                        <FaCartShopping /> <span>Purchase List</span>
-                                    </MenuItem>
-                                </NavLink>
-                                <NavLink className="nav-link" to="/stone_details">
-                                    <MenuItem className="flex items-center gap-2">
-                                        <GiDiamondTrophy /> <span>Stone Selection</span>
-                                    </MenuItem>
-                                </NavLink>
-                                <NavLink className="nav-link" to="/purchase_return">
-                                    <MenuItem className="flex items-center gap-2">
-                                        <FaArrowRotateLeft /> <span>Purchase Return List</span>
-                                    </MenuItem>
-                                </NavLink>
-                            </MenuList>
-                        </Menu>
+                        {
+                            isPurchaseTrue ? (
+                                <Menu 
+                                    animate={{
+                                        mount: { y: 0 },
+                                        unmount: { y: -10 },
+                                    }}
+                                >
+                                    <MenuHandler>
+                                        <ListItem className="flex justify-between items-center">
+                                            <div className="flex items-center">
+                                                <ListItemPrefix>
+                                                    <FaCartShopping />
+                                                </ListItemPrefix>
+                                                Purchase
+                                            </div>
+                                            <ListItemPrefix>
+                                                <FaChevronDown />
+                                            </ListItemPrefix>
+                                        </ListItem>
+                                    </MenuHandler>
+                                    <MenuList className="z-[99999] bg-white text-black w-[290px]">
+                                        {
+                                            permissions[11]?.view ? (
+                                                <NavLink className="nav-link" to="/purchase_list">
+                                                    <MenuItem className="flex items-center gap-2">
+                                                        <FaCartShopping /> <span>Purchase List</span>
+                                                    </MenuItem>
+                                                </NavLink>
+                                            ) : null
+                                        }
+                                        {
+                                            permissions[9]?.view ? (
+                                                <NavLink className="nav-link" to="/stone_details">
+                                                    <MenuItem className="flex items-center gap-2">
+                                                        <GiDiamondTrophy /> <span>Stone Selection</span>
+                                                    </MenuItem>
+                                                </NavLink>
+                                            ) : null
+                                        }
+                                        {
+                                            permissions[15]?.view ? (
+                                                <NavLink className="nav-link" to="/purchase_return">
+                                                    <MenuItem className="flex items-center gap-2">
+                                                        <FaArrowRotateLeft /> <span>Purchase Return List</span>
+                                                    </MenuItem>
+                                                </NavLink>
+                                            ) : null
+                                        }
+                                    </MenuList>
+                                </Menu>
+                            ) : null
+                        }
+
                         {/* Issue */}
-                        <Menu 
-                            animate={{
-                                mount: { y: 0 },
-                                unmount: { y: -10 },
-                            }}
-                        >
-                            <MenuHandler>
-                                <ListItem className="flex justify-between items-center">
-                                    <div className="flex items-center">
-                                        <ListItemPrefix>
-                                            <FaBoxOpen />
-                                        </ListItemPrefix>
-                                        Issues
-                                    </div>
-                                    <ListItemPrefix>
-                                        <FaChevronDown />
-                                    </ListItemPrefix>
-                                </ListItem>
-                            </MenuHandler>
-                            <MenuList className="z-[99999] bg-white text-black w-[290px]">
-                                <NavLink className="nav-link" to="/issue_list">
-                                    <MenuItem className="flex items-center gap-2">
-                                        <FaBoxOpen /> <span>Issue List</span>
-                                    </MenuItem>
-                                </NavLink>
-                                <NavLink className="nav-link" to="/issue_return">
-                                    <MenuItem className="flex items-center gap-2">
-                                        <FaArrowRotateLeft /> <span>Issue Return List</span>
-                                    </MenuItem>
-                                </NavLink>
-                            </MenuList>
-                        </Menu>
+                        {
+                            isIssueTrue ? (
+                                <Menu 
+                                    animate={{
+                                        mount: { y: 0 },
+                                        unmount: { y: -10 },
+                                    }}
+                                >
+                                    <MenuHandler>
+                                        <ListItem className="flex justify-between items-center">
+                                            <div className="flex items-center">
+                                                <ListItemPrefix>
+                                                    <FaBoxOpen />
+                                                </ListItemPrefix>
+                                                Issues
+                                            </div>
+                                            <ListItemPrefix>
+                                                <FaChevronDown />
+                                            </ListItemPrefix>
+                                        </ListItem>
+                                    </MenuHandler>
+                                    <MenuList className="z-[99999] bg-white text-black w-[290px]">
+                                        {
+                                            permissions[13]?.view ? (
+                                                <NavLink className="nav-link" to="/issue_list">
+                                                    <MenuItem className="flex items-center gap-2">
+                                                        <FaBoxOpen /> <span>Issue List</span>
+                                                    </MenuItem>
+                                                </NavLink>
+                                            ) : null
+                                        }
+                                        {
+                                            permissions[16]?.view ? (
+                                                <NavLink className="nav-link" to="/issue_return">
+                                                    <MenuItem className="flex items-center gap-2">
+                                                        <FaArrowRotateLeft /> <span>Issue Return List</span>
+                                                    </MenuItem>
+                                                </NavLink>
+                                            ) : null
+                                        }
+                                    </MenuList>
+                                </Menu>
+                            ) : null
+                        }
+
                         {/* Sales */}
-                        <Menu 
-                            animate={{
-                                mount: { y: 0 },
-                                unmount: { y: -10 },
-                            }}
-                        >
-                            <MenuHandler>
-                                <ListItem className="flex justify-between items-center">
-                                    <div className="flex items-center">
-                                        <ListItemPrefix>
-                                            <FaMoneyBill1 />
-                                        </ListItemPrefix>
-                                        Sales
-                                    </div>
-                                    <ListItemPrefix>
-                                        <FaChevronDown />
-                                    </ListItemPrefix>
-                                </ListItem>
-                            </MenuHandler>
-                            <MenuList className="z-[99999] bg-white text-black w-[290px]">
-                                <NavLink className="nav-link" to="/sales_list">
-                                    <MenuItem className="flex items-center gap-2">
-                                        <FaMoneyBill1 /> <span>Sales List</span>
-                                    </MenuItem>
-                                </NavLink>
-                                <NavLink className="nav-link" to="/sales_return">
-                                    <MenuItem className="flex items-center gap-2">
-                                        <FaArrowRotateLeft /> <span>Sales Return List</span>
-                                    </MenuItem>
-                                </NavLink>
-                            </MenuList>
-                        </Menu>
+                        {
+                            isSalesTrue ? (
+                                <Menu 
+                                    animate={{
+                                        mount: { y: 0 },
+                                        unmount: { y: -10 },
+                                    }}
+                                >
+                                    <MenuHandler>
+                                        <ListItem className="flex justify-between items-center">
+                                            <div className="flex items-center">
+                                                <ListItemPrefix>
+                                                    <FaMoneyBill1 />
+                                                </ListItemPrefix>
+                                                Sales
+                                            </div>
+                                            <ListItemPrefix>
+                                                <FaChevronDown />
+                                            </ListItemPrefix>
+                                        </ListItem>
+                                    </MenuHandler>
+                                    <MenuList className="z-[99999] bg-white text-black w-[290px]">
+                                        {
+                                            permissions[12]?.view ? (
+                                                <NavLink className="nav-link" to="/sales_list">
+                                                    <MenuItem className="flex items-center gap-2">
+                                                        <FaMoneyBill1 /> <span>Sales List</span>
+                                                    </MenuItem>
+                                                </NavLink>
+                                            ) : null
+                                        }
+                                        {
+                                            permissions[14]?.view ? (
+                                                <NavLink className="nav-link" to="/sales_return">
+                                                    <MenuItem className="flex items-center gap-2">
+                                                        <FaArrowRotateLeft /> <span>Sales Return List</span>
+                                                    </MenuItem>
+                                                </NavLink>
+                                            ) : null
+                                        }
+                                    </MenuList>
+                                </Menu>
+                            ) : null
+                        }
+
                         {/* Stock */}
-                        <Menu 
-                            animate={{
-                                mount: { y: 0 },
-                                unmount: { y: -10 },
-                            }}
-                        >
-                            <MenuHandler>
-                                <ListItem className="flex justify-between items-center">
-                                    <div className="flex items-center">
-                                        <ListItemPrefix>
-                                            <FaBoxesPacking />
-                                        </ListItemPrefix>
-                                        Stock
-                                    </div>
-                                    <ListItemPrefix>
-                                        <FaChevronDown />
-                                    </ListItemPrefix>
-                                </ListItem>
-                            </MenuHandler>
-                            <MenuList className="z-[99999] bg-white text-black w-[290px]">
-                                <NavLink className="nav-link" to="/damage">
-                                    <MenuItem className="flex items-center gap-2">
-                                        <FaListUl /> <span>Damage List</span>
-                                    </MenuItem>
-                                </NavLink>
-                                <NavLink className="nav-link" to="/adjustment">
-                                    <MenuItem className="flex items-center gap-2">
-                                        <FaPlusMinus /> <span>Adjustment List</span>
-                                    </MenuItem>
-                                </NavLink>
-                            </MenuList>
-                        </Menu>
+                        {
+                            isStockTrue ? (
+                                <Menu 
+                                    animate={{
+                                        mount: { y: 0 },
+                                        unmount: { y: -10 },
+                                    }}
+                                >
+                                    <MenuHandler>
+                                        <ListItem className="flex justify-between items-center">
+                                            <div className="flex items-center">
+                                                <ListItemPrefix>
+                                                    <FaBoxesPacking />
+                                                </ListItemPrefix>
+                                                Stock
+                                            </div>
+                                            <ListItemPrefix>
+                                                <FaChevronDown />
+                                            </ListItemPrefix>
+                                        </ListItem>
+                                    </MenuHandler>
+                                    <MenuList className="z-[99999] bg-white text-black w-[290px]">
+                                        {
+                                            permissions[18]?.view ? (
+                                                <NavLink className="nav-link" to="/damage">
+                                                    <MenuItem className="flex items-center gap-2">
+                                                        <FaListUl /> <span>Damage List</span>
+                                                    </MenuItem>
+                                                </NavLink>
+                                            ) : null
+                                        }
+                                        {
+                                            permissions[17]?.view ? (
+                                                <NavLink className="nav-link" to="/adjustment">
+                                                    <MenuItem className="flex items-center gap-2">
+                                                        <FaPlusMinus /> <span>Adjustment List</span>
+                                                    </MenuItem>
+                                                </NavLink>
+                                            ) : null
+                                        }
+                                    </MenuList>
+                                </Menu>
+                            ) : null
+                        }
+
                         {/* Wallet */}
-                        <NavLink className="nav-link" to='/wallet'>
-                            <ListItem>
-                                <ListItemPrefix>
-                                    <FaWallet />
-                                </ListItemPrefix>
-                                Wallet
-                            </ListItem>
-                        </NavLink>
+                        {
+                            permissions[21]?.view ? (
+                                <NavLink className="nav-link" to='/wallet'>
+                                    <ListItem>
+                                        <ListItemPrefix>
+                                            <FaWallet />
+                                        </ListItemPrefix>
+                                        Wallet
+                                    </ListItem>
+                                </NavLink>
+                            ) : null
+                        }
                     </List>
                 </Drawer>
             </nav>

@@ -1,7 +1,7 @@
 /* eslint-disable eqeqeq */
 import { Button, Card, CardBody, Dialog, DialogBody, Input, Typography, } from "@material-tailwind/react";
 import { FaCirclePlus, FaFloppyDisk, FaPencil, FaTrashCan, } from "react-icons/fa6";
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useFetchUOMQuery, useAddUOMMutation, useUpdateUOMMutation, useRemoveUOMMutation } from "../store";
 import DeleteModal from "../components/delete_modal";
 import SectionTitle from "../components/section_title";
@@ -9,12 +9,28 @@ import ModalTitle from "../components/modal_title";
 import moment from "moment";
 import TableList from "../components/data_table";
 import { useAuthUser } from "react-auth-kit";
+import { AuthContent } from "../context/authContext";
+import { useNavigate } from "react-router-dom";
 
 const validator = require('validator');
 
 function UOM() {
 
     const auth = useAuthUser();
+
+    const { permissions } = useContext(AuthContent);
+
+    const [unitPermission, setUnitPermission] = useState(null);
+
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        setUnitPermission(permissions[4]);
+
+        if(unitPermission?.view == false) {
+            navigate('./supplier');
+        }
+    }, [unitPermission])
 
     const [open, setOpen] = useState(false);
 
@@ -133,10 +149,14 @@ function UOM() {
             cell: (row) => (
                 <div className="flex items-center gap-2">
                     <Button variant="text" color="deep-purple" className="p-2" onClick={() => handleEdit(row.Code)}><FaPencil /></Button>
-                    <Button variant="text" color="red" className="p-2" onClick={() => {
-                        setDeleteId(row.Code);
-                        setOpenDelete(true);
-                    }}><FaTrashCan /></Button>
+                    {
+                        unitPermission?.delete ? (
+                            <Button variant="text" color="red" className="p-2" onClick={() => {
+                                setDeleteId(row.Code);
+                                setOpenDelete(true);
+                            }}><FaTrashCan /></Button>
+                        ) : null
+                    }
                 </div>
             )
         },
@@ -155,7 +175,7 @@ function UOM() {
 
     return(
         <div className="flex flex-col gap-4 px-2 relative">
-            <SectionTitle title="Unit of Measurement" handleModal={openModal} />
+            <SectionTitle title="Unit of Measurement" handleModal={openModal} permission={unitPermission?.create}/>
             <Card className="h-auto shadow-md w-[1000px] mx-1 rounded-sm p-2 border-t">
                 <CardBody className="rounded-sm overflow-auto p-0">
                     <TableList columns={column} data={tbodyData} />
@@ -205,22 +225,33 @@ function UOM() {
                                 }
                             </div>
                         </div>
-                            <div className="flex items-center justify-end mt-6 gap-2">
-                            <Button onClick={() => handleSubmit(false)} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2">
-                                <FaFloppyDisk className="text-base" />
-                                <Typography variant="small" className="capitalize">
-                                    { isEdit ? 'Update' : 'Save'}
-                                </Typography>
-                            </Button>
+                        <div className="flex items-center justify-end mt-6 gap-2">
                             {
                                 !isEdit ? (
-                                    <Button onClick={handleSubmit} color="deep-purple" size="sm" variant="outlined" className="flex items-center gap-2">
-                                        <FaCirclePlus className="text-base" />
-                                        <Typography variant="small" className="capitalize">
-                                            Save & New
-                                        </Typography>
-                                    </Button>
-                                ) : null
+                                    <>
+                                        <Button onClick={() => handleSubmit(false)} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2">
+                                            <FaFloppyDisk className="text-base" />
+                                            <Typography variant="small" className="capitalize">
+                                                Save
+                                            </Typography>
+                                        </Button>
+                                        <Button onClick={handleSubmit} color="deep-purple" size="sm" variant="outlined" className="flex items-center gap-2">
+                                            <FaCirclePlus className="text-base" />
+                                            <Typography variant="small" className="capitalize">
+                                                Save & New
+                                            </Typography>
+                                        </Button>
+                                    </>
+                                ) : (
+                                    unitPermission?.update ? (
+                                        <Button onClick={() => handleSubmit(false)} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2">
+                                            <FaFloppyDisk className="text-base" />
+                                            <Typography variant="small" className="capitalize">
+                                                Update
+                                            </Typography>
+                                        </Button>
+                                    ) : null
+                                )
                             }
                         </div>
                     </div>

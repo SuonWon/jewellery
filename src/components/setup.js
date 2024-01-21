@@ -9,6 +9,7 @@ import { Route, Routes } from 'react-router-dom';
 
 
 function Setup() {
+
     return (
 
         <div className='grid grid-cols-10 gap-2 xl:grid-cols-7'>
@@ -18,12 +19,12 @@ function Setup() {
             <div className='col-span-8 flex xl:col-span-5' >
                 <Routes>
                     <Route index element={<Brightness />}></Route>
-                    <Route path='home/master/grade' element={<Grade />}></Route>
-                    <Route path='home/master/brightness' element={<Brightness />}></Route>
-                    <Route path='home/master/type' element={<StoneType />}></Route>
-                    <Route path='home/master/uom' element={<UOM />}></Route>
-                    <Route path='home/master/stone' element={<Stone />}></Route>
-                    <Route path='home/master/walletCategory' element={<WalletCategory />}></Route>
+                    <Route path='grade' element={<Grade />}></Route>
+                    <Route path='brightness' element={<Brightness />}></Route>
+                    <Route path='type' element={<StoneType />}></Route>
+                    <Route path='uom' element={<UOM />}></Route>
+                    <Route path='stone' element={<Stone />}></Route>
+                    <Route path='walletCategory' element={<WalletCategory />}></Route>
                 </Routes>
             </div>
         </div>

@@ -3,8 +3,13 @@ import { BiCategory } from "react-icons/bi";
 import { FaRulerVertical } from "react-icons/fa6";
 import { GiCheckeredDiamond, GiCutDiamond, GiDiamondHard, GiDiamonds } from "react-icons/gi";
 import { Link } from "react-router-dom";
+import { AuthContent } from '../context/authContext';
+import { moduleName } from '../const';
+import { useContext } from 'react';
 
 function Sidebar() {
+
+    const { permissions } = useContext(AuthContent);
 
     return (
         <Card className="w-full h-full py-1 shadow-none border rounded-none xl:px-4">
@@ -15,60 +20,85 @@ function Sidebar() {
                 </Typography>
             </div>
             <List className="w-full">
-                <Link to="home/master/brightness" className="text-initial">
-                    <ListItem className="w-fit">
-                        <ListItemPrefix>
-                            <GiCheckeredDiamond />
-                        </ListItemPrefix>
-                        <span className="hidden xl:block">Stone Brightness</span>
-                        <span className="block xl:hidden">SB</span>
-                    </ListItem>
-                </Link>
-                <Link to="home/master/grade" className="text-initial">
-                    <ListItem className="w-fit">
-                        <ListItemPrefix>
-                            <GiDiamonds />
-                        </ListItemPrefix>
-                        <span className="hidden xl:block">Stone Grade</span>
-                        <span className="block xl:hidden">SG</span>
-                    </ListItem>
-                </Link>
-                <Link to="home/master/type" className="text-initial">
-                    <ListItem className="w-fit">
-                        <ListItemPrefix>
-                            <GiDiamondHard />
-                        </ListItemPrefix>
-                        <span className="hidden xl:block">Stone Type</span>
-                        <span className="block xl:hidden">ST</span>
-                    </ListItem>
-                </Link>
-                <Link to="home/master/stone" className="text-initial">
-                    <ListItem className="w-fit">
-                        <ListItemPrefix>
-                            <GiCutDiamond />
-                        </ListItemPrefix>
-                        <span className="hidden xl:block">Stone</span>
-                        <span className="block xl:hidden">S</span>
-                    </ListItem>
-                </Link>
-                <Link to="home/master/uom" className="text-initial">
-                    <ListItem className="w-fit">
-                        <ListItemPrefix>
-                            <FaRulerVertical />
-                        </ListItemPrefix>
-                        <span className="hidden xl:block">Stone Unit</span>
-                        <span className="block xl:hidden">SU</span>
-                    </ListItem>
-                </Link>
-                <Link to="home/master/walletCategory" className="text-initial">
-                    <ListItem className="w-fit">
-                        <ListItemPrefix>
-                            <BiCategory />
-                        </ListItemPrefix>
-                        <span className="hidden xl:block">Wallet Category</span>
-                        <span className="block xl:hidden">WC</span>
-                    </ListItem>
-                </Link>
+                {
+                    permissions[3]?.view ? (
+                        <Link to="brightness" className="text-initial">
+                            <ListItem className="w-fit">
+                                <ListItemPrefix>
+                                    <GiCheckeredDiamond />
+                                </ListItemPrefix>
+                                <span className="hidden xl:block">Stone Brightness</span>
+                                <span className="block xl:hidden">SB</span>
+                            </ListItem>
+                        </Link>
+                    ) : null
+                }
+                {
+                    permissions[2]?.view ? (
+                        <Link to="grade" className="text-initial">
+                            <ListItem className="w-fit">
+                                <ListItemPrefix>
+                                    <GiDiamonds />
+                                </ListItemPrefix>
+                                <span className="hidden xl:block">Stone Grade</span>
+                                <span className="block xl:hidden">SG</span>
+                            </ListItem>
+                        </Link>
+                    ) : null
+                }
+                {
+                    permissions[1]?.view ? (
+                        <Link to="type" className="text-initial">
+                            <ListItem className="w-fit">
+                                <ListItemPrefix>
+                                    <GiDiamondHard />
+                                </ListItemPrefix>
+                                <span className="hidden xl:block">Stone Type</span>
+                                <span className="block xl:hidden">ST</span>
+                            </ListItem>
+                        </Link>
+                    ) : null
+                }
+                {
+                    permissions[0]?.view ? (
+                        <Link to="stone" className="text-initial">
+                            <ListItem className="w-fit">
+                                <ListItemPrefix>
+                                    <GiCutDiamond />
+                                </ListItemPrefix>
+                                <span className="hidden xl:block">Stone</span>
+                                <span className="block xl:hidden">S</span>
+                            </ListItem>
+                        </Link>
+                    ) : null
+                }
+                {
+                    permissions[4]?.view ? (
+                        <Link to="uom" className="text-initial">
+                            <ListItem className="w-fit">
+                                <ListItemPrefix>
+                                    <FaRulerVertical />
+                                </ListItemPrefix>
+                                <span className="hidden xl:block">Stone Unit</span>
+                                <span className="block xl:hidden">SU</span>
+                            </ListItem>
+                        </Link>
+                    ) : null
+                }
+                {
+                    permissions[5]?.view ? (
+                        <Link to="walletCategory" className="text-initial">
+                            <ListItem className="w-fit">
+                                <ListItemPrefix>
+                                    <BiCategory />
+                                </ListItemPrefix>
+                                <span className="hidden xl:block">Wallet Category</span>
+                                <span className="block xl:hidden">WC</span>
+                            </ListItem>
+                        </Link>
+                    ) : null
+                }
+                
             </List>
         </Card>
     );

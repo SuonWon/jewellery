@@ -2,7 +2,7 @@
 import {  Button, Card, CardBody, Dialog, DialogBody, Input, Switch, Textarea, Typography } from "@material-tailwind/react";
 import { FaCirclePlus, FaFloppyDisk, FaPencil, FaTrashCan, FaMagnifyingGlass } from "react-icons/fa6";
 import { RiMenuSearchLine } from "react-icons/ri";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useFetchCustomerQuery, useAddCustomerMutation, useUpdateCustomerMutation, useRemoveCustomerMutation, useFetchCustomerCountQuery } from "../store";
 import Pagination from "../components/pagination";
 import DeleteModal from "../components/delete_modal";
@@ -11,12 +11,28 @@ import ModalTitle from "../components/modal_title";
 import moment from "moment";
 import TableList from "../components/data_table";
 import { useAuthUser } from "react-auth-kit";
+import { useNavigate } from "react-router-dom";
+import { AuthContent } from "../context/authContext";
 
 const validator = require("validator");
 
 function Customer() {
 
     const auth = useAuthUser();
+
+    const { permissions } = useContext(AuthContent);
+
+    const [customerPermission, setCustomerPermission] = useState(null);
+
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        setCustomerPermission(permissions[6]);
+
+        if(customerPermission?.view == false) {
+            navigate('/supplier');
+        }
+    }, [permissions])
 
     const [open, setOpen] = useState(false);
 
@@ -263,14 +279,22 @@ function Customer() {
             width: "150px",
             cell: (row) => (
                 <div className="flex items-center gap-2">
-                    <div className="border-r border-gray-400 pr-2">
-                        <div class="custom-checkbox">
-                            <input class="input-checkbox" checked={row.Status} id={row.Code} type="checkbox" onChange={handleChange} />
-                            <label for={row.Code}></label>
-                        </div>
-                    </div>
+                    {
+                        customerPermission?.update ? (
+                            <div className="border-r border-gray-400 pr-2">
+                                <div class="custom-checkbox">
+                                    <input class="input-checkbox" checked={row.Status} id={row.Code} type="checkbox" onChange={handleChange} />
+                                    <label for={row.Code}></label>
+                                </div>
+                            </div>
+                        ) : null
+                    }
                     <Button variant="text" color="deep-purple" className="p-2" onClick={() => handleEdit(row.Code)}><FaPencil /></Button>
-                    <Button variant="text" color="red" className="p-2" onClick={() => handleDeleteBtn(row.Code)}><FaTrashCan /></Button>
+                    {
+                        customerPermission?.delete ? (
+                            <Button variant="text" color="red" className="p-2" onClick={() => handleDeleteBtn(row.Code)}><FaTrashCan /></Button>
+                        ) : null
+                    }
                 </div>
             )
         },
@@ -299,263 +323,272 @@ function Customer() {
 
     return(
         <>
-        <div className="flex flex-col gap-4 relative max-w-[85%] min-w-[85%]">
-            <div className="w-78 absolute top-0 right-0 z-[9999]">
-            </div>
-            <SectionTitle title="Customers" handleModal={openModal} />
-            <Card className="h-auto shadow-md max-w-screen-xxl rounded-sm p-2 border-t mb-5">
-                <CardBody className="rounded-sm overflow-auto p-0">
-                    <div className="flex justify-end py-2">
-                        <div className="w-72">
-                            <Input label="Search" value={filterData.search} onChange={(e) => {
-                                    setFilterData({
-                                        skip: 0,
-                                        take: 10,
-                                        search: e.target.value
-                                    });
-                                    setCurrentPage(1);
-                                }}
-                                icon={<FaMagnifyingGlass />}
-                            />
-                        </div>
+        {
+            customerPermission != null && customerPermission != undefined ? (
+                <div className="flex flex-col gap-4 relative max-w-[85%] min-w-[85%]">
+                    <div className="w-78 absolute top-0 right-0 z-[9999]">
                     </div>
-                    
-                    <TableList columns={column} data={tbodyData} />
-
-                    <div className="grid grid-cols-2">
-                        <div className="flex mt-7 mb-5">
-                            <p className="mr-2 mt-[6px]">Show</p>
-                            <div className="w-[80px]">
-                                <select
-                                    className="block w-full px-2.5 py-1.5 border border-blue-gray-200 h-[35px] rounded-md focus:border-black text-black"
-                                    value={filterData.take} 
-                                    onChange={(e) => {
-                                        setFilterData({
-                                            ...filterData,
-                                            skip: 0,
-                                            take: e.target.value
-                                        })
-                                        setCurrentPage(1);
-                                    }}
-                                >
-                                    <option value="10">10</option>
-                                    <option value="20">20</option>
-                                    <option value="50">50</option>
-                                    <option value="100">100</option>
-                                </select>
+                    <SectionTitle title="Customers" handleModal={openModal} permission={customerPermission?.create}/>
+                    <Card className="h-auto shadow-md max-w-screen-xxl rounded-sm p-2 border-t mb-5">
+                        <CardBody className="rounded-sm overflow-auto p-0">
+                            <div className="flex justify-end py-2">
+                                <div className="w-72">
+                                    <Input label="Search" value={filterData.search} onChange={(e) => {
+                                            setFilterData({
+                                                skip: 0,
+                                                take: 10,
+                                                search: e.target.value
+                                            });
+                                            setCurrentPage(1);
+                                        }}
+                                        icon={<FaMagnifyingGlass />}
+                                    />
+                                </div>
                             </div>
                             
-                            <p className="ml-2 mt-[6px]">entries</p>
-                        </div>
-                        
-                        <div className="flex justify-end">
-                            {
-                                dataCount != undefined ? (
-                                    <Pagination
-                                        className="pagination-bar"
-                                        siblingCount={1}
-                                        currentPage={currentPage}
-                                        totalCount={dataCount}
-                                        pageSize={filterData.take}
-                                        onPageChange={(page) => {
-                                            setCurrentPage(page);
-                                            setFilterData({
-                                                ...filterData,
-                                                skip: (page - 1) * filterData.take
-                                            })
+                            <TableList columns={column} data={tbodyData} />
+        
+                            <div className="grid grid-cols-2">
+                                <div className="flex mt-7 mb-5">
+                                    <p className="mr-2 mt-[6px]">Show</p>
+                                    <div className="w-[80px]">
+                                        <select
+                                            className="block w-full px-2.5 py-1.5 border border-blue-gray-200 h-[35px] rounded-md focus:border-black text-black"
+                                            value={filterData.take} 
+                                            onChange={(e) => {
+                                                setFilterData({
+                                                    ...filterData,
+                                                    skip: 0,
+                                                    take: e.target.value
+                                                })
+                                                setCurrentPage(1);
+                                            }}
+                                        >
+                                            <option value="10">10</option>
+                                            <option value="20">20</option>
+                                            <option value="50">50</option>
+                                            <option value="100">100</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <p className="ml-2 mt-[6px]">entries</p>
+                                </div>
+                                
+                                <div className="flex justify-end">
+                                    {
+                                        dataCount != undefined ? (
+                                            <Pagination
+                                                className="pagination-bar"
+                                                siblingCount={1}
+                                                currentPage={currentPage}
+                                                totalCount={dataCount}
+                                                pageSize={filterData.take}
+                                                onPageChange={(page) => {
+                                                    setCurrentPage(page);
+                                                    setFilterData({
+                                                        ...filterData,
+                                                        skip: (page - 1) * filterData.take
+                                                    })
+                                                }}
+                                            />
+                                        ) : (<></>)
+                                    }
+                                </div>
+                                
+                            </div>
+                            
+                        </CardBody>
+                    </Card>
+                    <Dialog open={Boolean(open)} handler={openModal} size="lg">
+                        <DialogBody>
+                            <ModalTitle titleName={isEdit ? "Edit Customer" : "Customer"} handleClick={openModal} />
+                            <form  className="flex flex-col p-3 gap-2">
+                                <div className="grid grid-cols-3 gap-2 w-full">
+                                    <div>
+                                        <label className="text-black text-sm mb-2">Name</label>
+                                        <input
+                                            type="text"
+                                            className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
+                                            value={formData.customerName}
+                                            onChange={(e) => {
+                                                setFormData({
+                                                    ...formData, 
+                                                    customerName: e.target.value,
+                                                });
+                                            }}
+                                        />
+                                        {
+                                            validationText.customerName && <p className="block text-[12px] text-red-500 font-sans mb-2">{validationText.customerName}</p>
+                                        }
+                                    </div>
+                                    <div>
+                                        <label className="text-black text-sm mb-2">NRC No</label>
+                                        <input
+                                            type="text"
+                                            className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
+                                            value={formData.nrcNo}
+                                            onChange={(e) => {
+                                                setFormData({
+                                                    ...formData, 
+                                                    nrcNo: e.target.value,
+                                                });
+                                            }}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="text-black text-sm mb-2">Company Name</label>
+                                        <input
+                                            type="text"
+                                            className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
+                                            value={formData.companyName}
+                                            onChange={(e) => {
+                                                setFormData({
+                                                    ...formData, 
+                                                    companyName: e.target.value,
+                                                });
+                                            }}
+                                        />
+                                    </div>
+                                </div>
+                                <div className="grid grid-cols-4 gap-2 w-full">
+                                    <div>
+                                        <label className="text-black text-sm mb-2">Contact No</label>
+                                        <input
+                                            type="text"
+                                            className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
+                                            value={formData.contactNo}
+                                            onChange={(e) => {
+                                                setFormData({
+                                                    ...formData, 
+                                                    contactNo: e.target.value,
+                                                });
+                                            }}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="text-black text-sm mb-2">Office No</label>
+                                        <input
+                                            type="text"
+                                            className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
+                                            value={formData.officeNo}
+                                            onChange={(e) => {
+                                                setFormData({
+                                                    ...formData, 
+                                                    officeNo: e.target.value,
+                                                });
+                                            }}
+                                        />
+                                    </div>
+                                    <div className="col-span-2">
+                                        <label className="text-black text-sm mb-2">Street</label>
+                                        <input
+                                            type="text"
+                                            className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
+                                            value={formData.street}
+                                            onChange={(e) => {
+                                                setFormData({
+                                                    ...formData, 
+                                                    street: e.target.value,
+                                                });
+                                            }}
+                                        />
+                                    </div>
+                                </div>
+                                <div className="grid grid-cols-3 gap-2 w-full">
+                                    <div>
+                                        <label className="text-black text-sm mb-2">Township</label>
+                                        <input
+                                            type="text"
+                                            className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
+                                            value={formData.township}
+                                            onChange={(e) => {
+                                                setFormData({
+                                                    ...formData, 
+                                                    township: e.target.value,
+                                                });
+                                            }}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="text-black text-sm mb-2">City</label>
+                                        <input
+                                            type="text"
+                                            className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
+                                            value={formData.city}
+                                            onChange={(e) => {
+                                                setFormData({
+                                                    ...formData, 
+                                                    city: e.target.value,
+                                                });
+                                            }}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="text-black text-sm mb-2">Region</label>
+                                        <input
+                                            type="text"
+                                            className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
+                                            value={formData.region}
+                                            onChange={(e) => {
+                                                setFormData({
+                                                    ...formData, 
+                                                    region: e.target.value,
+                                                });
+                                            }}
+                                        />
+                                    </div>
+                                </div>
+                                <div>
+                                    <label className="text-black text-sm mb-2">Remark</label>
+                                    <textarea
+                                        type="text"
+                                        className="border border-blue-gray-200 w-full px-2.5 py-1.5 rounded-md text-black"
+                                        value={formData.remark}
+                                        onChange={(e) => {
+                                            setFormData({
+                                                ...formData, 
+                                                remark: e.target.value,
+                                            });
                                         }}
                                     />
-                                ) : (<></>)
-                            }
-                        </div>
-                        
-                    </div>
-                    
-                </CardBody>
-            </Card>
-            <Dialog open={Boolean(open)} handler={openModal} size="lg">
-                <DialogBody>
-                    <ModalTitle titleName={isEdit ? "Edit Customer" : "Customer"} handleClick={openModal} />
-                    <form  className="flex flex-col p-3 gap-2">
-                        <div className="grid grid-cols-3 gap-2 w-full">
-                            <div>
-                                <label className="text-black text-sm mb-2">Name</label>
-                                <input
-                                    type="text"
-                                    className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
-                                    value={formData.customerName}
-                                    onChange={(e) => {
-                                        setFormData({
-                                            ...formData, 
-                                            customerName: e.target.value,
-                                        });
-                                    }}
-                                />
-                                {
-                                    validationText.customerName && <p className="block text-[12px] text-red-500 font-sans mb-2">{validationText.customerName}</p>
-                                }
-                            </div>
-                            <div>
-                                <label className="text-black text-sm mb-2">NRC No</label>
-                                <input
-                                    type="text"
-                                    className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
-                                    value={formData.nrcNo}
-                                    onChange={(e) => {
-                                        setFormData({
-                                            ...formData, 
-                                            nrcNo: e.target.value,
-                                        });
-                                    }}
-                                />
-                            </div>
-                            <div>
-                                <label className="text-black text-sm mb-2">Company Name</label>
-                                <input
-                                    type="text"
-                                    className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
-                                    value={formData.companyName}
-                                    onChange={(e) => {
-                                        setFormData({
-                                            ...formData, 
-                                            companyName: e.target.value,
-                                        });
-                                    }}
-                                />
-                            </div>
-                        </div>
-                        <div className="grid grid-cols-4 gap-2 w-full">
-                            <div>
-                                <label className="text-black text-sm mb-2">Contact No</label>
-                                <input
-                                    type="text"
-                                    className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
-                                    value={formData.contactNo}
-                                    onChange={(e) => {
-                                        setFormData({
-                                            ...formData, 
-                                            contactNo: e.target.value,
-                                        });
-                                    }}
-                                />
-                            </div>
-                            <div>
-                                <label className="text-black text-sm mb-2">Office No</label>
-                                <input
-                                    type="text"
-                                    className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
-                                    value={formData.officeNo}
-                                    onChange={(e) => {
-                                        setFormData({
-                                            ...formData, 
-                                            officeNo: e.target.value,
-                                        });
-                                    }}
-                                />
-                            </div>
-                            <div className="col-span-2">
-                                <label className="text-black text-sm mb-2">Street</label>
-                                <input
-                                    type="text"
-                                    className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
-                                    value={formData.street}
-                                    onChange={(e) => {
-                                        setFormData({
-                                            ...formData, 
-                                            street: e.target.value,
-                                        });
-                                    }}
-                                />
-                            </div>
-                        </div>
-                        <div className="grid grid-cols-3 gap-2 w-full">
-                            <div>
-                                <label className="text-black text-sm mb-2">Township</label>
-                                <input
-                                    type="text"
-                                    className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
-                                    value={formData.township}
-                                    onChange={(e) => {
-                                        setFormData({
-                                            ...formData, 
-                                            township: e.target.value,
-                                        });
-                                    }}
-                                />
-                            </div>
-                            <div>
-                                <label className="text-black text-sm mb-2">City</label>
-                                <input
-                                    type="text"
-                                    className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
-                                    value={formData.city}
-                                    onChange={(e) => {
-                                        setFormData({
-                                            ...formData, 
-                                            city: e.target.value,
-                                        });
-                                    }}
-                                />
-                            </div>
-                            <div>
-                                <label className="text-black text-sm mb-2">Region</label>
-                                <input
-                                    type="text"
-                                    className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
-                                    value={formData.region}
-                                    onChange={(e) => {
-                                        setFormData({
-                                            ...formData, 
-                                            region: e.target.value,
-                                        });
-                                    }}
-                                />
-                            </div>
-                        </div>
-                        <div>
-                            <label className="text-black text-sm mb-2">Remark</label>
-                            <textarea
-                                type="text"
-                                className="border border-blue-gray-200 w-full px-2.5 py-1.5 rounded-md text-black"
-                                value={formData.remark}
-                                onChange={(e) => {
-                                    setFormData({
-                                        ...formData, 
-                                        remark: e.target.value,
-                                    });
-                                }}
-                            />
-                        </div>
-                        <div className="flex items-center justify-end mt-6 gap-2">
-                            {
-                                isEdit ? 
-                                <Button onClick={submitEdit} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2">
-                                    <FaFloppyDisk className="text-base" /> 
-                                    <Typography variant="small" className="capitalize">
-                                        Update
-                                    </Typography>
-                                </Button> : <>
-                                <Button onClick={onSubmit} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2">
-                                    <FaFloppyDisk className="text-base" /> 
-                                    <Typography variant="small" className="capitalize">
-                                        Save
-                                    </Typography>
-                                </Button>
-                                <Button onClick={onSaveSubmit} color="deep-purple" size="sm" variant="outlined" className="flex items-center gap-2">
-                                    <FaCirclePlus className="text-base" /> 
-                                    <Typography variant="small" className="capitalize">
-                                        Save & New
-                                    </Typography>
-                                </Button>
-                                </>
-                            }
-                            
-                        </div>
-                    </form>
-                </DialogBody>                      
-            </Dialog>
-            <DeleteModal deleteId={deleteId} open={openDelete} handleDelete={handleRemove} closeModal={() => setOpenDelete(!openDelete)} />
-        </div>
+                                </div>
+                                <div className="flex items-center justify-end mt-6 gap-2">
+                                    {
+                                        isEdit ? (
+                                            customerPermission?.update ? (
+                                                <Button onClick={submitEdit} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2">
+                                                    <FaFloppyDisk className="text-base" /> 
+                                                    <Typography variant="small" className="capitalize">
+                                                        Update
+                                                    </Typography>
+                                                </Button>
+                                            ) : null
+                                        ) : 
+                                        <>
+                                            <Button onClick={onSubmit} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2">
+                                                <FaFloppyDisk className="text-base" /> 
+                                                <Typography variant="small" className="capitalize">
+                                                    Save
+                                                </Typography>
+                                            </Button>
+                                            <Button onClick={onSaveSubmit} color="deep-purple" size="sm" variant="outlined" className="flex items-center gap-2">
+                                                <FaCirclePlus className="text-base" /> 
+                                                <Typography variant="small" className="capitalize">
+                                                    Save & New
+                                                </Typography>
+                                            </Button>
+                                        </>
+                                    }
+                                    
+                                </div>
+                            </form>
+                        </DialogBody>                      
+                    </Dialog>
+                    <DeleteModal deleteId={deleteId} open={openDelete} handleDelete={handleRemove} closeModal={() => setOpenDelete(!openDelete)} />
+                </div>
+
+            ) : null
+        }
         
         </>
     );

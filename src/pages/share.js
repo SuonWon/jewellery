@@ -1,7 +1,7 @@
 /* eslint-disable eqeqeq */
 import { Button, Card, CardBody, Dialog, DialogBody, Input, Switch, Textarea, Typography } from "@material-tailwind/react";
 import { FaCirclePlus, FaFloppyDisk, FaPencil, FaTrashCan, FaMagnifyingGlass } from "react-icons/fa6";
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useAddShareMutation, useFetchShareCountQuery, useFetchShareQuery, useRemoveShareMutation, useUpdateShareMutation } from "../store";
 import Pagination from "../components/pagination";
 import DeleteModal from "../components/delete_modal";
@@ -10,9 +10,25 @@ import ModalTitle from "../components/modal_title";
 import moment from "moment";
 import TableList from "../components/data_table";
 import { useAuthUser } from "react-auth-kit";
+import { useNavigate } from "react-router-dom";
+import { AuthContent } from "../context/authContext";
 const validator = require("validator");
 
 function Share() {
+
+    const {permissions} = useContext(AuthContent);
+
+    const [sharePermission, setSharePermission] = useState(null);
+
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        setSharePermission(permissions[10]);
+
+        if(sharePermission?.view == false) {
+            navigate('/supplier');
+        }
+    }, [permissions])
 
     const [open, setOpen] = useState(false);
 
@@ -225,12 +241,16 @@ function Share() {
             width: "150px",
             cell: (row) => (
                 <div className="flex items-center gap-2">
-                    <div className="border-r border-gray-400 pr-2">
-                        <div class="custom-checkbox">
-                            <input class="input-checkbox" checked={row.status} id={row.code} type="checkbox" onChange={handleChange} />
-                            <label for={row.code}></label>
-                        </div>
-                    </div>
+                    {
+                        sharePermission?.update ? (
+                            <div className="border-r border-gray-400 pr-2">
+                                <div class="custom-checkbox">
+                                    <input class="input-checkbox" checked={row.status} id={row.code} type="checkbox" onChange={handleChange} />
+                                    <label for={row.code}></label>
+                                </div>
+                            </div>
+                        ) : null
+                    }
                     <Button 
                         variant="text" color="deep-purple" 
                         className="p-2" 
@@ -238,15 +258,19 @@ function Share() {
                     >
                         <FaPencil />
                     </Button>
-                    <Button 
-                        variant="text" 
-                        color="red" 
-                        className="p-2" 
-                        onClick={() => handleDeleteBtn(Number(row.code))}
-                        disabled={row.isOwner}
-                    >
-                        <FaTrashCan />
-                    </Button>
+                    {
+                        sharePermission?.delete ? (
+                            <Button 
+                                variant="text" 
+                                color="red" 
+                                className="p-2" 
+                                onClick={() => handleDeleteBtn(Number(row.code))}
+                                disabled={row.isOwner}
+                            >
+                                <FaTrashCan />
+                            </Button>
+                        ) : null
+                    }
                 </div>
             )
         },
@@ -274,242 +298,249 @@ function Share() {
 
     return(
         <>
-        <div className="flex flex-col gap-4 relative max-w-[85%] min-w-[85%]">
-            <SectionTitle title="Share" handleModal={openModal} />
-            <Card className="h-auto shadow-md max-w-screen-xxl rounded-sm p-2 border-t mb-5">
-                <CardBody className="rounded-sm overflow-auto p-0">
-                    <div className="flex justify-end py-2">
-                        <div className="w-72">
-                            <Input label="Search" value={filterData.search} onChange={(e) => {
-                                    setFilterData({
-                                        skip: 0,
-                                        take: 10,
-                                        search: e.target.value
-                                    });
-                                    setCurrentPage(1);
-                                }}
-                                icon={<FaMagnifyingGlass />}
-                            />
-                        </div>
-                    </div>
-                    
-                    <TableList columns={column} data={tbodyData} />
-
-                    <div className="grid grid-cols-2">
-                        <div className="flex mt-7 mb-5">
-                            <p className="mr-2 mt-[6px]">Show</p>
-                            <div className="w-[80px]">
-                                <select
-                                    className="block w-full px-2.5 py-1.5 border border-blue-gray-200 h-[35px] rounded-md focus:border-black text-black"
-                                    value={filterData.take} 
-                                    onChange={(e) => {
-                                        setFilterData({
-                                            ...filterData,
-                                            skip: 0,
-                                            take: e.target.value
-                                        });
-                                        setCurrentPage(1);
-                                    }}
-                                >
-                                    <option value="10">10</option>
-                                    <option value="20">20</option>
-                                    <option value="50">50</option>
-                                    <option value="100">100</option>
-                                </select>
+        {
+            sharePermission != null && sharePermission != undefined ? (
+                <div className="flex flex-col gap-4 relative max-w-[85%] min-w-[85%]">
+                    <SectionTitle title="Share" handleModal={openModal} permission={sharePermission?.create}/>
+                    <Card className="h-auto shadow-md max-w-screen-xxl rounded-sm p-2 border-t mb-5">
+                        <CardBody className="rounded-sm overflow-auto p-0">
+                            <div className="flex justify-end py-2">
+                                <div className="w-72">
+                                    <Input label="Search" value={filterData.search} onChange={(e) => {
+                                            setFilterData({
+                                                skip: 0,
+                                                take: 10,
+                                                search: e.target.value
+                                            });
+                                            setCurrentPage(1);
+                                        }}
+                                        icon={<FaMagnifyingGlass />}
+                                    />
+                                </div>
                             </div>
                             
-                            <p className="ml-2 mt-[6px]">entries</p>
-                        </div>
-                        
-                        <div className="flex justify-end">
-                            {
-                                dataCount != undefined ? (
-                                    <Pagination
-                                        className="pagination-bar"
-                                        siblingCount={1}
-                                        currentPage={currentPage}
-                                        totalCount={dataCount}
-                                        pageSize={filterData.take}
-                                        onPageChange={(page) => {
-                                            setCurrentPage(page);
-                                            setFilterData({
-                                                ...filterData,
-                                                skip: (page - 1) * filterData.take
-                                            })
-                                        }}
-                                    />
-                                ) : (<></>)
-                            }
-                        </div>
-                        
-                    </div>
-                    
-                </CardBody>
-            </Card>
-            <Dialog open={Boolean(open)} handler={openModal} size="lg">
-                <DialogBody>
-                    <ModalTitle titleName={isEdit ? "Edit Share" : "Create Share"} handleClick={openModal} />
-                    <form  className="flex flex-col items-end p-3 gap-2">
-                        <div className="grid grid-cols-3 gap-2 w-full">
-                            {/* Share Name */}
-                            <div>
-                                <label className="text-black text-sm mb-2">Share Name</label>
-                                <input
-                                    type="text"
-                                    className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
-                                    value={formData.shareName}
-                                    onChange={(e) => {
-                                        setFormData({
-                                            ...formData,
-                                            shareName: e.target.value
-                                        });
-                                    }}
-                                />
-                                {
-                                    validationText.shareName && <p className="block text-[12px] text-red-500 font-sans">{validationText.shareName}</p>
-                                }
-                            </div>
-                            {/* NRC No */}
-                            <div>
-                                <label className="text-black text-sm mb-2">NRC No</label>
-                                <input
-                                    type="text"
-                                    className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
-                                    value={formData.nrcNo}
-                                    onChange={(e) => {
-                                        setFormData({
-                                            ...formData,
-                                            nrcNo: e.target.value
-                                        });
-                                    }}
-                                />
-                            </div>
-                            {/* Contact No */}
-                            <div>
-                                <label className="text-black text-sm mb-2">Contact No</label>
-                                <input
-                                    type="text"
-                                    className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
-                                    value={formData.contactNo}
-                                    onChange={(e) => {
-                                        setFormData({
-                                            ...formData,
-                                            contactNo: e.target.value
-                                        });
-                                    }}
-                                />
-                            </div>
-                        </div>
-                        <div className="grid grid-cols-4 gap-2 w-full">
-                            {/* Street */}
-                            <div className="col-span-2">
-                                <label className="text-black text-sm mb-2">Street</label>
-                                <input
-                                    type="text"
-                                    className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
-                                    value={formData.street}
-                                    onChange={(e) => {
-                                        setFormData({
-                                            ...formData,
-                                            street: e.target.value
-                                        });
-                                    }}
-                                />
-                            </div>
-                            {/* Township */}
-                            <div>
-                                <label className="text-black text-sm mb-2">Township</label>
-                                <input
-                                    type="text"
-                                    className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
-                                    value={formData.township}
-                                    onChange={(e) => {
-                                        setFormData({
-                                            ...formData,
-                                            township: e.target.value
-                                        });
-                                    }}
-                                />
-                            </div>
-                            {/* City */}
-                            <div>
-                                <label className="text-black text-sm mb-2">City</label>
-                                <input
-                                    type="text"
-                                    className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
-                                    value={formData.city}
-                                    onChange={(e) => {
-                                        setFormData({
-                                            ...formData,
-                                            city: e.target.value
-                                        });
-                                    }}
-                                />
-                            </div>
-                        </div>
-                        <div className="grid grid-cols-3 gap-2 w-full">
-                            {/* Region */}
-                            <div>
-                                <label className="text-black text-sm mb-2">Region</label>
-                                <input
-                                    type="text"
-                                    className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
-                                    value={formData.region}
-                                    onChange={(e) => {
-                                        setFormData({
-                                            ...formData,
-                                            region: e.target.value
-                                        });
-                                    }}
-                                />
-                            </div>
-                            {/* Remark */}
-                            <div className="col-span-2 h-fit">
-                                <label className="text-black mb-2 text-sm">Remark</label>
-                                <textarea
-                                    className="border border-blue-gray-200 w-full px-2.5 py-1.5 rounded-md text-black"
-                                    value={formData.remark == null ? "" : formData.remark}
-                                    rows="1"
-                                    onChange={(e) => {
-                                        setFormData({
-                                            ...formData,
-                                            remark: e.target.value
-                                        });
-                                    }}
-                                />
-                            </div>
-                        </div>
-                        <div className="flex items-center justify-end mt-6 gap-2">
-                            {
-                                    isEdit ? <Button onClick={submitEdit} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2">
-                                    <FaFloppyDisk className="text-base" /> 
-                                    <Typography variant="small" className="capitalize">
-                                        Update
-                                    </Typography>
-                                </Button> : 
-                                <>
-                                    <Button onClick={onSubmit} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2">
-                                        <FaFloppyDisk className="text-base" /> 
-                                        <Typography variant="small" className="capitalize">
-                                            Save
-                                        </Typography>
-                                    </Button>
-                                    <Button onClick={onSaveSubmit} color="deep-purple" size="sm" variant="outlined" className="flex items-center gap-2">
-                                        <FaCirclePlus className="text-base" /> 
-                                        <Typography variant="small" className="capitalize">
-                                            Save & New
-                                        </Typography>
-                                    </Button>
-                                </>
-                            }
-                        </div>
-                    </form>
-                     
-                </DialogBody>                      
-            </Dialog>
-            <DeleteModal deleteId={deleteId} open={openDelete} handleDelete={handleRemove} closeModal={() => setOpenDelete(!openDelete)} />
-        </div>
+                            <TableList columns={column} data={tbodyData} />
         
+                            <div className="grid grid-cols-2">
+                                <div className="flex mt-7 mb-5">
+                                    <p className="mr-2 mt-[6px]">Show</p>
+                                    <div className="w-[80px]">
+                                        <select
+                                            className="block w-full px-2.5 py-1.5 border border-blue-gray-200 h-[35px] rounded-md focus:border-black text-black"
+                                            value={filterData.take} 
+                                            onChange={(e) => {
+                                                setFilterData({
+                                                    ...filterData,
+                                                    skip: 0,
+                                                    take: e.target.value
+                                                });
+                                                setCurrentPage(1);
+                                            }}
+                                        >
+                                            <option value="10">10</option>
+                                            <option value="20">20</option>
+                                            <option value="50">50</option>
+                                            <option value="100">100</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <p className="ml-2 mt-[6px]">entries</p>
+                                </div>
+                                
+                                <div className="flex justify-end">
+                                    {
+                                        dataCount != undefined ? (
+                                            <Pagination
+                                                className="pagination-bar"
+                                                siblingCount={1}
+                                                currentPage={currentPage}
+                                                totalCount={dataCount}
+                                                pageSize={filterData.take}
+                                                onPageChange={(page) => {
+                                                    setCurrentPage(page);
+                                                    setFilterData({
+                                                        ...filterData,
+                                                        skip: (page - 1) * filterData.take
+                                                    })
+                                                }}
+                                            />
+                                        ) : (<></>)
+                                    }
+                                </div>
+                                
+                            </div>
+                            
+                        </CardBody>
+                    </Card>
+                    <Dialog open={Boolean(open)} handler={openModal} size="lg">
+                        <DialogBody>
+                            <ModalTitle titleName={isEdit ? "Edit Share" : "Create Share"} handleClick={openModal} />
+                            <form  className="flex flex-col items-end p-3 gap-2">
+                                <div className="grid grid-cols-3 gap-2 w-full">
+                                    {/* Share Name */}
+                                    <div>
+                                        <label className="text-black text-sm mb-2">Share Name</label>
+                                        <input
+                                            type="text"
+                                            className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
+                                            value={formData.shareName}
+                                            onChange={(e) => {
+                                                setFormData({
+                                                    ...formData,
+                                                    shareName: e.target.value
+                                                });
+                                            }}
+                                        />
+                                        {
+                                            validationText.shareName && <p className="block text-[12px] text-red-500 font-sans">{validationText.shareName}</p>
+                                        }
+                                    </div>
+                                    {/* NRC No */}
+                                    <div>
+                                        <label className="text-black text-sm mb-2">NRC No</label>
+                                        <input
+                                            type="text"
+                                            className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
+                                            value={formData.nrcNo}
+                                            onChange={(e) => {
+                                                setFormData({
+                                                    ...formData,
+                                                    nrcNo: e.target.value
+                                                });
+                                            }}
+                                        />
+                                    </div>
+                                    {/* Contact No */}
+                                    <div>
+                                        <label className="text-black text-sm mb-2">Contact No</label>
+                                        <input
+                                            type="text"
+                                            className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
+                                            value={formData.contactNo}
+                                            onChange={(e) => {
+                                                setFormData({
+                                                    ...formData,
+                                                    contactNo: e.target.value
+                                                });
+                                            }}
+                                        />
+                                    </div>
+                                </div>
+                                <div className="grid grid-cols-4 gap-2 w-full">
+                                    {/* Street */}
+                                    <div className="col-span-2">
+                                        <label className="text-black text-sm mb-2">Street</label>
+                                        <input
+                                            type="text"
+                                            className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
+                                            value={formData.street}
+                                            onChange={(e) => {
+                                                setFormData({
+                                                    ...formData,
+                                                    street: e.target.value
+                                                });
+                                            }}
+                                        />
+                                    </div>
+                                    {/* Township */}
+                                    <div>
+                                        <label className="text-black text-sm mb-2">Township</label>
+                                        <input
+                                            type="text"
+                                            className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
+                                            value={formData.township}
+                                            onChange={(e) => {
+                                                setFormData({
+                                                    ...formData,
+                                                    township: e.target.value
+                                                });
+                                            }}
+                                        />
+                                    </div>
+                                    {/* City */}
+                                    <div>
+                                        <label className="text-black text-sm mb-2">City</label>
+                                        <input
+                                            type="text"
+                                            className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
+                                            value={formData.city}
+                                            onChange={(e) => {
+                                                setFormData({
+                                                    ...formData,
+                                                    city: e.target.value
+                                                });
+                                            }}
+                                        />
+                                    </div>
+                                </div>
+                                <div className="grid grid-cols-3 gap-2 w-full">
+                                    {/* Region */}
+                                    <div>
+                                        <label className="text-black text-sm mb-2">Region</label>
+                                        <input
+                                            type="text"
+                                            className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
+                                            value={formData.region}
+                                            onChange={(e) => {
+                                                setFormData({
+                                                    ...formData,
+                                                    region: e.target.value
+                                                });
+                                            }}
+                                        />
+                                    </div>
+                                    {/* Remark */}
+                                    <div className="col-span-2 h-fit">
+                                        <label className="text-black mb-2 text-sm">Remark</label>
+                                        <textarea
+                                            className="border border-blue-gray-200 w-full px-2.5 py-1.5 rounded-md text-black"
+                                            value={formData.remark == null ? "" : formData.remark}
+                                            rows="1"
+                                            onChange={(e) => {
+                                                setFormData({
+                                                    ...formData,
+                                                    remark: e.target.value
+                                                });
+                                            }}
+                                        />
+                                    </div>
+                                </div>
+                                <div className="flex items-center justify-end mt-6 gap-2">
+                                    {
+                                        isEdit ? (
+                                            sharePermission?.update ? (
+                                                <Button onClick={submitEdit} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2">
+                                                    <FaFloppyDisk className="text-base" /> 
+                                                    <Typography variant="small" className="capitalize">
+                                                        Update
+                                                    </Typography>
+                                                </Button> 
+                                            ) : null
+                                        ) : 
+                                        <>
+                                            <Button onClick={onSubmit} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2">
+                                                <FaFloppyDisk className="text-base" /> 
+                                                <Typography variant="small" className="capitalize">
+                                                    Save
+                                                </Typography>
+                                            </Button>
+                                            <Button onClick={onSaveSubmit} color="deep-purple" size="sm" variant="outlined" className="flex items-center gap-2">
+                                                <FaCirclePlus className="text-base" /> 
+                                                <Typography variant="small" className="capitalize">
+                                                    Save & New
+                                                </Typography>
+                                            </Button>
+                                        </>
+                                    }
+                                </div>
+                            </form>
+                             
+                        </DialogBody>                      
+                    </Dialog>
+                    <DeleteModal deleteId={deleteId} open={openDelete} handleDelete={handleRemove} closeModal={() => setOpenDelete(!openDelete)} />
+                </div>
+            ) : null
+        }
         </>
     );
 

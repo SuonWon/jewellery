@@ -1,7 +1,7 @@
 /* eslint-disable eqeqeq */
 import { Button, Card, CardBody, Dialog, DialogBody, Input, Switch, Textarea, Typography } from "@material-tailwind/react";
 import { FaCirclePlus, FaFloppyDisk, FaPencil, FaTrashCan, FaMagnifyingGlass } from "react-icons/fa6";
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useAddWalletMutation, useFetchTrueShareQuery, useFetchWalletCountQuery, useFetchWalletQuery, useRemoveWalletMutation, useUpdateWalletMutation, } from "../store";
 import Pagination from "../components/pagination";
 import DeleteModal from "../components/delete_modal";
@@ -10,11 +10,27 @@ import ModalTitle from "../components/modal_title";
 import moment from "moment";
 import TableList from "../components/data_table";
 import { useAuthUser } from "react-auth-kit";
+import { useNavigate } from "react-router-dom";
 import { v4 as uuidv4 } from 'uuid';
+import { AuthContent } from "../context/authContext";
 
 const validator = require('validator');
 
 function WalletList() {
+
+    const { permissions } = useContext(AuthContent);
+
+    const [walletPermission, setWalletPermission] = useState(null);
+
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        setWalletPermission(permissions[8]);
+
+        if(walletPermission?.view == false) {
+            navigate('/supplier');
+        }
+    }, [permissions])
 
     const [filterData, setFilterData] = useState({
         skip: 0,
@@ -209,169 +225,185 @@ function WalletList() {
     });
 
     return(
-        <div className="flex flex-col gap-4 relative max-w-[85%] min-w-[85%]">
-            <SectionTitle title="Wallet List" handleModal={openModal} />
-            <Card className="h-auto shadow-md max-w-screen-xxl rounded-sm p-2 border-t mb-5">
-                <CardBody className="rounded-sm overflow-auto p-0">
-                    <div className="flex justify-end py-2">
-                        <div className="w-72">
-                            <Input label="Search" value={filterData.search} onChange={(e) => {
-                                    setFilterData({
-                                        skip: 0,
-                                        take: 10,
-                                        search: e.target.value
-                                    });
-                                    setCurrentPage(1);
-                                }}
-                                icon={<FaMagnifyingGlass />}
-                            />
-                        </div>
-                    </div>
-                    
-                    <TableList columns={column} data={tbodyData} />
-
-                    <div className="grid grid-cols-2">
-                        <div className="flex mt-7 mb-5">
-                            <p className="mr-2 mt-[6px]">Show</p>
-                            <div className="w-[80px]">
-                                <select
-                                    className="block w-full px-2.5 py-1.5 border border-blue-gray-200 h-[35px] rounded-md focus:border-black text-black"
-                                    value={filterData.take} 
-                                    onChange={(e) => {
-                                        setFilterData({
-                                            ...filterData,
-                                            skip: 0,
-                                            take: e.target.value
-                                        });
-                                        setCurrentPage(1);
-                                    }}
-                                >
-                                    <option value="10">10</option>
-                                    <option value="20">20</option>
-                                    <option value="50">50</option>
-                                    <option value="100">100</option>
-                                </select>
+        <>
+        {
+            walletPermission != null && walletPermission != undefined ? (
+                <div className="flex flex-col gap-4 relative max-w-[85%] min-w-[85%]">
+                    <SectionTitle title="Wallet List" handleModal={openModal} permission={walletPermission?.create}/>
+                    <Card className="h-auto shadow-md max-w-screen-xxl rounded-sm p-2 border-t mb-5">
+                        <CardBody className="rounded-sm overflow-auto p-0">
+                            <div className="flex justify-end py-2">
+                                <div className="w-72">
+                                    <Input label="Search" value={filterData.search} onChange={(e) => {
+                                            setFilterData({
+                                                skip: 0,
+                                                take: 10,
+                                                search: e.target.value
+                                            });
+                                            setCurrentPage(1);
+                                        }}
+                                        icon={<FaMagnifyingGlass />}
+                                    />
+                                </div>
                             </div>
                             
-                            <p className="ml-2 mt-[6px]">entries</p>
-                        </div>
-                        
-                        <div className="flex justify-end">
-                            {
-                                dataCount != undefined ? (
-                                    <Pagination
-                                        className="pagination-bar"
-                                        siblingCount={1}
-                                        currentPage={currentPage}
-                                        totalCount={dataCount}
-                                        pageSize={filterData.take}
-                                        onPageChange={(page) => {
-                                            setCurrentPage(page);
-                                            setFilterData({
-                                                ...filterData,
-                                                skip: (page - 1) * filterData.take
+                            <TableList columns={column} data={tbodyData} />
+        
+                            <div className="grid grid-cols-2">
+                                <div className="flex mt-7 mb-5">
+                                    <p className="mr-2 mt-[6px]">Show</p>
+                                    <div className="w-[80px]">
+                                        <select
+                                            className="block w-full px-2.5 py-1.5 border border-blue-gray-200 h-[35px] rounded-md focus:border-black text-black"
+                                            value={filterData.take} 
+                                            onChange={(e) => {
+                                                setFilterData({
+                                                    ...filterData,
+                                                    skip: 0,
+                                                    take: e.target.value
+                                                });
+                                                setCurrentPage(1);
+                                            }}
+                                        >
+                                            <option value="10">10</option>
+                                            <option value="20">20</option>
+                                            <option value="50">50</option>
+                                            <option value="100">100</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <p className="ml-2 mt-[6px]">entries</p>
+                                </div>
+                                
+                                <div className="flex justify-end">
+                                    {
+                                        dataCount != undefined ? (
+                                            <Pagination
+                                                className="pagination-bar"
+                                                siblingCount={1}
+                                                currentPage={currentPage}
+                                                totalCount={dataCount}
+                                                pageSize={filterData.take}
+                                                onPageChange={(page) => {
+                                                    setCurrentPage(page);
+                                                    setFilterData({
+                                                        ...filterData,
+                                                        skip: (page - 1) * filterData.take
+                                                    })
+                                                }}
+                                            />
+                                        ) : (<></>)
+                                    }
+                                </div>
+                                
+                            </div>
+                            
+                        </CardBody>
+                    </Card>
+                    <Dialog open={Boolean(open)} handler={openModal} size="sm">
+                        <DialogBody>
+                            <ModalTitle titleName={isEdit ? "Edit Wallet" : "Wallet"} handleClick={openModal} />
+        
+                            <div  className="grid grid-cols-3 gap-4">
+                                {/* <Switch label="Active" color="deep-purple" defaultChecked /> */}
+                                {/* Share Name */}
+                                <div className="col-span-2">
+                                    <label className="text-black mb-2 text-sm">Share Name</label>
+                                    <select
+                                        className="block w-full px-2.5 py-1.5 border border-blue-gray-200 h-[35px] rounded-md focus:border-black text-black"
+                                        value={formData.shareCode} 
+                                        onChange={(e) => setFormData({
+                                            ...formData,
+                                            shareCode: Number(e.target.value),
+                                        })}
+                                    >
+                                        <option value="0" disabled>Select Share</option>
+                                        {
+                                            shareData?.map((share) => {
+                                                return <option value={share.shareCode} key={share.shareCode}>{share.shareName}</option>
                                             })
+                                        }
+                                    </select>
+                                        
+                                    {
+                                        validationText.shareCode && <p className="block text-[12px] text-red-500 font-sans mb-2">{validationText.shareCode}</p>
+                                    }
+                                </div>
+                            </div>
+                            <div className="grid grid-cols-2 gap-4 mt-3">
+                                {/* Wallet Id */}
+                                <div>
+                                    <label className="text-black text-sm mb-2">Wallet Name</label>
+                                    <input
+                                        type="text"
+                                        className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
+                                        value={formData.walletName}
+                                        onChange={(e) => {
+                                            setFormData({
+                                                ...formData,
+                                                walletName: e.target.value
+                                            });
                                         }}
                                     />
-                                ) : (<></>)
-                            }
-                        </div>
-                        
-                    </div>
-                    
-                </CardBody>
-            </Card>
-            <Dialog open={Boolean(open)} handler={openModal} size="sm">
-                <DialogBody>
-                    <ModalTitle titleName={isEdit ? "Edit Wallet" : "Wallet"} handleClick={openModal} />
-
-                    <div  className="grid grid-cols-3 gap-4">
-                        {/* <Switch label="Active" color="deep-purple" defaultChecked /> */}
-                        {/* Share Name */}
-                        <div className="col-span-2">
-                            <label className="text-black mb-2 text-sm">Share Name</label>
-                            <select
-                                className="block w-full px-2.5 py-1.5 border border-blue-gray-200 h-[35px] rounded-md focus:border-black text-black"
-                                value={formData.shareCode} 
-                                onChange={(e) => setFormData({
-                                    ...formData,
-                                    shareCode: Number(e.target.value),
-                                })}
-                            >
-                                <option value="0" disabled>Select Share</option>
+                                    {
+                                        validationText.walletName && <p className="block text-[12px] text-red-500 font-sans">{validationText.walletName}</p>
+                                    }
+                                </div>
+                                {/* Balance */}
+                                <div>
+                                    <label className="text-black text-sm mb-2">Balance</label>
+                                    <input
+                                        type="number"
+                                        className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
+                                        value={formData.balance}
+                                        onChange={(e) => {
+                                            setFormData({
+                                                ...formData,
+                                                balance: parseFloat(e.target.value)
+                                            });
+                                        }}
+                                    />
+                                    {
+                                        validationText.balance && <p className="block text-[12px] text-red-500 font-sans">{validationText.balance}</p>
+                                    }
+                                </div>
+                            </div>
+                            <div className="flex items-center justify-end mt-6 gap-2">
                                 {
-                                    shareData?.map((share) => {
-                                        return <option value={share.shareCode} key={share.shareCode}>{share.shareName}</option>
-                                    })
+                                    !isEdit ? (
+                                        <>
+                                            <Button onClick={() => handleSubmit(false)} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2">
+                                                <FaFloppyDisk className="text-base" /> 
+                                                <Typography variant="small" className="capitalize">
+                                                    Save
+                                                </Typography>
+                                            </Button>
+                                            <Button onClick={handleSubmit} color="deep-purple" size="sm" variant="outlined" className="flex items-center gap-2">
+                                                <FaCirclePlus className="text-base" /> 
+                                                <Typography variant="small" className="capitalize">
+                                                    Save & New
+                                                </Typography>
+                                            </Button>
+                                        </>
+                                    ) : (
+                                        walletPermission?.update ? (
+                                            <Button onClick={() => handleSubmit(false)} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2">
+                                                <FaFloppyDisk className="text-base" /> 
+                                                <Typography variant="small" className="capitalize">
+                                                    Update
+                                                </Typography>
+                                            </Button>
+                                        ) : null
+                                    )
                                 }
-                            </select>
-                                
-                            {
-                                validationText.shareCode && <p className="block text-[12px] text-red-500 font-sans mb-2">{validationText.shareCode}</p>
-                            }
-                        </div>
-                    </div>
-                    <div className="grid grid-cols-2 gap-4 mt-3">
-                        {/* Wallet Id */}
-                        <div>
-                            <label className="text-black text-sm mb-2">Wallet Name</label>
-                            <input
-                                type="text"
-                                className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
-                                value={formData.walletName}
-                                onChange={(e) => {
-                                    setFormData({
-                                        ...formData,
-                                        walletName: e.target.value
-                                    });
-                                }}
-                            />
-                            {
-                                validationText.walletName && <p className="block text-[12px] text-red-500 font-sans">{validationText.walletName}</p>
-                            }
-                        </div>
-                        {/* Balance */}
-                        <div>
-                            <label className="text-black text-sm mb-2">Balance</label>
-                            <input
-                                type="number"
-                                className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
-                                value={formData.balance}
-                                onChange={(e) => {
-                                    setFormData({
-                                        ...formData,
-                                        balance: parseFloat(e.target.value)
-                                    });
-                                }}
-                            />
-                            {
-                                validationText.balance && <p className="block text-[12px] text-red-500 font-sans">{validationText.balance}</p>
-                            }
-                        </div>
-                    </div>
-                    <div className="flex items-center justify-end mt-6 gap-2">
-                            <Button onClick={() => handleSubmit(false)} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2">
-                                <FaFloppyDisk className="text-base" /> 
-                                <Typography variant="small" className="capitalize">
-                                    { isEdit ? 'Update' : 'Save'}
-                                </Typography>
-                            </Button>
-                            {
-                                !isEdit ? (
-                                    <Button onClick={handleSubmit} color="deep-purple" size="sm" variant="outlined" className="flex items-center gap-2">
-                                        <FaCirclePlus className="text-base" /> 
-                                        <Typography variant="small" className="capitalize">
-                                            Save & New
-                                        </Typography>
-                                    </Button>
-                                ) : null
-                            }
-                            
-                        </div>
-                </DialogBody>                      
-            </Dialog>
-            <DeleteModal deleteId={deleteId} open={openDelete} handleDelete={handleDelete} closeModal={() => setOpenDelete(!openDelete)} />
-        </div>
+                            </div>
+                        </DialogBody>                      
+                    </Dialog>
+                    <DeleteModal deleteId={deleteId} open={openDelete} handleDelete={handleDelete} closeModal={() => setOpenDelete(!openDelete)} />
+                </div>
+            ) : null
+        }
+        </>
     );
 
 }

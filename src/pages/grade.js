@@ -1,7 +1,7 @@
 /* eslint-disable eqeqeq */
 import { Button, Card, CardBody, Dialog, DialogBody, Input, Switch, Typography } from "@material-tailwind/react";
 import { FaCirclePlus, FaFloppyDisk, FaPencil, FaTrashCan, FaMagnifyingGlass } from "react-icons/fa6";
-import { useState } from "react";
+import { useContext, useState, useEffect } from "react";
 import { useFetchGradeQuery, useAddGradeMutation, useUpdateGradeMutation, useRemoveGradeMutation, useFetchGradeCountQuery } from "../store";
 import Pagination from "../components/pagination";
 import DeleteModal from "../components/delete_modal";
@@ -9,13 +9,30 @@ import SectionTitle from "../components/section_title";
 import ModalTitle from "../components/modal_title";
 import moment from "moment/moment";
 import TableList from "../components/data_table";
+import { AuthContent } from "../context/authContext";
 import { useAuthUser } from "react-auth-kit";
+import { useNavigate } from "react-router-dom";
 
 const validator = require('validator');
 
 function Grade() {
 
     const auth = useAuthUser();
+
+    const {permissions} = useContext(AuthContent);
+
+    // const gradePermission = permissions[2];
+    const [gradePermission, setGradePermission] = useState(null);
+
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        setGradePermission(permissions[2]);
+
+        if(gradePermission?.view == false) {
+            navigate('/supplier');
+        }
+    }, [gradePermission])
 
     const [open, setOpen] = useState(false);
 
@@ -164,17 +181,25 @@ function Grade() {
             width: "150px",
             cell: (row) => (
                 <div className="flex items-center gap-2">
-                    <div className="border-r border-gray-400 pr-2">
-                        <div class="custom-checkbox">
-                            <input class="input-checkbox" checked={row.Status} id={row.Code} type="checkbox" onChange={(e) => changeStatus(e.target.checked, row.Code)} />
-                            <label for={row.Code}></label>
-                        </div>
-                    </div>
+                    {
+                        gradePermission?.update ? (
+                            <div className="border-r border-gray-400 pr-2">
+                                <div class="custom-checkbox">
+                                    <input class="input-checkbox" checked={row.Status} id={row.Code} type="checkbox" onChange={(e) => changeStatus(e.target.checked, row.Code)} />
+                                    <label for={row.Code}></label>
+                                </div>
+                            </div>
+                        ) : null
+                    }
                     <Button variant="text" color="deep-purple" className="p-2" onClick={() => handleEdit(row.Code)}><FaPencil /></Button>
-                    <Button variant="text" color="red" className="p-2" onClick={() => {
-                        setDeleteId(row.Code);
-                        setOpenDelete(true);
-                    }}><FaTrashCan /></Button>
+                    {
+                        gradePermission?.delete ? (
+                            <Button variant="text" color="red" className="p-2" onClick={() => {
+                                setDeleteId(row.Code);
+                                setOpenDelete(true);
+                            }}><FaTrashCan /></Button>
+                        ) : null
+                    }
                 </div>
             )
         },
@@ -193,84 +218,86 @@ function Grade() {
     });
 
     return(
-        <div className="flex flex-col gap-4 px-2 relative">
-            <div className="w-78 absolute top-0 right-0 z-[9999]">
-            </div>
-            <SectionTitle title="Stone Grade" handleModal={openModal} />
-            <Card className="h-auto shadow-md w-[1000px] mx-1 rounded-sm p-2 border-t">
-                <CardBody className="rounded-sm overflow-auto p-0">
-                    <div className="flex justify-end py-2">
-                        <div className="w-72">
-                            <Input label="Search" value={filterData.search} onChange={(e) => {
-                                    setFilterData({
-                                        skip: 0,
-                                        take: 10,
-                                        search: e.target.value
-                                    });
-                                    setCurrentPage(1);
-                                }}
-                                icon={<FaMagnifyingGlass />}
-                            />
-                        </div>
+        <div>
+        {
+            gradePermission != null && gradePermission != undefined ? (
+                <div className="flex flex-col gap-4 px-2 relative">
+                    <div className="w-78 absolute top-0 right-0 z-[9999]">
                     </div>
-                    
-                    <TableList columns={column} data={tbodyData} />
-
-                    <div className="grid grid-cols-2">
-                        <div className="flex mt-7 mb-5">
-                            <p className="mr-2 mt-[6px]">Show</p>
-                            <div className="w-[80px]">
-                                <select
-                                    className="block w-full px-2.5 py-1.5 border border-blue-gray-200 h-[35px] rounded-md focus:border-black text-black"
-                                    value={filterData.take} 
-                                    onChange={(e) => {
-                                        setFilterData({
-                                            ...filterData,
-                                            skip: 0,
-                                            take: e.target.value
-                                        });
-                                        setCurrentPage(1);
-                                    }}
-                                >
-                                    <option value="10">10</option>
-                                    <option value="20">20</option>
-                                    <option value="50">50</option>
-                                    <option value="100">100</option>
-                                </select>
+                    <SectionTitle title="Stone Grade" handleModal={openModal} permission={gradePermission?.create}/>
+                    <Card className="h-auto shadow-md w-[1000px] mx-1 rounded-sm p-2 border-t">
+                        <CardBody className="rounded-sm overflow-auto p-0">
+                            <div className="flex justify-end py-2">
+                                <div className="w-72">
+                                    <Input label="Search" value={filterData.search} onChange={(e) => {
+                                            setFilterData({
+                                                skip: 0,
+                                                take: 10,
+                                                search: e.target.value
+                                            });
+                                            setCurrentPage(1);
+                                        }}
+                                        icon={<FaMagnifyingGlass />}
+                                    />
+                                </div>
                             </div>
                             
-                            <p className="ml-2 mt-[6px]">entries</p>
-                        </div>
-                        
-                        <div className="flex justify-end">
-                            {
-                                dataCount != undefined ? (
-                                    <Pagination
-                                        className="pagination-bar"
-                                        siblingCount={1}
-                                        currentPage={currentPage}
-                                        totalCount={dataCount}
-                                        pageSize={filterData.take}
-                                        onPageChange={(page) => {
-                                            setCurrentPage(page);
-                                            setFilterData({
-                                                ...filterData,
-                                                skip: (page - 1) * filterData.take
-                                            })
-                                        }}
-                                    />
-                                ) : (<></>)
-                            }
-                        </div>
-                        
-                    </div>
-                    
-                </CardBody>
-            </Card>
-            <Dialog open={Boolean(open)} handler={openModal} size="sm">
-                <DialogBody>
-                    <ModalTitle titleName={isEdit ? "Edit Stone Grade" : "Stone Grade"} handleClick={openModal} />
-                
+                            <TableList columns={column} data={tbodyData}/>
+        
+                            <div className="grid grid-cols-2">
+                                <div className="flex mt-7 mb-5">
+                                    <p className="mr-2 mt-[6px]">Show</p>
+                                    <div className="w-[80px]">
+                                        <select
+                                            className="block w-full px-2.5 py-1.5 border border-blue-gray-200 h-[35px] rounded-md focus:border-black text-black"
+                                            value={filterData.take} 
+                                            onChange={(e) => {
+                                                setFilterData({
+                                                    ...filterData,
+                                                    skip: 0,
+                                                    take: e.target.value
+                                                });
+                                                setCurrentPage(1);
+                                            }}
+                                        >
+                                            <option value="10">10</option>
+                                            <option value="20">20</option>
+                                            <option value="50">50</option>
+                                            <option value="100">100</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <p className="ml-2 mt-[6px]">entries</p>
+                                </div>
+                                
+                                <div className="flex justify-end">
+                                    {
+                                        dataCount != undefined ? (
+                                            <Pagination
+                                                className="pagination-bar"
+                                                siblingCount={1}
+                                                currentPage={currentPage}
+                                                totalCount={dataCount}
+                                                pageSize={filterData.take}
+                                                onPageChange={(page) => {
+                                                    setCurrentPage(page);
+                                                    setFilterData({
+                                                        ...filterData,
+                                                        skip: (page - 1) * filterData.take
+                                                    })
+                                                }}
+                                            />
+                                        ) : (<></>)
+                                    }
+                                </div>
+                                
+                            </div>
+                            
+                        </CardBody>
+                    </Card>
+                    <Dialog open={Boolean(open)} handler={openModal} size="sm">
+                        <DialogBody>
+                            <ModalTitle titleName={isEdit ? "Edit Stone Grade" : "Stone Grade"} handleClick={openModal} />
                             <div  className="flex flex-col p-3">
                                 
                                 {/* Description */}
@@ -292,30 +319,43 @@ function Grade() {
                                     }
                                 </div>
                                 <div className="flex items-center justify-end mt-6 gap-2">
-                                    <Button onClick={() => handleSubmit(false)} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2">
-                                        <FaFloppyDisk className="text-base" /> 
-                                        <Typography variant="small" className="capitalize">
-                                            {isEdit ? 'Update' : 'Save'}
-                                        </Typography>
-                                    </Button>
                                     {
                                         !isEdit ? (
-                                            <Button onClick={handleSubmit} color="deep-purple" size="sm" variant="outlined" className="flex items-center gap-2">
-                                                <FaCirclePlus className="text-base" /> 
-                                                <Typography variant="small" className="capitalize">
-                                                    Save & New
-                                                </Typography>
-                                            </Button>
-                                        ) : null
+                                            <>
+                                                <Button onClick={() => handleSubmit(false)} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2">
+                                                    <FaFloppyDisk className="text-base" /> 
+                                                    <Typography variant="small" className="capitalize">
+                                                        Save
+                                                    </Typography>
+                                                </Button>
+                                                <Button onClick={handleSubmit} color="deep-purple" size="sm" variant="outlined" className="flex items-center gap-2">
+                                                    <FaCirclePlus className="text-base" /> 
+                                                    <Typography variant="small" className="capitalize">
+                                                        Save & New
+                                                    </Typography>
+                                                </Button>
+                                            </>
+                                        ) : (
+                                            gradePermission?.update ? (
+                                                <Button onClick={() => handleSubmit(false)} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2">
+                                                    <FaFloppyDisk className="text-base" /> 
+                                                    <Typography variant="small" className="capitalize">
+                                                        Update
+                                                    </Typography>
+                                                </Button>
+                                            ): null
+                                        )
                                     }
-                                    
                                 </div>
                             </div>
-                   
-                     
-                </DialogBody>                      
-            </Dialog>
-            <DeleteModal deleteId={deleteId} open={openDelete} handleDelete={handleDelete} closeModal={() => setOpenDelete(!openDelete)} />
+                        </DialogBody>                      
+                    </Dialog>
+                    <DeleteModal deleteId={deleteId} open={openDelete} handleDelete={handleDelete} closeModal={() => setOpenDelete(!openDelete)} />
+                </div>
+            ) : (
+                <div>Loading....</div>
+            )
+        }
         </div>
     );
 
