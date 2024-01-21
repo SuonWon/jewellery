@@ -25,6 +25,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { apiUrl } from "./const";
 import Cookies from "js-cookie";
+import NoPermission from "./pages/noPermission";
 
 
 function App() {
@@ -55,11 +56,11 @@ function App() {
 
   return (
     <AuthContent.Provider value={{permissions, setPermissions}}>
-      <div className="flex flex-col justify-center">
+      <div className="flex flex-col justify-center w-full">
         {
           currentUrl.pathname === "/login" ? "" : <Nav />
         }
-        <div className="flex items-center justify-center">
+        <div className="flex items-center justify-center w-full">
           <Routes>
             <Route path="/" element={
               <RequireAuth loginPath="/login">
@@ -162,6 +163,12 @@ function App() {
             <Route path="system_role" element={
               <RequireAuth loginPath="/login">
                 <SystemRole />
+              </RequireAuth>
+            }></Route>
+            <Route path="/login" element={<Login />}></Route>
+            <Route path="403" element={
+              <RequireAuth loginPath="/login">
+                <NoPermission />
               </RequireAuth>
             }></Route>
             <Route path="/login" element={<Login />}></Route>

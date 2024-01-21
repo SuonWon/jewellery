@@ -232,12 +232,12 @@ function Stone() {
     });
 
     return(
-        <div>
+        <>
             {
                 stonePermission != null && stonePermission != undefined ? (
-                    <div className="flex flex-col gap-4 px-2 relative">
+                    <div className="flex flex-col gap-4 px-4 relative w-full">
                         <SectionTitle title="Stone" handleModal={openModal} permission={stonePermission?.create}/>
-                        <Card className="h-auto shadow-md w-[1000px] mx-1 rounded-sm p-2 border-t">
+                        <Card className="h-auto shadow-md min-w-[100%] max-w-[100%] mx-1 rounded-sm p-2 border-t">
                             <CardBody className="rounded-sm overflow-auto p-0">
                                 <div className="flex justify-end py-2">
                                     <div className="w-72">
@@ -382,7 +382,7 @@ function Stone() {
                     </div>
                 ) : null
             }
-        </div>
+        </>
     );
 
 }

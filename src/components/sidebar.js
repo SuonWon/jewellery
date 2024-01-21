@@ -13,13 +13,13 @@ function Sidebar() {
 
     return (
         <Card className="w-full h-full py-1 shadow-none border rounded-none xl:px-4">
-            <div className="mb-2 px-4 py-3">
+            <div className="mb-2 px-4 py-3 xl:px-4">
                 <Typography color="blue-gray" variant="h5">
                     <span className="hidden xl:block">Master Data</span>
-                    <span className="block xl:hidden">MD</span>
+                    <span className="block xl:hidden">M</span>
                 </Typography>
             </div>
-            <List className="w-full">
+            <List className="w-full w-min-full">
                 {
                     permissions[3]?.view ? (
                         <Link to="brightness" className="text-initial">

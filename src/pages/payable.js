@@ -13,7 +13,9 @@ const validator = require('validator');
 
 function Payable(props) {
 
-    // const {permissions} = useContext(AuthContent);
+    //const {permissions} = useContext(AuthContent);
+
+    console.log(props.payablePermission);
 
     const [payablePermission, setPayablePermission] = useState(props.payablePermission);
 

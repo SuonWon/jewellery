@@ -209,7 +209,6 @@ function PurchaseList() {
             ...payData,
             invoiceNo: invoiceNo,
             balance: Number(balance.replace(/,/g, "")),
-            payablePermission: payablePermission
         });
         setPayOpen(!payOpen);
     }
@@ -811,11 +810,11 @@ function PurchaseList() {
                         ) : null
                     }
                     <Button variant="text" color="deep-purple" className="p-2" onClick={() => handleView(row.Code)}><FaPencil /></Button>
-                    {
-                        purchasePermission?.delete ? (
+                    {/* {
+                        purchasePermission?.delete ? ( */}
                             {/* <Button variant="text" color="red" className="p-2" onClick={() => handleDeleteBtn(row.Code)}><FaTrashCan /></Button> */}
-                        ) : null
-                    }
+                        {/* ) : null
+                    } */}
                 </div>
             )
         },
@@ -1579,7 +1578,7 @@ function PurchaseList() {
                         </DialogBody>
                     </Dialog>
                     {
-                        payOpen? <Payable payOpen={payOpen} invoiceNo={payData.invoiceNo} balance={payData.balance}  
+                        payOpen? <Payable payOpen={payOpen} invoiceNo={payData.invoiceNo} balance={payData.balance} payablePermission={payablePermission} 
                             closePay={() => {
                                 refetch();
                                 setPayOpen(!payOpen)
