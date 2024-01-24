@@ -583,7 +583,7 @@ function Wallet() {
                         </Typography>
                         {
                             walletPermission?.create ? (
-                                <div className="flex gap 4">
+                                <div className="flex gap-4">
                                     <Button 
                                         variant="gradient" 
                                         size="sm" 
@@ -835,9 +835,23 @@ function Wallet() {
                                         <BiReset /> <span>Reset</span>
                                     </Button>
                                 </div>
+                                <div className="flex flex-col justify-end">
+                                    {
+                                        dateRange.startDate && <Typography className="flex justify-between" color="black" variant="p">
+                                            From {moment(dateRange.startDate).format("DD-MMM-YYYY")} to {moment(dateRange.endDate).format("DD-MMM-YYYY")}
+                                        </Typography>
+                                    }
+                                    {/* <Typography className="flex justify-between" color="black" variant="p">
+                                        <span>From</span>
+                                        <span>: {dateRange.startDate ? dateRange.startDate : ""}</span>
+                                    </Typography>
+                                    <Typography className="flex justify-between" color="black" variant="p">
+                                        <span>End Date</span>
+                                        <span>: {dateRange.endDate ? dateRange.endDate : ""}</span>
+                                    </Typography> */}
+                                </div>
                             </div>
                             <TableList columns={column} data={tbodyData} isSearch={true} />
-    
                             <div className="grid grid-cols-2">
                                 <div className="flex mt-7 mb-5">
                                     <p className="mr-2 mt-[6px]">Show</p>
@@ -926,12 +940,14 @@ function Wallet() {
                                                     setDateRange({
                                                         ...dateRange,
                                                         startDate: e.target.value,
+                                                        endDate: dateRange.endDate? dateRange.endDate : moment().format("MM-DD-YYYY")
                                                     });
                                                 }
                                             } else {
                                                 setDateRange({
                                                     ...dateRange,
                                                     startDate: e.target.value,
+                                                    endDate: dateRange.endDate? dateRange.endDate : moment().format("MM-DD-YYYY")
                                                 });
                                             }
                                         }}

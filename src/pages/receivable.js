@@ -179,7 +179,7 @@ function Receivable(props) {
         },
         {
             name: 'Wallet Name',
-            selector: row => row.walletName,
+            selector: row => row.wallet.walletName,
         },
         {
             name: 'Received Date',

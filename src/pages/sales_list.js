@@ -66,7 +66,15 @@ function SalesList() {
 
     const { data: unitData } = useFetchUOMQuery();
 
-    const { data: returnData } = useFetchReturnByInvoiceQuery('1111111111');
+    const { data: returnData } = useFetchReturnQuery({
+        skip: 0,
+        take: 0,
+        status: 'A',
+        return_type: 'S',
+        search_word: '',
+        start_date: null,
+        end_date: null
+    });
 
     axios.get(apiUrl + '/sales/get-id', {
         headers: {
@@ -265,6 +273,7 @@ function SalesList() {
                 amount: el.amount,
             }
         }));
+        console.log(returnData)
         setTBodyReturnData(returnData.filter(el => el.referenceNo === id));
         setIsEdit(true);
         setOpen(!open);
@@ -639,11 +648,11 @@ function SalesList() {
             width: "100px",
             cell: (row) => (
                 <div className="flex items-center gap-2">
-                    {/* {
+                    {
                         receivablePermission?.view ? (
                             <Button variant="text" color="deep-purple" className="p-2" onClick={() => openPayable(row.Code, row.GrandTotal)}><FaMoneyBillTrendUp /></Button>
                         ) : null
-                    } */}
+                    }
                     <Button variant="text" color="deep-purple" className="p-2" onClick={() => handleView(row.Code)}><FaPencil /></Button>
                     {/* {
                         salesPermission?.delete ? ( */}

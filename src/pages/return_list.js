@@ -55,8 +55,12 @@ function ReturnList({type = 'I'}) {
         end_date: null
     });
 
-    const { data } = useFetchReturnQuery(filterData);
-    const { data:dataCount } = useFetchReturnCountQuery(filterData);
+    const { data } = useFetchReturnQuery({
+        ...filterData,
+        return_type: type,
+    });
+
+    const { data: dataCount } = useFetchReturnCountQuery(filterData);
 
     const {data: stoneDetails} = useFetchActiveStoneDetailsQuery();
 
