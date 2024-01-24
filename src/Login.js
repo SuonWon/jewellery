@@ -1,4 +1,4 @@
-import { GoPerson, GoLock } from "react-icons/go";
+import { GoPerson, GoLock, GoEyeClosed, GoEye } from "react-icons/go";
 import { useSignIn } from 'react-auth-kit';
 import { useContext, useState } from "react";
 import axios from "axios";
@@ -7,6 +7,9 @@ import { apiUrl } from "./const";
 import { setToken } from "./store/userSlice";
 import { useDispatch } from "react-redux";
 import { AuthContent } from "./context/authContext";
+import { Button, Card, CardHeader, Checkbox, Dialog, DialogBody, Input, Step, Stepper, Typography } from "@material-tailwind/react";
+import { FaRegImages } from "react-icons/fa6";
+import Startup from "./pages/startup";
 
 
 const validator = require('validator');
@@ -25,6 +28,8 @@ function Login() {
         username: "", 
         password: ""
     });
+
+    const [open, setOpen] = useState(false);
 
     const [ showPassword, setShowPassword ] = useState(false);
 
@@ -96,6 +101,7 @@ function Login() {
     return(
 
         <div className="flex bg-white items-center w-full h-screen justify-center">
+            <Button onClick={() => setOpen(!open)}>Modal</Button>
             <div className="flex flex-col w-80 text-gray-900 bg-white rounded-md pb-12 shadow-xl">
                 <div className="h-24 flex items-center text-neutral-100 justify-start px-7 rounded-t-md" style={{backgroundColor: '#51448a'}}>
                     <h3 className="text-2xl font-bold mt-6 text-white">Jewellery Sales</h3>
@@ -149,6 +155,11 @@ function Login() {
                     </div>
                 </form>
             </div>
+            <Dialog open={open} size="sm">
+                <DialogBody className="p-8">
+                    <Startup handleOpen={() => setOpen(!open)} />
+                </DialogBody>
+            </Dialog>
         </div>
 
     );

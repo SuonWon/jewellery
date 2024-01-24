@@ -65,8 +65,18 @@ function PurchaseList() {
 
     const { data: stoneData } = useFetchTrueStoneQuery();
 
-    // const { data: returnData } = useFetchReturnQuery('P');
-    const { data: returnData } = useFetchReturnByInvoiceQuery('1111111111')
+    const { data: returnData } = useFetchReturnQuery({
+        skip: 0,
+        take: 10,
+        status: 'A',
+        return_type: 'P',
+        search_word: '',
+        start_date: null,
+        end_date: null
+    });
+
+    console.log(returnData);
+    //const { data: returnData } = useFetchReturnByInvoiceQuery()
 
     const auth = useAuthUser();
 

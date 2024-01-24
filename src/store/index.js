@@ -24,6 +24,7 @@ import { systemUserApi } from "../apis/systemUserApi";
 import { systemRoleApi } from "../apis/systemRoleApi";
 import userReducer from "./userSlice";
 import { setupListeners } from "@reduxjs/toolkit/dist/query";
+import { authApi } from "../apis/authApi";
 
 export const store = configureStore({
     reducer: {
@@ -52,6 +53,7 @@ export const store = configureStore({
         [walletApi.reducerPath] : walletApi.reducer,
         [systemUserApi.reducerPath] : systemUserApi.reducer,
         [systemRoleApi.reducerPath] : systemRoleApi.reducer,
+        [authApi.reducerPath] : authApi.reducer,
     },
     middleware: (getDefaultMiddleware) => {
         return getDefaultMiddleware()
@@ -77,7 +79,8 @@ export const store = configureStore({
             .concat(walletCategoryApi.middleware)
             .concat(walletApi.middleware)
             .concat(systemUserApi.middleware)
-            .concat(systemRoleApi.middleware);
+            .concat(systemRoleApi.middleware)
+            .concat(authApi.middleware);
     }
 });
 
@@ -106,3 +109,4 @@ export { useFetchWalletCategoryQuery, useFetchTrueWalletCategoryQuery, useFetchW
 export { useFetchWalletQuery, useFetchTrueWalletQuery, useFetchWalletByIdQuery, useFetchWalletNamesQuery, useAddWalletMutation, useUpdateWalletMutation, useRemoveWalletMutation, useFetchWalletCountQuery } from "../apis/walletApi";
 export { useFetchTrueUsersQuery, useFetchUserByIdQuery, useFetchUserRoleQuery, useFetchUsersCountQuery, useFetchUsersQuery, useAddUserMutation, useUpdateUserMutation, useRemoveUserMutation } from "../apis/systemUserApi";
 export { useFetchRoleByIdQuery, useFetchRolesCountQuery, useFetchRolesQuery, useAddRoleMutation, useUpdateRoleMutation } from "../apis/systemRoleApi";
+export { useAddCompanyMutation, useAddDefaultRoleMutation, useAddDefaultUserMutation, useAddDefaultCategoryMutation } from '../apis/authApi';

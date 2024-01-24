@@ -186,7 +186,7 @@ function Payable(props) {
         },
         {
             name: 'Wallet Name',
-            selector: row => row.walletName,
+            selector: row => row.wallet.walletName,
         },
         {
             name: 'Paid Date',
