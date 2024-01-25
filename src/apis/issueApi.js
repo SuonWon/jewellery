@@ -1,6 +1,5 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { apiUrl } from "../const";
-import Cookies from "js-cookie";
 
 //const token = 'Bearer ' + Cookies.get('_auth');
 
@@ -23,7 +22,7 @@ const issueApi = createApi({
                     return [{type: "Issue", id: "All"}]
                 },
                 query: (filterData) => {
-                    const query = `?skip=${filterData.skip}&take=${filterData.take}&status=${filterData.status}&isComplete=${filterData.isComplete}${filterData.search_word == '' ? '' : `&search_word=${filterData.search_word}`}${filterData.start_date == null ? '' : `&start_date=${filterData.start_date}`}${filterData.end_date == null ? '' : `&end_date=${filterData.end_date}`}`;
+                    const query = `?skip=${filterData.skip}&take=${filterData.take}&status=${filterData.status}&isComplete=${filterData.isComplete}${filterData.search_word === '' ? '' : `&search_word=${filterData.search_word}`}${filterData.start_date == null ? '' : `&start_date=${filterData.start_date}`}${filterData.end_date == null ? '' : `&end_date=${filterData.end_date}`}`;
                     return {
                         url: "/issue/get-all-issue" + query,
                         method: "GET",
@@ -52,7 +51,7 @@ const issueApi = createApi({
                     return [{type: "Issue", id: "All"}]
                 },
                 query: (filterData) => {
-                    const query = `?status=${filterData.status}&isComplete=${filterData.isComplete}${filterData.search_word == '' ? '' : `&search_word=${filterData.search_word}`}${filterData.start_date == null ? '' : `&start_date=${filterData.start_date}`}${filterData.end_date == null ? '' : `&end_date=${filterData.end_date}`}`;
+                    const query = `?status=${filterData.status}&isComplete=${filterData.isComplete}${filterData.search_word === '' ? '' : `&search_word=${filterData.search_word}`}${filterData.start_date == null ? '' : `&start_date=${filterData.start_date}`}${filterData.end_date == null ? '' : `&end_date=${filterData.end_date}`}`;
                     return {
                         url: "/issue/get-count" + query,
                         method: "GET",

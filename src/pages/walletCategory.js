@@ -1,5 +1,5 @@
 /* eslint-disable eqeqeq */
-import { Button, Card, CardBody, Dialog, DialogBody, Input, Switch, Textarea, Typography } from "@material-tailwind/react";
+import { Button, Card, CardBody, Dialog, DialogBody, Input, Typography } from "@material-tailwind/react";
 import { FaCirclePlus, FaFloppyDisk, FaPencil, FaTrashCan, FaMagnifyingGlass } from "react-icons/fa6";
 import { useContext, useEffect, useState } from "react";
 import { useAddWalletCategoryMutation, useFetchWalletCategoryCountQuery, useFetchWalletCategoryQuery, useRemoveWalletCategoryMutation, useUpdateWalletCategoryMutation } from "../store";
@@ -37,7 +37,7 @@ function WalletCategory() {
         if(catePermission?.view == false) {
             navigate('./supplier');
         }
-    }, [catePermission])
+    }, [catePermission, permissions, navigate])
 
     const [open, setOpen] = useState(false);
 

@@ -1,5 +1,5 @@
 /* eslint-disable eqeqeq */
-import { Button, Card, CardBody, Dialog, DialogBody, Input, Typography, } from "@material-tailwind/react";
+import { Button, Card, CardBody, Dialog, DialogBody, Typography, } from "@material-tailwind/react";
 import { FaCirclePlus, FaFloppyDisk, FaPencil, FaTrashCan, } from "react-icons/fa6";
 import { useContext, useEffect, useState } from "react";
 import { useFetchUOMQuery, useAddUOMMutation, useUpdateUOMMutation, useRemoveUOMMutation } from "../store";
@@ -30,7 +30,7 @@ function UOM() {
         if(unitPermission?.view == false) {
             navigate('./supplier');
         }
-    }, [unitPermission])
+    }, [unitPermission, permissions, navigate])
 
     const [open, setOpen] = useState(false);
 

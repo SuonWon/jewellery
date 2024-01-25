@@ -1,9 +1,9 @@
 /* eslint-disable eqeqeq */
 import { Button, Card, CardBody, Dialog, DialogBody, Typography } from "@material-tailwind/react";
-import { FaCirclePlus, FaEye, FaFloppyDisk, FaPencil, FaPlus, FaTrashCan, } from "react-icons/fa6";
+import { FaCirclePlus, FaFloppyDisk, FaPencil, FaPlus, FaTrashCan, } from "react-icons/fa6";
 import { useContext, useEffect, useState } from "react";
 import { apiUrl, focusSelect, pause } from "../const";
-import { useAddAdjustmentMutation, useFetchActiveStoneDetailsQuery, useFetchAdjustmentCountQuery, useFetchAdjustmentQuery, useFetchPurchaseQuery, useFetchStoneDetailsQuery, useFetchTruePurchaseQuery, useFetchUOMQuery, useRemoveAdjustMutation, useUpdateAdjustmentMutation, } from "../store";
+import { useAddAdjustmentMutation, useFetchActiveStoneDetailsQuery, useFetchAdjustmentCountQuery, useFetchAdjustmentQuery, useFetchTruePurchaseQuery, useFetchUOMQuery, useRemoveAdjustMutation, useUpdateAdjustmentMutation, } from "../store";
 import Pagination from "../components/pagination";
 import DeleteModal from "../components/delete_modal";
 import SuccessAlert from "../components/success_alert";
@@ -34,7 +34,7 @@ function Adjustment() {
         if(adjPermission?.view == false) {
             navigate('/403');
         }
-    }, [permissions])
+    }, [permissions, adjPermission, navigate])
 
     const [filterData, setFilterData] = useState({
         skip: 0,

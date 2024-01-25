@@ -4,7 +4,6 @@ import { FaRulerVertical } from "react-icons/fa6";
 import { GiCheckeredDiamond, GiCutDiamond, GiDiamondHard, GiDiamonds } from "react-icons/gi";
 import { Link } from "react-router-dom";
 import { AuthContent } from '../context/authContext';
-import { moduleName } from '../const';
 import { useContext } from 'react';
 
 function Sidebar() {

@@ -1,8 +1,8 @@
 /* eslint-disable eqeqeq */
 import { Button, Card, CardBody, Dialog, DialogBody, Typography } from "@material-tailwind/react";
-import { FaCirclePlus, FaFloppyDisk, FaMoneyBillTrendUp, FaPencil, FaPlus, FaTrashCan, } from "react-icons/fa6";
+import { FaCirclePlus, FaFloppyDisk, FaMoneyBillTrendUp, FaPencil, FaPlus, } from "react-icons/fa6";
 import { useContext, useEffect, useState } from "react";
-import { useAddSalesMutation, useFetchActiveStoneDetailsQuery, useFetchReturnByInvoiceQuery, useFetchReturnQuery, useFetchSalesCountQuery, useFetchSalesQuery, useFetchStoneDetailsQuery, useFetchTrueCustomerQuery, useFetchTrueSalesQuery, useFetchUOMQuery, useRemoveSalesMutation, useUpdateIssueMutation, useUpdateIssueStatusMutation, useUpdateSalesMutation } from "../store";
+import { useAddSalesMutation, useFetchActiveStoneDetailsQuery, useFetchReturnByInvoiceQuery, useFetchSalesCountQuery, useFetchSalesQuery, useFetchTrueCustomerQuery, useFetchUOMQuery, useRemoveSalesMutation, useUpdateIssueMutation, useUpdateIssueStatusMutation, useUpdateSalesMutation } from "../store";
 import Pagination from "../components/pagination";
 import { apiUrl, focusSelect, pause } from "../const";
 import DeleteModal from "../components/delete_modal";
@@ -37,13 +37,10 @@ function SalesList() {
         setSalesPermission(permissions[12]);
         setReceivablePermission(permissions[23]);
 
-        console.log(permissions[12]);
-        console.log(permissions[23]);
-
         if(salesPermission?.view == false) {
             navigate('/403');
         }
-    }, [permissions])
+    }, [permissions, salesPermission, navigate])
     
     const [filterData, setFilterData] = useState({
         skip: 0,
@@ -84,7 +81,7 @@ function SalesList() {
         setSalesId(res.data);
     });
 
-    const [removeSales, removeResult] = useRemoveSalesMutation();
+    const [removeSales] = useRemoveSalesMutation();
 
     const [addSales] = useAddSalesMutation();
 
@@ -186,10 +183,10 @@ function SalesList() {
          setOpenDelete(!openDelete);
     };
 
-    const handleDeleteBtn = (id) => {
-        setDeleteId(id);
-        setOpenDelete(!openDelete);
-    };
+    // const handleDeleteBtn = (id) => {
+    //     setDeleteId(id);
+    //     setOpenDelete(!openDelete);
+    // };
 
     const handleOpen = () => {
         setFormData(salesData);

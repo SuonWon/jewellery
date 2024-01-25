@@ -1,6 +1,6 @@
 /* eslint-disable eqeqeq */
-import { Button, Card, CardBody, Dialog, DialogBody, Switch, Typography, Input } from "@material-tailwind/react";
-import { FaCirclePlus, FaFloppyDisk, FaListCheck, FaPencil, FaTrashCan, FaMagnifyingGlass } from "react-icons/fa6";
+import { Button, Card, CardBody, Dialog, DialogBody, Typography, Input } from "@material-tailwind/react";
+import { FaCirclePlus, FaFloppyDisk, FaPencil, FaMagnifyingGlass } from "react-icons/fa6";
 import { useContext, useEffect, useState } from "react";
 import { useFetchStoneDetailsQuery, useAddStoneDetailsMutation, useUpdateStoneDetailsMutation, useRemoveStoneDetailsMutation, useFetchUOMQuery, useFetchTrueBrightnessQuery, useFetchTrueStoneQuery, useFetchTrueGradeQuery, useFetchTrueTypeQuery, useFetchTrueSupplierQuery, useFetchPurchaseQuery, useUpdatePurchaseStatusMutation, useUpdatePurchaseMutation, useFetchTruePurchaseQuery, useFetchStoneDetailsCountQuery } from "../store";
 import Pagination from "../components/pagination";
@@ -38,7 +38,7 @@ function StoneDetails() {
         if(selectionPermission?.view == false) {
             navigate('/403');
         }
-    }, [selectionPermission])
+    }, [permissions, selectionPermission, navigate])
 
     const [filterData, setFilterData] = useState({
         skip: 0,
@@ -107,7 +107,7 @@ function StoneDetails() {
 
     useEffect(() => {
         refetch();
-    }, []);
+    }, [refetch]);
 
     const [description, setDescription] = useState({
         stoneDesc: "",
@@ -117,7 +117,7 @@ function StoneDetails() {
         sizeUnit: "လုံးစီး",
     });
 
-    const [addStoneDetail, addResult] = useAddStoneDetailsMutation();
+    const [addStoneDetail] = useAddStoneDetailsMutation();
 
     const [editStoneDetail] = useUpdateStoneDetailsMutation();
 
@@ -435,10 +435,10 @@ function StoneDetails() {
         setOpenDelete(!openDelete);
     };
 
-    const handleDeleteBtn = (id) => {
-        setDeleteId(id);
-        setOpenDelete(!openDelete);
-    };
+    // const handleDeleteBtn = (id) => {
+    //     setDeleteId(id);
+    //     setOpenDelete(!openDelete);
+    // };
 
     const openCombineModal = (id) => {
         let temp = data.find(res => res.stoneDetailCode === id);
@@ -586,7 +586,7 @@ function StoneDetails() {
     const column = [
         {
             name: 'Status',
-            width: "150px",
+            width: "130px",
             center: "true",
             cell: row => (
                 <div className={`w-[90px] flex items-center justify-center text-white h-7 rounded-full ${row.Status ? 'bg-green-500' : 'bg-red-500' } `}>
@@ -597,15 +597,9 @@ function StoneDetails() {
             ),
         },
         {
-            name: 'Quantity',
-            width: "100px",
-            selector: row => row.Qty,
-
-        },
-        {
-            name: 'Weight',
-            width: "150px",
-            selector: row => row.Weight,
+            name: 'Reference No',
+            width: '130px',
+            selector: row => row.ReferenceNo,
         },
         {
             name: 'Description',
@@ -613,73 +607,79 @@ function StoneDetails() {
             selector: row => row.Description,
         },
         {
-            name: 'Reference No',
-            width: '150px',
-            selector: row => row.ReferenceNo,
+            name: 'Quantity',
+            width: "80px",
+            selector: row => row.Qty,
+
+        },
+        {
+            name: 'Weight',
+            width: "80px",
+            selector: row => row.Weight,
+        },
+        {
+            name: 'Purchase Price',
+            width: '130px',
+            selector: row => row.PurchasePrice,
+            right: true,
+        },
+        {
+            name: 'Sales Price',
+            width: '130px',
+            selector: row => row.SalesPrice,
+            right: true,
+        },
+        {
+            name: 'Profit',
+            width: '130px',
+            selector: row => row.Profit,
+            right: true,
         },
         {
             name: 'Supplier Name',
             width: '200px',
             selector: row => row.SupplierName,
         },
-        {
-            name: 'Purchase Price',
-            width: '150px',
-            selector: row => row.PurchasePrice,
-            right: true,
-        },
-        {
-            name: 'Sales Price',
-            width: '150px',
-            selector: row => row.SalesPrice,
-            right: true,
-        },
-        {
-            name: 'Profit',
-            width: '150px',
-            selector: row => row.Profit,
-            right: true,
-        },
-        {
-            name: 'Size',
-            width: "150",
-            selector: row => row.Size,
+        // {
+        //     name: 'Size',
+        //     width: "150",
+        //     selector: row => row.Size,
 
-        },
-        {
-            name: 'Size Unit',
-            width: "150",
-            selector: row => row.SizeUnit,
+        // },
+        // {
+        //     name: 'Size Unit',
+        //     width: "150",
+        //     selector: row => row.SizeUnit,
 
-        },
+        // },
         // {
         //     name: 'Stone Description',
         //     width: "200px",
         //     selector: row => row.StoneDesc,
 
         // },
-        {
-            name: 'Brightness',
-            width: "150px",
-            selector: row => row.BrightnessDesc,
+        // {
+        //     name: 'Brightness',
+        //     width: "150px",
+        //     selector: row => row.BrightnessDesc,
 
-        },
-        {
-            name: 'Grade',
-            width: "150px",
-            selector: row => row.GradeDesc,
+        // },
+        // {
+        //     name: 'Grade',
+        //     width: "150px",
+        //     selector: row => row.GradeDesc,
 
-        },
-        {
-            name: 'Type',
-            width: "150px",
-            selector: row => row.TypeDesc,
-        },
-        {
-            name: 'Unit',
-            width: "150px",
-            selector: row => row.UnitDesc,
-        },
+        // },
+        // {
+        //     name: 'Type',
+        //     width: "150px",
+        //     selector: row => row.TypeDesc,
+        // },
+        // {
+        //     name: 'Unit',
+        //     width: "150px",
+        //     selector: row => row.UnitDesc,
+        // },
         {
             name: 'Remark',
             width: "200px",
@@ -743,9 +743,9 @@ function StoneDetails() {
             UpdatedBy: stoneDetail.updatedBy,
             Remark: stoneDetail.remark,
             Status: stoneDetail.isActive,
-            PurchasePrice: stoneDetail.purchasePrice,
-            SalesPrice: stoneDetail.salesPrice,
-            Profit: stoneDetail.profit,
+            PurchasePrice: stoneDetail.purchasePrice.toLocaleString('en-US'),
+            SalesPrice: stoneDetail.salesPrice.toLocaleString('en-US'),
+            Profit: stoneDetail.profit.toLocaleString('en-US'),
         }
     });
 

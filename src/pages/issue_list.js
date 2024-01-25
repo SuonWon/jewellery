@@ -1,13 +1,12 @@
 import { Button, Card, CardBody, Dialog, DialogBody, Typography } from "@material-tailwind/react";
-import { FaCirclePlus, FaEye, FaFloppyDisk, FaPencil, FaPlus, FaTrashCan } from "react-icons/fa6";
-import { useAddIssueMutation, useFetchActiveStoneDetailsQuery, useFetchIssueCountQuery, useFetchIssueQuery, useFetchReturnByInvoiceQuery, useFetchStoneDetailsQuery, useFetchTrueCustomerQuery, useFetchUOMQuery, useRemoveIssueMutation, useUpdateIssueMutation } from "../store";
+import { FaCirclePlus, FaFloppyDisk, FaPencil, FaPlus, FaTrashCan } from "react-icons/fa6";
+import { useAddIssueMutation, useFetchActiveStoneDetailsQuery, useFetchIssueCountQuery, useFetchIssueQuery, useFetchReturnByInvoiceQuery, useFetchTrueCustomerQuery, useFetchUOMQuery, useRemoveIssueMutation, useUpdateIssueMutation } from "../store";
 import Pagination from "../components/pagination";
 import moment from "moment";
 import { useContext, useEffect, useState } from "react";
 import SuccessAlert from "../components/success_alert";
 import TableList from "../components/data_table";
 import DeleteModal from "../components/delete_modal";
-import { Link } from "react-router-dom";
 import { apiUrl, focusSelect } from "../const";
 import ModalTitle from "../components/modal_title";
 import { v4 as uuidv4 } from 'uuid';
@@ -34,10 +33,10 @@ function IssueList() {
     useEffect(() => {
         setIssuePermission(permissions[13]);
 
-        if(issuePermission?.view == false) {
+        if(issuePermission?.view === false) {
             navigate('/403');
         }
-    })
+    },[permissions, issuePermission, navigate])
 
     const [filterData, setFilterData] = useState({
         skip: 0,
@@ -143,7 +142,7 @@ function IssueList() {
 
     const handleView = (id) => {
         let tempData = data.find(res => res.issueNo === id);
-        console.log(tempData);
+
         setFormData({
             issueNo: tempData.issueNo,
             issueDate: tempData.issueDate,
@@ -242,7 +241,7 @@ function IssueList() {
                 }).then((res) => {
                     if(res.error != null) {
                         let message = '';
-                        if(res.error.data.statusCode == 409) {
+                        if(res.error.data.statusCode === 409) {
                             message = "Duplicate data found."
                         }
                         else {
@@ -284,7 +283,7 @@ function IssueList() {
                 }).then((res) => {
                     if(res.error != null) {
                         let message = '';
-                        if(res.error.data.statusCode == 409) {
+                        if(res.error.data.statusCode === 409) {
                             message = "Duplicate data found."
                         }
                         else {
@@ -339,7 +338,7 @@ function IssueList() {
                 }).then((res) => {
                     if(res.error != null) {
                         let message = '';
-                        if(res.error.data.statusCode == 409) {
+                        if(res.error.data.statusCode === 409) {
                             message = "Duplicate data found."
                         }
                         else {
@@ -482,7 +481,7 @@ function IssueList() {
         },
         {
             name: 'Date',
-            width: "150px",
+            width: "130px",
             selector: row => row.issueDate,
         },
         {
@@ -492,32 +491,32 @@ function IssueList() {
         },
         {
             name: 'Quantity',
-            width: "100px",
+            width: "80px",
             selector: row => row.qty,
             center: "true"
         },
         {
             name: 'Weight',
-            width: "100px",
+            width: "80px",
             selector: row => row.weight,
             center: "true"
 
         },
         {
             name: 'Unit',
-            width: "150px",
+            width: "80px",
             selector: row => row.unitCode,
             center: "true"
         },
         {
             name: 'Unit Price',
-            width: "150px",
+            width: "130px",
             selector: row => row.unitPrice,
             right: "true",
         },
         {
             name: 'Total Price',
-            width: "150px",
+            width: "130px",
             selector: row => row.totalPrice,
             right: "true",
         },
@@ -603,7 +602,7 @@ function IssueList() {
     return (
         <>
         {
-            permissions != null && permissions != undefined ? (
+            permissions !== null && permissions !== undefined ? (
                 <div className="flex flex-col gap-4 relative max-w-[85%] min-w-[85%]">
                     <div className="w-78 absolute top-0 right-0 z-[9999]">
                         {/* {
@@ -795,7 +794,7 @@ function IssueList() {
                                 
                                 <div className="flex justify-end">
                                     {
-                                        dataCount != undefined ? (
+                                        dataCount !== undefined ? (
                                             <Pagination
                                                 className="pagination-bar"
                                                 siblingCount={1}

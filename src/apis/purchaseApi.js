@@ -1,7 +1,5 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { apiUrl, pause } from "../const";
-import moment from "moment";
-import Cookies from "js-cookie";
+import { apiUrl } from "../const";
 
 //const token = 'Bearer ' + Cookies.get('_auth');
 
@@ -35,7 +33,7 @@ const purchaseApi = createApi({
                     return [{type: 'Purchase', id: 'All'}]
                 },
                 query: (filterData) => {
-                    const query = `?skip=${filterData.skip}&take=${filterData.take}&status=${filterData.status}&isComplete=${filterData.isComplete}&paidStatus=${filterData.paidStatus}${filterData.search_word == '' ? '' : `&search_word=${filterData.search_word}`}${filterData.start_date == null ? '' : `&start_date=${filterData.start_date}`}${filterData.end_date == null ? '' : `&end_date=${filterData.end_date}`}`;
+                    const query = `?skip=${filterData.skip}&take=${filterData.take}&status=${filterData.status}&isComplete=${filterData.isComplete}&paidStatus=${filterData.paidStatus}${filterData.search_word === '' ? '' : `&search_word=${filterData.search_word}`}${filterData.start_date == null ? '' : `&start_date=${filterData.start_date}`}${filterData.end_date == null ? '' : `&end_date=${filterData.end_date}`}`;
                     return {
                         url: '/purchase/get-all-purchases'+ query,
                         method: 'GET',
@@ -72,7 +70,7 @@ const purchaseApi = createApi({
                 },
                 query: (filterData) => {
 
-                    const query = `?status=${filterData.status}&isComplete=${filterData.isComplete}&paidStatus=${filterData.paidStatus}${filterData.search_word == '' ? '' : `&search_word=${filterData.search_word}`}${filterData.start_date == null ? '' : `&start_date=${filterData.start_date}`}${filterData.end_date == null ? '' : `&end_date=${filterData.end_date}`}`;
+                    const query = `?status=${filterData.status}&isComplete=${filterData.isComplete}&paidStatus=${filterData.paidStatus}${filterData.search_word === '' ? '' : `&search_word=${filterData.search_word}`}${filterData.start_date == null ? '' : `&start_date=${filterData.start_date}`}${filterData.end_date == null ? '' : `&end_date=${filterData.end_date}`}`;
                     return {
                         url: '/purchase/get-count'+query,
                         method: 'GET',

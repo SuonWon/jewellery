@@ -1,4 +1,4 @@
-import { Grid, Triangle } from "react-loader-spinner";
+import { Grid } from "react-loader-spinner";
 
 function ListLoader() {
     return (

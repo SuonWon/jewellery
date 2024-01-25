@@ -1,5 +1,5 @@
 /* eslint-disable eqeqeq */
-import { Button, Card, CardBody, Dialog, DialogBody, Input, Switch, Typography } from "@material-tailwind/react";
+import { Button, Card, CardBody, Dialog, DialogBody, Input, Typography } from "@material-tailwind/react";
 import { FaCirclePlus, FaFloppyDisk, FaPencil, FaTrashCan, FaMagnifyingGlass } from "react-icons/fa6";
 import { useContext, useEffect, useState } from "react";
 import { useFetchTypeQuery, useAddTypeMutation, useUpdateTypeMutation, useRemoveTypeMutation, useFetchTypeCountQuery } from "../store";
@@ -31,7 +31,7 @@ function StoneType() {
         if(typePermission?.view == false) {
             navigate('/403');
         }
-    }, [typePermission])
+    }, [typePermission, permissions, navigate])
 
     const [open, setOpen] = useState(false);
 

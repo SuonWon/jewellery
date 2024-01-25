@@ -1,5 +1,5 @@
 /* eslint-disable eqeqeq */
-import { Button, Card, CardBody, Dialog, DialogBody, Input, Switch, Textarea, Typography } from "@material-tailwind/react";
+import { Button, Card, CardBody, Dialog, DialogBody, Input,Typography } from "@material-tailwind/react";
 import { FaCirclePlus, FaFloppyDisk, FaPencil, FaTrashCan, FaMagnifyingGlass } from "react-icons/fa6";
 import { useContext, useEffect, useState } from "react";
 import { useAddShareMutation, useFetchShareCountQuery, useFetchShareQuery, useRemoveShareMutation, useUpdateShareMutation } from "../store";
@@ -28,7 +28,7 @@ function Share() {
         if(sharePermission?.view == false) {
             navigate('/403');
         }
-    }, [permissions])
+    }, [permissions, sharePermission, navigate])
 
     const [open, setOpen] = useState(false);
 
@@ -46,7 +46,7 @@ function Share() {
     
     const {data:dataCount} = useFetchShareCountQuery(filterData); 
 
-    const [addShare, addResult] = useAddShareMutation();
+    const [addShare] = useAddShareMutation();
 
     const [editShare] = useUpdateShareMutation();
 

@@ -1,6 +1,6 @@
 /* eslint-disable eqeqeq */
-import { Button, Card, CardBody, Dialog, DialogBody, Input, Switch, Textarea, Typography } from "@material-tailwind/react";
-import { FaCirclePlus, FaFloppyDisk, FaPencil, FaTrashCan, FaMagnifyingGlass } from "react-icons/fa6";
+import { Button, Card, CardBody, Dialog, DialogBody, Input, Typography } from "@material-tailwind/react";
+import { FaCirclePlus, FaFloppyDisk, FaMagnifyingGlass } from "react-icons/fa6";
 import { useContext, useEffect, useState } from "react";
 import { useAddWalletMutation, useFetchTrueShareQuery, useFetchWalletCountQuery, useFetchWalletQuery, useRemoveWalletMutation, useUpdateWalletMutation, } from "../store";
 import Pagination from "../components/pagination";
@@ -30,7 +30,7 @@ function WalletList() {
         if(walletPermission?.view == false) {
             navigate('/403');
         }
-    }, [permissions])
+    }, [permissions, walletPermission, navigate])
 
     const [filterData, setFilterData] = useState({
         skip: 0,
@@ -71,7 +71,7 @@ function WalletList() {
 
     const [ formData, setFormData ] = useState(resetData);
 
-    const [deleteId, setDeleteId] = useState('');
+    const [deleteId] = useState('');
 
     const [validationText, setValidationText] = useState({});
 
@@ -139,12 +139,12 @@ function WalletList() {
     //     await editWallet(saveData);
     // }
 
-    function handleEdit(id) {
-        const focusData = data.find(rec => rec.id == id);
-        setFormData(focusData);
-        setOpen(true);
-        setIsEdit(true);
-    }
+    // function handleEdit(id) {
+    //     const focusData = data.find(rec => rec.id == id);
+    //     setFormData(focusData);
+    //     setOpen(true);
+    //     setIsEdit(true);
+    // }
 
     async function handleDelete() {
         console.log(deleteId);
@@ -173,7 +173,7 @@ function WalletList() {
         },
         {
             name: 'Name',
-            width: "150px",
+            width: "300px",
             selector: row => row.walletName,
             
         },
@@ -216,7 +216,7 @@ function WalletList() {
             id: wallet.id,
             walletName: wallet.walletName,
             shareCode: wallet.share.shareName,
-            balance: wallet.balance,
+            balance: wallet.balance.toLocaleString('en-US'),
             createdAt: moment(wallet.createdAt).format("YYYY-MM-DD hh:mm:ss a"),
             createdBy: wallet.createdBy,
             updatedAt: moment(wallet.updatedAt).format("YYYY-MM-DD hh:mm:ss a"),

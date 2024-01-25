@@ -3,7 +3,7 @@ import { Button, Card, CardBody, Dialog, DialogBody, Typography } from "@materia
 import { FaCirclePlus, FaEye, FaFloppyDisk, FaPlus, FaTrashCan, } from "react-icons/fa6";
 import { useState } from "react";
 import { focusSelect, pause } from "../const";
-import { useFetchPurchaseQuery, useFetchStoneDetailsQuery, useFetchTruePurchaseQuery, useFetchUOMQuery, useRemovePurchaseMutation } from "../store";
+import { useFetchPurchaseQuery, useFetchStoneDetailsQuery, useFetchUOMQuery } from "../store";
 import DeleteModal from "../components/delete_modal";
 import SuccessAlert from "../components/success_alert";
 import moment from "moment";

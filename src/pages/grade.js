@@ -1,5 +1,5 @@
 /* eslint-disable eqeqeq */
-import { Button, Card, CardBody, Dialog, DialogBody, Input, Switch, Typography } from "@material-tailwind/react";
+import { Button, Card, CardBody, Dialog, DialogBody, Input, Typography } from "@material-tailwind/react";
 import { FaCirclePlus, FaFloppyDisk, FaPencil, FaTrashCan, FaMagnifyingGlass } from "react-icons/fa6";
 import { useContext, useState, useEffect } from "react";
 import { useFetchGradeQuery, useAddGradeMutation, useUpdateGradeMutation, useRemoveGradeMutation, useFetchGradeCountQuery } from "../store";
@@ -32,7 +32,7 @@ function Grade() {
         if(gradePermission?.view == false) {
             navigate('/403');
         }
-    }, [gradePermission])
+    }, [gradePermission, navigate, permissions])
 
     const [open, setOpen] = useState(false);
 

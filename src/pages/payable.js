@@ -2,13 +2,13 @@ import { Button, Card, CardBody, Dialog, DialogBody, Typography } from "@materia
 import ModalTitle from "../components/modal_title";
 import DataTable from "react-data-table-component";
 import { FaCheck, FaFloppyDisk, FaPencil, FaTrashCan, FaXmark } from "react-icons/fa6";
-import { useContext, useEffect, useState } from "react";
+import { useState } from "react";
 import { v4 as uuidv4 } from 'uuid';
 import moment from "moment";
 import { useAuthUser } from "react-auth-kit";
 import { focusSelect } from "../const";
-import { useAddPayableMutation, useFetchPayableQuery, useFetchTrueWalletQuery, useFetchWalletQuery, useRemovePayableMutation, useUpdatePayableMutation } from "../store";
-import { AuthContent } from "../context/authContext";
+import { useAddPayableMutation, useFetchPayableQuery, useFetchTrueWalletQuery, useRemovePayableMutation, useUpdatePayableMutation } from "../store";
+
 const validator = require('validator');
 
 function Payable(props) {
@@ -17,7 +17,7 @@ function Payable(props) {
 
     console.log(props.payablePermission);
 
-    const [payablePermission, setPayablePermission] = useState(props.payablePermission);
+    const [payablePermission] = useState(props.payablePermission);
 
     const {data} = useFetchPayableQuery(props.invoiceNo);
 
@@ -242,7 +242,7 @@ function Payable(props) {
     return (
         <> 
         {
-            payablePermission != null && payablePermission != undefined ? (
+            payablePermission != null && payablePermission !== undefined ? (
                 <Dialog 
                     open={props.payOpen} size="xl"
                 >

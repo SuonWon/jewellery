@@ -1,21 +1,21 @@
-import { Input } from "@material-tailwind/react";
+// import { Input } from "@material-tailwind/react";
 import DataTable from "react-data-table-component";
-import { GoSearch } from "react-icons/go";
+// import { GoSearch } from "react-icons/go";
 import ListLoader from "./customLoader";
 
 function TableList(props) {
 
-    const searchBox = <div className="w-60">
-        <Input 
-            placeholder="Search..." 
-            icon={<GoSearch />}
-            className="!border !border-gray-300"
-            labelProps={{
-                className: "hidden",
-            }}
+    // const searchBox = <div className="w-60">
+    //     <Input 
+    //         placeholder="Search..." 
+    //         icon={<GoSearch />}
+    //         className="!border !border-gray-300"
+    //         labelProps={{
+    //             className: "hidden",
+    //         }}
     
-        />
-    </div>;
+    //     />
+    // </div>;
 
     return (
         <>

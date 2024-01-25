@@ -1,6 +1,5 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { apiUrl } from "../const";
-import Cookies from "js-cookie";
 
 //const token = 'Bearer ' + Cookies.get('_auth');
 
@@ -31,7 +30,7 @@ const walletTransitionApi = createApi({
                     return [{type: "WalletTransaction", id: "All"}]
                 },
                 query: (filterData) => {
-                    const query = `?skip=${filterData.skip}&take=${filterData.take}&status=true${filterData.shareCode == '' ? '' : `&shareCode=${filterData.shareCode}`}${filterData.walletName == '' ? '' : `&walletName=${filterData.walletName}`}${filterData.category == '' ? '' : `&category=${filterData.category}`}${filterData.start_date == null ? '' : `&start_date=${filterData.start_date}`}${filterData.end_date == null ? '' : `&end_date=${filterData.end_date}`}`;
+                    const query = `?skip=${filterData.skip}&take=${filterData.take}&status=true${filterData.shareCode === 0 ? '' : `&shareCode=${filterData.shareCode}`}${filterData.walletName === '' ? '' : `&walletName=${filterData.walletName}`}${filterData.category === 0 ? '' : `&category=${filterData.category}`}${filterData.start_date == null ? '' : `&start_date=${filterData.start_date}`}${filterData.end_date == null ? '' : `&end_date=${filterData.end_date}`}`;
                     return {
                         url: `/transaction/get-all-transactions${query}`,
                         // params: {
@@ -50,7 +49,8 @@ const walletTransitionApi = createApi({
                     return [{type: "WalletTransaction", id: "All"}]
                 },
                 query: (filterData) => {
-                    const query = `?status=true${filterData.shareCode == '' ? '' : `&shareCode=${filterData.shareCode}`}${filterData.walletName == '' ? '' : `&walletName=${filterData.walletName}`}${filterData.category == '' ? '' : `&walletName=${filterData.category}`}${filterData.start_date == null ? '' : `&start_date=${filterData.start_date}`}${filterData.end_date == null ? '' : `&end_date=${filterData.end_date}`}`;
+                    console.log(filterData);
+                    const query = `?status=true${filterData.shareCode === 0 ? '' : `&shareCode=${filterData.shareCode}`}${filterData.walletName === '' ? '' : `&walletName=${filterData.walletName}`}${filterData.category === 0 ? '' : `&walletName=${filterData.category}`}${filterData.start_date == null ? '' : `&start_date=${filterData.start_date}`}${filterData.end_date == null ? '' : `&end_date=${filterData.end_date}`}`;
                     return {
                         url: `/transaction/get-count${query}`,
                         // params: {

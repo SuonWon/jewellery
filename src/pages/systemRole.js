@@ -1,10 +1,9 @@
 /* eslint-disable eqeqeq */
-import { Button, Card, CardBody, Dialog, DialogBody, Input, Switch, Textarea, Typography } from "@material-tailwind/react";
-import { FaCirclePlus, FaFloppyDisk, FaPencil, FaTrashCan, FaMagnifyingGlass } from "react-icons/fa6";
+import { Button, Card, CardBody, Dialog, DialogBody, Input, Typography } from "@material-tailwind/react";
+import { FaCirclePlus, FaFloppyDisk, FaPencil, FaMagnifyingGlass } from "react-icons/fa6";
 import { useContext, useEffect, useState } from "react";
 import { useAddRoleMutation, useFetchRolesCountQuery, useFetchRolesQuery, useUpdateRoleMutation } from "../store";
 import Pagination from "../components/pagination";
-import DeleteModal from "../components/delete_modal";
 import SectionTitle from "../components/section_title";
 import ModalTitle from "../components/modal_title";
 import moment from "moment";
@@ -30,7 +29,7 @@ function SystemRole() {
         if(rolePermission?.view == false) {
             navigate('/403');
         }
-    }, [permissions])
+    }, [permissions, rolePermission, navigate])
 
     const [filterData, setFilterData] = useState({
         skip: 0,
@@ -55,17 +54,17 @@ function SystemRole() {
     
     const { data: dataCount } = useFetchRolesCountQuery(filterData); 
 
-    const [addRole, addResult] = useAddRoleMutation();
+    const [addRole] = useAddRoleMutation();
 
     const [editRole] = useUpdateRoleMutation();
 
-    const [deleteId, setDeleteId] = useState('');
+    // const [deleteId, setDeleteId] = useState('');
 
     const auth = useAuthUser();
 
     const [open, setOpen] = useState(false);
 
-    const [openDelete, setOpenDelete] = useState(false);
+    // const [openDelete, setOpenDelete] = useState(false);
 
     const [isEdit, setIsEdit] = useState(false);
 
@@ -85,22 +84,22 @@ function SystemRole() {
 
     const [formData, setFormData] = useState(userInfo);
 
-    const handleChange = async (e) => {
+    // const handleChange = async (e) => {
         
-        let role = data.find((role) => role.roleCode == e.target.id);
-        await editRole({
-            roleDesc: role.roleDesc,
-            remark: role.remark,
-            permission: role.permission,
-            createdAt: role.createdAt,
-            createdBy: role.createdBy,
-            updatedAt: moment().toISOString(),
-            updatedBy: auth().username,
-        }).then((res) => {
-            console.log(res);
-        });
+    //     let role = data.find((role) => role.roleCode == e.target.id);
+    //     await editRole({
+    //         roleDesc: role.roleDesc,
+    //         remark: role.remark,
+    //         permission: role.permission,
+    //         createdAt: role.createdAt,
+    //         createdBy: role.createdBy,
+    //         updatedAt: moment().toISOString(),
+    //         updatedBy: auth().username,
+    //     }).then((res) => {
+    //         console.log(res);
+    //     });
 
-    };
+    // };
 
     const openModal = () => {
         setIsEdit(false);
@@ -214,11 +213,11 @@ function SystemRole() {
     //     setOpenDelete(!openDelete);
     // };
 
-    const handleDeleteBtn = (id) => {
-        console.log(id);
-        setDeleteId(id);
-        setOpenDelete(!openDelete);
-    };
+    // const handleDeleteBtn = (id) => {
+    //     console.log(id);
+    //     setDeleteId(id);
+    //     setOpenDelete(!openDelete);
+    // };
 
     const column = [
         {
@@ -277,9 +276,9 @@ function SystemRole() {
             roleCode: role.roleCode,
             roleDesc: role.roleDesc,
             remark: role.remark,
-            createdAt: role.createdAt,
+            createdAt: moment(role.createdAt).format("YYYY-MM-DD hh:mm:ss a"),
             createdBy: role.createdBy,
-            updatedAt: role.updatedAt,
+            updatedAt: moment(role.updatedAt).format("YYYY-MM-DD hh:mm:ss a"),
             updatedBy: role.updatedBy,
         }
     });

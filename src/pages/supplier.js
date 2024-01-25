@@ -1,5 +1,5 @@
 /* eslint-disable eqeqeq */
-import { Button, Card, CardBody, Dialog, DialogBody, Input, Switch, Textarea, Typography } from "@material-tailwind/react";
+import { Button, Card, CardBody, Dialog, DialogBody, Input, Typography } from "@material-tailwind/react";
 import { FaCirclePlus, FaFloppyDisk, FaPencil, FaTrashCan, FaMagnifyingGlass } from "react-icons/fa6";
 import { useContext, useEffect, useState } from "react";
 import { useFetchSupplierQuery, useAddSupplierMutation, useUpdateSupplierMutation, useRemoveSupplierMutation, useFetchSupplierCountQuery } from "../store";
@@ -28,7 +28,7 @@ function Supplier() {
         if(supPermission?.view == false) {
             navigate('/403');
         }
-    }, [permissions])
+    }, [permissions, supPermission, navigate])
 
     const [open, setOpen] = useState(false);
 
@@ -45,7 +45,7 @@ function Supplier() {
     const {data} = useFetchSupplierQuery(filterData);
     const {data:dataCount} = useFetchSupplierCountQuery(filterData);
 
-    const [addSupplier, addResult] = useAddSupplierMutation();
+    const [addSupplier] = useAddSupplierMutation();
 
     const [editSupplier] = useUpdateSupplierMutation();
 

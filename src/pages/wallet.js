@@ -1,14 +1,14 @@
 /* eslint-disable eqeqeq */
 import { Button, Card, CardBody, Dialog, DialogBody, IconButton, Typography } from "@material-tailwind/react";
-import { FaCircleMinus, FaCirclePlus, FaEquals, FaFilter, FaFloppyDisk, FaPencil, FaPlus, FaTrashCan, FaXmark, } from "react-icons/fa6";
+import { FaCircleMinus, FaCirclePlus, FaEquals, FaFilter, FaFloppyDisk, FaTrashCan, FaXmark, } from "react-icons/fa6";
 import { BiReset } from "react-icons/bi"
 import { useContext, useEffect, useState } from "react";
 import { apiUrl, focusSelect, pause } from "../const";
-import { useAddWalletTransactionMutation, useFetchShareQuery, useFetchTrueShareQuery, useFetchTrueWalletCategoryQuery, useFetchTrueWalletQuery, useFetchWalletCategoryQuery, useFetchWalletNamesQuery, useFetchWalletQuery, useFetchWalletTransactionCountQuery, useFetchWalletTransactionQuery, useRemoveWalletTransactionMutation, useUpdateWalletTransactionMutation } from "../store";
+import { useAddWalletTransactionMutation, useFetchTrueShareQuery, useFetchTrueWalletCategoryQuery, useFetchTrueWalletQuery, useFetchWalletNamesQuery, useFetchWalletTransactionCountQuery, useFetchWalletTransactionQuery, useRemoveWalletTransactionMutation, useUpdateWalletTransactionMutation } from "../store";
 import Pagination from "../components/pagination";
 import DeleteModal from "../components/delete_modal";
 import SuccessAlert from "../components/success_alert";
-import moment, { months } from "moment";
+import moment from "moment";
 import TableList from "../components/data_table";
 import { useAuthUser } from "react-auth-kit";
 import ModalTitle from "../components/modal_title";
@@ -36,7 +36,7 @@ function Wallet() {
         if(walletPermission?.view == false) {
             navigate('/403');
         }
-    }, [permissions])
+    }, [permissions, walletPermission, navigate])
 
     const [filterForm, setFilterForm] = useState({
         skip: 0,
@@ -44,7 +44,7 @@ function Wallet() {
         status: true,
         walletName: "",
         shareCode: 0,
-        category: "",
+        category: 0
     })
 
     const { data: walletData, refetch: refetchShare } = useFetchTrueWalletQuery();
@@ -84,7 +84,7 @@ function Wallet() {
 
     const [filterData, setFilterData] = useState([]);
 
-    const [removeTransaction, removeResult] = useRemoveWalletTransactionMutation();
+    const [removeTransaction] = useRemoveWalletTransactionMutation();
 
     const [addTransaction] = useAddWalletTransactionMutation();
 
@@ -104,8 +104,6 @@ function Wallet() {
         isError: false,
         title: ""
     });
-
-    console.log(filterForm)
 
     let totalCashIn = 0;
     let totalCashOut = 0;
@@ -191,24 +189,6 @@ function Wallet() {
     const handleOpen = () => {
         setFormData(transactionData);
         setIsView(false);
-        setOpen(!open);
-    };
-
-    const handleView = (id) => {
-        let tempData = data.find(res => res.id === id);
-        console.log(tempData);
-        setFormData({
-            ...tempData,
-            time: moment(tempData.date).format("hh:mm:ss")
-        });
-        if (tempData.cashType === "DEBIT") {
-            setIsCashIn(true);
-            setIsCashOut(false);
-        } else {
-            setIsCashIn(false);
-            setIsCashOut(true);
-        }
-        setIsView(true);
         setOpen(!open);
     };
 
@@ -413,28 +393,6 @@ function Wallet() {
         setOpenDateModal(!openDateModal);
     }
 
-    const handleFilter = () => {
-        setIsFilter(true);
-        console.log(filterForm);
-        let url = `${apiUrl}/transaction/get-all-transactions?status=${filterForm.status}&walletCode=${filterForm.walletCode}`;
-        if(filterForm.startDate !== "" && filterForm.endDate === "") {
-            url+= `&start_date=${moment(filterForm.startDate).toISOString()}`;
-        }
-        if(filterForm.startDate !== "" && filterForm.endDate !== "") {
-            url+=`&start_date=${moment(filterForm.startDate).toISOString()}&end_date=${moment(filterForm.endDate).toISOString()}`;
-        }
-        if (filterForm.category !== "") {
-            url+=`&category=${filterForm.category}`;
-        }
-        axios.get(url, {
-            headers: {
-                "Authorization": token
-            }
-        }).then((res) => {
-            setFilterData(res.data);
-        });
-    }
-
     const column = [
         {
             name: 'Status',
@@ -450,12 +408,12 @@ function Wallet() {
         },
         {
             name: 'Date',
-            width: "200px",
-            selector: row => moment(row.date).format('DD-MMM-YYYY hh:mm a'),
+            width: "130px",
+            selector: row => moment(row.date).format('DD-MMM-YYYY hh:mm a').split(' ')[0],
         },
         {
             name: 'Wallet Name',
-            width: "150px",
+            width: "200px",
             selector: row => row.walletName,
         },
         {
@@ -464,21 +422,21 @@ function Wallet() {
             selector: row => row.shareName,
         },
         {
-            name: 'Remark',
-            width: "200px",
-            selector: row => row.remark,
-        },
-        {
             name: 'Category',
             width: "120px",
             selector: row => row.categoryName,
             center: true
         },
         {
-            name: 'Payment Mode',
+            name: 'Cash Type',
             width: "150px",
-            selector: row => row.paymentMode,
+            selector: row => row.cashType == "DEBIT" ? "Cash In" : "Cash Out",
             center: true,
+        },
+        {
+            name: 'Remark',
+            width: "200px",
+            selector: row => row.remark,
         },
         {
             name: 'Amount',
@@ -487,9 +445,9 @@ function Wallet() {
             right: true,
         },
         {
-            name: 'Cash Type',
-            width: "200px",
-            selector: row => row.cashType == "DEBIT" ? "Cash In" : "Cash Out",
+            name: 'Payment Mode',
+            width: "150px",
+            selector: row => row.paymentMode,
             center: true,
         },
         {
@@ -689,7 +647,7 @@ function Wallet() {
                                             setCurrentPage(1);
                                         }}
                                     >
-                                        <option value="">All</option>
+                                        <option value="0">All</option>
                                         {
                                             shareData?.map((share) => {
                                                 return <option 
@@ -791,7 +749,7 @@ function Wallet() {
                                             setCurrentPage(1);
                                         }}
                                     >
-                                        <option value="">All</option>
+                                        <option value="0">All</option>
                                         {
                                             walletCategory?.map(category => {
                                                 return (

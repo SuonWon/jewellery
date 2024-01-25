@@ -1,8 +1,8 @@
 /* eslint-disable eqeqeq */
-import { Button, Card, CardBody, Dialog, DialogBody, Input, Switch, Textarea, Typography, usePrevious } from "@material-tailwind/react";
+import { Button, Card, CardBody, Dialog, DialogBody, Input, Typography } from "@material-tailwind/react";
 import { FaCirclePlus, FaFloppyDisk, FaPencil, FaTrashCan, FaMagnifyingGlass } from "react-icons/fa6";
 import { useContext, useEffect, useState } from "react";
-import { useAddUserMutation, useFetchRolesQuery, useFetchTrueUsersQuery, useFetchUsersCountQuery, useFetchUsersQuery, useRemoveUserMutation, useUpdateUserMutation } from "../store";
+import { useAddUserMutation, useFetchRolesQuery, useFetchUsersCountQuery, useFetchUsersQuery, useRemoveUserMutation, useUpdateUserMutation } from "../store";
 import Pagination from "../components/pagination";
 import DeleteModal from "../components/delete_modal";
 import SectionTitle from "../components/section_title";
@@ -31,7 +31,7 @@ function SystemUser() {
         if(userPermission?.view == false) {
             navigate('/403');
         }
-    }, [permissions])
+    }, [permissions, navigate, userPermission])
 
     const [filterData, setFilterData] = useState({
         skip: 0,
@@ -49,7 +49,7 @@ function SystemUser() {
 
     const { data: dataCount } = useFetchUsersCountQuery(filterData); 
 
-    const [addUser, addResult] = useAddUserMutation();
+    const [addUser] = useAddUserMutation();
 
     const [editUser] = useUpdateUserMutation();
 
@@ -286,9 +286,9 @@ function SystemUser() {
             roleCode: user.roleCode,
             status: user.isActive,
             remark: user.remark,
-            createdAt: user.createdAt,
+            createdAt: moment(user.createdAt).format("YYYY-MM-DD hh:mm:ss a"),
             createdBy: user.createdBy,
-            updatedAt: user.updatedAt,
+            updatedAt: moment(user.updatedAt).format("YYYY-MM-DD hh:mm:ss a"),
             updatedBy: user.updatedBy,
         }
     });

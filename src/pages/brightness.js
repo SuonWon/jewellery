@@ -1,5 +1,5 @@
 /* eslint-disable eqeqeq */
-import { Button, Card, CardBody, Dialog, DialogBody, Input, Switch, Typography } from "@material-tailwind/react";
+import { Button, Card, CardBody, Dialog, DialogBody, Input, Typography } from "@material-tailwind/react";
 import { FaCirclePlus, FaFloppyDisk, FaPencil, FaTrashCan, FaMagnifyingGlass } from "react-icons/fa6";
 import { useContext, useEffect, useState } from "react";
 import { useAddBrightnessMutation, useFetchBrightnessCountQuery, useFetchBrightnessQuery, useRemoveBrightnessMutation, useUpdateBrightnessMutation } from "../store";
@@ -32,7 +32,7 @@ function Brightness() {
         if(brightness?.view == false) {
             navigate('/403');
         }
-    }, [brightness])
+    }, [brightness, navigate, permissions])
 
     const [open, setOpen] = useState(false);
 
@@ -58,7 +58,7 @@ function Brightness() {
         createdBy: auth().username,
         updatedAt: moment().toISOString(),
         updatedBy: "",
-    });
+    }, [auth]);
 
     const [addBrightness, addResult] = useAddBrightnessMutation();
 
@@ -77,7 +77,7 @@ function Brightness() {
             updatedAt: moment().toISOString(),
             updatedBy: "",
         });
-    }, [addResult.isSuccess]);
+    }, [addResult.isSuccess, auth]);
 
     const [deleteId, setDeleteId] = useState('');
 

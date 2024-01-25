@@ -6,7 +6,7 @@ import Customer from "./pages/customer";
 import Supplier from "./pages/supplier";
 import StoneDetails from "./pages/stone_details";
 import PurchaseList from "./pages/purchase_list";
-import { AuthProvider, RequireAuth, useAuthUser } from "react-auth-kit";
+import { RequireAuth, useAuthUser } from "react-auth-kit";
 import SalesList from "./pages/sales_list";
 import ReturnList from "./pages/return_list";
 import StoneSelection from "./pages/stone_selection";
@@ -16,7 +16,6 @@ import Share from "./pages/share";
 import Damage from "./pages/damage";
 import Wallet from "./pages/wallet";
 import Adjustment from "./pages/adjustment";
-import { useFetchUserRoleQuery, useFetchWalletQuery } from "./store";
 import WalletList from "./pages/walletList";
 import SystemUser from "./pages/systemUser";
 import SystemRole from "./pages/systemRole";
@@ -34,11 +33,11 @@ function App() {
 
   const [permissions, setPermissions] = useState([]);
 
-  const filterData = {
-    skip: 0,
-    take: 0,
-    search: ''
-  }
+  // const filterData = {
+  //   skip: 0,
+  //   take: 0,
+  //   search: ''
+  // }
   // const {data : walletData } = useFetchWalletQuery(filterData);
 
   const currentUrl = useLocation();
@@ -52,7 +51,7 @@ function App() {
         setPermissions(res.data.permissions);
       })
     }
-  }, [permissions.length])
+  }, [permissions.length, auth])
 
   return (
     <AuthContent.Provider value={{permissions, setPermissions}}>

@@ -1,9 +1,9 @@
 /* eslint-disable eqeqeq */
 import { Button, Card, CardBody, Dialog, DialogBody, Typography } from "@material-tailwind/react";
-import { FaCirclePlus, FaEye, FaFloppyDisk, FaPencil, FaPlus, FaTrashCan, } from "react-icons/fa6";
+import { FaCirclePlus, FaFloppyDisk, FaPencil, FaPlus, FaTrashCan, } from "react-icons/fa6";
 import { useContext, useEffect, useState } from "react";
 import { apiUrl, focusSelect, pause } from "../const";
-import { useAddReturnMutation, useFetchActiveStoneDetailsQuery, useFetchIssueQuery, useFetchReturnCountQuery, useFetchReturnQuery, useFetchStoneDetailsQuery, useFetchTruePurchaseQuery, useFetchTrueSalesQuery, useFetchUOMQuery, useRemoveReturnMutation, useUpdateReturnMutation } from "../store";
+import { useAddReturnMutation, useFetchActiveStoneDetailsQuery, useFetchReturnCountQuery, useFetchReturnQuery, useFetchTruePurchaseQuery, useFetchTrueSalesQuery, useFetchUOMQuery, useRemoveReturnMutation, useUpdateReturnMutation } from "../store";
 import Pagination from "../components/pagination";
 import DeleteModal from "../components/delete_modal";
 import SuccessAlert from "../components/success_alert";
@@ -43,7 +43,7 @@ function ReturnList({type = 'I'}) {
         if(returnPermission.purchase?.view == false && returnPermission.sales?.view == false && returnPermission.issue?.view == false) {
             navigate('/suppleir')
         }
-    }, [permissions])
+    }, [permissions, returnPermission.purchase, returnPermission.sales, returnPermission.issue, navigate])
 
     const [filterData, setFilterData] = useState({
         skip: 0,

@@ -1,4 +1,4 @@
-import { Button, Chip, Drawer, IconButton, List, ListItem, ListItemPrefix, ListItemSuffix, Menu, MenuHandler, MenuItem, MenuList, Typography } from "@material-tailwind/react";
+import { Button, Drawer, IconButton, List, ListItem, ListItemPrefix, Menu, MenuHandler, MenuItem, MenuList, Typography } from "@material-tailwind/react";
 import { FaArrowRightFromBracket, FaBoxesPacking, FaCartShopping, FaChartPie, FaChevronDown, FaDatabase, FaBoxOpen, FaListUl, FaMoneyBill1, FaSliders, FaUsers, FaWallet, FaArrowRotateLeft, FaPlusMinus, FaUser, FaLayerGroup, FaBars, FaXmark } from "react-icons/fa6";
 import { GiDiamondTrophy } from "react-icons/gi";
 import { NavLink, useNavigate } from "react-router-dom";

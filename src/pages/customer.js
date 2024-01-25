@@ -1,7 +1,6 @@
 /* eslint-disable eqeqeq */
-import {  Button, Card, CardBody, Dialog, DialogBody, Input, Switch, Textarea, Typography } from "@material-tailwind/react";
+import {  Button, Card, CardBody, Dialog, DialogBody, Input, Typography } from "@material-tailwind/react";
 import { FaCirclePlus, FaFloppyDisk, FaPencil, FaTrashCan, FaMagnifyingGlass } from "react-icons/fa6";
-import { RiMenuSearchLine } from "react-icons/ri";
 import { useContext, useEffect, useState } from "react";
 import { useFetchCustomerQuery, useAddCustomerMutation, useUpdateCustomerMutation, useRemoveCustomerMutation, useFetchCustomerCountQuery } from "../store";
 import Pagination from "../components/pagination";
@@ -32,7 +31,7 @@ function Customer() {
         if(customerPermission?.view == false) {
             navigate('/403');
         }
-    }, [permissions])
+    }, [permissions, customerPermission, navigate])
 
     const [open, setOpen] = useState(false);
 
@@ -49,7 +48,7 @@ function Customer() {
     const {data} = useFetchCustomerQuery(filterData);
     const {data:dataCount} = useFetchCustomerCountQuery(filterData); 
 
-    const [addCustomer, addResult] = useAddCustomerMutation();
+    const [addCustomer] = useAddCustomerMutation();
 
     const [editCustomer] = useUpdateCustomerMutation();
 
@@ -97,7 +96,7 @@ function Customer() {
         createdBy: auth().username,
         updatedAt: moment().toISOString(),
         updatedBy: "",
-    });
+    }, []);
 
     const handleChange = async (e) => {
         

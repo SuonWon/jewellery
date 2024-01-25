@@ -1,9 +1,9 @@
 /* eslint-disable eqeqeq */
-import { Button, Card, CardBody, Dialog, DialogBody, Typography, Input } from "@material-tailwind/react";
-import { FaCirclePlus, FaFloppyDisk, FaMoneyBillTrendUp, FaPencil, FaPlus, FaTrashCan, FaMagnifyingGlass } from "react-icons/fa6";
+import { Button, Card, CardBody, Dialog, DialogBody, Typography } from "@material-tailwind/react";
+import { FaCirclePlus, FaFloppyDisk, FaMoneyBillTrendUp, FaPencil, FaPlus, FaTrashCan } from "react-icons/fa6";
 import { useContext, useState, useEffect } from "react";
 import { apiUrl, focusSelect, pause } from "../const";
-import { useAddPurchaseMutation, useFetchPurchaseCountQuery, useFetchPurchaseQuery, useFetchReturnByInvoiceQuery, useFetchReturnQuery, useFetchTrueShareQuery, useFetchTrueStoneQuery, useFetchTrueSupplierQuery, useFetchUOMQuery, useRemovePurchaseMutation, useUpdatePurchaseMutation } from "../store";
+import { useAddPurchaseMutation, useFetchPurchaseCountQuery, useFetchPurchaseQuery, useFetchReturnByInvoiceQuery, useFetchTrueShareQuery, useFetchTrueStoneQuery, useFetchTrueSupplierQuery, useFetchUOMQuery, useRemovePurchaseMutation, useUpdatePurchaseMutation } from "../store";
 import Pagination from "../components/pagination";
 import DeleteModal from "../components/delete_modal";
 import SuccessAlert from "../components/success_alert";
@@ -40,7 +40,7 @@ function PurchaseList() {
         if(purchasePermission?.view == false) {
             navigate('/403');
         }
-    }, [permissions])
+    }, [permissions, purchasePermission, navigate])
 
     const [filterData, setFilterData] = useState({
         skip: 0,
@@ -110,7 +110,7 @@ function PurchaseList() {
         message: ''
     });
 
-    const [removePurchase, removeResult] = useRemovePurchaseMutation();
+    const [removePurchase] = useRemovePurchaseMutation();
 
     const purchaseData = {
         invoiceNo: "",
@@ -181,10 +181,10 @@ function PurchaseList() {
         setOpenDelete(!openDelete);
     };
 
-    const handleDeleteBtn = (id) => {
-        setDeleteId(id);
-        setOpenDelete(!openDelete);
-    };
+    // const handleDeleteBtn = (id) => {
+    //     setDeleteId(id);
+    //     setOpenDelete(!openDelete);
+    // };
 
     const handleOpen = () => {
         axios.get(`${apiUrl}/share/get-owner`, {
@@ -731,20 +731,14 @@ function PurchaseList() {
         },
         {
             name: 'Date',
-            width: "130px",
+            width: "120px",
             selector: row => row.PurDate,
         },
         {
             name: 'Grand Total',
-            width: "150px",
+            width: "130px",
             selector: row => row.GrandTotal,
             right: "true",
-        },
-        {
-            name: 'Supplier',
-            width: "200px",
-            selector: row => row.Supplier,
-
         },
         {
             name: "Stone",
@@ -753,13 +747,13 @@ function PurchaseList() {
         },
         {
             name: "Quantity",
-            width: "100px",
+            width: "80px",
             selector: row => row.Qty,
             center: "true"
         },
         {
             name: "Weight",
-            width: "100px",
+            width: "80px",
             selector: row => row.Weight,
             center: "true"
         },
@@ -774,6 +768,12 @@ function PurchaseList() {
             width: "150px",
             selector: row => row.SubTotal,
             right: "true",
+        },
+        {
+            name: 'Supplier',
+            width: "200px",
+            selector: row => row.Supplier,
+
         },
         {
             name: "Service (%)",

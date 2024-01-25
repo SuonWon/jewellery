@@ -16,7 +16,7 @@ const validator = require('validator');
 
 function Login() {
 
-    const {permissions, setPermissions} = useContext(AuthContent)
+    const {setPermissions} = useContext(AuthContent)
 
     const dispatch = useDispatch();
 
