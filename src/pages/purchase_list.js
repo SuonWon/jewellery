@@ -3,7 +3,7 @@ import { Button, Card, CardBody, Dialog, DialogBody, Typography } from "@materia
 import { FaCirclePlus, FaFloppyDisk, FaMoneyBillTrendUp, FaPencil, FaPlus, FaTrashCan } from "react-icons/fa6";
 import { useContext, useState, useEffect } from "react";
 import { apiUrl, focusSelect, pause } from "../const";
-import { useAddPurchaseMutation, useFetchPurchaseCountQuery, useFetchPurchaseQuery, useFetchReturnByInvoiceQuery, useFetchTrueShareQuery, useFetchTrueStoneQuery, useFetchTrueSupplierQuery, useFetchUOMQuery, useRemovePurchaseMutation, useUpdatePurchaseMutation } from "../store";
+import { useAddPurchaseMutation, useFetchPurchaseCountQuery, useFetchPurchaseQuery, useFetchReturnByInvoiceQuery, useFetchTrueShareQuery, useFetchTrueStoneQuery, useFetchTrueSupplierQuery, useFetchUOMQuery, useFetchReturnQuery, useRemovePurchaseMutation, useUpdatePurchaseMutation } from "../store";
 import Pagination from "../components/pagination";
 import DeleteModal from "../components/delete_modal";
 import SuccessAlert from "../components/success_alert";
@@ -75,7 +75,6 @@ function PurchaseList() {
         end_date: null
     });
 
-    console.log(returnData);
     //const { data: returnData } = useFetchReturnByInvoiceQuery()
 
     const auth = useAuthUser();

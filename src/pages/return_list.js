@@ -351,22 +351,22 @@ function ReturnList({type = 'I'}) {
         },
         {
             name: 'Return No',
-            width: '200px',
+            width: '120px',
             selector: row => row.returnNo,
         },
         {
             name: 'Date',
-            width: "150px",
+            width: "100px",
             selector: row => row.returnDate,
         },
         {
             name: 'Reference No',
-            width: "200px",
+            width: "120px",
             selector: row => row.referenceNo,
         },
         {
             name: 'Type',
-            width: "120px",
+            width: "100px",
             selector: row => row.returnType === 'I' ? "Issue" : row.returnType === 'S' ? "Sales" : "Purchase",
         },
         {
@@ -376,19 +376,19 @@ function ReturnList({type = 'I'}) {
         },
         {
             name: 'Qty',
-            width: "150px",
+            width: "80px",
             selector: row => row.qty,
             center: "true"
         },
         {
             name: 'Weight',
-            width: "150px",
+            width: "80px",
             selector: row => row.weight,
             center: "true"
         },
         {
             name: 'Unit',
-            width: "150px",
+            width: "80px",
             selector: row => row.unitCode,
             center: "true"
         },

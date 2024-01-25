@@ -2,7 +2,7 @@
 import { Button, Card, CardBody, Dialog, DialogBody, Typography } from "@material-tailwind/react";
 import { FaCirclePlus, FaFloppyDisk, FaMoneyBillTrendUp, FaPencil, FaPlus, } from "react-icons/fa6";
 import { useContext, useEffect, useState } from "react";
-import { useAddSalesMutation, useFetchActiveStoneDetailsQuery, useFetchReturnByInvoiceQuery, useFetchSalesCountQuery, useFetchSalesQuery, useFetchTrueCustomerQuery, useFetchUOMQuery, useRemoveSalesMutation, useUpdateIssueMutation, useUpdateIssueStatusMutation, useUpdateSalesMutation } from "../store";
+import { useAddSalesMutation, useFetchActiveStoneDetailsQuery, useFetchReturnByInvoiceQuery, useFetchSalesCountQuery, useFetchSalesQuery, useFetchTrueCustomerQuery, useFetchUOMQuery, useRemoveSalesMutation, useFetchReturnQuery, useUpdateIssueMutation, useUpdateIssueStatusMutation, useUpdateSalesMutation } from "../store";
 import Pagination from "../components/pagination";
 import { apiUrl, focusSelect, pause } from "../const";
 import DeleteModal from "../components/delete_modal";

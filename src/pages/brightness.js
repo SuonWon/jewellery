@@ -58,7 +58,7 @@ function Brightness() {
         createdBy: auth().username,
         updatedAt: moment().toISOString(),
         updatedBy: "",
-    }, [auth]);
+    }, []);
 
     const [addBrightness, addResult] = useAddBrightnessMutation();
 
@@ -77,7 +77,7 @@ function Brightness() {
             updatedAt: moment().toISOString(),
             updatedBy: "",
         });
-    }, [addResult.isSuccess, auth]);
+    }, [addResult.isSuccess]);
 
     const [deleteId, setDeleteId] = useState('');
 

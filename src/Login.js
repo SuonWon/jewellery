@@ -88,7 +88,6 @@ function Login() {
                     
                 }
                 else {
-                    console.log("reach");
                     newErrors.err = "Username or password is wrong.";
                     setValidationText(newErrors);
                 }
