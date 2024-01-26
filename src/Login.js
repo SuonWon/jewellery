@@ -1,6 +1,6 @@
 import { GoPerson, GoLock, GoEyeClosed, GoEye } from "react-icons/go";
 import { useSignIn } from 'react-auth-kit';
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { apiUrl } from "./const";
@@ -10,13 +10,14 @@ import { AuthContent } from "./context/authContext";
 import { Button, Card, CardHeader, Checkbox, Dialog, DialogBody, Input, Step, Stepper, Typography } from "@material-tailwind/react";
 import { FaRegImages } from "react-icons/fa6";
 import Startup from "./pages/startup";
+import { useCheckUserQuery } from "./store";
 
 
 const validator = require('validator');
 
 function Login() {
 
-    const {setPermissions} = useContext(AuthContent)
+    const {setPermissions} = useContext(AuthContent);
 
     const dispatch = useDispatch();
 
@@ -30,6 +31,15 @@ function Login() {
     });
 
     const [open, setOpen] = useState(false);
+
+    const {data:checkUser} = useCheckUserQuery();
+
+    useEffect(() => {
+        
+        if(checkUser?.length == 0) {
+            setOpen(true);
+        }
+    }, [open])
 
     const [ showPassword, setShowPassword ] = useState(false);
 

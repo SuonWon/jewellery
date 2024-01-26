@@ -44,9 +44,17 @@ const authApi = createApi({
                     };
                 },
             }),
+            checkUser: builder.query({
+                query: () => {
+                    return {
+                        url: "/auth/check-user",
+                        method: "GET",
+                    }
+                }
+            })
         };
     },
 });
 
-export const { useAddCompanyMutation, useAddDefaultRoleMutation, useAddDefaultUserMutation, useAddDefaultCategoryMutation } = authApi;
+export const { useAddCompanyMutation, useAddDefaultRoleMutation, useAddDefaultUserMutation, useAddDefaultCategoryMutation, useCheckUserQuery } = authApi;
 export { authApi };

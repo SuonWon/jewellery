@@ -109,4 +109,4 @@ export { useFetchWalletCategoryQuery, useFetchTrueWalletCategoryQuery, useFetchW
 export { useFetchWalletQuery, useFetchTrueWalletQuery, useFetchWalletByIdQuery, useFetchWalletNamesQuery, useAddWalletMutation, useUpdateWalletMutation, useRemoveWalletMutation, useFetchWalletCountQuery } from "../apis/walletApi";
 export { useFetchTrueUsersQuery, useFetchUserByIdQuery, useFetchUserRoleQuery, useFetchUsersCountQuery, useFetchUsersQuery, useAddUserMutation, useUpdateUserMutation, useRemoveUserMutation } from "../apis/systemUserApi";
 export { useFetchRoleByIdQuery, useFetchRolesCountQuery, useFetchRolesQuery, useAddRoleMutation, useUpdateRoleMutation } from "../apis/systemRoleApi";
-export { useAddCompanyMutation, useAddDefaultRoleMutation, useAddDefaultUserMutation, useAddDefaultCategoryMutation } from '../apis/authApi';
+export { useAddCompanyMutation, useAddDefaultRoleMutation, useAddDefaultUserMutation, useAddDefaultCategoryMutation, useCheckUserQuery } from '../apis/authApi';

@@ -52,7 +52,7 @@ const purchaseApi = createApi({
                         skip: 0,
                         take: 0,
                         status: 'O',
-                        isComplete: 'F'
+                        isComplete: 'A'
                     }
                     return {
                         url: '/purchase/get-all-purchases',
