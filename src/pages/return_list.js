@@ -684,7 +684,7 @@ function ReturnList({type = 'I'}) {
                                 }
                                 {/* Return Type */}
                                 <div>
-                                <label className="text-black text-sm mb-2">Return No</label>
+                                <label className="text-black text-sm mb-2">Return Type</label>
                                     <input
                                         type="text"
                                         className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
