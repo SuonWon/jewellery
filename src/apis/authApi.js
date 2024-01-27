@@ -44,6 +44,15 @@ const authApi = createApi({
                     };
                 },
             }),
+            addDefaultShare: builder.mutation({
+                query: (supplierData) => {
+                    return {
+                        url: "/auth/create-share",
+                        method: "POST",
+                        body: supplierData
+                    }
+                } 
+            }),
             checkUser: builder.query({
                 query: () => {
                     return {
@@ -51,10 +60,10 @@ const authApi = createApi({
                         method: "GET",
                     }
                 }
-            })
+            }),
         };
     },
 });
 
-export const { useAddCompanyMutation, useAddDefaultRoleMutation, useAddDefaultUserMutation, useAddDefaultCategoryMutation, useCheckUserQuery } = authApi;
+export const { useAddCompanyMutation, useAddDefaultRoleMutation, useAddDefaultUserMutation, useAddDefaultCategoryMutation, useCheckUserQuery, useAddDefaultShareMutation } = authApi;
 export { authApi };

@@ -778,16 +778,14 @@ function Wallet() {
                                     </Button> */}
                                     <Button variant="filled" className="flex items-center capitalize gap-2 py-2 px-3" 
                                         onClick={() => {
-                                            setIsFilter(false);
                                             setFilterForm({
+                                                skip: 0,
+                                                take: 10,
                                                 status: true,
-                                                walletCode: "",
+                                                walletName: "",
                                                 shareCode: 0,
-                                                startDate: "",
-                                                endDate: "",
-                                                category: "",
+                                                category: 0
                                             });
-                                            refetch();
                                         }}
                                     >
                                         <BiReset /> <span>Reset</span>

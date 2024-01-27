@@ -46,6 +46,7 @@ function Adjustment() {
     });
 
     const { data } = useFetchAdjustmentQuery(filterData);
+
     const { data: dataCount } = useFetchAdjustmentCountQuery(filterData);
 
     const {data: stoneDetails} = useFetchActiveStoneDetailsQuery();
@@ -152,10 +153,6 @@ function Adjustment() {
 
         if (formData.adjustmentDate === "") {
             newErrors.adjustmentDate = "Damage Date is required."
-        }
-
-        if (formData.referenceNo === "") {
-            newErrors.referenceNo = "Reference No is required."
         }
 
         if (validator.isEmpty(formData.stoneDetailCode)) {

@@ -161,8 +161,7 @@ function SalesList() {
         setPayData({
             ...payData,
             invoiceNo: invoiceNo,
-            balance: Number(balance.replace(/,/g, "")),
-            receivablePermission: receivablePermission
+            balance: Number(balance.replace(/,/g, ""))
         });
         setPayOpen(!payOpen);
     }
@@ -1415,7 +1414,7 @@ function SalesList() {
                         </DialogBody>
                     </Dialog>
                     {
-                        payOpen? <Receivable payOpen={payOpen} invoiceNo={payData.invoiceNo} balance={payData.balance} 
+                        payOpen? <Receivable payOpen={payOpen} invoiceNo={payData.invoiceNo} receivablePermission={receivablePermission} balance={payData.balance} 
                         closePay={() => {
                             refetch();
                             setPayOpen(!payOpen);

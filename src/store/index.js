@@ -103,10 +103,10 @@ export { useFetchShareQuery, useFetchTrueShareQuery, useFetchShareByIdQuery, use
 export { useFetchDamageIdQuery, useFetchDamageQuery, useFetchDamageByIdQuery, useAddDamageMutation, useUpdateDamageMutation, useRemoveDamageMutation } from "../apis/damageApi";
 export { useFetchAdjustmentQuery, useFetchAdjustmentByIdQuery, useAddAdjustmentMutation, useUpdateAdjustmentMutation, useRemoveAdjustMutation, useFetchAdjustmentCountQuery } from "../apis/adjustmentApi";
 export { useFetchWalletTransactionQuery, useFetchWalletTransactionByIdQuery, useAddWalletTransactionMutation, useUpdateWalletTransactionMutation, useRemoveWalletTransactionMutation, useFetchWalletTransactionCountQuery } from "../apis/walletTransitionApi";
-export { useFetchPayableQuery, useFetchPayableByIdQuery, useFetchOwnerWalletQuery, useAddPayableMutation, useUpdatePayableMutation, useRemovePayableMutation } from "../apis/payableApi";
+export { useFetchPayableQuery, useFetchPayableByIdQuery, useAddPayableMutation, useUpdatePayableMutation, useRemovePayableMutation } from "../apis/payableApi";
 export { useFetchReceivableQuery, useFetchReceivableByIdQuery, useAddReceivableMutation, useUpdateReceivableMutation, useRemoveReceivableMutation } from "../apis/receivableApi";
 export { useFetchWalletCategoryQuery, useFetchTrueWalletCategoryQuery, useFetchWalletCategoryByIdQuery, useAddWalletCategoryMutation, useUpdateWalletCategoryMutation, useRemoveWalletCategoryMutation, useFetchWalletCategoryCountQuery } from "../apis/walletCategoryApi";
-export { useFetchWalletQuery, useFetchTrueWalletQuery, useFetchWalletByIdQuery, useFetchWalletNamesQuery, useAddWalletMutation, useUpdateWalletMutation, useRemoveWalletMutation, useFetchWalletCountQuery } from "../apis/walletApi";
+export { useFetchWalletQuery, useFetchTrueWalletQuery, useFetchWalletByIdQuery, useFetchWalletNamesQuery, useAddWalletMutation, useUpdateWalletMutation, useRemoveWalletMutation, useFetchWalletCountQuery, useFetchOwnerWalletQuery } from "../apis/walletApi";
 export { useFetchTrueUsersQuery, useFetchUserByIdQuery, useFetchUserRoleQuery, useFetchUsersCountQuery, useFetchUsersQuery, useAddUserMutation, useUpdateUserMutation, useRemoveUserMutation } from "../apis/systemUserApi";
 export { useFetchRoleByIdQuery, useFetchRolesCountQuery, useFetchRolesQuery, useAddRoleMutation, useUpdateRoleMutation } from "../apis/systemRoleApi";
-export { useAddCompanyMutation, useAddDefaultRoleMutation, useAddDefaultUserMutation, useAddDefaultCategoryMutation, useCheckUserQuery } from '../apis/authApi';
+export { useAddCompanyMutation, useAddDefaultRoleMutation, useAddDefaultUserMutation, useAddDefaultCategoryMutation, useCheckUserQuery, useAddDefaultShareMutation } from '../apis/authApi';

@@ -7,21 +7,21 @@ import { v4 as uuidv4 } from 'uuid';
 import moment from "moment";
 import { useAuthUser } from "react-auth-kit";
 import { focusSelect } from "../const";
-import { useAddPayableMutation, useFetchPayableQuery, useFetchTrueWalletQuery, useRemovePayableMutation, useUpdatePayableMutation } from "../store";
+import { useAddPayableMutation, useFetchOwnerWalletQuery, useFetchPayableQuery, useRemovePayableMutation, useUpdatePayableMutation } from "../store";
 
 const validator = require('validator');
 
 function Payable(props) {
 
-    //const {permissions} = useContext(AuthContent);
+    console.log(props.invoiceNo)
 
-    console.log(props.payablePermission);
+    //const {permissions} = useContext(AuthContent);
 
     const [payablePermission] = useState(props.payablePermission);
 
     const {data} = useFetchPayableQuery(props.invoiceNo);
 
-    const {data : walletData } = useFetchTrueWalletQuery();
+    const {data : walletData } = useFetchOwnerWalletQuery();
 
     const [addPayable] = useAddPayableMutation();
 
@@ -65,10 +65,11 @@ function Payable(props) {
     }
 
     const handleRemove = async (id) => {
-        let removeData = data.filter((el) => el.id === id);
+        let removeData = data.find((el) => el.id === id);
         console.log(removeData);
         removePayable({
-            id: removeData[0].id,
+            id: removeData.id,
+            walletName: removeData.wallet.walletName,
             deletedAt: moment().toISOString(),
             deletedBy: auth().username
         }).then((res) => { console.log(res) });
@@ -131,6 +132,7 @@ function Payable(props) {
 
     const handleSubmit = () => {
         if (validatePayable()) {
+            console.log(payForm)
             addPayable({
                 id: payForm.id,
                 walletCode: payForm.walletCode,
@@ -146,7 +148,7 @@ function Payable(props) {
                 updatedBy: "",
                 deletedBy: "",
             }).then((res) => {
-                console.log(res.data);
+                console.log(res);
             });
             setPayForm(payInfo);
         }
@@ -287,7 +289,7 @@ function Payable(props) {
                                             onChange={(e) => {
                                                 setPayForm({
                                                     ...payForm,
-                                                    walletName: e.target.selectedOptions[0].text.split(",")[1].trimStart(),
+                                                    walletName: e.target.selectedOptions[0].text,
                                                     walletCode: e.target.value,
                                                 })
                                             }}
@@ -296,7 +298,7 @@ function Payable(props) {
                                             {
                                                 walletData?.map((wallet) => {
                                                     return (
-                                                        <option key={wallet.id} value={wallet.id}>{wallet.share.shareName}, {wallet.walletName}</option>
+                                                        <option key={wallet.id} value={wallet.id}>{wallet.walletName}</option>
                                                     )
                                                 })
                                             }

@@ -35,11 +35,10 @@ function Login() {
     const {data:checkUser} = useCheckUserQuery();
 
     useEffect(() => {
-        
         if(checkUser?.length == 0) {
             setOpen(true);
         }
-    }, [open])
+    }, [checkUser])
 
     const [ showPassword, setShowPassword ] = useState(false);
 
@@ -110,7 +109,7 @@ function Login() {
     return(
 
         <div className="flex bg-white items-center w-full h-screen justify-center">
-            <Button onClick={() => setOpen(!open)}>Modal</Button>
+            {/* <Button onClick={() => setOpen(!open)}>Modal</Button> */}
             <div className="flex flex-col w-80 text-gray-900 bg-white rounded-md pb-12 shadow-xl">
                 <div className="h-24 flex items-center text-neutral-100 justify-start px-7 rounded-t-md" style={{backgroundColor: '#51448a'}}>
                     <h3 className="text-2xl font-bold mt-6 text-white">Jewellery Sales</h3>

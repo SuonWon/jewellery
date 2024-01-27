@@ -385,6 +385,7 @@ function StoneDetails() {
                 unitCode: formData.unitCode,
                 remark: formData.remark,
                 isActive: formData.isActive,
+                purchasePrice: formData.purchasePrice,
                 createdBy: formData.createdBy,
                 updatedBy: auth().username,
             }).then((res) => {
@@ -1224,12 +1225,12 @@ function StoneDetails() {
                                             {/* Sales Price */}
                                             <div>
                                                 <label className="text-black text-sm mb-2">Sales Price</label>
-                                                <input type="number" className="border border-blue-gray-200 w-full h-[40px] p-2.5 rounded-md text-black" value={0} readOnly/>
+                                                <input type="number" className="border border-blue-gray-200 w-full h-[40px] p-2.5 rounded-md text-black" value={formData.salesPrice} readOnly/>
                                             </div>
                                             {/* Profit */}
                                             <div>
                                                 <label className="text-black text-sm mb-2">Profit</label>
-                                                <input type="number" className="border border-blue-gray-200 w-full h-[40px] p-2.5 rounded-md text-black" value={0} readOnly/>
+                                                <input type="number" className="border border-blue-gray-200 w-full h-[40px] p-2.5 rounded-md text-black" value={formData.profit} readOnly/>
                                             </div>
                                         </div>
                                     </div>

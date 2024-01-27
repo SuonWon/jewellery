@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Button, Step, Stepper, Typography } from "@material-tailwind/react";
 import { ReactComponent as WelcomeImage } from '../images/welcome_01.svg';
 import { GoEye, GoEyeClosed } from "react-icons/go";
-import { useAddCompanyMutation, useAddDefaultCategoryMutation, useAddDefaultRoleMutation, useAddDefaultUserMutation } from "../store";
+import { useAddCompanyMutation, useAddDefaultCategoryMutation, useAddDefaultRoleMutation, useAddDefaultShareMutation, useAddDefaultUserMutation } from "../store";
 import { moduleName } from "../const";
 const validator = require('validator');
 
@@ -16,6 +16,8 @@ function Startup(props) {
     const [addDefaultRole] = useAddDefaultRoleMutation();
 
     const [addDefaultCategory] = useAddDefaultCategoryMutation();
+
+    const [addDefaultSupplier] = useAddDefaultShareMutation();
 
     const [roleCode, setRoleCode] = useState(0);
 
@@ -34,6 +36,21 @@ function Startup(props) {
             }
         })
     });
+
+    const [shareData, setShareData] = useState({
+        shareName: "",
+        nrcNo: "",
+        contactNo: "",
+        street: "",
+        township: "",
+        city: "",
+        region: "",
+        remark: "",
+        isActive: true,
+        isOwner: true,
+        createdBy: "Admin",
+        updatedBy: "",
+    })
 
     const [companyData, setCompanyData] = useState({
         companyLogo: "",
@@ -80,6 +97,9 @@ function Startup(props) {
         if (validator.isEmpty(userData.password)) {
             newErrors.password = "Password is required."
         }
+        if (validator.isEmpty(shareData.shareName)) {
+            newErrors.shareName = "Default supplier name is required."
+        }
         if (validator.isEmpty(userData.confirmPassword)) {
             newErrors.confirmPassword = "Confirm password is required."
         }
@@ -125,6 +145,7 @@ function Startup(props) {
                 createdBy: "Admin",
                 updatedBy: "",
             });
+            addDefaultSupplier(shareData);
             props.handleOpen();
         }
     }
@@ -318,6 +339,21 @@ function Startup(props) {
                             }
                             {
                                 validationText.misPassword && <p className="block text-[12px] text-red-500 font-sans mb-2">{validationText.misPassword}</p>
+                            }
+                        </div>
+                        {/* Share Name */}
+                        <div>
+                            <label className="text-black text-sm mb-2">Default Share name</label>
+                            <input 
+                                type="text" 
+                                className="border border-blue-gray-200 text-black w-full h-[40px] p-2.5 rounded-lg" 
+                                value={shareData.shareName}
+                                onChange={(e) => {
+                                    setShareData({...shareData, shareName: e.target.value});
+                                }}
+                            />
+                            {
+                                validationText.shareName && <p className="block text-[12px] text-red-500 font-sans mb-2">{validationText.shareName}</p>
                             }
                         </div>
                     </div>

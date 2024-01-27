@@ -49,29 +49,27 @@ const payableApi = createApi({
                     }
                 }
             }),
-            fetchOwnerWallet: builder.query({
-                query: () => {
-                    return {
-                        url: "/payable/get-owner-wallets",
-                        method: "GET",
-                        // headers: {
-                        //     "Authorization": token
-                        // },
-                    }
-                }
-            }),
+            // fetchOwnerWallet: builder.query({
+            //     query: () => {
+            //         return {
+            //             url: "/payable/get-owner-wallets",
+            //             method: "GET",
+            //             // headers: {
+            //             //     "Authorization": token
+            //             // },
+            //         }
+            //     }
+            // }),
             addPayable: builder.mutation({
                 invalidatesTags: () => {
                     return [{type: "Payable", id: "All"}];
                 },
                 query: (payData) => {
+                    console.log(payData);
                     return {
                         url: "/payable/create-payable",
                         method: "POST",
-                        // headers: {
-                        //     "Authorization": token
-                        // },
-                        body: payData,
+                        body: payData
                     };
                 },
             }),
@@ -109,5 +107,5 @@ const payableApi = createApi({
     },
 });
 
-export const { useFetchPayableQuery, useFetchPayableByIdQuery, useFetchOwnerWalletQuery, useAddPayableMutation, useUpdatePayableMutation, useRemovePayableMutation } = payableApi;
+export const { useFetchPayableQuery, useFetchPayableByIdQuery, useAddPayableMutation, useUpdatePayableMutation, useRemovePayableMutation } = payableApi;
 export { payableApi };

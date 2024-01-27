@@ -46,6 +46,7 @@ function Damage() {
     });
 
     const { data } = useFetchDamageQuery(filterData);
+
     const { data: dataCount } = useFetchDamageQuery(filterData);
 
     const {data: stoneDetails} = useFetchActiveStoneDetailsQuery();
@@ -151,10 +152,6 @@ function Damage() {
 
         if (formData.damageDate === "") {
             newErrors.damageDate = "Damage Date is required."
-        }
-
-        if (formData.referenceNo === "") {
-            newErrors.referenceNo = "Reference No is required."
         }
 
         if (validator.isEmpty(formData.stoneDetailCode)) {

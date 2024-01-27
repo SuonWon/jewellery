@@ -7,16 +7,18 @@ import { v4 as uuidv4 } from 'uuid';
 import moment from "moment";
 import { useAuthUser } from "react-auth-kit";
 import { focusSelect } from "../const";
-import { useAddReceivableMutation, useFetchReceivableQuery, useFetchTrueWalletQuery, useRemoveReceivableMutation, useUpdateReceivableMutation } from "../store";
+import { useAddReceivableMutation, useFetchOwnerWalletQuery, useFetchReceivableQuery, useRemoveReceivableMutation, useUpdateReceivableMutation } from "../store";
 const validator = require('validator');
 
 function Receivable(props) {
 
     const [receivablePermission] = useState(props.receivablePermission);
 
+    console.log(receivablePermission);
+
     const {data} = useFetchReceivableQuery(props.invoiceNo);
 
-    const { data: walletData } = useFetchTrueWalletQuery();
+    const { data: walletData } = useFetchOwnerWalletQuery();
 
     const [addReceivable] = useAddReceivableMutation();
 
@@ -135,10 +137,11 @@ function Receivable(props) {
     };
 
     const handleRemove = async (id) => {
-        let removeData = data.filter((el) => el.id === id);
+        let removeData = data.find((el) => el.id === id);
         console.log(removeData);
         removeReceivable({
-            id: removeData[0].id,
+            id: removeData.id,
+            walletName: removeData.wallet.walletName,
             deletedAt: moment().toISOString(),
             deletedBy: auth().username
         }).then((res) => { console.log(res) });
@@ -278,7 +281,7 @@ function Receivable(props) {
                                         onChange={(e) => {
                                             setPayForm({
                                                 ...payForm,
-                                                walletName: e.target.selectedOptions[0].text.split(",")[1].trimStart(),
+                                                walletName: e.target.selectedOptions[0].text,
                                                 walletCode: e.target.value,
                                             })
                                         }}
@@ -287,7 +290,7 @@ function Receivable(props) {
                                         {
                                             walletData?.map((wallet) => {
                                                 return (
-                                                    <option key={wallet.id} value={wallet.id}>{wallet.share.shareName}, {wallet.walletName}</option>
+                                                    <option key={wallet.id} value={wallet.id}>{wallet.walletName}</option>
                                                 )
                                             })
                                         }

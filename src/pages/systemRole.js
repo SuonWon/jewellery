@@ -68,8 +68,6 @@ function SystemRole() {
 
     const [isEdit, setIsEdit] = useState(false);
 
-    const [isSelectAll, setIsSelectAll] = useState(false);
-
     const [ validationText, setValidationText ] = useState({});
 
     const [ currentPage, setCurrentPage] = useState(1);
@@ -104,7 +102,6 @@ function SystemRole() {
     const openModal = () => {
         setIsEdit(false);
         setFormData(userInfo);
-        setIsSelectAll(false);
         setPermissionData(permission);
         setOpen(!open);
     };
@@ -178,7 +175,6 @@ function SystemRole() {
                 delete: el.delete,
             }
         }));
-        setIsSelectAll(false);
         setOpen(!open);
     };
 
@@ -421,9 +417,9 @@ function SystemRole() {
                                                             }
                                                         })
                                                     );
-                                                    setIsSelectAll(e.target.checked);
+                                                    
                                                 }}
-                                                checked={isSelectAll}
+                                                checked = {permissionData.find(el => el.moduleCheck === false)? false : true}
                                             />
                                             <span className="text-sm">Select All</span>
                                         </label>
