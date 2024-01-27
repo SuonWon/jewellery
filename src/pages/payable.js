@@ -15,8 +15,6 @@ function Payable(props) {
 
     console.log(props.invoiceNo)
 
-    //const {permissions} = useContext(AuthContent);
-
     const [payablePermission] = useState(props.payablePermission);
 
     const {data} = useFetchPayableQuery(props.invoiceNo);

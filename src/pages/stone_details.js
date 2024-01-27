@@ -44,7 +44,7 @@ function StoneDetails() {
         skip: 0,
         take: 10,
         search: '',
-        refetchOnMountOrArgChange: true
+        //refetchOnMountOrArgChange: true
     });
 
     const purchaseFilter = {
@@ -610,12 +610,14 @@ function StoneDetails() {
         {
             name: 'Quantity',
             width: "80px",
+            center: "true",
             selector: row => row.Qty,
 
         },
         {
             name: 'Weight',
             width: "80px",
+            center: "true",
             selector: row => row.Weight,
         },
         {

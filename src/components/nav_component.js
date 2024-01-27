@@ -51,11 +51,11 @@ function Nav() {
                 </div>
                 <div className="flex flex-row col-span-4 justify-center text-sm items-center font-medium space-x-2 hidden xl:flex">
                     {/* Dashboard */}
-                    <NavLink to='/dashboard'>
+                    {/* <NavLink to='/dashboard'>
                         <Typography variant='small' className="flex justify-center items-center text-white p-2 space-x-2 hover:bg-white hover:text-black rounded-lg ">
                             <FaChartPie className='text-base' /> <span className=''>Dashboard</span>
                         </Typography>
-                    </NavLink>
+                    </NavLink> */}
                     {/* Setup */}
                     {
                         isSetupTrue ? (
@@ -333,14 +333,14 @@ function Nav() {
                     </div>
                     <List className="text-black">
                         {/* Dashboard */}
-                        <NavLink to='/dashboard'>
+                        {/* <NavLink to='/dashboard'>
                             <ListItem>
                                 <ListItemPrefix>
                                     <FaChartPie />
                                 </ListItemPrefix>
                                 Dashboard
                             </ListItem>
-                        </NavLink>
+                        </NavLink> */}
                         {/* Setup */}
                         {
                             isSetupTrue ? (
