@@ -100,7 +100,7 @@ export { useFetchStoneSelectionQuery, useAddStoneSelectionMutation, useUpdateSto
 export { useFetchReturnQuery, useAddReturnMutation, useUpdateReturnMutation, useRemoveReturnMutation, useFetchReturnCountQuery, useFetchReturnByInvoiceQuery } from "../apis/returnApi";
 export { useFetchIssueQuery, useAddIssueMutation, useUpdateIssueMutation, useUpdateIssueStatusMutation, useRemoveIssueMutation, useFetchIssueCountQuery } from "../apis/issueApi";
 export { useFetchShareQuery, useFetchTrueShareQuery, useFetchShareByIdQuery, useAddShareMutation, useUpdateShareMutation, useRemoveShareMutation, useFetchShareCountQuery } from "../apis/shareApi";
-export { useFetchDamageIdQuery, useFetchDamageQuery, useFetchDamageByIdQuery, useAddDamageMutation, useUpdateDamageMutation, useRemoveDamageMutation } from "../apis/damageApi";
+export { useFetchDamageIdQuery, useFetchDamageQuery, useFetchDamageByIdQuery, useAddDamageMutation, useUpdateDamageMutation, useRemoveDamageMutation, useFetchDamageCountQuery } from "../apis/damageApi";
 export { useFetchAdjustmentQuery, useFetchAdjustmentByIdQuery, useAddAdjustmentMutation, useUpdateAdjustmentMutation, useRemoveAdjustMutation, useFetchAdjustmentCountQuery } from "../apis/adjustmentApi";
 export { useFetchWalletTransactionQuery, useFetchWalletTransactionByIdQuery, useAddWalletTransactionMutation, useUpdateWalletTransactionMutation, useRemoveWalletTransactionMutation, useFetchWalletTransactionCountQuery } from "../apis/walletTransitionApi";
 export { useFetchPayableQuery, useFetchPayableByIdQuery, useAddPayableMutation, useUpdatePayableMutation, useRemovePayableMutation } from "../apis/payableApi";

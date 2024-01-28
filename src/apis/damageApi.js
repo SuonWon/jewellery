@@ -121,5 +121,5 @@ const damageApi = createApi({
     },
 });
 
-export const { useFetchDamageIdQuery, useFetchDamageQuery, useFetchDamageByIdQuery, useAddDamageMutation, useUpdateDamageMutation, useRemoveDamageMutation } = damageApi;
+export const { useFetchDamageIdQuery, useFetchDamageQuery, useFetchDamageByIdQuery, useAddDamageMutation, useUpdateDamageMutation, useRemoveDamageMutation, useFetchDamageCountQuery } = damageApi;
 export { damageApi };

@@ -15,6 +15,7 @@ import axios from "axios";
 import Cookies from "js-cookie";
 import { useNavigate } from "react-router-dom";
 import { AuthContent } from "../context/authContext";
+import { useFetchDamageCountQuery } from "../apis/damageApi";
 
 const token = 'Bearer ' + Cookies.get('_auth');
 
@@ -47,7 +48,7 @@ function Damage() {
 
     const { data } = useFetchDamageQuery(filterData);
 
-    const { data: dataCount } = useFetchDamageQuery(filterData);
+    const { data: dataCount } = useFetchDamageCountQuery(filterData);
 
     const {data: stoneDetails} = useFetchActiveStoneDetailsQuery();
 
@@ -737,7 +738,7 @@ function Damage() {
                                     >
                                         <option value="" disabled>Select stone detail</option>
                                         {
-                                            selectedStoneDetails.length === 0? 
+                                            selectedStoneDetails?.length === 0? 
                                             stoneDetails?.length === 0 ? <option value="" disabled>There is no Data</option> :
                                             stoneDetails?.map((stoneDetail) => {
                                                 return <option value={stoneDetail.stoneDetailCode} key={stoneDetail.stoneDetailCode} >{stoneDetail.stoneDesc} ({stoneDetail.supplier.supplierName})</option>
