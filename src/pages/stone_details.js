@@ -1173,7 +1173,7 @@ function StoneDetails() {
                                             </div>
                                             <div>
                                                 <label className="text-black text-sm mb-2">Qty</label>
-                                                <input type="number" className="border border-blue-gray-200 w-full h-[40px] p-2.5 rounded-md text-black" value={formData.qty} onChange={(e) => setFormData({...formData, qty: Number(e.target.value)})} readOnly={isEdit} onFocus={(e) => focusSelect(e)}/>
+                                                <input type="number" className="border border-blue-gray-200 w-full h-[40px] p-2.5 rounded-md text-black" value={formData.qty} onChange={(e) => setFormData({...formData, qty: Math.floor(Number(e.target.value))})} readOnly={isEdit} onFocus={(e) => focusSelect(e)}/>
                                                 {
                                                     validationText.qty && <p className="block text-[12px] text-red-500 font-sans">{validationText.qty}</p>
                                                 }

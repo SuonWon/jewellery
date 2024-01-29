@@ -22,23 +22,23 @@ function WalletList() {
 
     const [walletPermission, setWalletPermission] = useState(null);
 
-    const navigate = useNavigate();
-
-    useEffect(() => {
-        setWalletPermission(permissions[8]);
-
-        if(walletPermission?.view == false) {
-            navigate('/403');
-        }
-    }, [permissions, walletPermission, navigate])
-
     const [filterData, setFilterData] = useState({
         skip: 0,
         take: 10,
         search: ''
     });
 
-    const {data} = useFetchWalletQuery(filterData);
+    const {data, refetch} = useFetchWalletQuery(filterData);
+
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        setWalletPermission(permissions[8]);
+        refetch();
+        if(walletPermission?.view == false) {
+            navigate('/403');
+        }
+    }, [permissions, walletPermission, navigate])
     
     const {data:dataCount} = useFetchWalletCountQuery(filterData);
 
@@ -304,10 +304,10 @@ function WalletList() {
                         <DialogBody>
                             <ModalTitle titleName={isEdit ? "Edit Wallet" : "Wallet"} handleClick={openModal} />
         
-                            <div  className="grid grid-cols-3 gap-4">
+                            <div  className="grid grid-cols-2 gap-4">
                                 {/* <Switch label="Active" color="deep-purple" defaultChecked /> */}
                                 {/* Share Name */}
-                                <div className="col-span-2">
+                                <div className="">
                                     <label className="text-black mb-2 text-sm">Share Name</label>
                                     <select
                                         className="block w-full px-2.5 py-1.5 border border-blue-gray-200 h-[35px] rounded-md focus:border-black text-black"
@@ -329,8 +329,6 @@ function WalletList() {
                                         validationText.shareCode && <p className="block text-[12px] text-red-500 font-sans mb-2">{validationText.shareCode}</p>
                                     }
                                 </div>
-                            </div>
-                            <div className="grid grid-cols-2 gap-4 mt-3">
                                 {/* Wallet Id */}
                                 <div>
                                     <label className="text-black text-sm mb-2">Wallet Name</label>
@@ -349,8 +347,10 @@ function WalletList() {
                                         validationText.walletName && <p className="block text-[12px] text-red-500 font-sans">{validationText.walletName}</p>
                                     }
                                 </div>
+                            </div>
+                            <div className="grid grid-cols-2 gap-4 mt-3">
                                 {/* Balance */}
-                                <div>
+                                {/* <div>
                                     <label className="text-black text-sm mb-2">Balance</label>
                                     <input
                                         type="number"
@@ -366,7 +366,7 @@ function WalletList() {
                                     {
                                         validationText.balance && <p className="block text-[12px] text-red-500 font-sans">{validationText.balance}</p>
                                     }
-                                </div>
+                                </div> */}
                             </div>
                             <div className="flex items-center justify-end mt-6 gap-2">
                                 {

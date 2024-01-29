@@ -844,7 +844,7 @@ function ReturnList({type = 'I'}) {
                                             onChange={(e) => {
                                                 setFormData({
                                                     ...formData, 
-                                                    qty: parseFloat(e.target.value),
+                                                    qty: Math.floor(Number(e.target.value)),
                                                 });
                                             }}
                                             onFocus={(e) => focusSelect(e)}

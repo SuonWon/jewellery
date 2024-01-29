@@ -267,11 +267,14 @@ function PurchaseList() {
             }
         }));
         tempData.purchaseShareDetails.map(el => {
-            if (el.shareCode === dShare.shareCode) {
+            if (el.share.isOwner) {
+                console.log(el)
                 setDShare({
                     ...dShare,
                     sharePercentage: el.sharePercentage,
-                    amount: el.amount
+                    amount: el.amount,
+                    shareCode: el.share.shareCode,
+                    shareName: el.share.shareName
                 });
             }
         });
@@ -279,6 +282,8 @@ function PurchaseList() {
         setIsEdit(true);
         setOpen(!open);
     };
+
+    //console.log(dShare);
 
     //console.log(tBodyData);
 
@@ -1207,7 +1212,7 @@ function PurchaseList() {
                                                     onChange={(e) => {
                                                         setFormData({
                                                             ...formData,
-                                                            qty: parseFloat(e.target.value),
+                                                            qty: Math.floor(Number(e.target.value)),
                                                         });
                                                     }}
                                                     onFocus={(e) => focusSelect(e)}
