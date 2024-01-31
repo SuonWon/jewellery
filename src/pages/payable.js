@@ -8,6 +8,7 @@ import moment from "moment";
 import { useAuthUser } from "react-auth-kit";
 import { focusSelect } from "../const";
 import { useAddPayableMutation, useFetchOwnerWalletQuery, useFetchPayableQuery, useRemovePayableMutation, useUpdatePayableMutation } from "../store";
+import ListLoader from "../components/customLoader";
 
 const validator = require('validator');
 
@@ -17,7 +18,7 @@ function Payable(props) {
 
     const [payablePermission] = useState(props.payablePermission);
 
-    const {data} = useFetchPayableQuery(props.invoiceNo);
+    const {data, isLoading: dataLoad} = useFetchPayableQuery(props.invoiceNo);
 
     const {data : walletData } = useFetchOwnerWalletQuery();
 
@@ -435,7 +436,9 @@ function Payable(props) {
                                                             minHeight: '40px',
                                                         }
                                                     }
-                                                }} 
+                                                }}
+                                                progressPending={dataLoad}
+			                                    progressComponent={<ListLoader />}
                                             />
                                             <div className="grid grid-cols-6 gap-2 my-3">
                                                 <label className="text-black mb-2 text-sm col-span-2 col-start-3 text-right">Total Paid Amount :</label>

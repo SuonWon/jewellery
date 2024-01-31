@@ -51,7 +51,7 @@ function Wallet() {
 
     const { data: walletNames } = useFetchWalletNamesQuery();
 
-    const { data, refetch } = useFetchWalletTransactionQuery(filterForm);
+    const { data, refetch, isLoading: dataLoad } = useFetchWalletTransactionQuery(filterForm);
 
     const { data:dataCount } = useFetchWalletTransactionCountQuery(filterForm);
 
@@ -807,7 +807,7 @@ function Wallet() {
                                     </Typography> */}
                                 </div>
                             </div>
-                            <TableList columns={column} data={tbodyData} isSearch={true} />
+                            <TableList columns={column} data={tbodyData} isSearch={true} pending={dataLoad} />
                             <div className="grid grid-cols-2">
                                 <div className="flex mt-7 mb-5">
                                     <p className="mr-2 mt-[6px]">Show</p>

@@ -45,7 +45,7 @@ function Adjustment() {
         end_date: null
     });
 
-    const { data } = useFetchAdjustmentQuery(filterData);
+    const { data, isLoading: dataLoad } = useFetchAdjustmentQuery(filterData);
 
     const { data: dataCount } = useFetchAdjustmentCountQuery(filterData);
 
@@ -585,7 +585,7 @@ function Adjustment() {
                                 </div>
                             </div>
                         
-                            <TableList columns={column} data={tbodyData} />
+                            <TableList columns={column} data={tbodyData} pending={dataLoad} />
     
                             <div className="grid grid-cols-2">
                                 <div className="flex mt-7 mb-5">

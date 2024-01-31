@@ -38,7 +38,7 @@ function UOM() {
 
     const [isEdit, setIsEdit] = useState(false);
 
-    const {data} = useFetchUOMQuery();
+    const {data, isLoading: dataLoad} = useFetchUOMQuery();
 
     const [ unitData, setUnitData ] = useState({
         unitCode: '',
@@ -178,7 +178,7 @@ function UOM() {
             <SectionTitle title="Unit of Measurement" handleModal={openModal} permission={unitPermission?.create}/>
             <Card className="h-auto shadow-md min-w-[100%] max-w-[100%] mx-1 rounded-sm p-2 border-t">
                 <CardBody className="rounded-sm overflow-auto p-0">
-                    <TableList columns={column} data={tbodyData} />
+                    <TableList columns={column} data={tbodyData} pending={dataLoad} />
                 </CardBody>
             </Card>
             <Dialog open={open} handler={openModal} size="sm">

@@ -55,7 +55,7 @@ function ReturnList({type = 'I'}) {
         end_date: null
     });
 
-    const { data } = useFetchReturnQuery({
+    const { data, isLoading: dataLoad } = useFetchReturnQuery({
         ...filterData,
         return_type: type,
     });
@@ -604,7 +604,7 @@ function ReturnList({type = 'I'}) {
                                 </div>
                             </div>
                         
-                            <TableList columns={column} data={tbodyData} />
+                            <TableList columns={column} data={tbodyData} pending={dataLoad} />
     
                             <div className="grid grid-cols-2">
                                 <div className="flex mt-7 mb-5">

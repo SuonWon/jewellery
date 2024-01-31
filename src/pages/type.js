@@ -45,7 +45,8 @@ function StoneType() {
         search: ''
     });
 
-    const {data} = useFetchTypeQuery(filterData);
+    const {data, isLoading: dataLoad} = useFetchTypeQuery(filterData);
+
     const {data:dataCount} = useFetchTypeCountQuery(filterData);
 
     const [ stoneType, setStoneType ] = useState({
@@ -238,7 +239,7 @@ function StoneType() {
                                     </div>
                                 </div>
                                 
-                                <TableList columns={column} data={tbodyData}/>
+                                <TableList columns={column} data={tbodyData} pending={dataLoad} />
         
                                 <div className="grid grid-cols-2">
                                     <div className="flex mt-7 mb-5">

@@ -39,7 +39,7 @@ function SystemUser() {
         search: ''
     });
 
-    const {data} = useFetchUsersQuery(filterData);
+    const {data, isLoading: dataLoad} = useFetchUsersQuery(filterData);
 
     const {data: roleData} = useFetchRolesQuery({
         skip: 0,
@@ -316,7 +316,7 @@ function SystemUser() {
                                 </div>
                             </div>
                             
-                            <TableList columns={column} data={tbodyData} />
+                            <TableList columns={column} data={tbodyData} pending={dataLoad} />
         
                             <div className="grid grid-cols-2">
                                 <div className="flex mt-7 mb-5">

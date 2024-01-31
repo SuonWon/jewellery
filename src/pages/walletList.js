@@ -28,7 +28,7 @@ function WalletList() {
         search: ''
     });
 
-    const {data, refetch} = useFetchWalletQuery(filterData);
+    const {data, refetch, isLoading: dataLoad} = useFetchWalletQuery(filterData);
 
     const navigate = useNavigate();
 
@@ -38,9 +38,9 @@ function WalletList() {
         if(walletPermission?.view == false) {
             navigate('/403');
         }
-    }, [permissions, walletPermission, navigate])
+    }, [permissions, walletPermission, navigate, data])
     
-    const {data:dataCount} = useFetchWalletCountQuery(filterData);
+    const {data: dataCount} = useFetchWalletCountQuery(filterData);
 
     const {data: shareData} = useFetchTrueShareQuery();
 
@@ -247,7 +247,7 @@ function WalletList() {
                                 </div>
                             </div>
                             
-                            <TableList columns={column} data={tbodyData} />
+                            <TableList columns={column} data={tbodyData} pending={dataLoad} />
         
                             <div className="grid grid-cols-2">
                                 <div className="flex mt-7 mb-5">

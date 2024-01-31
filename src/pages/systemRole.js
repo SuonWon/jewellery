@@ -50,7 +50,7 @@ function SystemRole() {
 
     const [permissionData, setPermissionData] = useState(permission);
 
-    const {data} = useFetchRolesQuery(filterData);
+    const {data, isLoading: dataLoad} = useFetchRolesQuery(filterData);
     
     const { data: dataCount } = useFetchRolesCountQuery(filterData); 
 
@@ -302,7 +302,7 @@ function SystemRole() {
                                 </div>
                             </div>
                             
-                            <TableList columns={column} data={tbodyData} />
+                            <TableList columns={column} data={tbodyData} pending={dataLoad} />
         
                             <div className="grid grid-cols-2">
                                 <div className="flex mt-7 mb-5">
@@ -359,7 +359,7 @@ function SystemRole() {
                         <DialogBody>
                             <ModalTitle titleName={isEdit ? "Edit Role" : "Create Role"} handleClick={openModal} />
                             <form  className="flex flex-col py-1 px-3 gap-2">
-                                <div className="grid grid-cols-3 mb-3 w-full">
+                                <div className="grid grid-cols-3 gap-2 mb-3 w-full">
                                     {/* Username */}
                                     <div>
                                         <label className="text-black text-sm mb-2">Role Name</label>
@@ -378,25 +378,37 @@ function SystemRole() {
                                             validationText.roleDesc && <p className="block text-[12px] text-red-500 font-sans">{validationText.roleDesc}</p>
                                         }
                                     </div>
-                                </div>
-                                {/* Remark */}
-                                <div className="grid grid-cols-2">
-                                    <div className="grid gap-2 w-full">
-                                            <label className="text-black text-sm">Remark</label>
-                                            <textarea
-                                                className="border border-blue-gray-200 w-full px-2.5 py-1.5 rounded-md text-black"
-                                                value={formData.remark == null ? "" : formData.remark}
-                                                rows="1"
-                                                onChange={(e) => {
-                                                    setFormData({
-                                                        ...formData,
-                                                        remark: e.target.value
-                                                    });
-                                                }}
-                                            />
+                                    {/* Remark */}
+                                    <div className="col-span-2 w-full">
+                                        <label className="text-black text-sm">Remark</label>
+                                        <textarea
+                                            className="border border-blue-gray-200 w-full px-2.5 py-1.5 rounded-md text-black"
+                                            value={formData.remark == null ? "" : formData.remark}
+                                            rows="1"
+                                            onChange={(e) => {
+                                                setFormData({
+                                                    ...formData,
+                                                    remark: e.target.value
+                                                });
+                                            }}
+                                        />
                                     </div>
                                 </div>
-                                <div className="flex justify-end ">
+                                <div className="flex gap-3 justify-end ">
+                                    <div>
+                                        <input 
+                                            className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black focus:outline-none focus:border-black"
+                                            type="search"
+                                            placeholder="Search"
+                                            onChange={(e) => {
+                                                if (e.target.value) {
+                                                    setPermissionData(permission.filter((el) => el.moduleName.toLowerCase() === e.target.value.toLowerCase()));
+                                                } else {
+                                                    setPermissionData(permission)
+                                                }
+                                            }}
+                                        />
+                                    </div>
                                     <div className="flex gap-2">
                                         <label htmlFor="selectAll" className="flex items-center justify-center gap-2 py-1 px-2 rounded-md hover:bg-gray-100 text-black">
                                             <input 
@@ -441,12 +453,12 @@ function SystemRole() {
                                         </label> */}
                                     </div>
                                 </div>
-                                <div className="grid grid-cols-4 h-[290px] overflow-auto">
+                                <div className="grid h-[350px] overflow-auto">
         
                                     {
                                         permissionData?.map((el) => {
                                             return (
-                                                <>
+                                                <div className="grid grid-cols-4 h-fit">
                                                     <div className="col-span-4 flex items-center gap-2 mt-2">
                                                         <input 
                                                             type="checkbox" 
@@ -577,7 +589,7 @@ function SystemRole() {
                                                             <label className="text-black text-sm" htmlFor={`${el.moduleName}Delete`}>Delete</label>
                                                         </div>
                                                     </div>
-                                                </>
+                                                </div>
                                             )
                                         })
                                     }

@@ -51,7 +51,8 @@ function WalletCategory() {
         search: ''
     });
 
-    const {data} = useFetchWalletCategoryQuery(filterData);
+    const {data, isLoading: dataLoad} = useFetchWalletCategoryQuery(filterData);
+
     const {data:dataCount} = useFetchWalletCategoryCountQuery(filterData);
 
     const resetData = {
@@ -239,7 +240,7 @@ function WalletCategory() {
                         </div>
                     </div>
                     
-                    <TableList columns={column} data={tbodyData} />
+                    <TableList columns={column} data={tbodyData} pending={dataLoad} />
 
                     <div className="grid grid-cols-2">
                         <div className="flex mt-7 mb-5">
@@ -295,7 +296,6 @@ function WalletCategory() {
             <Dialog open={open} handler={openModal} size="sm">
                 <DialogBody>
                     <ModalTitle titleName={isEdit ? "Edit Wallet Category" : "Wallet Category"} handleClick={openModal} />
-
                     <div  className="flex flex-col p-3 gap-4">
                         {/* <Switch label="Active" color="deep-purple" defaultChecked /> */}
                         <div>
@@ -344,9 +344,7 @@ function WalletCategory() {
                                 )
                             }
                         </div>
-                    </div>
-                        
-                     
+                    </div>     
                 </DialogBody>                      
             </Dialog>
             <DeleteModal deleteId={deleteId} open={openDelete} handleDelete={handleDelete} closeModal={() => setOpenDelete(!openDelete)} />

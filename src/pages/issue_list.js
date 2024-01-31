@@ -48,7 +48,8 @@ function IssueList() {
         end_date: null
     });
 
-    const { data } = useFetchIssueQuery(filterData);
+    const { data, isLoading: dataLoad } = useFetchIssueQuery(filterData);
+
     const { data: dataCount } = useFetchIssueCountQuery(filterData);
 
     const { data: stoneDetails } = useFetchActiveStoneDetailsQuery();
@@ -80,7 +81,7 @@ function IssueList() {
 
     const auth = useAuthUser();
 
-    const [addIssue, addResult] = useAddIssueMutation();
+    const [addIssue] = useAddIssueMutation();
 
     const [removeIssue] = useRemoveIssueMutation();
 
@@ -763,7 +764,7 @@ function IssueList() {
                                 </div>
                             </div>
     
-                            <TableList columns={column} data={issueDataList} />
+                            <TableList columns={column} data={issueDataList} pending={dataLoad} />
     
     
                             <div className="grid grid-cols-2">

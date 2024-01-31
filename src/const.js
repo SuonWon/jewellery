@@ -1,6 +1,6 @@
-export const pause = (duration) => {
+export const pause = () => {
     return new Promise((resolve) => {
-        setTimeout(resolve, duration);
+        setTimeout(resolve, 3000);
     });
 };
 

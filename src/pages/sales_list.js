@@ -29,6 +29,7 @@ function SalesList() {
     const {permissions} = useContext(AuthContent);
     
     const [salesPermission, setSalesPermission] = useState(null);
+
     const [receivablePermission, setReceivablePermission] = useState(null);
 
     const navigate = useNavigate();
@@ -52,7 +53,8 @@ function SalesList() {
     });
 
     // const { data, refetch } = useFetchTrueSalesQuery();
-    const { data, refetch } = useFetchSalesQuery(filterData);
+    const { data, isLoading: dataLoad, refetch } = useFetchSalesQuery(filterData);
+
     const { data: dataCount } = useFetchSalesCountQuery(filterData);
 
     const { data: issueData } = useFetchTrueIssueQuery();
@@ -846,7 +848,7 @@ function SalesList() {
                                 </div>
                             </div>
                         
-                            <TableList columns={column} data={tbodyData} />
+                            <TableList columns={column} data={tbodyData} pending={dataLoad} />
     
                             <div className="grid grid-cols-2">
                                 <div className="flex mt-7 mb-5">

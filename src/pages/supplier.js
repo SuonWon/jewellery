@@ -42,7 +42,8 @@ function Supplier() {
         search: ''
     });
 
-    const {data} = useFetchSupplierQuery(filterData);
+    const {data, isLoading: dataLoad} = useFetchSupplierQuery(filterData);
+
     const {data:dataCount} = useFetchSupplierCountQuery(filterData);
 
     const [addSupplier] = useAddSupplierMutation();
@@ -335,7 +336,7 @@ function Supplier() {
                                 </div>
                             </div>
                             
-                            <TableList columns={column} data={tbodyData} />
+                            <TableList columns={column} data={tbodyData} pending={dataLoad} />
         
                             <div className="grid grid-cols-2">
                                 <div className="flex mt-7 mb-5">

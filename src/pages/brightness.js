@@ -12,6 +12,8 @@ import TableList from "../components/data_table";
 import { useAuthUser } from "react-auth-kit";
 import { AuthContent } from "../context/authContext";
 import { useNavigate } from "react-router-dom";
+import SuccessAlert from "../components/success_alert";
+import { pause } from "../const";
 
 const validator = require("validator");
 
@@ -48,8 +50,9 @@ function Brightness() {
 
     const [ validationText, setValidationText ] = useState({});
 
-    const {data} = useFetchBrightnessQuery(filterData);
-    const {data:dataCount} = useFetchBrightnessCountQuery(filterData);
+    const { data, isLoading: dataLoad } = useFetchBrightnessQuery(filterData);
+
+    const { data:dataCount } = useFetchBrightnessCountQuery(filterData);
 
     const [formData, setFormData] = useState({
         brightDesc: "",
@@ -60,7 +63,7 @@ function Brightness() {
         updatedBy: "",
     }, []);
 
-    const [addBrightness, addResult] = useAddBrightnessMutation();
+    const [addBrightness] = useAddBrightnessMutation();
 
     const [editBrightness] = useUpdateBrightnessMutation();
 
@@ -68,18 +71,15 @@ function Brightness() {
 
     const [ currentPage, setCurrentPage] = useState(1);
 
-    useEffect(() => {
-        setFormData({
-            brightDesc: "",
-            status: true,
-            createdAt: moment().toISOString(),
-            createdBy: auth().username,
-            updatedAt: moment().toISOString(),
-            updatedBy: "",
-        });
-    }, [addResult.isSuccess]);
-
     const [deleteId, setDeleteId] = useState('');
+
+    const [alertMsg, setAlertMsg] = useState({
+        visible: false,
+        title: '',
+        message: '',
+        isError: false,
+        isWarning: false,
+    });
 
     const resetData = () => {
         setFormData({
@@ -103,7 +103,27 @@ function Brightness() {
             updatedAt: moment().toISOString(),
             updatedBy: "",
         }).then((res) => {
-            //console.log(res);
+            if(res.data) {
+                setAlertMsg({
+                    ...alertMsg,
+                    visible: true,
+                    title: "Success",
+                    message: "Stone brightness updated successfully",
+                });
+            } else {
+                setAlertMsg({
+                    ...alertMsg,
+                    visible: true,
+                    title: "Error",
+                    message: res.error.data.message,
+                    isError: true,
+                });
+            }
+        });
+        await pause();
+        setAlertMsg({
+            ...alertMsg,
+            visible: false,
         });
 
     };
@@ -127,20 +147,60 @@ function Brightness() {
 
     const onSubmit = async () => {
         if(validateForm()) {
-            addBrightness(formData).then((res) => {
-                console.log(res);
+            await addBrightness(formData).then((res) => {
+                if(res.data) {
+                    setAlertMsg({
+                        ...alertMsg,
+                        visible: true,
+                        title: "Success",
+                        message: "New stone brightness added successfully",
+                    });
+                } else {
+                    setAlertMsg({
+                        ...alertMsg,
+                        visible: true,
+                        title: "Error",
+                        message: res.error.data.message,
+                        isError: true,
+                    });
+                }
             });
             setOpen(!open);
             resetData();
+            await pause();
+            setAlertMsg({
+                ...alertMsg,
+                visible: false,
+            });
         }
     };
 
-    const onSaveSubmit = () => {
+    const onSaveSubmit = async () => {
         if (validateForm()) {
             addBrightness(formData).then((res) => {
-                console.log(res);
+                if(res.data) {
+                    setAlertMsg({
+                        ...alertMsg,
+                        visible: true,
+                        title: "Success",
+                        message: "New stone brightness added successfully",
+                    });
+                } else {
+                    setAlertMsg({
+                        ...alertMsg,
+                        visible: true,
+                        title: "Error",
+                        message: res.error.data.message,
+                        isError: true,
+                    });
+                }
             });
             resetData();
+            await pause();
+            setAlertMsg({
+                ...alertMsg,
+                visible: false,
+            });
         }
     };
 
@@ -157,19 +217,65 @@ function Brightness() {
             updatedAt: moment().toISOString(),
             updatedBy: auth().username,
         }).then((res) => {
-            console.log(res);
+            if(res.data) {
+                setAlertMsg({
+                    ...alertMsg,
+                    visible: true,
+                    title: "Success",
+                    message: "Stone brightness updated successfully",
+                });
+            } else {
+                setAlertMsg({
+                    ...alertMsg,
+                    visible: true,
+                    title: "Error",
+                    message: res.error.data.message,
+                    isError: true,
+                });
+            }
         });
         setOpen(!open);
+        await pause();
+        setAlertMsg({
+            ...alertMsg,
+            visible: false,
+        });
     };
 
     const handleRemove = async (id) => {
-        removeBrightness(id).then((res) => {console.log(res)});
+        removeBrightness(id).then((res) => {
+            if(res.data) {
+                setAlertMsg({
+                    ...alertMsg,
+                    visible: true,
+                    title: "Success",
+                    message: "Stone brightness deleted successfully",
+                });
+            } else {
+                setAlertMsg({
+                    ...alertMsg,
+                    visible: true,
+                    title: "Error",
+                    message: res.error.data.message,
+                    isError: true,
+                });
+            }
+        });
         setOpenDelete(!openDelete);
+        await pause();
+        setAlertMsg({
+            ...alertMsg,
+            visible: false,
+        });
     };
 
     const handleDeleteBtn = (id) => {
         setDeleteId(id);
         setOpenDelete(!openDelete);
+    };
+
+    const showAlert = () => {
+        
     }
 
     const column = [
@@ -244,15 +350,9 @@ function Brightness() {
                 brightness != null && brightness != undefined ? (
                     <div className="flex flex-col gap-4 px-4 relative w-full">
                         <div className="w-78 absolute top-0 right-0 z-[9999]">
-                            {/* {
-                                addResult.isSuccess && isAlert && <SuccessAlert message="Save successful." handleAlert={() => setIsAlert(false)} />
-                            }
                             {
-                                editResult.isSuccess && isAlert && <SuccessAlert message="Update successful." handleAlert={() => setIsAlert(false)} />
+                                alertMsg.visible? <SuccessAlert title={alertMsg.title} message={alertMsg.message} isError={alertMsg.isError}  /> : ""
                             }
-                            {
-                                removeResult.isSuccess && isAlert && <SuccessAlert message="Delete successful." handleAlert={() => setIsAlert(false)} />
-                            } */}
                         </div>
                         <SectionTitle title="Stone Brightness" handleModal={openModal} permission={brightness?.create}/>
                         <Card className="h-auto shadow-md min-w-[100%] max-w-[100%] mx-1 rounded-sm p-2 border-t">
@@ -272,7 +372,7 @@ function Brightness() {
                                     </div>
                                 </div>
                                 
-                                <TableList columns={column} data={tbodyData} />
+                                <TableList columns={column} data={tbodyData} pending={dataLoad} />
             
                                 <div className="grid grid-cols-2">
                                     <div className="flex mt-7 mb-5">

@@ -25,6 +25,7 @@ import axios from "axios";
 import { apiUrl } from "./const";
 import Cookies from "js-cookie";
 import NoPermission from "./pages/noPermission";
+import Home from "./pages/home";
 
 
 function App() {
@@ -64,7 +65,8 @@ function App() {
             <Route path="/" element={
               <RequireAuth loginPath="/login">
                 {/* <Dashboard /> */}
-                <Setup />
+                {/* <Setup /> */}
+                <Home />
               </RequireAuth>
             }></Route>
             <Route path="/dashboard" element={
