@@ -6,9 +6,10 @@ import { useState } from "react";
 import { v4 as uuidv4 } from 'uuid';
 import moment from "moment";
 import { useAuthUser } from "react-auth-kit";
-import { focusSelect } from "../const";
+import { focusSelect, pause } from "../const";
 import { useAddReceivableMutation, useFetchOwnerWalletQuery, useFetchReceivableQuery, useRemoveReceivableMutation, useUpdateReceivableMutation } from "../store";
 import ListLoader from "../components/customLoader";
+import SuccessAlert from "../components/success_alert";
 const validator = require('validator');
 
 function Receivable(props) {
@@ -52,6 +53,14 @@ function Receivable(props) {
     }
 
     const [payForm, setPayForm] = useState(payInfo);
+
+    const [alertMsg, setAlertMsg] = useState({
+        visible: false,
+        title: '',
+        message: '',
+        isError: false,
+        isWarning: false,
+    });
 
     let receivedAmt = 0;
 
@@ -114,7 +123,7 @@ function Receivable(props) {
         setDeleteId(id);
     };
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         if (validatePayable()) {
             addReceivable({
                 id: payForm.id,
@@ -131,9 +140,29 @@ function Receivable(props) {
                 updatedBy: "",
                 deletedBy: "",
             }).then((res) => {
-                console.log(res.data);
+                if(res.data) {
+                    setAlertMsg({
+                        ...alertMsg,
+                        visible: true,
+                        title: "Success",
+                        message: "Receivable data created successfully.",
+                    });
+                } else {
+                    setAlertMsg({
+                        ...alertMsg,
+                        visible: true,
+                        title: "Error",
+                        message: res.error.data.message,
+                        isError: true,
+                    });
+                }
             });
             setPayForm(payInfo);
+            await pause();
+            setAlertMsg({
+                ...alertMsg,
+                visible: false,
+            });
         }
     };
 
@@ -145,11 +174,33 @@ function Receivable(props) {
             walletName: removeData.wallet.walletName,
             deletedAt: moment().toISOString(),
             deletedBy: auth().username
-        }).then((res) => { console.log(res) });
+        }).then((res) => { 
+            if(res.data) {
+                setAlertMsg({
+                    ...alertMsg,
+                    visible: true,
+                    title: "Success",
+                    message: "Receivable data deleted successfully.",
+                });
+            } else {
+                setAlertMsg({
+                    ...alertMsg,
+                    visible: true,
+                    title: "Error",
+                    message: "This data cannot be deleted.",
+                    isError: true,
+                });
+            }
+         });
         document.getElementById("deleteWarning").style.display = "none";
+        await pause();
+        setAlertMsg({
+            ...alertMsg,
+            visible: false,
+        });
     };
 
-    const handleUpdate = () => {
+    const handleUpdate = async () => {
         if (validatePayable()) {
             updateReceivable({
                 id: payForm.id,
@@ -168,10 +219,30 @@ function Receivable(props) {
                 updatedAt: moment().toISOString(),
                 deletedBy: "",
             }).then((res) => {
-                console.log(res.data);
+                if(res.data) {
+                    setAlertMsg({
+                        ...alertMsg,
+                        visible: true,
+                        title: "Success",
+                        message: "Receivable data updated successfully.",
+                    });
+                } else {
+                    setAlertMsg({
+                        ...alertMsg,
+                        visible: true,
+                        title: "Error",
+                        message: res.error.data.message,
+                        isError: true,
+                    });
+                }
             });
             setIsEdit(false);
             setPayForm(payInfo);
+            await pause();
+            setAlertMsg({
+                ...alertMsg,
+                visible: false,
+            });
         }
     };
 
@@ -243,6 +314,9 @@ function Receivable(props) {
             >
                 <DialogBody>
                     <ModalTitle titleName="Receivable" handleClick={props.closePay} />
+                        {
+                            alertMsg.visible? <SuccessAlert title={alertMsg.title} message={alertMsg.message} isError={alertMsg.isError}  /> : ""
+                        }
                     <div className="grid grid-cols-6 gap-2 mb-3">
                         <div className="col-span-3">
                             <div className="grid grid-cols-3 gap-2 mb-3">

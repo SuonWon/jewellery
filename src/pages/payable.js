@@ -6,9 +6,10 @@ import { useState } from "react";
 import { v4 as uuidv4 } from 'uuid';
 import moment from "moment";
 import { useAuthUser } from "react-auth-kit";
-import { focusSelect } from "../const";
+import { focusSelect, pause } from "../const";
 import { useAddPayableMutation, useFetchOwnerWalletQuery, useFetchPayableQuery, useRemovePayableMutation, useUpdatePayableMutation } from "../store";
 import ListLoader from "../components/customLoader";
+import SuccessAlert from "../components/success_alert";
 
 const validator = require('validator');
 
@@ -55,6 +56,14 @@ function Payable(props) {
 
     const [payForm, setPayForm] = useState(payInfo);
 
+    const [alertMsg, setAlertMsg] = useState({
+        visible: false,
+        title: '',
+        message: '',
+        isError: false,
+        isWarning: false,
+    });
+
     let paidAmt = 0;
 
     if(data) {
@@ -65,14 +74,35 @@ function Payable(props) {
 
     const handleRemove = async (id) => {
         let removeData = data.find((el) => el.id === id);
-        console.log(removeData);
         removePayable({
             id: removeData.id,
             walletName: removeData.wallet.walletName,
             deletedAt: moment().toISOString(),
             deletedBy: auth().username
-        }).then((res) => { console.log(res) });
+        }).then((res) => { 
+            if(res.data) {
+                setAlertMsg({
+                    ...alertMsg,
+                    visible: true,
+                    title: "Success",
+                    message: "Payable data deleted successfully.",
+                });
+            } else {
+                setAlertMsg({
+                    ...alertMsg,
+                    visible: true,
+                    title: "Error",
+                    message: "This data cannot be deleted.",
+                    isError: true,
+                });
+            }
+        });
         document.getElementById("deleteWarning").style.display = "none";
+        await pause();
+        setAlertMsg({
+            ...alertMsg,
+            visible: false,
+        });
     };
 
     function validatePayable() {
@@ -129,7 +159,7 @@ function Payable(props) {
         setDeleteId(id);
     };
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         if (validatePayable()) {
             console.log(payForm)
             addPayable({
@@ -147,13 +177,33 @@ function Payable(props) {
                 updatedBy: "",
                 deletedBy: "",
             }).then((res) => {
-                console.log(res);
+                if(res.data) {
+                    setAlertMsg({
+                        ...alertMsg,
+                        visible: true,
+                        title: "Success",
+                        message: "Payable data created successfully.",
+                    });
+                } else {
+                    setAlertMsg({
+                        ...alertMsg,
+                        visible: true,
+                        title: "Error",
+                        message: res.error.data.message,
+                        isError: true,
+                    });
+                }
             });
             setPayForm(payInfo);
+            await pause();
+            setAlertMsg({
+                ...alertMsg,
+                visible: false,
+            });
         }
     };
 
-    const handleUpdate = () => {
+    const handleUpdate = async () => {
         if (validatePayable()) {
             updatePayable({
                 id: payForm.id,
@@ -172,10 +222,30 @@ function Payable(props) {
                 updatedAt: moment().toISOString(),
                 deletedBy: "",
             }).then((res) => {
-                console.log(res.data);
+                if(res.data) {
+                    setAlertMsg({
+                        ...alertMsg,
+                        visible: true,
+                        title: "Success",
+                        message: "Payable data updated successfully.",
+                    });
+                } else {
+                    setAlertMsg({
+                        ...alertMsg,
+                        visible: true,
+                        title: "Error",
+                        message: res.error.data.message,
+                        isError: true,
+                    });
+                }
             });
             setIsEdit(false);
             setPayForm(payInfo);
+            await pause();
+            setAlertMsg({
+                ...alertMsg,
+                visible: false,
+            });
         }
     };
 
@@ -249,6 +319,9 @@ function Payable(props) {
                 >
                     <DialogBody>
                         <ModalTitle titleName="Payable" handleClick={props.closePay}/>
+                        {
+                            alertMsg.visible? <SuccessAlert title={alertMsg.title} message={alertMsg.message} isError={alertMsg.isError}  /> : ""
+                        }
                         <div className="grid grid-cols-6 gap-2 mb-3">
                             <div className="col-span-3">
                                 <div className="grid grid-cols-3 gap-2 mb-3">

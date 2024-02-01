@@ -12,6 +12,8 @@ import TableList from "../components/data_table";
 import { useAuthUser } from "react-auth-kit";
 import { useNavigate } from "react-router-dom";
 import { AuthContent } from "../context/authContext";
+import { pause } from "../const";
+import SuccessAlert from "../components/success_alert";
 const validator = require("validator");
 
 function Share() {
@@ -60,6 +62,14 @@ function Share() {
 
     const [ currentPage, setCurrentPage] = useState(1);
 
+    const [alertMsg, setAlertMsg] = useState({
+        visible: false,
+        title: '',
+        message: '',
+        isError: false,
+        isWarning: false,
+    });
+
     const shareInfo = {
         shareName: "",
         nrcNo: "",
@@ -95,9 +105,28 @@ function Share() {
             updatedAt: moment().toISOString(),
             updatedBy: auth().username,
         }).then((res) => {
-            console.log(res);
+            if(res.data) {
+                setAlertMsg({
+                    ...alertMsg,
+                    visible: true,
+                    title: "Success",
+                    message: "Share updated successfully",
+                });
+            } else {
+                setAlertMsg({
+                    ...alertMsg,
+                    visible: true,
+                    title: "Error",
+                    message: res.error.data.message,
+                    isError: true,
+                });
+            }
         });
-
+        await pause();
+        setAlertMsg({
+            ...alertMsg,
+            visible: false,
+        });
     };
 
     const openModal = () => {
@@ -120,19 +149,59 @@ function Share() {
     const onSubmit = async () => {
         if(validateForm()) {
             addShare(formData).then((res) => {
-                console.log(res);
+                if(res.data) {
+                    setAlertMsg({
+                        ...alertMsg,
+                        visible: true,
+                        title: "Success",
+                        message: "Share created successfully.",
+                    });
+                } else {
+                    setAlertMsg({
+                        ...alertMsg,
+                        visible: true,
+                        title: "Error",
+                        message: res.error.data.message,
+                        isError: true,
+                    });
+                }
             });
             setFormData(shareInfo);
             setOpen(!open);
+            await pause();
+            setAlertMsg({
+                ...alertMsg,
+                visible: false,
+            });
         }
     };
 
-    const onSaveSubmit = () => {
+    const onSaveSubmit = async () => {
         if (validateForm()) {
             addShare(formData).then((res) => {
-                console.log(res);
+                if(res.data) {
+                    setAlertMsg({
+                        ...alertMsg,
+                        visible: true,
+                        title: "Success",
+                        message: "Share created successfully.",
+                    });
+                } else {
+                    setAlertMsg({
+                        ...alertMsg,
+                        visible: true,
+                        title: "Error",
+                        message: res.error.data.message,
+                        isError: true,
+                    });
+                }
             });
-            setFormData(shareInfo)
+            setFormData(shareInfo);
+            await pause();
+            setAlertMsg({
+                ...alertMsg,
+                visible: false,
+            });
         }
     };
 
@@ -149,14 +218,56 @@ function Share() {
             updatedAt: moment().toISOString(),
             updatedBy: auth().username,
         }).then((res) => {
-            console.log(res);
+            if(res.data) {
+                setAlertMsg({
+                    ...alertMsg,
+                    visible: true,
+                    title: "Success",
+                    message: "Share updated successfully.",
+                });
+            } else {
+                setAlertMsg({
+                    ...alertMsg,
+                    visible: true,
+                    title: "Error",
+                    message: res.error.data.message,
+                    isError: true,
+                });
+            }
         });
         setOpen(!open);
+        await pause();
+        setAlertMsg({
+            ...alertMsg,
+            visible: false,
+        });
     };
 
     const handleRemove = async (id) => {
-        removeShare(id).then((res) => {console.log(res)});
+        removeShare(id).then((res) => {
+            if(res.data) {
+                setAlertMsg({
+                    ...alertMsg,
+                    visible: true,
+                    title: "Success",
+                    message: "Share deleted successfully.",
+                });
+            } else {
+                setAlertMsg({
+                    ...alertMsg,
+                    visible: true,
+                    title: "Error",
+                    message: "This data cannot be deleted.",
+                    isError: true,
+                });
+            }
+        });
         setOpenDelete(!openDelete);
+        await pause();
+        setAlertMsg({
+            ...alertMsg,
+            visible: false,
+        });
     };
 
     const handleDeleteBtn = (id) => {
@@ -301,6 +412,11 @@ function Share() {
         {
             sharePermission != null && sharePermission != undefined ? (
                 <div className="flex flex-col gap-4 relative max-w-[85%] min-w-[85%]">
+                    <div className="w-78 absolute top-0 right-0 z-[9999]">
+                        {
+                            alertMsg.visible? <SuccessAlert title={alertMsg.title} message={alertMsg.message} isError={alertMsg.isError}  /> : ""
+                        }
+                    </div>
                     <SectionTitle title="Share" handleModal={openModal} permission={sharePermission?.create}/>
                     <Card className="h-auto shadow-md max-w-screen-xxl rounded-sm p-2 border-t mb-5">
                         <CardBody className="rounded-sm overflow-auto p-0">
@@ -375,6 +491,9 @@ function Share() {
                     <Dialog open={Boolean(open)} handler={openModal} size="lg">
                         <DialogBody>
                             <ModalTitle titleName={isEdit ? "Edit Share" : "Create Share"} handleClick={openModal} />
+                            {
+                                alertMsg.visible? <SuccessAlert title={alertMsg.title} message={alertMsg.message} isError={alertMsg.isError}  /> : ""
+                            }
                             <form  className="flex flex-col items-end p-3 gap-2">
                                 <div className="grid grid-cols-3 gap-2 w-full">
                                     {/* Share Name */}

@@ -256,7 +256,7 @@ function Brightness() {
                     ...alertMsg,
                     visible: true,
                     title: "Error",
-                    message: res.error.data.message,
+                    message: "This data cannot be deleted.",
                     isError: true,
                 });
             }
@@ -273,10 +273,6 @@ function Brightness() {
         setDeleteId(id);
         setOpenDelete(!openDelete);
     };
-
-    const showAlert = () => {
-        
-    }
 
     const column = [
         {
@@ -428,60 +424,59 @@ function Brightness() {
                         <Dialog open={Boolean(open)} handler={openModal} size="sm">
                             <DialogBody>
                                 <ModalTitle titleName={isEdit ? "Edit Stone Brightness" : "Stone Brightness"} handleClick={openModal} />
-                                {/* {
-                                    addResult.isSuccess && isAlert && <SuccessAlert message="Save successful." handleAlert={() => setIsAlert(false)} />
-                                } */}
-                                    <div  className="flex flex-col p-3">
-                                        {/* <Switch label="Active" color="deep-purple" defaultChecked /> */}
-                                        {/* <Input label="Description" value={formData.brightDesc} onChange={(e) => setFormData({...formData, brightDesc: e.target.value})} /> */}
-                                        {/* Description */}
-                                        <div>
-                                            <label className="text-black text-sm mb-2">Description</label>
-                                            <input
-                                                type="text"
-                                                className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
-                                                value={formData.brightDesc}
-                                                onChange={(e) => {
-                                                    setFormData({
-                                                        ...formData, 
-                                                        brightDesc: e.target.value,
-                                                    });
-                                                }}
-                                            />
-                                            {
-                                                validationText.brightDesc && <p className="block text-[12px] text-red-500 font-sans mb-2">{validationText.brightDesc}</p>
-                                            }
-                                        </div>
-                                        <div className="flex items-center justify-end mt-6 gap-2">
-                                            {
-                                                isEdit ? (
-                                                    brightness?.update ? (
-                                                        <Button onClick={submitEdit} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2">
-                                                            <FaFloppyDisk className="text-base" /> 
-                                                            <Typography variant="small" className="capitalize">
-                                                                Update
-                                                            </Typography>
-                                                        </Button>
-                                                    ) : null
-                                                ) : 
-                                                <>
-                                                    <Button onClick={onSubmit} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2">
+                                {
+                                    alertMsg.visible? <SuccessAlert title={alertMsg.title} message={alertMsg.message} isError={alertMsg.isError}  /> : ""
+                                }
+                                <div  className="flex flex-col p-3">
+                                    {/* <Switch label="Active" color="deep-purple" defaultChecked /> */}
+                                    {/* <Input label="Description" value={formData.brightDesc} onChange={(e) => setFormData({...formData, brightDesc: e.target.value})} /> */}
+                                    {/* Description */}
+                                    <div>
+                                        <label className="text-black text-sm mb-2">Description</label>
+                                        <input
+                                            type="text"
+                                            className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
+                                            value={formData.brightDesc}
+                                            onChange={(e) => {
+                                                setFormData({
+                                                    ...formData, 
+                                                    brightDesc: e.target.value,
+                                                });
+                                            }}
+                                        />
+                                        {
+                                            validationText.brightDesc && <p className="block text-[12px] text-red-500 font-sans mb-2">{validationText.brightDesc}</p>
+                                        }
+                                    </div>
+                                    <div className="flex items-center justify-end mt-6 gap-2">
+                                        {
+                                            isEdit ? (
+                                                brightness?.update ? (
+                                                    <Button onClick={submitEdit} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2">
                                                         <FaFloppyDisk className="text-base" /> 
                                                         <Typography variant="small" className="capitalize">
-                                                            Save
+                                                            Update
                                                         </Typography>
                                                     </Button>
-                                                    <Button onClick={onSaveSubmit} color="deep-purple" size="sm" variant="outlined" className="flex items-center gap-2">
-                                                        <FaCirclePlus className="text-base" /> 
-                                                        <Typography variant="small" className="capitalize">
-                                                            Save & New
-                                                        </Typography>
-                                                    </Button>
-                                                </>
-                                            }
-                                        </div>
+                                                ) : null
+                                            ) : 
+                                            <>
+                                                <Button onClick={onSubmit} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2">
+                                                    <FaFloppyDisk className="text-base" /> 
+                                                    <Typography variant="small" className="capitalize">
+                                                        Save
+                                                    </Typography>
+                                                </Button>
+                                                <Button onClick={onSaveSubmit} color="deep-purple" size="sm" variant="outlined" className="flex items-center gap-2">
+                                                    <FaCirclePlus className="text-base" /> 
+                                                    <Typography variant="small" className="capitalize">
+                                                        Save & New
+                                                    </Typography>
+                                                </Button>
+                                            </>
+                                        }
                                     </div>
-                                 
+                                </div>
                             </DialogBody>                      
                         </Dialog>
                         <DeleteModal deleteId={deleteId} open={openDelete} handleDelete={handleRemove} closeModal={() => setOpenDelete(!openDelete)} />

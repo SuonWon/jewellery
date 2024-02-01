@@ -80,7 +80,7 @@ function ReturnList({type = 'I'}) {
         setReturnId(res.data);
     });
 
-    const [removeReturn, removeResult] = useRemoveReturnMutation();
+    const [removeReturn] = useRemoveReturnMutation();
 
     const [addReturn] = useAddReturnMutation();
 
@@ -100,11 +100,12 @@ function ReturnList({type = 'I'}) {
 
     const [currentPage, setCurrentPage] = useState(1);
 
-    const [isAlert, setIsAlert] = useState(true);
-
-    const [ alert, setAlert] = useState({
-        isAlert: false,
-        message: ''
+    const [alertMsg, setAlertMsg] = useState({
+        visible: false,
+        title: '',
+        message: '',
+        isError: false,
+        isWarning: false,
     });
 
     const returnData = {
@@ -132,16 +133,35 @@ function ReturnList({type = 'I'}) {
     const [ validationText, setValidationText ] = useState({});
 
     const handleRemove = async (id) => {
-        let removeData = data.filter((el) => el.invoiceNo === id);
+        let removeData = data.find((el) => el.returnNo === id);
         removeReturn({
-            id: removeData[0].invoiceNo,
+            id: removeData.returnNo,
             deletedAt: moment().toISOString(),
             deletedBy: auth().username
-        }).then((res) => { console.log(res) });
-        setIsAlert(true);
+        }).then((res) => { 
+            if(res.data) {
+                setAlertMsg({
+                    ...alertMsg,
+                    visible: true,
+                    title: "Success",
+                    message: "Return data deleted successfully.",
+                });
+            } else {
+                setAlertMsg({
+                    ...alertMsg,
+                    visible: true,
+                    title: "Error",
+                    message: "This data cannot be deleted.",
+                    isError: true,
+                });
+            }
+         });
         setOpenDelete(!openDelete);
-        await pause(2000);
-        setIsAlert(false);
+        await pause();
+        setAlertMsg({
+            ...alertMsg,
+            visible: false,
+        });
     };
 
     const handleDeleteBtn = (id) => {
@@ -188,143 +208,118 @@ function ReturnList({type = 'I'}) {
 
     }
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         if (validateForm()) {
-            try {
-                console.log(formData);
-                addReturn({
-                    ...formData,
-                    returnNo: returnId,
-                    returnDate: moment(formData.returnDate).toISOString(),
-                }).then((res) => {
-                    if(res.error != null) {
-                        let message = '';
-                        if(res.error.data.statusCode == 409) {
-                            message = "Duplicate data found."
-                        }
-                        else {
-                            message = res.error.data.message
-                        }
-                        setAlert({
-                            isAlert: true,
-                            message: message
-                        })
-                        setTimeout(() => {
-                            setAlert({
-                                isAlert: false,
-                                message: ''
-                            })
-                        }, 2000);
-                    }
-                    
-                });
-                setFormData(returnData);
-                setOpen(!open);
-                
-            }
-            catch(err) {
-                console.log(err.statusCode);
-                
-            }
+            addReturn({
+                ...formData,
+                returnNo: returnId,
+                returnDate: moment(formData.returnDate).toISOString(),
+            }).then((res) => {
+                if(res.data) {
+                    setAlertMsg({
+                        ...alertMsg,
+                        visible: true,
+                        title: "Success",
+                        message: "Return data created successfully.",
+                    });
+                } else {
+                    setAlertMsg({
+                        ...alertMsg,
+                        visible: true,
+                        title: "Error",
+                        message: res.error.data.message,
+                        isError: true,
+                    });
+                }
+            });
             setFormData(returnData);
             setOpen(!open);
+            await pause();
+            setAlertMsg({
+                ...alertMsg,
+                visible: false,
+            });
         }
     }
 
-    const handleSave = () => {
+    const handleSave = async () => {
         if (validateForm()) {
-            try {
-                addReturn({
-                    ...formData,
-                    returnNo: returnId,
-                    returnDate: moment(formData.returnDate).toISOString(),
-                }).then((res) => {
-                    if(res.error != null) {
-                        let message = '';
-                        if(res.error.data.statusCode == 409) {
-                            message = "Duplicate data found."
-                        }
-                        else {
-                            message = res.error.data.message
-                        }
-                        setAlert({
-                            isAlert: true,
-                            message: message
-                        })
-                        setTimeout(() => {
-                            setAlert({
-                                isAlert: false,
-                                message: ''
-                            })
-                        }, 2000);
-                    }
-                    
-                });
-                setFormData(returnData);
-                
-            }
-            catch(err) {
-                console.log(err.statusCode);
-                
-            }
+            addReturn({
+                ...formData,
+                returnNo: returnId,
+                returnDate: moment(formData.returnDate).toISOString(),
+            }).then((res) => {
+                if(res.data) {
+                    setAlertMsg({
+                        ...alertMsg,
+                        visible: true,
+                        title: "Success",
+                        message: "Return data created successfully.",
+                    });
+                } else {
+                    setAlertMsg({
+                        ...alertMsg,
+                        visible: true,
+                        title: "Error",
+                        message: res.error.data.message,
+                        isError: true,
+                    });
+                }
+            });
             setFormData(returnData);
+            await pause();
+            setAlertMsg({
+                ...alertMsg,
+                visible: false,
+            });
         }
     }
 
-    const handleUpdate = () => {
+    const handleUpdate = async () => {
         if (validateForm()) {
-            try {
-                console.log(formData);
-                updateReturn({
-                    returnNo: formData.returnNo,
-                    returnDate: formData.returnDate,
-                    referenceNo: formData.referenceNo,
-                    stoneDetailCode: formData.stoneDetailCode,
-                    returnType: formData.returnType,
-                    qty: formData.qty,
-                    weight: formData.weight,
-                    unitCode: formData.unitCode,
-                    unitPrice: formData.unitPrice,
-                    totalPrice: formData.totalPrice,
-                    remark: formData.remark,
-                    status: formData.status,
-                    createdBy: formData.createdBy,
-                    createdAt: formData.createdAt,
-                    updatedBy: auth().username,
-                    updatedAt: moment().toISOString(),
-                    deletedBy: "",
-                }).then((res) => {
-                    if(res.error != null) {
-                        let message = '';
-                        if(res.error.data.statusCode == 409) {
-                            message = "Duplicate data found."
-                        }
-                        else {
-                            message = res.error.data.message
-                        }
-                        setAlert({
-                            isAlert: true,
-                            message: message
-                        })
-                        setTimeout(() => {
-                            setAlert({
-                                isAlert: false,
-                                message: ''
-                            })
-                        }, 2000);
-                    }
-                    
-                });
-                setFormData(returnData);
-                setOpen(!open);
-                
-            }
-            catch(err) {
-                console.log(err.statusCode);
-                
-            }
+            updateReturn({
+                returnNo: formData.returnNo,
+                returnDate: formData.returnDate,
+                referenceNo: formData.referenceNo,
+                stoneDetailCode: formData.stoneDetailCode,
+                returnType: formData.returnType,
+                qty: formData.qty,
+                weight: formData.weight,
+                unitCode: formData.unitCode,
+                unitPrice: formData.unitPrice,
+                totalPrice: formData.totalPrice,
+                remark: formData.remark,
+                status: formData.status,
+                createdBy: formData.createdBy,
+                createdAt: formData.createdAt,
+                updatedBy: auth().username,
+                updatedAt: moment().toISOString(),
+                deletedBy: "",
+            }).then((res) => {
+                if(res.data) {
+                    setAlertMsg({
+                        ...alertMsg,
+                        visible: true,
+                        title: "Success",
+                        message: "Return data created successfully.",
+                    });
+                } else {
+                    setAlertMsg({
+                        ...alertMsg,
+                        visible: true,
+                        title: "Error",
+                        message: res.error.data.message,
+                        isError: true,
+                    });
+                }
+            });
             setFormData(returnData);
             setOpen(!open);
+            await pause();
+            setAlertMsg({
+                ...alertMsg,
+                visible: false,
+            });
         }
     };
 
@@ -467,7 +462,7 @@ function ReturnList({type = 'I'}) {
                 <div className="flex flex-col gap-4 relative max-w-[85%] min-w-[85%]">
                     <div className="w-78 absolute top-0 right-0 z-[9999]">
                         {
-                            removeResult.isSuccess && isAlert && <SuccessAlert title="Purchase" message="Delete successful." handleAlert={() => setIsAlert(false)} />
+                            alertMsg.visible? <SuccessAlert title={alertMsg.title} message={alertMsg.message} isError={alertMsg.isError} isWarning={alertMsg.isWarning}  /> : ""
                         }
                     </div>
                     <div className="flex items-center py-3 bg-white gap-4 sticky top-0 z-10">
@@ -667,6 +662,9 @@ function ReturnList({type = 'I'}) {
                                 } 
                                 handleClick={() => setOpen(!open)} 
                             />
+                            {
+                                alertMsg.visible? <SuccessAlert title={alertMsg.title} message={alertMsg.message} isError={alertMsg.isError} isWarning={alertMsg.isWarning}  /> : ""
+                            }
                             <div className="grid grid-cols-4 gap-2 mb-3">
                                 {
                                     isEdit? 

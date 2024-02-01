@@ -3,7 +3,7 @@ import { Button, Card, CardBody, Dialog, DialogBody, Typography } from "@materia
 import { FaCirclePlus, FaFloppyDisk, FaMoneyBillTrendUp, FaPencil, FaPlus, FaTrashCan } from "react-icons/fa6";
 import { useContext, useState, useEffect } from "react";
 import { apiUrl, focusSelect, pause } from "../const";
-import { useAddPurchaseMutation, useFetchPurchaseCountQuery, useFetchPurchaseQuery, useFetchReturnByInvoiceQuery, useFetchTrueShareQuery, useFetchTrueStoneQuery, useFetchTrueSupplierQuery, useFetchUOMQuery, useFetchReturnQuery, useRemovePurchaseMutation, useUpdatePurchaseMutation } from "../store";
+import { useAddPurchaseMutation, useFetchPurchaseCountQuery, useFetchPurchaseQuery, useFetchTrueShareQuery, useFetchTrueStoneQuery, useFetchTrueSupplierQuery, useFetchUOMQuery, useFetchReturnQuery, useRemovePurchaseMutation, useUpdatePurchaseMutation } from "../store";
 import Pagination from "../components/pagination";
 import DeleteModal from "../components/delete_modal";
 import SuccessAlert from "../components/success_alert";
@@ -29,6 +29,7 @@ function PurchaseList() {
     const { permissions } = useContext(AuthContent);
 
     const [purchasePermission, setPurchasePermission] = useState(null);
+
     const [payablePermission, setPayablePermission] = useState(null);
 
     const navigate = useNavigate();
@@ -68,7 +69,7 @@ function PurchaseList() {
     const { data: returnData } = useFetchReturnQuery({
         skip: 0,
         take: 10,
-        status: 'A',
+        status: 'O',
         return_type: 'P',
         search_word: '',
         start_date: null,
@@ -96,17 +97,18 @@ function PurchaseList() {
 
     const [openDelete, setOpenDelete] = useState(false);
 
-    const [isAlert, setIsAlert] = useState(false);
-
     const [addPurchase, addResult] = useAddPurchaseMutation();
 
     const [updatePurchase] = useUpdatePurchaseMutation();
 
     const [currentPage, setCurrentPage] = useState(1);
 
-    const [alert, setAlert] = useState({
-        isAlert: false,
-        message: ''
+    const [alertMsg, setAlertMsg] = useState({
+        visible: false,
+        title: '',
+        message: '',
+        isError: false,
+        isWarning: false,
     });
 
     const [removePurchase] = useRemovePurchaseMutation();
@@ -170,14 +172,29 @@ function PurchaseList() {
             deletedAt: moment().toISOString(),
             deletedBy: auth().username
         }).then(async (res) => { 
-            if(res.data != null) {
-                setIsAlert(true);
-                await pause(2000);
-                setIsAlert(false);
+            if(res.data) {
+                setAlertMsg({
+                    ...alertMsg,
+                    visible: true,
+                    title: "Success",
+                    message: "Purchase invoice deleted successfully.",
+                });
+            } else {
+                setAlertMsg({
+                    ...alertMsg,
+                    visible: true,
+                    title: "Error",
+                    message: "This data cannot be deleted.",
+                    isError: true,
+                });
             }
-         });
-        
+        });
         setOpenDelete(!openDelete);
+        await pause();
+        setAlertMsg({
+            ...alertMsg,
+            visible: false,
+        });
     };
 
     // const handleDeleteBtn = (id) => {
@@ -283,10 +300,6 @@ function PurchaseList() {
         setOpen(!open);
     };
 
-    //console.log(dShare);
-
-    //console.log(tBodyData);
-
     function validateForm() {
         const newErrors = {};
 
@@ -340,61 +353,53 @@ function PurchaseList() {
                 purchaseInvoiceNo = res.data
             });
             console.log(purchaseInvoiceNo);
-            try {
-                addPurchase({
-                    ...formData,
-                    invoiceNo: purchaseInvoiceNo,
-                    purDate: moment(formData.purDate).toISOString(),
-                    purchaseShareDetails: tBodyData.map(el => {
-                        return {
-                            id: el.id,
-                            lineNo: el.lineNo,
-                            shareCode: el.shareCode,
-                            sharePercentage: el.sharePercentage,
-                            amount: el.amount,
-                        }
-                    }),
-                }).then((res) => {
-                    if (res.error != null) {
-                        let message = '';
-                        if (res.error.data.statusCode == 409) {
-                            message = "Duplicate data found."
-                        }
-                        else {
-                            message = res.error.data.message
-                        }
-                        setAlert({
-                            isAlert: true,
-                            message: message
-                        })
-                        setTimeout(() => {
-                            setAlert({
-                                isAlert: false,
-                                message: ''
-                            })
-                        }, 2000);
+            addPurchase({
+                ...formData,
+                invoiceNo: purchaseInvoiceNo,
+                purDate: moment(formData.purDate).toISOString(),
+                purchaseShareDetails: tBodyData.map(el => {
+                    return {
+                        id: el.id,
+                        lineNo: el.lineNo,
+                        shareCode: el.shareCode,
+                        sharePercentage: el.sharePercentage,
+                        amount: el.amount,
                     }
-
-                });
-                setFormData(purchaseData);
-                setTBodyData([]);
-                setDShare({
-                    id: uuidv4(),
-                    lineNo: 1,
-                    shareCode: 0,
-                    shareName: "",
-                    sharePercentage: 100,
-                    amount: 0,
-                });
-                setOpen(!open);
-
-            }
-            catch (err) {
-                console.log(err.statusCode);
-            }
+                }),
+            }).then((res) => {
+                if(res.data) {
+                    setAlertMsg({
+                        ...alertMsg,
+                        visible: true,
+                        title: "Success",
+                        message: "Purchase invoice created successfully.",
+                    });
+                } else {
+                    setAlertMsg({
+                        ...alertMsg,
+                        visible: true,
+                        title: "Error",
+                        message: res.error.data.message,
+                        isError: true,
+                    });
+                }
+            });
             setFormData(purchaseData);
             setTBodyData([]);
+            setDShare({
+                id: uuidv4(),
+                lineNo: 1,
+                shareCode: 0,
+                shareName: "",
+                sharePercentage: 100,
+                amount: 0,
+            });
             setOpen(!open);
+            await pause();
+            setAlertMsg({
+                ...alertMsg,
+                visible: false,
+            });
         }
     }
 
@@ -408,145 +413,131 @@ function PurchaseList() {
             }).then((res) => {
                 purchaseInvoiceNo = res.data
             });
-            try {
-                addPurchase({
-                    ...formData,
-                    invoiceNo: purchaseInvoiceNo,
-                    purDate: moment(formData.purDate).toISOString(),
-                    purchaseShareDetails: tBodyData.map(el => {
-                        return {
-                            id: el.id,
-                            lineNo: el.lineNo,
-                            shareCode: el.shareCode,
-                            sharePercentage: el.sharePercentage,
-                            amount: el.amount,
-                        }
-                    }),
-                }).then((res) => {
-                    if (res.error != null) {
-                        let message = '';
-                        if (res.error.data.statusCode == 409) {
-                            message = "Duplicate data found."
-                        }
-                        else {
-                            message = res.error.data.message
-                        }
-                        setAlert({
-                            isAlert: true,
-                            message: message
-                        })
-                        setTimeout(() => {
-                            setAlert({
-                                isAlert: false,
-                                message: ''
-                            })
-                        }, 2000);
+            addPurchase({
+                ...formData,
+                invoiceNo: purchaseInvoiceNo,
+                purDate: moment(formData.purDate).toISOString(),
+                purchaseShareDetails: tBodyData.map(el => {
+                    return {
+                        id: el.id,
+                        lineNo: el.lineNo,
+                        shareCode: el.shareCode,
+                        sharePercentage: el.sharePercentage,
+                        amount: el.amount,
                     }
-
-                });
-                setFormData(purchaseData);
-                setTBodyData([]);
-                axios.get(`${apiUrl}/share/get-owner`, {
-                    headers: {
-                        "Authorization": token
-                    }
-                }).then((res) => {
-                    setTBodyData([
-                        {
-                            ...dShare,
-                            shareCode: res.data.shareCode,
-                            shareName: res.data.shareName,
-                            sharePercentage: 100,
-                            amount: 0,
-                        }
-                    ]);
-                    setDShare({
+                }),
+            }).then((res) => {
+                if(res.data) {
+                    setAlertMsg({
+                        ...alertMsg,
+                        visible: true,
+                        title: "Success",
+                        message: "Purchase invoice created successfully.",
+                    });
+                } else {
+                    setAlertMsg({
+                        ...alertMsg,
+                        visible: true,
+                        title: "Error",
+                        message: res.error.data.message,
+                        isError: true,
+                    });
+                }
+            });
+            setFormData(purchaseData);
+            setTBodyData([]);
+            await pause();
+            setAlertMsg({
+                ...alertMsg,
+                visible: false,
+            });
+            axios.get(`${apiUrl}/share/get-owner`, {
+                headers: {
+                    "Authorization": token
+                }
+            }).then((res) => {
+                setTBodyData([
+                    {
                         ...dShare,
                         shareCode: res.data.shareCode,
                         shareName: res.data.shareName,
                         sharePercentage: 100,
                         amount: 0,
-                    });
+                    }
+                ]);
+                setDShare({
+                    ...dShare,
+                    shareCode: res.data.shareCode,
+                    shareName: res.data.shareName,
+                    sharePercentage: 100,
+                    amount: 0,
                 });
-            }
-            catch (err) {
-                console.log(err.statusCode);
-            }
-            setFormData(purchaseData);
-            setTBodyData([]);
+            });
         }
     };
 
-    const handleUpdate = () => {
+    const handleUpdate = async () => {
         if (validateForm()) {
-            try {
-                updatePurchase({
-                    invoiceNo: formData.invoiceNo,
-                    purDate: formData.purDate,
-                    supplierCode: formData.supplierCode,
-                    stoneCode: formData.stoneCode,
-                    qty: formData.qty,
-                    totalWeight: formData.totalWeight,
-                    unitCode: formData.unitCode,
-                    unitPrice: formData.unitPrice,
-                    subTotal: formData.subTotal,
-                    servicePer: formData.servicePer,
-                    serviceCharge: formData.serviceCharge,
-                    discAmt: formData.discAmt,
-                    grandTotal: formData.grandTotal,
-                    remark: formData.remark,
-                    status: formData.status,
-                    paidStatus: formData.paidStatus,
-                    createdBy: formData.createdBy,
-                    createdAt: formData.createdAt,
-                    updatedBy: auth().username,
-                    updatedAt: formData.updatedAt,
-                    deletedBy: "",
-                    purchaseShareDetails: tBodyData.map(el => {
-                        return {
-                            id: el.id,
-                            lineNo: el.lineNo,
-                            shareCode: el.shareCode,
-                            sharePercentage: el.sharePercentage,
-                            amount: el.amount,
-                        }
-                    }),
-                }).then((res) => {
-                    if(res.error != null) {
-                        let message = '';
-                        if(res.error.data.statusCode == 409) {
-                            message = "Duplicate data found."
-                        }
-                        else {
-                            message = res.error.data.message
-                        }
-                        setAlert({
-                            isAlert: true,
-                            message: message
-                        })
-                        setTimeout(() => {
-                            setAlert({
-                                isAlert: false,
-                                message: ''
-                            })
-                        }, 2000);
+            updatePurchase({
+                invoiceNo: formData.invoiceNo,
+                purDate: formData.purDate,
+                supplierCode: formData.supplierCode,
+                stoneCode: formData.stoneCode,
+                qty: formData.qty,
+                totalWeight: formData.totalWeight,
+                unitCode: formData.unitCode,
+                unitPrice: formData.unitPrice,
+                subTotal: formData.subTotal,
+                servicePer: formData.servicePer,
+                serviceCharge: formData.serviceCharge,
+                discAmt: formData.discAmt,
+                grandTotal: formData.grandTotal,
+                remark: formData.remark,
+                status: formData.status,
+                paidStatus: formData.paidStatus,
+                createdBy: formData.createdBy,
+                createdAt: formData.createdAt,
+                updatedBy: auth().username,
+                updatedAt: formData.updatedAt,
+                deletedBy: "",
+                purchaseShareDetails: tBodyData.map(el => {
+                    return {
+                        id: el.id,
+                        lineNo: el.lineNo,
+                        shareCode: el.shareCode,
+                        sharePercentage: el.sharePercentage,
+                        amount: el.amount,
                     }
-                    
-                });
-                setFormData(purchaseData);
-                setOpen(!open);
-                
-            }
-            catch(err) {
-                console.log(err.statusCode);
-                
-            }
+                }),
+            }).then((res) => {
+                if(res.data) {
+                    setAlertMsg({
+                        ...alertMsg,
+                        visible: true,
+                        title: "Success",
+                        message: "Purchase invoice updated successfully.",
+                    });
+                } else {
+                    setAlertMsg({
+                        ...alertMsg,
+                        visible: true,
+                        title: "Error",
+                        message: res.error.data.message,
+                        isError: true,
+                    });
+                }
+            });
             setFormData(purchaseData);
             setOpen(!open);
+            await pause();
+            setAlertMsg({
+                ...alertMsg,
+                visible: false,
+            });
         }
     };
 
-    const saveShare = () => {
+    const saveShare = async () => {
 
         if(validateShare()) {
             let isExist = tBodyData.find(res => res.shareCode === shares.shareCode);
@@ -571,10 +562,17 @@ function PurchaseList() {
                 });
                 setShares(shareInfo);
             } else {
-                setAlert({
-                    isAlert: true,
-                    message: "Share already exist in the list."
+                setAlertMsg({
+                    visible: true,
+                    message: "Share already exist in the list.",
+                    title: "Warning",
+                    isWarning: true,
                 });
+                await pause();
+                setAlertMsg({
+                    ...alertMsg,
+                    visible: false,
+                })
             }
             
         }
@@ -837,23 +835,29 @@ function PurchaseList() {
     const returnColumn = [
         {
             name: "Return No",
+            width: "110px",
             selector: row => row.returnNo,
         },
         {
-            name: "Stone",
-            width: "140px",
-            selector: row => row.stoneDetailCode,
-        },
-        {
-            name: "Amount",
-            width: "100px",
-            selector: row => row.totalPrice.toLocaleString('en-us'),
-            right: true,
+            name: "Stone Detail",
+            selector: row => row.stoneDetail.stoneDesc,
         },
         {
             name: "Weight",
             width: "90px",
             selector: row => row.weight,
+            right: true,
+        },
+        {
+            name: "Qty",
+            width: "90px",
+            selector: row => row.qty,
+            right: true,
+        },
+        {
+            name: "Amount",
+            width: "100px",
+            selector: row => row.totalPrice.toLocaleString('en-us'),
             right: true,
         },
     ];
@@ -890,7 +894,7 @@ function PurchaseList() {
                 <div className="flex flex-col gap-4 relative max-w-[85%] min-w-[85%]">
                     <div className="w-78 absolute top-0 right-0 z-[9999]">
                         {
-                            isAlert && <SuccessAlert title="Purchase" message="Delete successful." handleAlert={() => setIsAlert(false)} />
+                            alertMsg.visible? <SuccessAlert title={alertMsg.title} message={alertMsg.message} isError={alertMsg.isError} isWarning={alertMsg.isWarning}  /> : ""
                         }
                     </div>
                     <div className="flex items-center py-3 bg-white gap-4 sticky top-0 z-10">
@@ -1128,6 +1132,9 @@ function PurchaseList() {
                     >
                         <DialogBody>
                             <ModalTitle titleName="Purchase" handleClick={() => setOpen(!open)} />
+                            {
+                                alertMsg.visible? <SuccessAlert title={alertMsg.title} message={alertMsg.message} isError={alertMsg.isError} isWarning={alertMsg.isWarning}  /> : ""
+                            }
                             <div className="grid grid-cols-5 gap-2 mb-3">
                                 <div className="col-span-3">
                                     <div className="grid grid-cols-3 gap-2 mb-3">
@@ -1226,7 +1233,7 @@ function PurchaseList() {
                                                     className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
                                                     value={formData.totalWeight}
                                                     onChange={(e) => {
-                                                        let weight = parseFloat(e.target.value);
+                                                        let weight = parseFloat(e.target.value === "" ? 0 : e.target.value);
                                                         let totalP = formData.unitPrice * weight;
                                                         let totalA = (totalP + formData.serviceCharge) - formData.discAmt;
                                                         setFormData({
@@ -1281,7 +1288,7 @@ function PurchaseList() {
                                                     className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
                                                     value={formData.unitPrice}
                                                     onChange={(e) => {
-                                                        let price = parseFloat(e.target.value);
+                                                        let price = parseFloat(e.target.value === "" ? 0 : e.target.value);
                                                         let totalP = formData.totalWeight * price;
                                                         let totalA = (totalP + formData.serviceCharge) - formData.discAmt;
                                                         setFormData({
@@ -1290,7 +1297,6 @@ function PurchaseList() {
                                                             subTotal: totalP,
                                                             serviceCharge: formData.servicePer > 0 ? (formData.servicePer / 100) * totalP : formData.serviceCharge,
                                                             grandTotal: totalA,
-    
                                                         });
                                                         let newTbody = tBodyData.map(el => {
                                                             return {

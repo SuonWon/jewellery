@@ -2,7 +2,7 @@
 import { Button, Card, CardBody, Dialog, DialogBody, Typography } from "@material-tailwind/react";
 import { FaCirclePlus, FaFloppyDisk, FaMoneyBillTrendUp, FaPencil, FaPlus, } from "react-icons/fa6";
 import { useContext, useEffect, useState } from "react";
-import { useAddSalesMutation, useFetchActiveStoneDetailsQuery, useFetchReturnByInvoiceQuery, useFetchSalesCountQuery, useFetchSalesQuery, useFetchTrueCustomerQuery, useFetchUOMQuery, useRemoveSalesMutation, useFetchReturnQuery, useUpdateIssueMutation, useUpdateIssueStatusMutation, useUpdateSalesMutation } from "../store";
+import { useAddSalesMutation, useFetchActiveStoneDetailsQuery, useFetchSalesCountQuery, useFetchSalesQuery, useFetchTrueCustomerQuery, useFetchUOMQuery, useRemoveSalesMutation, useFetchReturnQuery, useUpdateIssueMutation, useUpdateIssueStatusMutation, useUpdateSalesMutation } from "../store";
 import Pagination from "../components/pagination";
 import { apiUrl, focusSelect, pause } from "../const";
 import DeleteModal from "../components/delete_modal";
@@ -68,7 +68,7 @@ function SalesList() {
     const { data: returnData } = useFetchReturnQuery({
         skip: 0,
         take: 0,
-        status: 'A',
+        status: 'O',
         return_type: 'S',
         search_word: '',
         start_date: null,
@@ -110,8 +110,6 @@ function SalesList() {
         balance: 0,
      });
 
-    const [isAlert, setIsAlert] = useState(false);
-
     const [open, setOpen] = useState(false);
 
     const [isEdit, setIsEdit] = useState(false);
@@ -120,12 +118,12 @@ function SalesList() {
 
     const [tBodyReturnData, setTBodyReturnData] = useState([]);
 
-    const [alert, setAlert] = useState({
-        isAlert: false,
+    const [alertMsg, setAlertMsg] = useState({
+        visible: false,
+        title: '',
         message: '',
-        isWarning: false,
         isError: false,
-        title: ""
+        isWarning: false,
     });
 
     const [selectedIssue, setSelectedIssue] = useState({});
@@ -169,19 +167,35 @@ function SalesList() {
     }
 
     const handleRemove = async (id) => {
-        let removeData = data.filter((el) => el.invoiceNo === id);
+        let removeData = data.find((el) => el.invoiceNo === id);
         removeSales({
-            id: removeData[0].invoiceNo,
+            id: removeData.invoiceNo,
             deletedAt: moment().toISOString(),
             deletedBy: auth().username
         }).then(async (res) => { 
-        if(res.data != null) 
-            setIsAlert(true);
-            await pause(2000);
-            setIsAlert(false);
-         });
-        
-         setOpenDelete(!openDelete);
+            if(res.data) {
+                setAlertMsg({
+                    ...alertMsg,
+                    visible: true,
+                    title: "Success",
+                    message: "Sales invoice deleted successfully.",
+                });
+            } else {
+                setAlertMsg({
+                    ...alertMsg,
+                    visible: true,
+                    title: "Error",
+                    message: "This data cannot be deleted.",
+                    isError: true,
+                });
+            }
+        });
+        setOpenDelete(!openDelete);
+        await pause();
+        setAlertMsg({
+            ...alertMsg,
+            visible: false,
+        });
     };
 
     // const handleDeleteBtn = (id) => {
@@ -302,201 +316,174 @@ function SalesList() {
 
     }
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         if (validateForm()) {
-            try {
-                addSales({
-                    ...formData,
-                    invoiceNo: salesId,
-                    salesDate: moment(formData.salesDate).toISOString(),
-                    salesShareDetails: tBodyData.map(el => {
-                        return {
-                            id: uuidv4(),
-                            lineNo: el.lineNo,
-                            shareCode: el.shareCode,
-                            sharePercentage: el.sharePercentage,
-                            amount: el.amount,
-                        };
-                    }),
-                }).then((res) => {
-                    if (res.error != null) {
-                        let message = '';
-                        if (res.error.data.statusCode == 409) {
-                            message = "Duplicate data found."
-                        }
-                        else {
-                            message = res.error.data.message
-                        }
-                        setAlert({
-                            isAlert: true,
-                            message: message
-                        })
-                        setTimeout(() => {
-                            setAlert({
-                                isAlert: false,
-                                message: ''
-                            })
-                        }, 2000);
-                    }
-
-                });
-                if (issueStatus) {
-                    updateIssueStatus({
-                        id: formData.issueNo,
-                        updatedBy: auth().username,
+            addSales({
+                ...formData,
+                invoiceNo: salesId,
+                salesDate: moment(formData.salesDate).toISOString(),
+                salesShareDetails: tBodyData.map(el => {
+                    return {
+                        id: uuidv4(),
+                        lineNo: el.lineNo,
+                        shareCode: el.shareCode,
+                        sharePercentage: el.sharePercentage,
+                        amount: el.amount,
+                    };
+                }),
+            }).then((res) => {
+                if(res.data) {
+                    setAlertMsg({
+                        ...alertMsg,
+                        visible: true,
+                        title: "Success",
+                        message: "Sales invoice created successfully.",
+                    });
+                } else {
+                    setAlertMsg({
+                        ...alertMsg,
+                        visible: true,
+                        title: "Error",
+                        message: res.error.data.message,
+                        isError: true,
                     });
                 }
-                setIssueStatus(false);
-                setFormData(salesData);
-                setOpen(!open);
-
-            }
-            catch (err) {
-                console.log(err.statusCode);
-
+            });
+            if (issueStatus) {
+                updateIssueStatus({
+                    id: formData.issueNo,
+                    updatedBy: auth().username,
+                });
             }
             setIssueStatus(false);
             setFormData(salesData);
             setOpen(!open);
+            await pause();
+            setAlertMsg({
+                ...alertMsg,
+                visible: false,
+            });
         }
     };
 
-    const handleSave = () => {
+    const handleSave = async () => {
         if (validateForm()) {
-            console.log(formData);
-            try {
-                console.log(tBodyData);
-                addSales({
-                    ...formData,
-                    invoiceNo: salesId,
-                    salesDate: moment(formData.salesDate).toISOString(),
-                    salesShareDetails: tBodyData.map(el => {
-                        return {
-                            id: uuidv4(),
-                            lineNo: el.lineNo,
-                            shareCode: el.shareCode,
-                            sharePercentage: el.sharePercentage,
-                            amount: el.amount,
-                        };
-                    }),
-                }).then((res) => {
-                    if (res.error != null) {
-                        let message = '';
-                        if (res.error.data.statusCode == 409) {
-                            message = "Duplicate data found."
-                        }
-                        else {
-                            message = res.error.data.message
-                        }
-                        setAlert({
-                            isAlert: true,
-                            message: message
-                        })
-                        setTimeout(() => {
-                            setAlert({
-                                isAlert: false,
-                                message: ''
-                            })
-                        }, 2000);
-                    }
-
-                });
-                if (issueStatus) {
-                    updateIssueStatus({
-                        id: formData.issueNo,
-                        updatedBy: auth().username,
+            addSales({
+                ...formData,
+                invoiceNo: salesId,
+                salesDate: moment(formData.salesDate).toISOString(),
+                salesShareDetails: tBodyData.map(el => {
+                    return {
+                        id: uuidv4(),
+                        lineNo: el.lineNo,
+                        shareCode: el.shareCode,
+                        sharePercentage: el.sharePercentage,
+                        amount: el.amount,
+                    };
+                }),
+            }).then((res) => {
+                if(res.data) {
+                    setAlertMsg({
+                        ...alertMsg,
+                        visible: true,
+                        title: "Success",
+                        message: "Sales invoice created successfully.",
+                    });
+                } else {
+                    setAlertMsg({
+                        ...alertMsg,
+                        visible: true,
+                        title: "Error",
+                        message: res.error.data.message,
+                        isError: true,
                     });
                 }
-                setIssueStatus(false);
-                setFormData(salesData);
-                setTBodyData([]);
-
-            }
-            catch (err) {
-                console.log(err.statusCode);
-
+            });
+            if (issueStatus) {
+                updateIssueStatus({
+                    id: formData.issueNo,
+                    updatedBy: auth().username,
+                });
             }
             setIssueStatus(false);
             setFormData(salesData);
             setTBodyData([]);
+            await pause();
+            setAlertMsg({
+                ...alertMsg,
+                visible: false,
+            });
         }
     };
 
-    const handleUpdate = () => {
+    const handleUpdate = async () => {
         if (validateForm()) {
-            try {
-                updateSales({
-                    invoiceNo: formData.invoiceNo,
-                    salesDate: formData.salesDate,
-                    issueNo: formData.issueNo,
-                    customerCode: formData.customerCode,
-                    stoneDetailCode: formData.stoneDetailCode,
-                    qty: formData.qty,
-                    weight: formData.weight,
-                    unitCode: formData.unitCode,
-                    unitPrice: formData.unitPrice,
-                    subTotal: formData.subTotal,
-                    servicePer: formData.servicePer,
-                    serviceCharge: formData.serviceCharge,
-                    discAmt: formData.discAmt,
-                    grandTotal: formData.grandTotal,
-                    remark: formData.remark,
-                    status: formData.status,
-                    createdBy: formData.createdBy,
-                    createdAt: formData.createdAt,
-                    updatedBy: auth().username,
-                    updatedAt: formData.updatedAt,
-                    deletedBy: "",
-                    salesShareDetails: tBodyData.map(el => {
-                        return {
-                            id: el.id,
-                            lineNo: el.lineNo,
-                            shareCode: el.shareCode,
-                            sharePercentage: el.sharePercentage,
-                            amount: el.amount,
-                        }
-                    }),
-                }).then((res) => {
-                    if(res.error != null) {
-                        let message = '';
-                        if(res.error.data.statusCode == 409) {
-                            message = "Duplicate data found."
-                        }
-                        else {
-                            message = res.error.data.message
-                        }
-                        setAlert({
-                            isAlert: true,
-                            message: message
-                        })
-                        setTimeout(() => {
-                            setAlert({
-                                isAlert: false,
-                                message: ''
-                            })
-                        }, 2000);
+            updateSales({
+                invoiceNo: formData.invoiceNo,
+                salesDate: formData.salesDate,
+                issueNo: formData.issueNo,
+                customerCode: formData.customerCode,
+                stoneDetailCode: formData.stoneDetailCode,
+                qty: formData.qty,
+                weight: formData.weight,
+                unitCode: formData.unitCode,
+                unitPrice: formData.unitPrice,
+                subTotal: formData.subTotal,
+                servicePer: formData.servicePer,
+                serviceCharge: formData.serviceCharge,
+                discAmt: formData.discAmt,
+                grandTotal: formData.grandTotal,
+                remark: formData.remark,
+                status: formData.status,
+                createdBy: formData.createdBy,
+                createdAt: formData.createdAt,
+                updatedBy: auth().username,
+                updatedAt: formData.updatedAt,
+                deletedBy: "",
+                salesShareDetails: tBodyData.map(el => {
+                    return {
+                        id: el.id,
+                        lineNo: el.lineNo,
+                        shareCode: el.shareCode,
+                        sharePercentage: el.sharePercentage,
+                        amount: el.amount,
                     }
-                    
-                });
-                if (issueStatus !== selectedIssue.isComplete && formData.issueNo !== "") {
-                    updateStatus({
-                        ...selectedIssue,
-                        isComplete: issueStatus,
-                        updatedBy: auth().username,
-                    }).then((res) => {
-                        console.log(res);
+                }),
+            }).then((res) => {
+                if(res.data) {
+                    setAlertMsg({
+                        ...alertMsg,
+                        visible: true,
+                        title: "Success",
+                        message: "Sales invoice updated successfully.",
                     });
-                    setSelectedIssue({});
+                } else {
+                    setAlertMsg({
+                        ...alertMsg,
+                        visible: true,
+                        title: "Error",
+                        message: res.error.data.message,
+                        isError: true,
+                    });
                 }
-                setFormData(salesData);
-                setOpen(!open);
-                
-            }
-            catch(err) {
-                console.log(err.statusCode);   
+            });
+            if (issueStatus !== selectedIssue.isComplete && formData.issueNo !== "") {
+                updateStatus({
+                    ...selectedIssue,
+                    isComplete: issueStatus,
+                    updatedBy: auth().username,
+                }).then((res) => {
+                    console.log(res);
+                });
+                setSelectedIssue({});
             }
             setFormData(salesData);
             setOpen(!open);
+            await pause();
+            setAlertMsg({
+                ...alertMsg,
+                visible: false,
+            });
         }
     };
 
@@ -665,16 +652,27 @@ function SalesList() {
     const returnColumn = [
         {
             name: "Return No",
+            width: "110px",
             selector: row => row.returnNo,
         },
         {
-            name: "Amount",
-            selector: row => row.totalPrice.toLocaleString('en-us'),
+            name: "Stone Detail",
+            width: "180px",
+            selector: row => row.stoneDetail.stoneDesc,
+        },
+        {
+            name: "Qty",
+            selector: row => row.qty,
             right: true,
         },
         {
             name: "Weight",
             selector: row => row.weight,
+            right: true,
+        },
+        {
+            name: "Amount",
+            selector: row => row.totalPrice.toLocaleString('en-us'),
             right: true,
         },
     ];
@@ -711,7 +709,7 @@ function SalesList() {
                 <div className="flex flex-col gap-4 relative max-w-[85%] min-w-[85%]">
                     <div className="w-78 absolute top-0 right-0 z-[9999]">
                         {
-                            isAlert && <SuccessAlert title="Sales" message="Delete successful." handleAlert={() => setIsAlert(false)} />
+                            alertMsg.visible? <SuccessAlert title={alertMsg.title} message={alertMsg.message} isError={alertMsg.isError} isWarning={alertMsg.isWarning}  /> : ""
                         }
                     </div>
                     <div className="flex items-center py-3 bg-white gap-4 sticky top-0 z-10">
@@ -906,7 +904,7 @@ function SalesList() {
                         <DialogBody>
                             <ModalTitle titleName="Sales" handleClick={() => setOpen(!open)} />
                             {
-                                alert.isAlert? <SuccessAlert title={alert.title} message={alert.message} isWarning={alert.isWarning} /> : ""
+                                alertMsg.visible? <SuccessAlert title={alertMsg.title} message={alertMsg.message} isError={alertMsg.isError} isWarning={alertMsg.isWarning}  /> : ""
                             }
                             <div className="grid grid-cols-5 gap-2 mb-3">
                                 <div className="col-span-3">
@@ -993,22 +991,19 @@ function SalesList() {
                                                     type="checkbox" 
                                                     className="border border-blue-gray-200 w-[20px] h-[20px] py-1.5 rounded-md text-black"
                                                     checked={issueStatus}
-                                                    onChange={() => {
+                                                    onChange={ async () => {
                                                         if (formData.issueNo === "") {
-                                                            setAlert({
-                                                                isAlert: true,
+                                                            setAlertMsg({
+                                                                visible: true,
                                                                 message: "Please select issue no.",
                                                                 isWarning: true,
                                                                 title: "Warning"
+                                                            });
+                                                            await pause();
+                                                            setAlertMsg({
+                                                                ...alertMsg,
+                                                                visible: false
                                                             })
-                                                            setTimeout(() => {
-                                                                setAlert({
-                                                                    isAlert: false,
-                                                                    message: '',
-                                                                    isWarning: false,
-                                                                    title: '',
-                                                                })
-                                                            }, 2000);
                                                         } else {
                                                             setIssueStatus(!issueStatus);
                                                         }
@@ -1115,7 +1110,7 @@ function SalesList() {
                                                     className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
                                                     value={formData.weight}
                                                     onChange={(e) => {
-                                                        let weight = parseFloat(e.target.value);
+                                                        let weight = parseFloat(e.target.value === "" ? 0 : e.target.value);
                                                         let totalP = formData.unitPrice * weight;
                                                         let totalA = (totalP + formData.serviceCharge) - formData.discAmt;
                                                         setFormData({
@@ -1170,7 +1165,7 @@ function SalesList() {
                                                     className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
                                                     value={formData.unitPrice}
                                                     onChange={(e) => {
-                                                        let price = parseFloat(e.target.value);
+                                                        let price = parseFloat(e.target.value === "" ? 0 : e.target.value);
                                                         let totalP = formData.weight * price;
                                                         let totalA = (totalP + formData.serviceCharge) - formData.discAmt;
                                                         setFormData({

@@ -1,13 +1,13 @@
 import { Button, Card, CardBody, Dialog, DialogBody, Typography } from "@material-tailwind/react";
 import { FaCirclePlus, FaFloppyDisk, FaPencil, FaPlus, FaTrashCan } from "react-icons/fa6";
-import { useAddIssueMutation, useFetchActiveStoneDetailsQuery, useFetchIssueCountQuery, useFetchIssueQuery, useFetchReturnByInvoiceQuery, useFetchTrueCustomerQuery, useFetchUOMQuery, useRemoveIssueMutation, useUpdateIssueMutation } from "../store";
+import { useAddIssueMutation, useFetchActiveStoneDetailsQuery, useFetchIssueCountQuery, useFetchIssueQuery, useFetchReturnQuery, useFetchTrueCustomerQuery, useFetchUOMQuery, useRemoveIssueMutation, useUpdateIssueMutation } from "../store";
 import Pagination from "../components/pagination";
 import moment from "moment";
 import { useContext, useEffect, useState } from "react";
 import SuccessAlert from "../components/success_alert";
 import TableList from "../components/data_table";
 import DeleteModal from "../components/delete_modal";
-import { apiUrl, focusSelect } from "../const";
+import { apiUrl, focusSelect, pause } from "../const";
 import ModalTitle from "../components/modal_title";
 import { v4 as uuidv4 } from 'uuid';
 import { useAuthUser } from "react-auth-kit";
@@ -48,6 +48,14 @@ function IssueList() {
         end_date: null
     });
 
+    const [alertMsg, setAlertMsg] = useState({
+        visible: false,
+        title: '',
+        message: '',
+        isError: false,
+        isWarning: false,
+    });
+
     const { data, isLoading: dataLoad } = useFetchIssueQuery(filterData);
 
     const { data: dataCount } = useFetchIssueCountQuery(filterData);
@@ -59,7 +67,15 @@ function IssueList() {
     const { data: customerData } = useFetchTrueCustomerQuery();
 
     // const { data: returnData } = useFetchReturnQuery('I');
-    const { data: returnData } = useFetchReturnByInvoiceQuery('1111111111')
+    const { data: returnData } = useFetchReturnQuery({
+        skip: 0,
+        take: 10,
+        status: 'O',
+        return_type: 'I',
+        search_word: '',
+        start_date: null,
+        end_date: null
+    });
 
     axios.get(`${apiUrl}/issue/get-id`, {
         headers: {
@@ -88,11 +104,6 @@ function IssueList() {
     const [updateIssue] = useUpdateIssueMutation();
 
     const [currentPage, setCurrentPage] = useState(1);
-
-    const [ alert, setAlert] = useState({
-        isAlert: false,
-        message: ''
-    });
 
     const issueData = {
         issueNo: "",
@@ -138,6 +149,7 @@ function IssueList() {
         setFormData(issueData);
         setTBodyData([]);
         setIsEdit(false);
+        setValidationText({});
         setOpen(!open);
     };
 
@@ -189,11 +201,30 @@ function IssueList() {
             id: removeData[0].issueNo,
             deletedAt: moment().toISOString(),
             deletedBy: auth().username
-        }).then((res) => { console.log(res) });
-        // setIsAlert(true);
+        }).then((res) => { 
+            if(res.data) {
+                setAlertMsg({
+                    ...alertMsg,
+                    visible: true,
+                    title: "Success",
+                    message: "Issue data deleted successfully.",
+                });
+            } else {
+                setAlertMsg({
+                    ...alertMsg,
+                    visible: true,
+                    title: "Error",
+                    message: "This data cannot be deleted.",
+                    isError: true,
+                });
+            }
+         });
         setOpenDelete(!openDelete);
-        // await pause(2000);
-        // setIsAlert(false);
+        await pause();
+        setAlertMsg({
+            ...alertMsg,
+            visible: false,
+        });
     };
 
     function validateForm() {
@@ -232,142 +263,117 @@ function IssueList() {
 
     };
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         if (validateForm()) {
-            try {
-                addIssue({
-                    ...formData,
-                    issueNo: issueId,
-                    issueDate: moment(formData.issueDate).toISOString(),
-                }).then((res) => {
-                    if(res.error != null) {
-                        let message = '';
-                        if(res.error.data.statusCode === 409) {
-                            message = "Duplicate data found."
-                        }
-                        else {
-                            message = res.error.data.message
-                        }
-                        setAlert({
-                            isAlert: true,
-                            message: message
-                        })
-                        setTimeout(() => {
-                            setAlert({
-                                isAlert: false,
-                                message: ''
-                            })
-                        }, 2000);
-                    }
-                    
-                });
-                setFormData(issueData);
-                
-            }
-            catch(err) {
-                console.log(err.statusCode);
-                
-            }
-            setFormData(issueData);
-            setTBodyData([]);
-            setOpen(!open)
-        }
-    };
-
-    const handleSave = () => {
-        if (validateForm()) {
-            try {
-                addIssue({
-                    ...formData,
-                    issueNo: issueId,
-                    issueDate: moment(formData.issueDate).toISOString(),
-                }).then((res) => {
-                    if(res.error != null) {
-                        let message = '';
-                        if(res.error.data.statusCode === 409) {
-                            message = "Duplicate data found."
-                        }
-                        else {
-                            message = res.error.data.message
-                        }
-                        setAlert({
-                            isAlert: true,
-                            message: message
-                        })
-                        setTimeout(() => {
-                            setAlert({
-                                isAlert: false,
-                                message: ''
-                            })
-                        }, 2000);
-                    }
-                    
-                });
-                setFormData(issueData);
-                
-            }
-            catch(err) {
-                console.log(err.statusCode);
-                
-            }
-            setFormData(issueData);
-            setTBodyData([]);
-        }
-    };
-
-    const handleUpdate = () => {
-        if (validateForm()) {
-            try {
-                console.log(formData);
-                updateIssue({
-                    issueNo: formData.issueNo,
-                    issueDate: formData.issueDate,
-                    stoneDetailCode: formData.stoneDetailCode,
-                    qty: formData.qty,
-                    weight: formData.weight,
-                    unitCode: formData.unitCode,
-                    unitPrice: formData.unitPrice,
-                    totalPrice: formData.totalPrice,
-                    status: formData.status,
-                    remark: formData.remark,
-                    createdBy: formData.createdBy,
-                    createdAt: formData.createdAt,
-                    updatedBy: auth().username,
-                    updatedAt: moment().toISOString(),
-                    deletedBy: "",
-                    issueMember: formData.issueMember,
-                }).then((res) => {
-                    if(res.error != null) {
-                        let message = '';
-                        if(res.error.data.statusCode === 409) {
-                            message = "Duplicate data found."
-                        }
-                        else {
-                            message = res.error.data.message
-                        }
-                        setAlert({
-                            isAlert: true,
-                            message: message
-                        })
-                        setTimeout(() => {
-                            setAlert({
-                                isAlert: false,
-                                message: ''
-                            })
-                        }, 2000);
-                    }
-                    
-                });
-                setFormData(issueData);
-                setOpen(!open);
-                
-            }
-            catch(err) {
-                console.log(err.statusCode);
-                
-            }
+            addIssue({
+                ...formData,
+                issueNo: issueId,
+                issueDate: moment(formData.issueDate).toISOString(),
+            }).then((res) => {
+                if(res.data) {
+                    setAlertMsg({
+                        ...alertMsg,
+                        visible: true,
+                        title: "Success",
+                        message: "Issue data created successfully.",
+                    });
+                } else {
+                    setAlertMsg({
+                        ...alertMsg,
+                        visible: true,
+                        title: "Error",
+                        message: res.error.data.message,
+                        isError: true,
+                    });
+                }
+            });
             setFormData(issueData);
             setOpen(!open);
+            await pause();
+            setAlertMsg({
+                ...alertMsg,
+                visible: false,
+            });
+        }
+    };
+
+    const handleSave = async () => {
+        if (validateForm()) {
+            addIssue({
+                ...formData,
+                issueNo: issueId,
+                issueDate: moment(formData.issueDate).toISOString(),
+            }).then((res) => {
+                if(res.data) {
+                    setAlertMsg({
+                        ...alertMsg,
+                        visible: true,
+                        title: "Success",
+                        message: "Issue data created successfully.",
+                    });
+                } else {
+                    setAlertMsg({
+                        ...alertMsg,
+                        visible: true,
+                        title: "Error",
+                        message: res.error.data.message,
+                        isError: true,
+                    });
+                }
+            });
+            setFormData(issueData);
+            await pause();
+            setAlertMsg({
+                ...alertMsg,
+                visible: false,
+            });
+        }
+    };
+
+    const handleUpdate = async () => {
+        if (validateForm()) {
+            updateIssue({
+                issueNo: formData.issueNo,
+                issueDate: formData.issueDate,
+                stoneDetailCode: formData.stoneDetailCode,
+                qty: formData.qty,
+                weight: formData.weight,
+                unitCode: formData.unitCode,
+                unitPrice: formData.unitPrice,
+                totalPrice: formData.totalPrice,
+                status: formData.status,
+                remark: formData.remark,
+                createdBy: formData.createdBy,
+                createdAt: formData.createdAt,
+                updatedBy: auth().username,
+                updatedAt: moment().toISOString(),
+                deletedBy: "",
+                issueMember: formData.issueMember,
+            }).then((res) => {
+                if(res.data) {
+                    setAlertMsg({
+                        ...alertMsg,
+                        visible: true,
+                        title: "Success",
+                        message: "Issue data updated successfully.",
+                    });
+                } else {
+                    setAlertMsg({
+                        ...alertMsg,
+                        visible: true,
+                        title: "Error",
+                        message: res.error.data.message,
+                        isError: true,
+                    });
+                }
+            });
+            setFormData(issueData);
+            setOpen(!open);
+            await pause();
+            setAlertMsg({
+                ...alertMsg,
+                visible: false,
+            });
         }
     };
 
@@ -387,7 +393,7 @@ function IssueList() {
         });
     };
 
-    const saveMember = () => {
+    const saveMember = async () => {
 
         if(validateMember()) {
             let isExist = tBodyData.find(res => res.customerCode === memberData.customerCode);
@@ -412,20 +418,17 @@ function IssueList() {
                 });
                 setMemberData(issueMemberData);
             } else {
-                setAlert({
-                    isAlert: true,
+                setAlertMsg({
+                    visible: true,
                     message: "Customer is already selected.",
                     isWarning: true,
                     title: "Warning"
                 });
-                setTimeout(() => {
-                    setAlert({
-                        isAlert: false,
-                        message: '',
-                        isWarning: false,
-                        title: ''
-                    })
-                }, 2000);
+                await pause();
+                setAlertMsg({
+                    ...alertMsg,
+                    visible: false
+                });
             }
             
         }
@@ -564,11 +567,17 @@ function IssueList() {
     const returnColumn = [
         {
             name: "Return No",
+            width: "110px",
             selector: row => row.returnNo,
         },
         {
-            name: "Amount",
-            selector: row => row.totalPrice.toLocaleString('en-us'),
+            name: "Stone Detail",
+            width: "180px",
+            selector: row => row.stoneDetail.stoneDesc,
+        },
+        {
+            name: "Qty",
+            selector: row => row.qty,
             right: true,
         },
         {
@@ -576,6 +585,11 @@ function IssueList() {
             selector: row => row.weight,
             right: true,
         },
+        // {
+        //     name: "Amount",
+        //     selector: row => row.totalPrice.toLocaleString('en-us'),
+        //     right: true,
+        // },
     ];
 
     const issueDataList = data?.map((issueData) => {
@@ -606,9 +620,9 @@ function IssueList() {
             permissions !== null && permissions !== undefined ? (
                 <div className="flex flex-col gap-4 relative max-w-[85%] min-w-[85%]">
                     <div className="w-78 absolute top-0 right-0 z-[9999]">
-                        {/* {
-                            removeResult.isSuccess && isAlert && <SuccessAlert title="Purchase" message="Delete successful." handleAlert={() => setIsAlert(false)} />
-                        } */}
+                        {
+                            alertMsg.visible? <SuccessAlert title={alertMsg.title} message={alertMsg.message} isError={alertMsg.isError} isWarning={alertMsg.isWarning} /> : ""
+                        }
                     </div>
                     <div className="flex items-center py-3 bg-white gap-4 sticky top-0 z-10">
                         <Typography variant="h5">
@@ -823,7 +837,7 @@ function IssueList() {
                         <DialogBody>
                             <ModalTitle titleName={isEdit ? "Edit Issue" : "Create Issue"} handleClick={() => setOpen(!open)} />
                             {
-                                alert.isAlert? <SuccessAlert title={alert.title} message={alert.message} isWarning={alert.isWarning} /> : ""
+                                alertMsg.visible? <SuccessAlert title={alertMsg.title} message={alertMsg.message} isError={alertMsg.isError} isWarning={alertMsg.isWarning} /> : ""
                             }
                             <div className="grid grid-cols-4 gap-4 px-3 mb-3">
                                 <div className="col-span-2 grid grid-cols-2 gap-2 h-fit">

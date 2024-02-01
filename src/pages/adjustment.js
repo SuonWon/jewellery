@@ -73,11 +73,9 @@ function Adjustment() {
 
     const [selectedStoneDetails, setSelectedStoneDetails] = useState([]);
 
-    const [isAlert, setIsAlert] = useState(true);
-
     const [adjustId, setAdjustId] = useState("");
 
-    const [removeAdjust, removeResult] = useRemoveAdjustMutation();
+    const [removeAdjust] = useRemoveAdjustMutation();
 
     const [addAdjust] = useAddAdjustmentMutation();
 
@@ -85,9 +83,12 @@ function Adjustment() {
 
     const [currentPage, setCurrentPage] = useState(1);
 
-    const [ alert, setAlert] = useState({
-        isAlert: false,
-        message: ''
+    const [alertMsg, setAlertMsg] = useState({
+        visible: false,
+        title: '',
+        message: '',
+        isError: false,
+        isWarning: false,
     });
 
     const adjustData = {
@@ -115,16 +116,35 @@ function Adjustment() {
     const [ validationText, setValidationText ] = useState({});
 
     const handleRemove = async (id) => {
-        let removeData = data.filter((el) => el.damageNo === id);
+        let removeData = data.find((el) => el.adjustmentNo === id);
         removeAdjust({
-            id: removeData[0].damageNo,
+            id: removeData.adjustmentNo,
             deletedAt: moment().toISOString(),
             deletedBy: auth().username
-        }).then((res) => { console.log(res) });
-        setIsAlert(true);
+        }).then((res) => { 
+            if(res.data) {
+                setAlertMsg({
+                    ...alertMsg,
+                    visible: true,
+                    title: "Success",
+                    message: "Adjustment data deleted successfully",
+                });
+            } else {
+                setAlertMsg({
+                    ...alertMsg,
+                    visible: true,
+                    title: "Error",
+                    message: "This data cannot be deleted.",
+                    isError: true,
+                });
+            }
+         });
         setOpenDelete(!openDelete);
-        await pause(2000);
-        setIsAlert(false);
+        await pause();
+        setAlertMsg({
+            ...alertMsg,
+            visible: false,
+        });
     };
 
     const handleDeleteBtn = (id) => {
@@ -169,143 +189,120 @@ function Adjustment() {
 
     }
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         if (validateForm()) {
-            try {
-                console.log(formData);
-                addAdjust({
-                    ...formData,
-                    adjustmentNo: adjustId,
-                    adjustmentDate: moment(formData.damageDate).toISOString(),
-                }).then((res) => {
-                    if(res.error != null) {
-                        let message = '';
-                        if(res.error.data.statusCode == 409) {
-                            message = "Duplicate data found."
-                        }
-                        else {
-                            message = res.error.data.message
-                        }
-                        setAlert({
-                            isAlert: true,
-                            message: message
-                        })
-                        setTimeout(() => {
-                            setAlert({
-                                isAlert: false,
-                                message: ''
-                            })
-                        }, 2000);
-                    }
-                    
-                });
-                setFormData(adjustData);
-                setOpen(!open);
-                
-            }
-            catch(err) {
-                console.log(err.statusCode);
-                
-            }
+            console.log(formData);
+            addAdjust({
+                ...formData,
+                adjustmentNo: adjustId,
+                adjustmentDate: moment(formData.damageDate).toISOString(),
+            }).then((res) => {
+                if(res.data) {
+                    setAlertMsg({
+                        ...alertMsg,
+                        visible: true,
+                        title: "Success",
+                        message: "Adjustment data created successfully",
+                    });
+                } else {
+                    setAlertMsg({
+                        ...alertMsg,
+                        visible: true,
+                        title: "Error",
+                        message: res.error.data.message,
+                        isError: true,
+                    });
+                }
+            });
             setFormData(adjustData);
             setOpen(!open);
+            await pause();
+            setAlertMsg({
+                ...alertMsg,
+                visible: false,
+            });
         }
     };
 
-    const handleSave = () => {
+    const handleSave = async () => {
         if (validateForm()) {
-            try {
-                addAdjust({
-                    ...formData,
-                    adjustmentNo: adjustId,
-                    adjustmentDate: moment(formData.damageDate).toISOString(),
-                }).then((res) => {
-                    if(res.error != null) {
-                        let message = '';
-                        if(res.error.data.statusCode == 409) {
-                            message = "Duplicate data found."
-                        }
-                        else {
-                            message = res.error.data.message
-                        }
-                        setAlert({
-                            isAlert: true,
-                            message: message
-                        })
-                        setTimeout(() => {
-                            setAlert({
-                                isAlert: false,
-                                message: ''
-                            })
-                        }, 2000);
-                    }
-                    
-                });
-                setFormData(adjustData);
-                
-            }
-            catch(err) {
-                console.log(err.statusCode);
-                
-            }
+            addAdjust({
+                ...formData,
+                adjustmentNo: adjustId,
+                adjustmentDate: moment(formData.damageDate).toISOString(),
+            }).then((res) => {
+                if(res.data) {
+                    setAlertMsg({
+                        ...alertMsg,
+                        visible: true,
+                        title: "Success",
+                        message: "Adjustment data created successfully",
+                    });
+                } else {
+                    setAlertMsg({
+                        ...alertMsg,
+                        visible: true,
+                        title: "Error",
+                        message: res.error.data.message,
+                        isError: true,
+                    });
+                }
+            });
             setFormData(adjustData);
+            await pause();
+            setAlertMsg({
+                ...alertMsg,
+                visible: false,
+            });
         }
     };
 
-    const handleUpdate = () => {
+    const handleUpdate = async () => {
         if (validateForm()) {
-            try {
-                console.log(formData);
-                updateAdjust({
-                    adjustmentNo: formData.adjustmentNo,
-                    adjustmentDate: formData.adjustmentDate,
-                    referenceNo: formData.referenceNo,
-                    stoneDetailCode: formData.stoneDetailCode,
-                    qty: formData.qty,
-                    weight: formData.weight,
-                    unitCode: formData.unitCode,
-                    unitPrice: formData.unitPrice,
-                    totalPrice: formData.totalPrice,
-                    adjustmentType: formData.adjustmentType,
-                    remark: formData.remark,
-                    status: formData.status,
-                    createdBy: formData.createdBy,
-                    createdAt: formData.createdDate,
-                    updatedBy: auth().username,
-                    updatedAt: moment().toISOString(),
-                    deletedBy: "",
-                }).then((res) => {
-                    if(res.error != null) {
-                        let message = '';
-                        if(res.error.data.statusCode == 409) {
-                            message = "Duplicate data found."
-                        }
-                        else {
-                            message = res.error.data.message
-                        }
-                        setAlert({
-                            isAlert: true,
-                            message: message
-                        })
-                        setTimeout(() => {
-                            setAlert({
-                                isAlert: false,
-                                message: ''
-                            })
-                        }, 2000);
-                    }
-                    
-                });
-                setFormData(adjustData);
-                setOpen(!open);
-                
-            }
-            catch(err) {
-                console.log(err.statusCode);
-                
-            }
+            console.log(formData);
+            updateAdjust({
+                adjustmentNo: formData.adjustmentNo,
+                adjustmentDate: formData.adjustmentDate,
+                referenceNo: formData.referenceNo,
+                stoneDetailCode: formData.stoneDetailCode,
+                qty: formData.qty,
+                weight: formData.weight,
+                unitCode: formData.unitCode,
+                unitPrice: formData.unitPrice,
+                totalPrice: formData.totalPrice,
+                adjustmentType: formData.adjustmentType,
+                remark: formData.remark,
+                status: formData.status,
+                createdBy: formData.createdBy,
+                createdAt: formData.createdDate,
+                updatedBy: auth().username,
+                updatedAt: moment().toISOString(),
+                deletedBy: "",
+            }).then((res) => {
+                if(res.data) {
+                    setAlertMsg({
+                        ...alertMsg,
+                        visible: true,
+                        title: "Success",
+                        message: "Adjustment data updated successfully",
+                    });
+                } else {
+                    setAlertMsg({
+                        ...alertMsg,
+                        visible: true,
+                        title: "Error",
+                        message: res.error.data.message,
+                        isError: true,
+                    });
+                }
+            });
             setFormData(adjustData);
             setOpen(!open);
+            await pause();
+            setAlertMsg({
+                ...alertMsg,
+                visible: false,
+            });
         }
     };
 
@@ -448,7 +445,7 @@ function Adjustment() {
                 <div className="flex flex-col gap-4 relative max-w-[85%] min-w-[85%]">
                     <div className="w-78 absolute top-0 right-0 z-[9999]">
                         {
-                            removeResult.isSuccess && isAlert && <SuccessAlert title="Purchase" message="Delete successful." handleAlert={() => setIsAlert(false)} />
+                            alertMsg.visible? <SuccessAlert title={alertMsg.title} message={alertMsg.message} isError={alertMsg.isError}  /> : ""
                         }
                     </div>
                     <div className="flex items-center py-3 bg-white gap-4 sticky top-0 z-10">
@@ -642,6 +639,9 @@ function Adjustment() {
                     <Dialog open={open} size="lg">
                         <DialogBody>
                             <ModalTitle titleName={isEdit ? "Edit Adjustment" : "Create Adjustment"} handleClick={() => setOpen(!open)} />
+                            {
+                                alertMsg.visible? <SuccessAlert title={alertMsg.title} message={alertMsg.message} isError={alertMsg.isError}  /> : ""
+                            }
                             <div className="grid grid-cols-4 gap-2 mb-3">
                                 {
                                     isEdit? 
@@ -848,7 +848,7 @@ function Adjustment() {
                                             className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
                                             value={formData.unitPrice}
                                             onChange={(e) => {
-                                                let price = parseFloat(e.target.value);
+                                                let price = parseFloat(e.target.value === "" ? 0 : e.target.value);
                                                 setFormData({
                                                     ...formData, 
                                                     unitPrice: price,

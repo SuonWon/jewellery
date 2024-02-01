@@ -64,6 +64,26 @@ const walletTransitionApi = createApi({
                     };
                 },
             }),
+            fetchWalletTransactionBalance: builder.query({
+                providesTags: () => {
+                    return [{type: "WalletTransaction", id: "All"}]
+                },
+                query: (filterData) => {
+                    console.log(filterData);
+                    const query = `?status=true${filterData.shareCode === 0 ? '' : `&shareCode=${filterData.shareCode}`}${filterData.walletName === '' ? '' : `&walletName=${filterData.walletName}`}${filterData.category === 0 ? '' : `&walletName=${filterData.category}`}${filterData.start_date == null ? '' : `&start_date=${filterData.start_date}`}${filterData.end_date == null ? '' : `&end_date=${filterData.end_date}`}`;
+                    return {
+                        url: `/transaction/get-balance${query}`,
+                        // params: {
+                        //     status: walletData.status,
+                        //     walletCode: walletData.walletCode
+                        // },
+                        method: "GET",
+                        // headers: {
+                        //     "Authorization": token
+                        // },
+                    };
+                },
+            }),
             fetchWalletTransactionById: builder.query({
                 providesTags: () => {
                     return [{type: "WalletTransaction", id: "All"}]
@@ -127,5 +147,5 @@ const walletTransitionApi = createApi({
     },
 });
 
-export const { useFetchWalletTransactionQuery, useFetchWalletTransactionByIdQuery, useAddWalletTransactionMutation, useUpdateWalletTransactionMutation, useRemoveWalletTransactionMutation, useFetchWalletTransactionCountQuery } = walletTransitionApi;
+export const { useFetchWalletTransactionQuery, useFetchWalletTransactionByIdQuery, useAddWalletTransactionMutation, useUpdateWalletTransactionMutation, useRemoveWalletTransactionMutation, useFetchWalletTransactionCountQuery, useFetchWalletTransactionBalanceQuery } = walletTransitionApi;
 export { walletTransitionApi };

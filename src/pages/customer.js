@@ -12,6 +12,8 @@ import TableList from "../components/data_table";
 import { useAuthUser } from "react-auth-kit";
 import { useNavigate } from "react-router-dom";
 import { AuthContent } from "../context/authContext";
+import { pause } from "../const";
+import SuccessAlert from "../components/success_alert";
 
 const validator = require("validator");
 
@@ -43,6 +45,14 @@ function Customer() {
         skip: 0,
         take: 10,
         search: ''
+    });
+
+    const [alertMsg, setAlertMsg] = useState({
+        visible: false,
+        title: '',
+        message: '',
+        isError: false,
+        isWarning: false,
     });
 
     const {data, isLoading: dataLoad} = useFetchCustomerQuery(filterData);
@@ -120,9 +130,28 @@ function Customer() {
             updatedAt: moment().toISOString(),
             updatedBy: "",
         }).then((res) => {
-            console.log(res);
+            if(res.data) {
+                setAlertMsg({
+                    ...alertMsg,
+                    visible: true,
+                    title: "Success",
+                    message: "Customer updated successfully",
+                });
+            } else {
+                setAlertMsg({
+                    ...alertMsg,
+                    visible: true,
+                    title: "Error",
+                    message: res.error.data.message,
+                    isError: true,
+                });
+            }
         });
-
+        await pause();
+        setAlertMsg({
+            ...alertMsg,
+            visible: false,
+        });
     };
 
     const openModal = () => {
@@ -146,19 +175,59 @@ function Customer() {
     const onSubmit = async () => {
         if(validateForm()) {
             addCustomer(formData).then((res) => {
-                console.log(res);
+                if(res.data) {
+                    setAlertMsg({
+                        ...alertMsg,
+                        visible: true,
+                        title: "Success",
+                        message: "New customer created successfully",
+                    });
+                } else {
+                    setAlertMsg({
+                        ...alertMsg,
+                        visible: true,
+                        title: "Error",
+                        message: res.error.data.message,
+                        isError: true,
+                    });
+                }
             });
             resetData();
             setOpen(!open);
+            await pause();
+            setAlertMsg({
+                ...alertMsg,
+                visible: false,
+            });
         }
     };
 
-    const onSaveSubmit = () => {
+    const onSaveSubmit = async () => {
         if (validateForm()) {
             addCustomer(formData).then((res) => {
-                console.log(res);
+                if(res.data) {
+                    setAlertMsg({
+                        ...alertMsg,
+                        visible: true,
+                        title: "Success",
+                        message: "New customer created successfully.",
+                    });
+                } else {
+                    setAlertMsg({
+                        ...alertMsg,
+                        visible: true,
+                        title: "Error",
+                        message: res.error.data.message,
+                        isError: true,
+                    });
+                }
             });
             resetData();
+            await pause();
+            setAlertMsg({
+                ...alertMsg,
+                visible: false,
+            });
         }
     };
 
@@ -176,14 +245,56 @@ function Customer() {
             updatedAt: moment().toISOString(),
             updatedBy: auth().username,
         }).then((res) => {
-            console.log(res);
+            if(res.data) {
+                setAlertMsg({
+                    ...alertMsg,
+                    visible: true,
+                    title: "Success",
+                    message: "Customer data updated successfully.",
+                });
+            } else {
+                setAlertMsg({
+                    ...alertMsg,
+                    visible: true,
+                    title: "Error",
+                    message: res.error.data.message,
+                    isError: true,
+                });
+            }
         });
         setOpen(!open);
+        await pause();
+        setAlertMsg({
+            ...alertMsg,
+            visible: false,
+        });
     };
 
     const handleRemove = async (id) => {
-        removeCustomer(id).then((res) => {console.log(res)});
+        removeCustomer(id).then((res) => {
+            if(res.data) {
+                setAlertMsg({
+                    ...alertMsg,
+                    visible: true,
+                    title: "Success",
+                    message: "Customer data deleted successfully.",
+                });
+            } else {
+                setAlertMsg({
+                    ...alertMsg,
+                    visible: true,
+                    title: "Error",
+                    message: "This data cannot be deleted.",
+                    isError: true,
+                });
+            }
+        });
         setOpenDelete(!openDelete);
+        await pause();
+        setAlertMsg({
+            ...alertMsg,
+            visible: false,
+        });
     };
 
     const handleDeleteBtn = (id) => {
@@ -327,6 +438,9 @@ function Customer() {
             customerPermission != null && customerPermission != undefined ? (
                 <div className="flex flex-col gap-4 relative max-w-[85%] min-w-[85%]">
                     <div className="w-78 absolute top-0 right-0 z-[9999]">
+                        {
+                            alertMsg.visible? <SuccessAlert title={alertMsg.title} message={alertMsg.message} isError={alertMsg.isError}  /> : ""
+                        }
                     </div>
                     <SectionTitle title="Customers" handleModal={openModal} permission={customerPermission?.create}/>
                     <Card className="h-auto shadow-md max-w-screen-xxl rounded-sm p-2 border-t mb-5">
@@ -402,6 +516,9 @@ function Customer() {
                     <Dialog open={Boolean(open)} handler={openModal} size="lg">
                         <DialogBody>
                             <ModalTitle titleName={isEdit ? "Edit Customer" : "Customer"} handleClick={openModal} />
+                            {
+                                alertMsg.visible? <SuccessAlert title={alertMsg.title} message={alertMsg.message} isError={alertMsg.isError}  /> : ""
+                            }
                             <form  className="flex flex-col p-3 gap-2">
                                 <div className="grid grid-cols-3 gap-2 w-full">
                                     <div>

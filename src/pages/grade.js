@@ -12,6 +12,8 @@ import TableList from "../components/data_table";
 import { AuthContent } from "../context/authContext";
 import { useAuthUser } from "react-auth-kit";
 import { useNavigate } from "react-router-dom";
+import SuccessAlert from "../components/success_alert";
+import { pause } from "../const";
 
 const validator = require('validator');
 
@@ -44,6 +46,14 @@ function Grade() {
         skip: 0,
         take: 10,
         search: ''
+    });
+
+    const [alertMsg, setAlertMsg] = useState({
+        visible: false,
+        title: '',
+        message: '',
+        isError: false,
+        isWarning: false,
     });
 
     const {data, isLoading: dataLoad} = useFetchGradeQuery(filterData);
@@ -105,22 +115,57 @@ function Grade() {
                 updatedBy: isEdit ? auth().username : "",
 
             }
-
             if(isEdit) {
                 saveData.gradeCode = grade.gradeCode
             }
-
-            isEdit ? await editGrade(saveData) : await addGrade(saveData);
-
+            isEdit ? await editGrade(saveData).then((res) => {
+                if(res.data) {
+                    setAlertMsg({
+                        ...alertMsg,
+                        visible: true,
+                        title: "Success",
+                        message: "Stone Grade updated successfully",
+                    });
+                } else {
+                    setAlertMsg({
+                        ...alertMsg,
+                        visible: true,
+                        title: "Error",
+                        message: res.error.data.message,
+                        isError: true,
+                    });
+                }
+            }) : await addGrade(saveData).then((res) => {
+                if(res.data) {
+                    setAlertMsg({
+                        ...alertMsg,
+                        visible: true,
+                        title: "Success",
+                        message: "Stone Grade created successfully.",
+                    });
+                } else {
+                    setAlertMsg({
+                        ...alertMsg,
+                        visible: true,
+                        title: "Error",
+                        message: res.error.data.message,
+                        isError: true,
+                    });
+                }
+            });
             setOpen(isNew);
-
             setGrade({ 
                 gradeCode: 0,
                 gradeDesc: '',
                 status: true,
                 createdAt: moment().toISOString(),
                 createdBy: auth().username
-            })
+            });
+            await pause();
+            setAlertMsg({
+                ...alertMsg,
+                visible: false,
+            });
         }
     }
 
@@ -132,7 +177,29 @@ function Grade() {
             updatedAt: moment().toISOString(),
             updatedBy: auth().username
         }
-        await editGrade(saveData);
+        await editGrade(saveData).then((res) => {
+            if(res.data) {
+                setAlertMsg({
+                    ...alertMsg,
+                    visible: true,
+                    title: "Success",
+                    message: "Stone Grade updated successfully",
+                });
+            } else {
+                setAlertMsg({
+                    ...alertMsg,
+                    visible: true,
+                    title: "Error",
+                    message: res.error.data.message,
+                    isError: true,
+                });
+            }
+        });
+        await pause();
+        setAlertMsg({
+            ...alertMsg,
+            visible: false,
+        });
     }
 
     function handleEdit(id) {
@@ -143,8 +210,30 @@ function Grade() {
     }
 
     const handleDelete = async () => {
-        await removeGrade(deleteId);
+        await removeGrade(deleteId).then((res) => {
+            if(res.data) {
+                setAlertMsg({
+                    ...alertMsg,
+                    visible: true,
+                    title: "Success",
+                    message: "Stone Grade deleted successfully.",
+                });
+            } else {
+                setAlertMsg({
+                    ...alertMsg,
+                    visible: true,
+                    title: "Error",
+                    message: "This data cannot be deleted.",
+                    isError: true,
+                });
+            }
+        });
         setOpenDelete(!openDelete);
+        await pause();
+        setAlertMsg({
+            ...alertMsg,
+            visible: false,
+        });
     }
 
     const column = [
@@ -224,6 +313,9 @@ function Grade() {
             gradePermission != null && gradePermission != undefined ? (
                 <div className="flex flex-col gap-4 px-4 w-full relative">
                     <div className="w-78 absolute top-0 right-0 z-[9999]">
+                        {
+                            alertMsg.visible? <SuccessAlert title={alertMsg.title} message={alertMsg.message} isError={alertMsg.isError}  /> : ""
+                        }
                     </div>
                     <SectionTitle title="Stone Grade" handleModal={openModal} permission={gradePermission?.create}/>
                     <Card className="h-auto shadow-md min-w-[100%] max-w-[100%] mx-1 rounded-sm p-2 border-t">
@@ -299,6 +391,9 @@ function Grade() {
                     <Dialog open={Boolean(open)} handler={openModal} size="sm">
                         <DialogBody>
                             <ModalTitle titleName={isEdit ? "Edit Stone Grade" : "Stone Grade"} handleClick={openModal} />
+                            {
+                                alertMsg.visible? <SuccessAlert title={alertMsg.title} message={alertMsg.message} isError={alertMsg.isError}  /> : ""
+                            }
                             <div  className="flex flex-col p-3">
                                 
                                 {/* Description */}

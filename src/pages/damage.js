@@ -74,11 +74,9 @@ function Damage() {
 
     const [selectedStoneDetails, setSelectedStoneDetails] = useState([]);
 
-    const [isAlert, setIsAlert] = useState(true);
-
     const [damageId, setDamageId] = useState("");
 
-    const [removeDamage, removeResult] = useRemoveDamageMutation();
+    const [removeDamage] = useRemoveDamageMutation();
 
     const [addDamage] = useAddDamageMutation();
 
@@ -86,9 +84,12 @@ function Damage() {
 
     const [currentPage, setCurrentPage] = useState(1);
 
-    const [ alert, setAlert] = useState({
-        isAlert: false,
-        message: ''
+    const [alertMsg, setAlertMsg] = useState({
+        visible: false,
+        title: '',
+        message: '',
+        isError: false,
+        isWarning: false,
     });
 
     const damageData = {
@@ -120,11 +121,30 @@ function Damage() {
             id: removeData[0].damageNo,
             deletedAt: moment().toISOString(),
             deletedBy: auth().username
-        }).then((res) => { console.log(res) });
-        setIsAlert(true);
+        }).then((res) => { 
+            if(res.data) {
+                setAlertMsg({
+                    ...alertMsg,
+                    visible: true,
+                    title: "Success",
+                    message: "Damage data deleted successfully",
+                });
+            } else {
+                setAlertMsg({
+                    ...alertMsg,
+                    visible: true,
+                    title: "Error",
+                    message: "This data cannot be deleted.",
+                    isError: true,
+                });
+            }
+         });
         setOpenDelete(!openDelete);
-        await pause(2000);
-        setIsAlert(false);
+        await pause();
+        setAlertMsg({
+            ...alertMsg,
+            visible: false,
+        });
     };
 
     const handleDeleteBtn = (id) => {
@@ -169,142 +189,120 @@ function Damage() {
 
     }
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         if (validateForm()) {
-            try {
-                console.log(formData);
-                addDamage({
-                    ...formData,
-                    damageNo: damageId,
-                    damageDate: moment(formData.damageDate).toISOString(),
-                }).then((res) => {
-                    if(res.error != null) {
-                        let message = '';
-                        if(res.error.data.statusCode == 409) {
-                            message = "Duplicate data found."
-                        }
-                        else {
-                            message = res.error.data.message
-                        }
-                        setAlert({
-                            isAlert: true,
-                            message: message
-                        })
-                        setTimeout(() => {
-                            setAlert({
-                                isAlert: false,
-                                message: ''
-                            })
-                        }, 2000);
-                    }
-                    
-                });
-                setFormData(damageData);
-                setOpen(!open);
-                
-            }
-            catch(err) {
-                console.log(err.statusCode);
-                
-            }
+            addDamage({
+                ...formData,
+                damageNo: damageId,
+                damageDate: moment(formData.damageDate).toISOString(),
+            }).then((res) => {
+                if(res.data) {
+                    setAlertMsg({
+                        ...alertMsg,
+                        visible: true,
+                        title: "Success",
+                        message: "Damage data created successfully",
+                    });
+                } else {
+                    setAlertMsg({
+                        ...alertMsg,
+                        visible: true,
+                        title: "Error",
+                        message: res.error.data.message,
+                        isError: true,
+                    });
+                }
+            });
             setFormData(damageData);
             setOpen(!open);
+            await pause();
+            setAlertMsg({
+                ...alertMsg,
+                visible: false,
+            });
         }
     };
 
-    const handleSave = () => {
+    const handleSave = async () => {
         if (validateForm()) {
-            try {
-                addDamage({
-                    ...formData,
-                    damageNo: damageId,
-                    damageDate: moment(formData.damageDate).toISOString(),
-                }).then((res) => {
-                    if(res.error != null) {
-                        let message = '';
-                        if(res.error.data.statusCode == 409) {
-                            message = "Duplicate data found."
-                        }
-                        else {
-                            message = res.error.data.message
-                        }
-                        setAlert({
-                            isAlert: true,
-                            message: message
-                        })
-                        setTimeout(() => {
-                            setAlert({
-                                isAlert: false,
-                                message: ''
-                            })
-                        }, 2000);
-                    }
-                    
-                });
-                setFormData(damageData);
-                
-            }
-            catch(err) {
-                console.log(err.statusCode);
-                
-            }
+            addDamage({
+                ...formData,
+                damageNo: damageId,
+                damageDate: moment(formData.damageDate).toISOString(),
+            }).then((res) => {
+                if(res.data) {
+                    setAlertMsg({
+                        ...alertMsg,
+                        visible: true,
+                        title: "Success",
+                        message: "Damage data created successfully",
+                    });
+                } else {
+                    setAlertMsg({
+                        ...alertMsg,
+                        visible: true,
+                        title: "Error",
+                        message: res.error.data.message,
+                        isError: true,
+                    });
+                }
+            });
             setFormData(damageData);
+            await pause();
+            setAlertMsg({
+                ...alertMsg,
+                visible: false,
+            });
+            
         }
     };
 
-    const handleUpdate = () => {
+    const handleUpdate = async () => {
         if (validateForm()) {
-            try {
-                console.log(formData);
-                updateDamage({
-                    damageNo: formData.damageNo,
-                    damageDate: formData.damageDate,
-                    referenceNo: formData.referenceNo,
-                    stoneDetailCode: formData.stoneDetailCode,
-                    qty: formData.qty,
-                    weight: formData.weight,
-                    unitCode: formData.unitCode,
-                    unitPrice: formData.unitPrice,
-                    totalPrice: formData.totalPrice,
-                    remark: formData.remark,
-                    status: formData.status,
-                    createdBy: formData.createdBy,
-                    createdAt: formData.createdDate,
-                    updatedBy: auth().username,
-                    updatedAt: moment().toISOString(),
-                    deletedBy: "",
-                }).then((res) => {
-                    if(res.error != null) {
-                        let message = '';
-                        if(res.error.data.statusCode == 409) {
-                            message = "Duplicate data found."
-                        }
-                        else {
-                            message = res.error.data.message
-                        }
-                        setAlert({
-                            isAlert: true,
-                            message: message
-                        })
-                        setTimeout(() => {
-                            setAlert({
-                                isAlert: false,
-                                message: ''
-                            })
-                        }, 2000);
-                    }
-                    
-                });
-                setFormData(damageData);
-                setOpen(!open);
+            console.log(formData);
+            updateDamage({
+                damageNo: formData.damageNo,
+                damageDate: formData.damageDate,
+                referenceNo: formData.referenceNo,
+                stoneDetailCode: formData.stoneDetailCode,
+                qty: formData.qty,
+                weight: formData.weight,
+                unitCode: formData.unitCode,
+                unitPrice: formData.unitPrice,
+                totalPrice: formData.totalPrice,
+                remark: formData.remark,
+                status: formData.status,
+                createdBy: formData.createdBy,
+                createdAt: formData.createdDate,
+                updatedBy: auth().username,
+                updatedAt: moment().toISOString(),
+                deletedBy: "",
+            }).then((res) => {
+                if(res.data) {
+                    setAlertMsg({
+                        ...alertMsg,
+                        visible: true,
+                        title: "Success",
+                        message: "Damage data updated successfully",
+                    });
+                } else {
+                    setAlertMsg({
+                        ...alertMsg,
+                        visible: true,
+                        title: "Error",
+                        message: res.error.data.message,
+                        isError: true,
+                    });
+                }
                 
-            }
-            catch(err) {
-                console.log(err.statusCode);
-                
-            }
+            });
             setFormData(damageData);
             setOpen(!open);
+            await pause();
+            setAlertMsg({
+                ...alertMsg,
+                visible: false,
+            });
         }
     };
 
@@ -441,7 +439,7 @@ function Damage() {
                 <div className="flex flex-col gap-4 relative max-w-[85%] min-w-[85%]">
                     <div className="w-78 absolute top-0 right-0 z-[9999]">
                         {
-                            removeResult.isSuccess && isAlert && <SuccessAlert title="Purchase" message="Delete successful." handleAlert={() => setIsAlert(false)} />
+                            alertMsg.visible? <SuccessAlert title={alertMsg.title} message={alertMsg.message} isError={alertMsg.isError}  /> : ""
                         }
                     </div>
                     <div className="flex items-center py-3 bg-white gap-4 sticky top-0 z-10">
@@ -635,6 +633,9 @@ function Damage() {
                     <Dialog open={open} size="lg">
                         <DialogBody>
                             <ModalTitle titleName={isEdit ? "Edit Damage" : "Create Damage"} handleClick={() => setOpen(!open)} />
+                            {
+                                alertMsg.visible? <SuccessAlert title={alertMsg.title} message={alertMsg.message} isError={alertMsg.isError}  /> : ""
+                            }
                             <div className="grid grid-cols-4 gap-2 mb-3">
                                 {
                                     isEdit? 

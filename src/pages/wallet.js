@@ -4,7 +4,7 @@ import { FaCircleMinus, FaCirclePlus, FaEquals, FaFilter, FaFloppyDisk, FaTrashC
 import { BiReset } from "react-icons/bi"
 import { useContext, useEffect, useState } from "react";
 import { apiUrl, focusSelect, pause } from "../const";
-import { useAddWalletTransactionMutation, useFetchTrueShareQuery, useFetchTrueWalletCategoryQuery, useFetchTrueWalletQuery, useFetchWalletNamesQuery, useFetchWalletTransactionCountQuery, useFetchWalletTransactionQuery, useRemoveWalletTransactionMutation, useUpdateWalletTransactionMutation } from "../store";
+import { useAddWalletTransactionMutation, useFetchTrueShareQuery, useFetchTrueWalletCategoryQuery, useFetchTrueWalletQuery, useFetchWalletNamesQuery, useFetchWalletTransactionBalanceQuery, useFetchWalletTransactionCountQuery, useFetchWalletTransactionQuery, useRemoveWalletTransactionMutation, useUpdateWalletTransactionMutation } from "../store";
 import Pagination from "../components/pagination";
 import DeleteModal from "../components/delete_modal";
 import SuccessAlert from "../components/success_alert";
@@ -53,7 +53,11 @@ function Wallet() {
 
     const { data, refetch, isLoading: dataLoad } = useFetchWalletTransactionQuery(filterForm);
 
-    const { data:dataCount } = useFetchWalletTransactionCountQuery(filterForm);
+    console.log(data);
+
+    const { data: dataCount } = useFetchWalletTransactionCountQuery(filterForm);
+
+    const { data: walletBalance } = useFetchWalletTransactionBalanceQuery(filterForm);
 
     const { data: walletCategory} = useFetchTrueWalletCategoryQuery();
 
@@ -133,7 +137,7 @@ function Wallet() {
         id: "",
         walletCode: "",
         date: moment().format("YYYY-MM-DD"),
-        time: moment().format("hh:mm:ss"),
+        time: moment().format("HH:mm:ss"),
         categoryCode: 0,
         paymentMode: "Cash",
         cashType: "",
@@ -188,6 +192,7 @@ function Wallet() {
 
     const handleOpen = () => {
         setFormData(transactionData);
+        setValidationText({});
         setIsView(false);
         setOpen(!open);
     };
@@ -203,8 +208,8 @@ function Wallet() {
             newErrors.time = "Time is required."
         }
 
-        if (formData.walletCode === 0) {
-            newErrors.stoneDetailCode = "Wallet Code is required."
+        if (validator.isEmpty(formData.walletCode)) {
+            newErrors.walletCode = "Wallet Code is required."
         }
 
         if (formData.categoryCode === 0) {
@@ -218,6 +223,7 @@ function Wallet() {
     }
 
     const handleSubmit = () => {
+        console.log(formData)
         if (validateForm()) {
             try {
                 addTransaction({
@@ -270,6 +276,7 @@ function Wallet() {
     };
 
     const handleSave = () => {
+        console.log(formData)
         if (validateForm()) {
             try {
                 addTransaction({
@@ -580,7 +587,7 @@ function Wallet() {
                                     Cash In
                                 </Typography>
                                 <Typography variant="h5" className="text-end">
-                                    {totalCashIn.toLocaleString("en-us")}
+                                    {walletBalance?.cashIn.toLocaleString("en-us")}
                                 </Typography>
                             </div>
                             <div className="border-r-2 grid grid-rows gap-2 justify-center items-center">
@@ -589,7 +596,7 @@ function Wallet() {
                                     Cash Out
                                 </Typography>
                                 <Typography variant="h5" className="text-end">
-                                    {totalCashOut.toLocaleString("en-us")}
+                                    {walletBalance?.cashOut.toLocaleString("en-us")}
                                 </Typography>
                             </div>
                             <div className="grid grid-rows gap-2 justify-center items-center">
@@ -598,14 +605,14 @@ function Wallet() {
                                     Net Balance
                                 </Typography>
                                 <Typography variant="h5" className="text-end">
-                                    {(totalCashIn - totalCashOut).toLocaleString("en-us")}
+                                    {walletBalance?.total.toLocaleString("en-us")}
                                 </Typography>
                             </div>
                         </CardBody>
                     </Card>
                     <Card className="h-auto shadow-md max-w-screen-xxl rounded-sm p-2 border-t">
                         <CardBody className="grid grid-rows gap-2 rounded-sm overflow-auto p-0">
-                            <div className="grid grid-cols-5 gap-2 px-2">
+                            <div className="grid grid-cols-2 gap-2 px-2 lg:grid-cols-3 2xl:grid-cols-5">
                                 {/* Wallet Code */}
                                 <div>
                                     <label className="text-black text-sm mb-2">Wallet Name</label>
@@ -814,10 +821,11 @@ function Wallet() {
                                     <div className="w-[80px]">
                                         <select
                                             className="block w-full px-2.5 py-1.5 border border-blue-gray-200 h-[35px] rounded-md focus:border-black text-black"
-                                            value={filterData.take} 
+                                            value={filterForm.take} 
                                             onChange={(e) => {
-                                                setFilterData({
-                                                    ...filterData,
+                                                console.log(e.target.value)
+                                                setFilterForm({
+                                                    ...filterForm,
                                                     skip: 0,
                                                     take: e.target.value
                                                 });
@@ -830,7 +838,6 @@ function Wallet() {
                                             <option value="100">100</option>
                                         </select>
                                     </div>
-                                    
                                     <p className="ml-2 mt-[6px]">entries</p>
                                 </div>
                                 
@@ -1042,7 +1049,7 @@ function Wallet() {
                                         }
                                     </select>
                                     {
-                                        validationText.referenceNo && <p className="block text-[12px] text-red-500 font-sans">{validationText.referenceNo}</p>
+                                        validationText.walletCode && <p className="block text-[12px] text-red-500 font-sans">{validationText.walletCode}</p>
                                     }
                                 </div>
                             </div>
@@ -1087,7 +1094,7 @@ function Wallet() {
                                             setFormData({...formData, categoryCode: Number(e.target.value)});
                                         }}
                                     >
-                                        <option value="" disabled>Select...</option>
+                                        <option value="0" disabled>Select...</option>
                                         {
                                             walletCategory?.map(category => {
                                                 return (
@@ -1096,6 +1103,9 @@ function Wallet() {
                                             })
                                         }
                                     </select>
+                                    {
+                                        validationText.categoryCode && <p className="block text-[12px] text-red-500 font-sans">{validationText.categoryCode}</p>
+                                    }
                                 </div>
                                 {/* <div>
                                     <label className="text-black text-sm mb-2">Cash Type</label>
