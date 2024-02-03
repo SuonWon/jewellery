@@ -55,14 +55,6 @@ function Adjustment() {
 
     const {data: purchaseData} = useFetchTruePurchaseQuery();
 
-    axios.get(apiUrl + '/adjustment/get-id', {
-        headers: {
-            "Authorization": token
-        }
-    }).then((res) => {
-        setAdjustId(res.data);
-    });
-
     const auth = useAuthUser();
 
     const [open, setOpen] = useState(false);
@@ -73,7 +65,7 @@ function Adjustment() {
 
     const [selectedStoneDetails, setSelectedStoneDetails] = useState([]);
 
-    const [adjustId, setAdjustId] = useState("");
+    // const [adjustId, setAdjustId] = useState("");
 
     const [removeAdjust] = useRemoveAdjustMutation();
 
@@ -191,6 +183,16 @@ function Adjustment() {
 
     const handleSubmit = async () => {
         if (validateForm()) {
+            var adjustId = '';
+    
+            await axios.get(apiUrl + '/adjustment/get-id', {
+                headers: {
+                    "Authorization": token
+                }
+            }).then((res) => {
+                adjustId = res.data;
+            });
+    
             console.log(formData);
             addAdjust({
                 ...formData,
@@ -226,6 +228,16 @@ function Adjustment() {
 
     const handleSave = async () => {
         if (validateForm()) {
+            var adjustId = '';
+    
+            await axios.get(apiUrl + '/adjustment/get-id', {
+                headers: {
+                    "Authorization": token
+                }
+            }).then((res) => {
+                adjustId = res.data;
+            });
+    
             addAdjust({
                 ...formData,
                 adjustmentNo: adjustId,

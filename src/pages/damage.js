@@ -56,14 +56,6 @@ function Damage() {
 
     const {data: purchaseData} = useFetchTruePurchaseQuery();
 
-    axios.get(apiUrl + '/damage/get-id', {
-        headers: {
-            "Authorization": token
-        }
-    }).then((res) => {
-        setDamageId(res.data);
-    });
-
     const auth = useAuthUser();
 
     const [open, setOpen] = useState(false);
@@ -74,7 +66,7 @@ function Damage() {
 
     const [selectedStoneDetails, setSelectedStoneDetails] = useState([]);
 
-    const [damageId, setDamageId] = useState("");
+    // const [damageId, setDamageId] = useState("");
 
     const [removeDamage] = useRemoveDamageMutation();
 
@@ -191,6 +183,16 @@ function Damage() {
 
     const handleSubmit = async () => {
         if (validateForm()) {
+            var damageId = '';
+    
+            await axios.get(apiUrl + '/damage/get-id', {
+                headers: {
+                    "Authorization": token
+                }
+            }).then((res) => {
+                damageId = res.data;
+            });
+    
             addDamage({
                 ...formData,
                 damageNo: damageId,
@@ -225,6 +227,16 @@ function Damage() {
 
     const handleSave = async () => {
         if (validateForm()) {
+            var damageId = '';
+    
+            await axios.get(apiUrl + '/damage/get-id', {
+                headers: {
+                    "Authorization": token
+                }
+            }).then((res) => {
+                damageId = res.data;
+            });
+    
             addDamage({
                 ...formData,
                 damageNo: damageId,

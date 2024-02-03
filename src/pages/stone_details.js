@@ -532,6 +532,7 @@ function StoneDetails() {
 
     const handleCombine = async () => {
         let saveData = combineData.filter(res => res.isSelected);
+        // add purchasePrice, actual qty and actual weight
         if (saveData.length > 1) {
             let combinedStone = {
                 referenceNo: "",
@@ -660,7 +661,7 @@ function StoneDetails() {
         },
         {
             name: 'Weight',
-            width: "80px",
+            width: "90px",
             center: "true",
             selector: row => row.Weight,
         },

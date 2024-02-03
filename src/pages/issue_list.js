@@ -77,14 +77,6 @@ function IssueList() {
         end_date: null
     });
 
-    axios.get(`${apiUrl}/issue/get-id`, {
-        headers: {
-            "Authorization": token
-        }
-    }).then((res) => {
-        setIssueId(res.data);
-    });
-
     const [isEdit, setIsEdit] = useState(false);
 
     const [open, setOpen] = useState(false);
@@ -93,7 +85,7 @@ function IssueList() {
 
     const [deleteId, setDeleteId] = useState('');
 
-    const [issueId, setIssueId] = useState('');
+    // const [issueId, setIssueId] = useState('');
 
     const auth = useAuthUser();
 
@@ -265,6 +257,16 @@ function IssueList() {
 
     const handleSubmit = async () => {
         if (validateForm()) {
+            var issueId = '';
+
+            await axios.get(`${apiUrl}/issue/get-id`, {
+                headers: {
+                    "Authorization": token
+                }
+            }).then((res) => {
+                issueId = res.data;
+            });
+
             addIssue({
                 ...formData,
                 issueNo: issueId,
@@ -299,6 +301,16 @@ function IssueList() {
 
     const handleSave = async () => {
         if (validateForm()) {
+            var issueId = '';
+
+            await axios.get(`${apiUrl}/issue/get-id`, {
+                headers: {
+                    "Authorization": token
+                }
+            }).then((res) => {
+                issueId = res.data;
+            });
+
             addIssue({
                 ...formData,
                 issueNo: issueId,

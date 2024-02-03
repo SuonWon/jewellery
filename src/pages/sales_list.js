@@ -75,14 +75,6 @@ function SalesList() {
         end_date: null
     });
 
-    axios.get(apiUrl + '/sales/get-id', {
-        headers: {
-            "Authorization": token
-        }
-    }).then((res) => {
-        setSalesId(res.data);
-    });
-
     const [removeSales] = useRemoveSalesMutation();
 
     const [addSales] = useAddSalesMutation();
@@ -97,7 +89,7 @@ function SalesList() {
 
     const [openDelete, setOpenDelete] = useState(false);
 
-    const [salesId, setSalesId] = useState("");
+    // const [salesId, setSalesId] = useState("");
 
     const [tBodyData, setTBodyData] = useState([]);
 
@@ -318,6 +310,16 @@ function SalesList() {
 
     const handleSubmit = async () => {
         if (validateForm()) {
+
+            var salesId = '';
+            await axios.get(apiUrl + '/sales/get-id', {
+                headers: {
+                    "Authorization": token
+                }
+            }).then((res) => {
+                salesId = res.data;
+            });
+
             addSales({
                 ...formData,
                 invoiceNo: salesId,
@@ -368,6 +370,17 @@ function SalesList() {
 
     const handleSave = async () => {
         if (validateForm()) {
+
+            var salesId = '';
+
+            await axios.get(apiUrl + '/sales/get-id', {
+                headers: {
+                    "Authorization": token
+                }
+            }).then((res) => {
+                salesId = res.data;
+            });
+
             addSales({
                 ...formData,
                 invoiceNo: salesId,
