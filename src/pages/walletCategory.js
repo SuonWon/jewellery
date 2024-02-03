@@ -12,6 +12,8 @@ import TableList from "../components/data_table";
 import { useAuthUser } from "react-auth-kit";
 import { AuthContent } from "../context/authContext";
 import { useNavigate } from "react-router-dom";
+import { pause } from "../const";
+import SuccessAlert from "../components/success_alert";
 
 const validator = require('validator');
 
@@ -49,6 +51,14 @@ function WalletCategory() {
         skip: 0,
         take: 10,
         search: ''
+    });
+
+    const [alertMsg, setAlertMsg] = useState({
+        visible: false,
+        title: '',
+        message: '',
+        isError: false,
+        isWarning: false,
     });
 
     const {data, isLoading: dataLoad} = useFetchWalletCategoryQuery(filterData);
@@ -109,12 +119,48 @@ function WalletCategory() {
                 saveData.categoryCode = formData.categoryCode
             }
 
-            isEdit ? await editCategory(saveData) : await addCategory(saveData);
-
+            isEdit ? await editCategory(saveData).then((res) => {
+                if(res.data) {
+                    setAlertMsg({
+                        ...alertMsg,
+                        visible: true,
+                        title: "Success",
+                        message: "Wallet category updated successfully.",
+                    });
+                } else {
+                    setAlertMsg({
+                        ...alertMsg,
+                        visible: true,
+                        title: "Error",
+                        message: res.error.data.message,
+                        isError: true,
+                    });
+                }
+            }) : await addCategory(saveData).then((res) => {
+                if(res.data) {
+                    setAlertMsg({
+                        ...alertMsg,
+                        visible: true,
+                        title: "Success",
+                        message: "Wallet category created successfully.",
+                    });
+                } else {
+                    setAlertMsg({
+                        ...alertMsg,
+                        visible: true,
+                        title: "Error",
+                        message: res.error.data.message,
+                        isError: true,
+                    });
+                }
+            });
             setOpen(isNew);
-
-            setFormData(resetData)
-
+            setFormData(resetData);
+            await pause();
+            setAlertMsg({
+                ...alertMsg,
+                visible: false,
+            });
         }
     }
 
@@ -126,7 +172,29 @@ function WalletCategory() {
             updatedAt: moment().toISOString(),
             updatedBy: auth().username
         }
-        await editCategory(saveData);
+        await editCategory(saveData).then((res) => {
+            if(res.data) {
+                setAlertMsg({
+                    ...alertMsg,
+                    visible: true,
+                    title: "Success",
+                    message: "Wallet category updated successfully.",
+                });
+            } else {
+                setAlertMsg({
+                    ...alertMsg,
+                    visible: true,
+                    title: "Error",
+                    message: res.error.data.message,
+                    isError: true,
+                });
+            }
+        });
+        await pause();
+        setAlertMsg({
+            ...alertMsg,
+            visible: false,
+        });
     }
 
     function handleEdit(id) {
@@ -138,8 +206,30 @@ function WalletCategory() {
 
     async function handleDelete() {
         console.log(deleteId);
-        await removeCategory(deleteId);
+        await removeCategory(deleteId).then((res) => {
+            if(res.data) {
+                setAlertMsg({
+                    ...alertMsg,
+                    visible: true,
+                    title: "Success",
+                    message: "Wallet category deleted successfully.",
+                });
+            } else {
+                setAlertMsg({
+                    ...alertMsg,
+                    visible: true,
+                    title: "Error",
+                    message: "This data cannot be deleted.",
+                    isError: true,
+                });
+            }
+        });
         setOpenDelete(!openDelete);
+        await pause();
+        setAlertMsg({
+            ...alertMsg,
+            visible: false,
+        });
     }
 
     const column = [
@@ -222,6 +312,11 @@ function WalletCategory() {
 
     return(
         <div className="flex flex-col gap-4 px-4 relative w-full">
+            <div className="w-78 absolute top-0 right-0 z-[9999]">
+                {
+                    alertMsg.visible? <SuccessAlert title={alertMsg.title} message={alertMsg.message} isError={alertMsg.isError}  /> : ""
+                }
+            </div>
             <SectionTitle title="Wallet Category" handleModal={openModal} permission={catePermission?.create}/>
             <Card className="h-auto shadow-md min-w-[100%] max-w-[100%] mx-1 rounded-sm p-2 border-t">
                 <CardBody className="rounded-sm overflow-auto p-0">
@@ -295,6 +390,9 @@ function WalletCategory() {
             </Card>
             <Dialog open={open} handler={openModal} size="sm">
                 <DialogBody>
+                    {
+                        alertMsg.visible? <SuccessAlert title={alertMsg.title} message={alertMsg.message} isError={alertMsg.isError}  /> : ""
+                    }
                     <ModalTitle titleName={isEdit ? "Edit Wallet Category" : "Wallet Category"} handleClick={openModal} />
                     <div  className="flex flex-col p-3 gap-4">
                         {/* <Switch label="Active" color="deep-purple" defaultChecked /> */}

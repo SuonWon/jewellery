@@ -13,6 +13,8 @@ import { useAuthUser } from "react-auth-kit";
 import { GoEye, GoEyeClosed } from "react-icons/go";
 import { useNavigate } from "react-router-dom";
 import { AuthContent } from "../context/authContext";
+import { pause } from "../const";
+import SuccessAlert from "../components/success_alert";
 
 var bcrypt = require('bcryptjs');
 const validator = require("validator");
@@ -45,6 +47,14 @@ function SystemUser() {
         skip: 0,
         take: 0,
         search: ''
+    });
+
+    const [alertMsg, setAlertMsg] = useState({
+        visible: false,
+        title: '',
+        message: '',
+        isError: false,
+        isWarning: false,
     });
 
     const { data: dataCount } = useFetchUsersCountQuery(filterData); 
@@ -87,7 +97,6 @@ function SystemUser() {
     var salt = bcrypt.genSaltSync(10);
 
     const handleChange = async (e) => {
-        
         let user = data.find((user) => user.username == e.target.id);
         await editUser({
             username: user.username,
@@ -101,9 +110,28 @@ function SystemUser() {
             updatedAt: moment().toISOString(),
             updatedBy: auth().username,
         }).then((res) => {
-            console.log(res);
+            if(res.data) {
+                setAlertMsg({
+                    ...alertMsg,
+                    visible: true,
+                    title: "Success",
+                    message: "System user updated successfully.",
+                });
+            } else {
+                setAlertMsg({
+                    ...alertMsg,
+                    visible: true,
+                    title: "Error",
+                    message: res.error.data.message,
+                    isError: true,
+                });
+            }
         });
-
+        await pause();
+        setAlertMsg({
+            ...alertMsg,
+            visible: false,
+        });
     };
 
     const openModal = () => {
@@ -136,23 +164,63 @@ function SystemUser() {
                 ...formData,
                 password: hash
             }).then((res) => {
-                console.log(res);
+                if(res.data) {
+                    setAlertMsg({
+                        ...alertMsg,
+                        visible: true,
+                        title: "Success",
+                        message: "System user created successfully.",
+                    });
+                } else {
+                    setAlertMsg({
+                        ...alertMsg,
+                        visible: true,
+                        title: "Error",
+                        message: res.error.data.message,
+                        isError: true,
+                    });
+                }
             });
             setFormData(userInfo);
             setOpen(!open);
+            await pause();
+            setAlertMsg({
+                ...alertMsg,
+                visible: false,
+            });
         }
     };
 
-    const onSaveSubmit = () => {
+    const onSaveSubmit = async () => {
         var hash = bcrypt.hashSync(formData.password, salt);
         if (validateForm()) {
             addUser({
                 ...formData,
                 password: hash
             }).then((res) => {
-                console.log(res);
+                if(res.data) {
+                    setAlertMsg({
+                        ...alertMsg,
+                        visible: true,
+                        title: "Success",
+                        message: "System user created successfully.",
+                    });
+                } else {
+                    setAlertMsg({
+                        ...alertMsg,
+                        visible: true,
+                        title: "Error",
+                        message: res.error.data.message,
+                        isError: true,
+                    });
+                }
             });
-            setFormData(userInfo)
+            setFormData(userInfo);
+            await pause();
+            setAlertMsg({
+                ...alertMsg,
+                visible: false,
+            });
         }
     };
 
@@ -176,14 +244,56 @@ function SystemUser() {
             updatedAt: moment().toISOString(),
             updatedBy: auth().username,
         }).then((res) => {
-            console.log(res);
+            if(res.data) {
+                setAlertMsg({
+                    ...alertMsg,
+                    visible: true,
+                    title: "Success",
+                    message: "System role updated successfully.",
+                });
+            } else {
+                setAlertMsg({
+                    ...alertMsg,
+                    visible: true,
+                    title: "Error",
+                    message: res.error.data.message,
+                    isError: true,
+                });
+            }
         });
         setOpen(!open);
+        await pause();
+        setAlertMsg({
+            ...alertMsg,
+            visible: false,
+        });
     };
 
     const handleRemove = async (id) => {
-        removeUser(id).then((res) => {console.log(res)});
+        removeUser(id).then((res) => {
+            if(res.data) {
+                setAlertMsg({
+                    ...alertMsg,
+                    visible: true,
+                    title: "Success",
+                    message: "System role deleted successfully.",
+                });
+            } else {
+                setAlertMsg({
+                    ...alertMsg,
+                    visible: true,
+                    title: "Error",
+                    message: "This data cannot be deleted.",
+                    isError: true,
+                });
+            }
+        });
         setOpenDelete(!openDelete);
+        await pause();
+        setAlertMsg({
+            ...alertMsg,
+            visible: false,
+        });
     };
 
     const handleDeleteBtn = (id) => {
@@ -298,6 +408,11 @@ function SystemUser() {
         {
             userPermission != null && userPermission != undefined ? (
                 <div className="flex flex-col gap-4 relative max-w-[85%] min-w-[85%]">
+                    <div className="w-78 absolute top-0 right-0 z-[9999]">
+                        {
+                            alertMsg.visible? <SuccessAlert title={alertMsg.title} message={alertMsg.message} isError={alertMsg.isError}  /> : ""
+                        }
+                    </div>
                     <SectionTitle title="System User" handleModal={openModal} permission={userPermission?.create}/>
                     <Card className="h-auto shadow-md max-w-screen-xxl rounded-sm p-2 border-t mb-5">
                         <CardBody className="rounded-sm overflow-auto p-0">
@@ -371,6 +486,9 @@ function SystemUser() {
                     </Card>
                     <Dialog open={Boolean(open)} handler={openModal} size="sm">
                         <DialogBody>
+                            {
+                                alertMsg.visible? <SuccessAlert title={alertMsg.title} message={alertMsg.message} isError={alertMsg.isError}  /> : ""
+                            }
                             <ModalTitle titleName={isEdit ? "Edit User" : "Create User"} handleClick={openModal} />
                             <form  className="flex flex-col items-end p-3 gap-2">
                                 <div className="grid grid-cols-2 gap-2 mb-3 w-full">

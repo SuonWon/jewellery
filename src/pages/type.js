@@ -12,6 +12,8 @@ import TableList from "../components/data_table";
 import { useAuthUser } from "react-auth-kit";
 import { AuthContent } from "../context/authContext";
 import { useNavigate } from "react-router-dom";
+import SuccessAlert from "../components/success_alert";
+import { pause } from "../const";
 
 const validator = require('validator');
 
@@ -43,6 +45,14 @@ function StoneType() {
         skip: 0,
         take: 10,
         search: ''
+    });
+
+    const [alertMsg, setAlertMsg] = useState({
+        visible: false,
+        title: '',
+        message: '',
+        isError: false,
+        isWarning: false,
     });
 
     const {data, isLoading: dataLoad} = useFetchTypeQuery(filterData);
@@ -109,17 +119,54 @@ function StoneType() {
                 saveData.typeCode= stoneType.typeCode
             }
 
-            isEdit ? await editType(saveData) : await addType(saveData);
-
+            isEdit ? await editType(saveData).then((res) => {
+                if(res.data) {
+                    setAlertMsg({
+                        ...alertMsg,
+                        visible: true,
+                        title: "Success",
+                        message: "Stone type updated successfully.",
+                    });
+                } else {
+                    setAlertMsg({
+                        ...alertMsg,
+                        visible: true,
+                        title: "Error",
+                        message: res.error.data.message,
+                        isError: true,
+                    });
+                }
+            }) : await addType(saveData).then((res) => {
+                if(res.data) {
+                    setAlertMsg({
+                        ...alertMsg,
+                        visible: true,
+                        title: "Success",
+                        message: "Stone type created successfully.",
+                    });
+                } else {
+                    setAlertMsg({
+                        ...alertMsg,
+                        visible: true,
+                        title: "Error",
+                        message: res.error.data.message,
+                        isError: true,
+                    });
+                }
+            });
             setOpen(isNew);
-
             setStoneType({
                 typeCode: 0,
                 typeDesc: '',
                 status: true,
                 createdAt: moment().toISOString(),
                 createdBy: auth().username,
-            })
+            });
+            await pause();
+            setAlertMsg({
+                ...alertMsg,
+                visible: false,
+            });
         }
     }
 
@@ -131,7 +178,29 @@ function StoneType() {
             updatedAt: moment().toISOString(),
             updatedBy: auth().username
         }
-        await editType(saveData);
+        await editType(saveData).then((res) => {
+            if(res.data) {
+                setAlertMsg({
+                    ...alertMsg,
+                    visible: true,
+                    title: "Success",
+                    message: "Stone type updated successfully.",
+                });
+            } else {
+                setAlertMsg({
+                    ...alertMsg,
+                    visible: true,
+                    title: "Error",
+                    message: res.error.data.message,
+                    isError: true,
+                });
+            }
+        });
+        await pause();
+        setAlertMsg({
+            ...alertMsg,
+            visible: false,
+        });
     }
 
     function handleEdit(id) {
@@ -142,8 +211,30 @@ function StoneType() {
     }
 
     async function handleDelete() {
-        await removeType(deleteId);
+        await removeType(deleteId).then((res) => {
+            if(res.data) {
+                setAlertMsg({
+                    ...alertMsg,
+                    visible: true,
+                    title: "Success",
+                    message: "Stone type deleted successfully.",
+                });
+            } else {
+                setAlertMsg({
+                    ...alertMsg,
+                    visible: true,
+                    title: "Error",
+                    message: "This data cannot be deleted.",
+                    isError: true,
+                });
+            }
+        });
         setOpenDelete(!openDelete);
+        await pause();
+        setAlertMsg({
+            ...alertMsg,
+            visible: false,
+        });
     }
 
     const column = [
@@ -220,7 +311,11 @@ function StoneType() {
             {
                 typePermission != null && typePermission != undefined ? (
                     <div className="flex flex-col gap-4 px-4 w-full relative">
-                        
+                        <div className="w-78 absolute top-0 right-0 z-[9999]">
+                            {
+                                alertMsg.visible? <SuccessAlert title={alertMsg.title} message={alertMsg.message} isError={alertMsg.isError}  /> : ""
+                            }
+                        </div>
                         <SectionTitle title="Stone Type" handleModal={openModal} permission={typePermission?.create}/>
                         <Card className="h-auto shadow-md min-w-[100%] max-w-[100%] mx-1 rounded-sm p-2 border-t">
                             <CardBody className="rounded-sm overflow-auto p-0">
@@ -294,6 +389,9 @@ function StoneType() {
                         </Card>
                         <Dialog open={Boolean(open)} handler={openModal} size="sm">
                             <DialogBody>
+                                {
+                                    alertMsg.visible? <SuccessAlert title={alertMsg.title} message={alertMsg.message} isError={alertMsg.isError}  /> : ""
+                                }
                                 <ModalTitle titleName={isEdit ? "Edit Stone Type" : "Stone Type"} handleClick={openModal} />
                                 <div  className="flex flex-col p-3">
                                     {/* <Switch label="Active" color="deep-purple" defaultChecked /> */}

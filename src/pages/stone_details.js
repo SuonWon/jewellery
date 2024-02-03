@@ -11,7 +11,7 @@ import moment from "moment";
 import TableList from "../components/data_table";
 import { useAuthUser } from "react-auth-kit";
 import SuccessAlert from "../components/success_alert";
-import { apiUrl, focusSelect, sizeUnit } from "../const";
+import { apiUrl, focusSelect, pause, sizeUnit } from "../const";
 import DataTable from "react-data-table-component";
 import axios from "axios";
 import Cookies from "js-cookie";
@@ -93,12 +93,12 @@ function StoneDetails() {
 
     const [ currentPage, setCurrentPage] = useState(1);
 
-    const [ alert, setAlert] = useState({
-        isAlert: false,
+    const [alertMsg, setAlertMsg] = useState({
+        visible: false,
+        title: '',
         message: '',
-        isWarning: false,
         isError: false,
-        title: ""
+        isWarning: false,
     });
 
     const [selectOption, setSelectOption] = useState({
@@ -215,33 +215,27 @@ function StoneDetails() {
 
     const onSubmit = async () => {
         if(validateForm()) {
-            console.log(formData);
-            try {
                 console.log("Ji");
                 addStoneDetail({
                     ...formData,
                     stoneDesc: `${description.stoneDesc} ${description.size}${description.sizeUnit} ${description.gradeDesc} ${description.brightDesc}`,
                 }).then((res) => {
-                    if(res.error != null) {
-                        let message = '';
-                        if(res.error.data.statusCode == 409) {
-                            message = "Duplicate data found."
-                        }
-                        else {
-                            message = res.error.data.message
-                        }
-                        setAlert({
-                            isAlert: true,
-                            message: message
-                        })
-                        setTimeout(() => {
-                            setAlert({
-                                isAlert: false,
-                                message: ''
-                            })
-                        }, 2000);
+                    if(res.data) {
+                        setAlertMsg({
+                            ...alertMsg,
+                            visible: true,
+                            title: "Success",
+                            message: "Stone selection created successfully.",
+                        });
+                    } else {
+                        setAlertMsg({
+                            ...alertMsg,
+                            visible: true,
+                            title: "Error",
+                            message: res.error.data.message,
+                            isError: true,
+                        });
                     }
-                    
                 });
                 if (purchaseStatus) {
                     updatePStatus({
@@ -252,65 +246,57 @@ function StoneDetails() {
                 setPurchaseStatus(false);
                 setFormData(stoneDetail);
                 setOpen(!open);
-                
-            }
-            catch(err) {
-                console.log(err.statusCode);
-                
-            }
+                await pause();
+                setAlertMsg({
+                    ...alertMsg,
+                    visible: false,
+                });
         }
     };
 
-    const onSaveSubmit = () => {
+    const onSaveSubmit = async () => {
         if (validateForm()) {
-            try {
-                addStoneDetail({
-                    ...formData,
-                    stoneDesc: `${description.stoneDesc} ${description.size}${description.sizeUnit} ${description.gradeDesc} ${description.brightDesc}`,
-                }).then((res) => {
-
-                    if(res.error != null) {
-                        setOpen(!open);
-                        let message = '';
-                        if(res.error.data.statusCode == 409) {
-                            message = "Duplicate data found."
-                        }
-                        else {
-                            message = res.error.data.message
-                        }
-                        setAlert({
-                            isAlert: true,
-                            message: message
-                        })
-                        
-                        setTimeout(() => {
-                            setAlert({
-                                isAlert: false,
-                                message: ''
-                            })
-                        }, 2000);
-                    }
-                });
-                if (purchaseStatus) {
-                    updatePStatus({
-                        id: formData.referenceNo,
-                        updatedBy: auth().username,
+            addStoneDetail({
+                ...formData,
+                stoneDesc: `${description.stoneDesc} ${description.size}${description.sizeUnit} ${description.gradeDesc} ${description.brightDesc}`,
+            }).then((res) => {
+                if(res.data) {
+                    setAlertMsg({
+                        ...alertMsg,
+                        visible: true,
+                        title: "Success",
+                        message: "Stone selection created successfully.",
+                    });
+                } else {
+                    setAlertMsg({
+                        ...alertMsg,
+                        visible: true,
+                        title: "Error",
+                        message: res.error.data.message,
+                        isError: true,
                     });
                 }
-                setPurchaseStatus(false);
-                setFormData(stoneDetail);
-                setDescription({
-                    stoneDesc: "",
-                    brightDesc: "",
-                    gradeDesc: "",
-                    size: "",
-                    sizeUnit: "လုံးစီး",
+            });
+            if (purchaseStatus) {
+                updatePStatus({
+                    id: formData.referenceNo,
+                    updatedBy: auth().username,
                 });
             }
-            catch(err) {
-                console.log(err.statusCode);
-            }
-            
+            setPurchaseStatus(false);
+            setFormData(stoneDetail);
+            setDescription({
+                stoneDesc: "",
+                brightDesc: "",
+                gradeDesc: "",
+                size: "",
+                sizeUnit: "လုံးစီး",
+            });
+            await pause();
+            setAlertMsg({
+                ...alertMsg,
+                visible: false,
+            });
         }
     };
 
@@ -390,7 +376,22 @@ function StoneDetails() {
                 createdBy: formData.createdBy,
                 updatedBy: auth().username,
             }).then((res) => {
-                console.log(res);
+                if(res.data) {
+                    setAlertMsg({
+                        ...alertMsg,
+                        visible: true,
+                        title: "Success",
+                        message: "Stone selection updated successfully.",
+                    });
+                } else {
+                    setAlertMsg({
+                        ...alertMsg,
+                        visible: true,
+                        title: "Error",
+                        message: res.error.data.message,
+                        isError: true,
+                    });
+                }
             });
             if(purchaseStatus !== purchase.isComplete && formData.referenceNo !== "") {
                 console.log(purchaseStatus);
@@ -403,6 +404,11 @@ function StoneDetails() {
                 });
             }
             setOpen(!open);
+            await pause();
+            setAlertMsg({
+                ...alertMsg,
+                visible: false,
+            });
         }
     };
 
@@ -427,14 +433,55 @@ function StoneDetails() {
             createdBy: stoneDetail.createdBy,
             updatedBy: auth().username,
         }).then((res) => {
-            console.log(res);
+            if(res.data) {
+                setAlertMsg({
+                    ...alertMsg,
+                    visible: true,
+                    title: "Success",
+                    message: "Stone selection updated successfully.",
+                });
+            } else {
+                setAlertMsg({
+                    ...alertMsg,
+                    visible: true,
+                    title: "Error",
+                    message: res.error.data.message,
+                    isError: true,
+                });
+            }
         });
-
+        await pause();
+        setAlertMsg({
+            ...alertMsg,
+            visible: false,
+        });
     };
 
     const handleRemove = async (id) => {
-        removeStoneDetail(id).then((res) => {console.log(res)});
+        removeStoneDetail(id).then((res) => {
+            if(res.data) {
+                setAlertMsg({
+                    ...alertMsg,
+                    visible: true,
+                    title: "Success",
+                    message: "Stone selection deleted successfully.",
+                });
+            } else {
+                setAlertMsg({
+                    ...alertMsg,
+                    visible: true,
+                    title: "Error",
+                    message: "This data cannot be deleted.",
+                    isError: true,
+                });
+            }
+        });
         setOpenDelete(!openDelete);
+        await pause();
+        setAlertMsg({
+            ...alertMsg,
+            visible: false,
+        });
     };
 
     // const handleDeleteBtn = (id) => {
@@ -527,7 +574,6 @@ function StoneDetails() {
             .then((res) => {
                 console.log(res.data);
                 if(res.error == null) {
-                    console.log("Hello");
                     saveData.map(el => {
                         console.log(el);
                         editStoneDetail({
@@ -556,20 +602,17 @@ function StoneDetails() {
             });
             setOpenCombineStock(!openCombineStock)
         }else {
-            setAlert({
-                isAlert: true,
+            setAlertMsg({
+                visible: true,
                 message: "Please select at least two items to continue.",
                 isWarning: true,
                 title: "Warning"
             });
-            setTimeout(() => {
-                setAlert({
-                    isAlert: false,
-                    message: '',
-                    isWarning: false,
-                    title: ''
-                })
-            }, 2000);
+            await pause();
+            setAlertMsg({
+                ...alertMsg,
+                visible: true,
+            })
         }
     };
 
@@ -708,7 +751,7 @@ function StoneDetails() {
                     {
                         selectionPermission?.update ? (
                             <>
-                                <div className="border-r border-gray-400 pr-2">
+                                <div className="border-r border-gray-400 pl-3 pr-2">
                                     <div class="custom-checkbox">
                                         <input class="input-checkbox" checked={row.Status} id={row.Code} type="checkbox" onChange={handleChange} />
                                         <label for={row.Code}></label>
@@ -832,7 +875,7 @@ function StoneDetails() {
                     <SectionTitle title="Stone Details" handleModal={openModal} permission={selectionPermission?.create}/>
                     <div className="w-78 absolute top-0 right-0 z-[9999]">
                         {
-                            alert.isAlert && <SuccessAlert title="Stone Details" message={alert.message} isError={true} />
+                            alertMsg.visible? <SuccessAlert title={alertMsg.title} message={alertMsg.message} isError={alertMsg.isError}  /> : ""
                         }
                     </div>
                     <Card className="h-[auto] shadow-md max-w-screen-xxl rounded-sm p-2 border-t">
@@ -909,7 +952,7 @@ function StoneDetails() {
                         <DialogBody>
                             <ModalTitle titleName={isEdit ? "Edit Stone Detail" : "Create Stone Detail"} handleClick={openModal} />
                             {
-                                alert.isAlert? <SuccessAlert title={alert.title} message={alert.message} isWarning={alert.isWarning} /> : ""
+                                alertMsg.visible? <SuccessAlert title={alertMsg.title} message={alertMsg.message} isError={alertMsg.isError}  /> : ""
                             }
                             <form  className="flex flex-col p-3 gap-4">
                                 <div className="grid grid-cols-4 gap-2">
@@ -995,22 +1038,19 @@ function StoneDetails() {
                                                     className="border border-blue-gray-200 w-[20px] h-[20px] py-1.5 rounded-md text-black"
                                                     checked={purchaseStatus}
                                                     disabled={isCombined}
-                                                    onChange={() => {
+                                                    onChange={async () => {
                                                         if (formData.referenceNo === "") {
-                                                            setAlert({
-                                                                isAlert: true,
+                                                            setAlertMsg({
+                                                                visible: true,
                                                                 message: "Please select reference no.",
                                                                 isWarning: true,
                                                                 title: "Warning"
                                                             });
-                                                            setTimeout(() => {
-                                                                setAlert({
-                                                                    isAlert: false,
-                                                                    message: '',
-                                                                    isWarning: false,
-                                                                    title: ''
-                                                                })
-                                                            }, 2000);
+                                                            await pause();
+                                                            setAlertMsg({
+                                                                ...alertMsg,
+                                                                visible: false
+                                                            });
                                                         } else {
                                                             setPurchaseStatus(!purchaseStatus);
                                                         }

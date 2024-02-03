@@ -9,9 +9,10 @@ import ModalTitle from "../components/modal_title";
 import moment from "moment";
 import TableList from "../components/data_table";
 import { useAuthUser } from "react-auth-kit";
-import { moduleName } from "../const";
+import { moduleName, pause } from "../const";
 import { useNavigate } from "react-router-dom";
 import { AuthContent } from "../context/authContext";
+import SuccessAlert from "../components/success_alert";
 
 const validator = require("validator");
 
@@ -80,24 +81,15 @@ function SystemRole() {
         permissions: [],
     }
 
+    const [alertMsg, setAlertMsg] = useState({
+        visible: false,
+        title: '',
+        message: '',
+        isError: false,
+        isWarning: false,
+    });
+
     const [formData, setFormData] = useState(userInfo);
-
-    // const handleChange = async (e) => {
-        
-    //     let role = data.find((role) => role.roleCode == e.target.id);
-    //     await editRole({
-    //         roleDesc: role.roleDesc,
-    //         remark: role.remark,
-    //         permission: role.permission,
-    //         createdAt: role.createdAt,
-    //         createdBy: role.createdBy,
-    //         updatedAt: moment().toISOString(),
-    //         updatedBy: auth().username,
-    //     }).then((res) => {
-    //         console.log(res);
-    //     });
-
-    // };
 
     const openModal = () => {
         setIsEdit(false);
@@ -131,14 +123,34 @@ function SystemRole() {
                     }
                 })
             }).then((res) => {
-                console.log(res);
+                if(res.data) {
+                    setAlertMsg({
+                        ...alertMsg,
+                        visible: true,
+                        title: "Success",
+                        message: "System role created successfully.",
+                    });
+                } else {
+                    setAlertMsg({
+                        ...alertMsg,
+                        visible: true,
+                        title: "Error",
+                        message: res.error.data.message,
+                        isError: true,
+                    });
+                }
             });
             setFormData(userInfo);
             setOpen(!open);
+            await pause();
+            setAlertMsg({
+                ...alertMsg,
+                visible: false,
+            });
         }
     };
 
-    const onSaveSubmit = () => {
+    const onSaveSubmit = async () => {
         if (validateForm()) {
             addRole({
                 ...formData,
@@ -152,9 +164,29 @@ function SystemRole() {
                     }
                 })
             }).then((res) => {
-                console.log(res);
+                if(res.data) {
+                    setAlertMsg({
+                        ...alertMsg,
+                        visible: true,
+                        title: "Success",
+                        message: "System role created successfully.",
+                    });
+                } else {
+                    setAlertMsg({
+                        ...alertMsg,
+                        visible: true,
+                        title: "Error",
+                        message: res.error.data.message,
+                        isError: true,
+                    });
+                }
             });
-            setFormData(userInfo)
+            setFormData(userInfo);
+            await pause();
+            setAlertMsg({
+                ...alertMsg,
+                visible: false,
+            });
         }
     };
 
@@ -199,9 +231,29 @@ function SystemRole() {
                 }
             }),
         }).then((res) => {
-            console.log(res);
+            if(res.data) {
+                setAlertMsg({
+                    ...alertMsg,
+                    visible: true,
+                    title: "Success",
+                    message: "System role updated successfully.",
+                });
+            } else {
+                setAlertMsg({
+                    ...alertMsg,
+                    visible: true,
+                    title: "Error",
+                    message: res.error.data.message,
+                    isError: true,
+                });
+            }
         });
         setOpen(!open);
+        await pause();
+        setAlertMsg({
+            ...alertMsg,
+            visible: false,
+        });
     };
 
     // const handleRemove = async (id) => {
@@ -284,6 +336,11 @@ function SystemRole() {
         {
             rolePermission != null && rolePermission != undefined ? (
                 <div className="flex flex-col gap-4 relative max-w-[85%] min-w-[85%]">
+                    <div className="w-78 absolute top-0 right-0 z-[9999]">
+                        {
+                            alertMsg.visible? <SuccessAlert title={alertMsg.title} message={alertMsg.message} isError={alertMsg.isError}  /> : ""
+                        }
+                    </div>
                     <SectionTitle title="System Role" handleModal={openModal} permission={rolePermission?.create}/>
                     <Card className="h-auto shadow-md max-w-screen-xxl rounded-sm p-2 border-t mb-5">
                         <CardBody className="rounded-sm overflow-auto p-0">
@@ -358,6 +415,9 @@ function SystemRole() {
                     <Dialog open={Boolean(open)} handler={openModal} size="lg">
                         <DialogBody>
                             <ModalTitle titleName={isEdit ? "Edit Role" : "Create Role"} handleClick={openModal} />
+                            {
+                                alertMsg.visible? <SuccessAlert title={alertMsg.title} message={alertMsg.message} isError={alertMsg.isError}  /> : ""
+                            }
                             <form  className="flex flex-col py-1 px-3 gap-2">
                                 <div className="grid grid-cols-3 gap-2 mb-3 w-full">
                                     {/* Username */}

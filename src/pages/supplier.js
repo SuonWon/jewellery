@@ -12,6 +12,8 @@ import TableList from "../components/data_table";
 import { useAuthUser } from "react-auth-kit";
 import { useNavigate } from "react-router-dom";
 import { AuthContent } from "../context/authContext";
+import { pause } from "../const";
+import SuccessAlert from "../components/success_alert";
 const validator = require("validator");
 
 function Supplier() {
@@ -40,6 +42,14 @@ function Supplier() {
         skip: 0,
         take: 10,
         search: ''
+    });
+
+    const [alertMsg, setAlertMsg] = useState({
+        visible: false,
+        title: '',
+        message: '',
+        isError: false,
+        isWarning: false,
     });
 
     const {data, isLoading: dataLoad} = useFetchSupplierQuery(filterData);
@@ -116,9 +126,28 @@ function Supplier() {
             updatedAt: moment().toISOString(),
             updatedBy: "",
         }).then((res) => {
-            console.log(res);
+            if(res.data) {
+                setAlertMsg({
+                    ...alertMsg,
+                    visible: true,
+                    title: "Success",
+                    message: "Supplier updated successfully.",
+                });
+            } else {
+                setAlertMsg({
+                    ...alertMsg,
+                    visible: true,
+                    title: "Error",
+                    message: res.error.data.message,
+                    isError: true,
+                });
+            }
         });
-
+        await pause();
+        setAlertMsg({
+            ...alertMsg,
+            visible: false,
+        });
     };
 
     const openModal = () => {
@@ -142,19 +171,59 @@ function Supplier() {
     const onSubmit = async () => {
         if(validateForm()) {
             addSupplier(formData).then((res) => {
-                console.log(res);
+                if(res.data) {
+                    setAlertMsg({
+                        ...alertMsg,
+                        visible: true,
+                        title: "Success",
+                        message: "Supplier created successfully.",
+                    });
+                } else {
+                    setAlertMsg({
+                        ...alertMsg,
+                        visible: true,
+                        title: "Error",
+                        message: res.error.data.message,
+                        isError: true,
+                    });
+                }
             });
             resetData();
             setOpen(!open);
+            await pause();
+            setAlertMsg({
+                ...alertMsg,
+                visible: false,
+            });
         }
     };
 
-    const onSaveSubmit = () => {
+    const onSaveSubmit = async () => {
         if (validateForm()) {
             addSupplier(formData).then((res) => {
-                console.log(res);
+                if(res.data) {
+                    setAlertMsg({
+                        ...alertMsg,
+                        visible: true,
+                        title: "Success",
+                        message: "Supplier created successfully.",
+                    });
+                } else {
+                    setAlertMsg({
+                        ...alertMsg,
+                        visible: true,
+                        title: "Error",
+                        message: res.error.data.message,
+                        isError: true,
+                    });
+                }
             });
             resetData();
+            await pause();
+            setAlertMsg({
+                ...alertMsg,
+                visible: false,
+            });
         }
     };
 
@@ -172,14 +241,56 @@ function Supplier() {
             updatedAt: moment().toISOString(),
             updatedBy: auth().username,
         }).then((res) => {
-            console.log(res);
+            if(res.data) {
+                setAlertMsg({
+                    ...alertMsg,
+                    visible: true,
+                    title: "Success",
+                    message: "Supplier updated successfully.",
+                });
+            } else {
+                setAlertMsg({
+                    ...alertMsg,
+                    visible: true,
+                    title: "Error",
+                    message: res.error.data.message,
+                    isError: true,
+                });
+            }
         });
         setOpen(!open);
+        await pause();
+        setAlertMsg({
+            ...alertMsg,
+            visible: false,
+        });
     };
 
     const handleRemove = async (id) => {
-        removeSupplier(id).then((res) => {console.log(res)});
+        removeSupplier(id).then((res) => {
+            if(res.data) {
+                setAlertMsg({
+                    ...alertMsg,
+                    visible: true,
+                    title: "Success",
+                    message: "Supplier deleted successfully.",
+                });
+            } else {
+                setAlertMsg({
+                    ...alertMsg,
+                    visible: true,
+                    title: "Error",
+                    message: "This data cannot be deleted.",
+                    isError: true,
+                });
+            }
+        });
         setOpenDelete(!openDelete);
+        await pause();
+        setAlertMsg({
+            ...alertMsg,
+            visible: false,
+        });
     };
 
     const handleDeleteBtn = (id) => {
@@ -318,6 +429,11 @@ function Supplier() {
         {
             supPermission != null && supPermission != undefined ? (
                 <div className="flex flex-col gap-4 relative max-w-[85%] min-w-[85%]">
+                    <div className="w-78 absolute top-0 right-0 z-[9999]">
+                        {
+                            alertMsg.visible? <SuccessAlert title={alertMsg.title} message={alertMsg.message} isError={alertMsg.isError}  /> : ""
+                        }
+                    </div>
                     <SectionTitle title="Suppliers" handleModal={openModal} permission={supPermission?.create}/>
                     <Card className="h-auto shadow-md max-w-screen-xxl rounded-sm p-2 border-t mb-5">
                         <CardBody className="rounded-sm overflow-auto p-0">
@@ -386,14 +502,17 @@ function Supplier() {
                                 </div>
                                 
                             </div>
-                            
                         </CardBody>
                     </Card>
                     <Dialog open={Boolean(open)} handler={openModal} size="lg">
                         <DialogBody>
+                            {
+                                alertMsg.visible? <SuccessAlert title={alertMsg.title} message={alertMsg.message} isError={alertMsg.isError}  /> : ""
+                            }
                             <ModalTitle titleName={isEdit ? "Edit Supplier" : "Create Supplier"} handleClick={openModal} />
                             <form  className="flex flex-col p-3 gap-2">
                                 <div className="grid grid-cols-3 gap-2 w-full">
+                                    {/* Name */}
                                     <div>
                                         <label className="text-black text-sm mb-2">Name</label>
                                         <input
@@ -411,6 +530,7 @@ function Supplier() {
                                             validationText.supplierName && <p className="block text-[12px] text-red-500 font-sans mb-2">{validationText.supplierName}</p>
                                         }
                                     </div>
+                                    {/* Contact Name */}
                                     <div>
                                         <label className="text-black text-sm mb-2">Contact Name</label>
                                         <input
@@ -427,6 +547,7 @@ function Supplier() {
                                     </div>
                                 </div>
                                 <div className="grid grid-cols-4 gap-2 w-full">
+                                    {/* Contact No */}
                                     <div>
                                         <label className="text-black text-sm mb-2">Contact No</label>
                                         <input
@@ -441,6 +562,7 @@ function Supplier() {
                                             }}
                                         />
                                     </div>
+                                    {/* Office No */}
                                     <div>
                                         <label className="text-black text-sm mb-2">Office No</label>
                                         <input
@@ -455,6 +577,7 @@ function Supplier() {
                                             }}
                                         />
                                     </div>
+                                    {/* Street */}
                                     <div className="col-span-2">
                                         <label className="text-black text-sm mb-2">Street</label>
                                         <input
@@ -471,6 +594,7 @@ function Supplier() {
                                     </div>
                                 </div>
                                 <div className="grid grid-cols-3 gap-2 w-full">
+                                    {/* Township */}
                                     <div>
                                         <label className="text-black text-sm mb-2">Township</label>
                                         <input
@@ -485,6 +609,7 @@ function Supplier() {
                                             }}
                                         />
                                     </div>
+                                    {/* City */}
                                     <div>
                                         <label className="text-black text-sm mb-2">City</label>
                                         <input
@@ -499,6 +624,7 @@ function Supplier() {
                                             }}
                                         />
                                     </div>
+                                    {/* Region */}
                                     <div>
                                         <label className="text-black text-sm mb-2">Region</label>
                                         <input
@@ -514,6 +640,7 @@ function Supplier() {
                                         />
                                     </div>
                                 </div>
+                                {/* Remark */}
                                 <div>
                                     <label className="text-black text-sm mb-2">Remark</label>
                                     <textarea

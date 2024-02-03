@@ -12,6 +12,8 @@ import TableList from "../components/data_table";
 import { useAuthUser } from "react-auth-kit";
 import { AuthContent } from "../context/authContext";
 import { useNavigate } from "react-router-dom";
+import SuccessAlert from "../components/success_alert";
+import { pause } from "../const";
 
 const validator = require('validator');
 
@@ -44,6 +46,14 @@ function Stone() {
         skip: 0,
         take: 10,
         search: ''
+    });
+
+    const [alertMsg, setAlertMsg] = useState({
+        visible: false,
+        title: '',
+        message: '',
+        isError: false,
+        isWarning: false,
     });
 
     const {data, isLoading: dataLoad} = useFetchStoneQuery(filterData);
@@ -115,7 +125,41 @@ function Stone() {
                 saveData.stoneCode = stone.stoneCode
             }
 
-            isEdit ? await editStone(saveData) : await addStone(saveData);
+            isEdit ? await editStone(saveData).then((res) => {
+                if(res.data) {
+                    setAlertMsg({
+                        ...alertMsg,
+                        visible: true,
+                        title: "Success",
+                        message: "Stone updated successfully.",
+                    });
+                } else {
+                    setAlertMsg({
+                        ...alertMsg,
+                        visible: true,
+                        title: "Error",
+                        message: res.error.data.message,
+                        isError: true,
+                    });
+                }
+            }) : await addStone(saveData).then((res) => {
+                if(res.data) {
+                    setAlertMsg({
+                        ...alertMsg,
+                        visible: true,
+                        title: "Success",
+                        message: "Stone created successfully.",
+                    });
+                } else {
+                    setAlertMsg({
+                        ...alertMsg,
+                        visible: true,
+                        title: "Error",
+                        message: res.error.data.message,
+                        isError: true,
+                    });
+                }
+            });
 
             setOpen(isNew);
 
@@ -126,7 +170,12 @@ function Stone() {
                 status: true,
                 createdAt: moment().toISOString(),
                 createdBy: auth().username,
-            })
+            });
+            await pause();
+            setAlertMsg({
+                ...alertMsg,
+                visible: false,
+            });
 
         }
     }
@@ -139,7 +188,29 @@ function Stone() {
             updatedAt: moment().toISOString(),
             updatedBy: auth().username
         }
-        await editStone(saveData);
+        await editStone(saveData).then((res) => {
+            if(res.data) {
+                setAlertMsg({
+                    ...alertMsg,
+                    visible: true,
+                    title: "Success",
+                    message: "Stone created successfully.",
+                });
+            } else {
+                setAlertMsg({
+                    ...alertMsg,
+                    visible: true,
+                    title: "Error",
+                    message: res.error.data.message,
+                    isError: true,
+                });
+            }
+        });
+        await pause();
+        setAlertMsg({
+            ...alertMsg,
+            visible: false,
+        });
     }
 
     function handleEdit(id) {
@@ -150,8 +221,30 @@ function Stone() {
     }
 
     async function handleDelete() {
-        await removeStone(deleteId);
+        await removeStone(deleteId).then((res) => {
+            if(res.data) {
+                setAlertMsg({
+                    ...alertMsg,
+                    visible: true,
+                    title: "Success",
+                    message: "Stone deleted successfully.",
+                });
+            } else {
+                setAlertMsg({
+                    ...alertMsg,
+                    visible: true,
+                    title: "Error",
+                    message: "This data cannot be deleted.",
+                    isError: true,
+                });
+            }
+        });
         setOpenDelete(!openDelete);
+        await pause();
+        setAlertMsg({
+            ...alertMsg,
+            visible: false,
+        });
     }
 
     const column = [
@@ -237,6 +330,11 @@ function Stone() {
             {
                 stonePermission != null && stonePermission != undefined ? (
                     <div className="flex flex-col gap-4 px-4 relative w-full">
+                        <div className="w-78 absolute top-0 right-0 z-[9999]">
+                            {
+                                alertMsg.visible? <SuccessAlert title={alertMsg.title} message={alertMsg.message} isError={alertMsg.isError}  /> : ""
+                            }
+                        </div>
                         <SectionTitle title="Stone" handleModal={openModal} permission={stonePermission?.create}/>
                         <Card className="h-auto shadow-md min-w-[100%] max-w-[100%] mx-1 rounded-sm p-2 border-t">
                             <CardBody className="rounded-sm overflow-auto p-0">
@@ -310,8 +408,10 @@ function Stone() {
                         </Card>
                         <Dialog open={open} handler={openModal} size="sm">
                             <DialogBody>
+                                {
+                                    alertMsg.visible? <SuccessAlert title={alertMsg.title} message={alertMsg.message} isError={alertMsg.isError}  /> : ""
+                                }
                                 <ModalTitle titleName={isEdit ? "Edit Stone" : "Stone"} handleClick={openModal} />
-            
                                 <div  className="flex flex-col p-3 gap-2">
                                     {/* <Switch label="Active" color="deep-purple" defaultChecked /> */}
                                     {/* Description */}

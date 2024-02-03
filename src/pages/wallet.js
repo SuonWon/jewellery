@@ -3,7 +3,7 @@ import { Button, Card, CardBody, Dialog, DialogBody, IconButton, Typography } fr
 import { FaCircleMinus, FaCirclePlus, FaEquals, FaFilter, FaFloppyDisk, FaTrashCan, FaXmark, } from "react-icons/fa6";
 import { BiReset } from "react-icons/bi"
 import { useContext, useEffect, useState } from "react";
-import { apiUrl, focusSelect, pause } from "../const";
+import { focusSelect, pause } from "../const";
 import { useAddWalletTransactionMutation, useFetchTrueShareQuery, useFetchTrueWalletCategoryQuery, useFetchTrueWalletQuery, useFetchWalletNamesQuery, useFetchWalletTransactionBalanceQuery, useFetchWalletTransactionCountQuery, useFetchWalletTransactionQuery, useRemoveWalletTransactionMutation, useUpdateWalletTransactionMutation } from "../store";
 import Pagination from "../components/pagination";
 import DeleteModal from "../components/delete_modal";
@@ -13,12 +13,8 @@ import TableList from "../components/data_table";
 import { useAuthUser } from "react-auth-kit";
 import ModalTitle from "../components/modal_title";
 import { v4 as uuidv4 } from 'uuid';
-import axios from "axios";
-import Cookies from "js-cookie";
 import { useNavigate } from "react-router-dom";
 import { AuthContent } from "../context/authContext";
-
-const token = 'Bearer ' + Cookies.get('_auth');
 
 const validator = require('validator');
 
@@ -53,8 +49,6 @@ function Wallet() {
 
     const { data, refetch, isLoading: dataLoad } = useFetchWalletTransactionQuery(filterForm);
 
-    console.log(data);
-
     const { data: dataCount } = useFetchWalletTransactionCountQuery(filterForm);
 
     const { data: walletBalance } = useFetchWalletTransactionBalanceQuery(filterForm);
@@ -66,7 +60,7 @@ function Wallet() {
     useEffect(() => {
         refetch();
         refetchShare();
-    }, []);
+    }, [data]);
 
     const auth = useAuthUser();
 
@@ -76,17 +70,9 @@ function Wallet() {
 
     const [openDelete, setOpenDelete] = useState(false);
 
-    const [isAlert, setIsAlert] = useState(false);
-
     const [isCashIn, setIsCashIn] = useState(true);
 
-    const [isCashOut, setIsCashOut] = useState(false);
-
-    const [isFilter, setIsFilter] = useState(false);
-
     const [openDateModal, setOpenDateModal] = useState(false);
-
-    const [filterData, setFilterData] = useState([]);
 
     const [removeTransaction] = useRemoveWalletTransactionMutation();
 
@@ -101,37 +87,13 @@ function Wallet() {
         endDate: ""
     });
 
-    const [ alert, setAlert] = useState({
-        isAlert: false,
+    const [alertMsg, setAlertMsg] = useState({
+        visible: false,
+        title: '',
         message: '',
-        isWarning: false,
         isError: false,
-        title: ""
+        isWarning: false,
     });
-
-    let totalCashIn = 0;
-    let totalCashOut = 0;
-    let total = 0;
-
-    if(isFilter) {
-        filterData.map((el) => {
-            total += el.amount;
-            if(el.cashType === "DEBIT") {
-                totalCashIn += el.amount;
-            } else if (el.cashType === "CREDIT") {
-                totalCashOut += el.amount;
-            }
-        });
-    } else {
-        data?.map((el) => {
-            total += el.amount;
-            if(el.cashType === "DEBIT") {
-                totalCashIn += el.amount;
-            } else if (el.cashType === "CREDIT") {
-                totalCashOut += el.amount;
-            }
-        });
-    }
 
     const transactionData = {
         id: "",
@@ -157,32 +119,35 @@ function Wallet() {
     const [ validationText, setValidationText ] = useState({});
 
     const handleRemove = async (id) => {
-        let removeData = {};
-        if(isFilter) {
-            removeData = filterData.find((el) => el.id === id);
-        } else {
-            removeData = data.find((el) => el.id === id);
-        }
-        console.log(removeData);
+        let removeData = data.find((el) => el.id === id);
         await removeTransaction({
             id: removeData.id,
             deletedAt: moment().toISOString(),
             deletedBy: auth().username
-        }).then((res) => { console.log(res) });
-        if(isFilter) {
-            axios.get(`${apiUrl}/transaction/get-all-transactions?status=true&walletCode=${removeData.walletCode}`, {
-                headers: {
-                    "Authorization": token
-                }
-            }).then((res) => {
-                setFilterData(res.data);
-                console.log(res.data);
-            });
-        }
-        setIsAlert(true);
+        }).then((res) => { 
+            if(res.data) {
+                setAlertMsg({
+                    ...alertMsg,
+                    visible: true,
+                    title: "Success",
+                    message: "Wallet transition deleted successfully.",
+                });
+            } else {
+                setAlertMsg({
+                    ...alertMsg,
+                    visible: true,
+                    title: "Error",
+                    message: "This cannot be deleted.",
+                    isError: true,
+                });
+            }
+         });
         setOpenDelete(!openDelete);
-        await pause(2000);
-        setIsAlert(false);
+        await pause();
+        setAlertMsg({
+            ...alertMsg,
+            visible: false,
+        });
     };
 
     const handleDeleteBtn = (id) => {
@@ -222,162 +187,138 @@ function Wallet() {
 
     }
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         console.log(formData)
         if (validateForm()) {
-            try {
-                addTransaction({
-                    id: uuidv4(),
-                    walletCode: formData.walletCode,
-                    date: moment(formData.date + "T" + formData.time).toISOString(),
-                    cashType: isCashIn? "DEBIT" : "CREDIT",
-                    categoryCode: formData.categoryCode,
-                    paymentMode: formData.paymentMode,
-                    amount: formData.amount,
-                    remark: formData.remark,
-                    status: formData.status,
-                    isSalesPruchase: formData.isSalesPruchase,
-                    createdBy: formData.createdBy,
-                    updatedBy: formData.updatedBy,
-                    deletedBy: formData.deletedBy,
-                }).then((res) => {
-                    if(res.error != null) {
-                        let message = '';
-                        if(res.error.data.statusCode == 409) {
-                            message = "Duplicate data found."
-                        }
-                        else {
-                            message = res.error.data.message
-                        }
-                        setAlert({
-                            isAlert: true,
-                            message: message
-                        })
-                        setTimeout(() => {
-                            setAlert({
-                                isAlert: false,
-                                message: ''
-                            })
-                        }, 2000);
-                    }
-                    
-                });
-                setFormData(transactionData);
-                setOpen(!open);
-                
-            }
-            catch(err) {
-                console.log(err.statusCode);
-                
-            }
+            addTransaction({
+                id: uuidv4(),
+                walletCode: formData.walletCode,
+                date: moment(formData.date + "T" + formData.time).toISOString(),
+                cashType: isCashIn? "DEBIT" : "CREDIT",
+                categoryCode: formData.categoryCode,
+                paymentMode: formData.paymentMode,
+                amount: formData.amount,
+                remark: formData.remark,
+                status: formData.status,
+                isSalesPruchase: formData.isSalesPruchase,
+                createdBy: formData.createdBy,
+                updatedBy: formData.updatedBy,
+                deletedBy: formData.deletedBy,
+            }).then((res) => {
+                if(res.data) {
+                    setAlertMsg({
+                        ...alertMsg,
+                        visible: true,
+                        title: "Success",
+                        message: "Wallet transition created successfully.",
+                    });
+                } else {
+                    setAlertMsg({
+                        ...alertMsg,
+                        visible: true,
+                        title: "Error",
+                        message: res.error.data.message,
+                        isError: true,
+                    });
+                }
+            });
             setFormData(transactionData);
             setOpen(!open);
+            await pause();
+            setAlertMsg({
+                ...alertMsg,
+                visible: false,
+            });
         }
     };
 
-    const handleSave = () => {
+    const handleSave = async () => {
         console.log(formData)
         if (validateForm()) {
-            try {
-                addTransaction({
-                    id: uuidv4(),
-                    walletCode: formData.walletCode,
-                    date: moment(formData.date + "T" + formData.time).toISOString(),
-                    cashType: isCashIn? "DEBIT" : "CREDIT",
-                    categoryCode: formData.categoryCode,
-                    paymentMode: formData.paymentMode,
-                    amount: formData.amount,
-                    remark: formData.remark,
-                    status: formData.status,
-                    isSalesPruchase: formData.isSalesPruchase,
-                    createdBy: formData.createdBy,
-                    updatedBy: formData.updatedBy,
-                    deletedBy: formData.deletedBy,
-                }).then((res) => {
-                    if(res.error != null) {
-                        let message = '';
-                        if(res.error.data.statusCode == 409) {
-                            message = "Duplicate data found."
-                        }
-                        else {
-                            message = res.error.data.message
-                        }
-                        setAlert({
-                            isAlert: true,
-                            message: message
-                        })
-                        setTimeout(() => {
-                            setAlert({
-                                isAlert: false,
-                                message: ''
-                            })
-                        }, 2000);
-                    }
-                    
-                });
-                setFormData(transactionData);
-                
-            }
-            catch(err) {
-                console.log(err.statusCode);
-                
-            }
+            addTransaction({
+                id: uuidv4(),
+                walletCode: formData.walletCode,
+                date: moment(formData.date + "T" + formData.time).toISOString(),
+                cashType: isCashIn? "DEBIT" : "CREDIT",
+                categoryCode: formData.categoryCode,
+                paymentMode: formData.paymentMode,
+                amount: formData.amount,
+                remark: formData.remark,
+                status: formData.status,
+                isSalesPruchase: formData.isSalesPruchase,
+                createdBy: formData.createdBy,
+                updatedBy: formData.updatedBy,
+                deletedBy: formData.deletedBy,
+            }).then((res) => {
+                if(res.data) {
+                    setAlertMsg({
+                        ...alertMsg,
+                        visible: true,
+                        title: "Success",
+                        message: "Wallet transition created successfully.",
+                    });
+                } else {
+                    setAlertMsg({
+                        ...alertMsg,
+                        visible: true,
+                        title: "Error",
+                        message: res.error.data.message,
+                        isError: true,
+                    });
+                }
+            });
             setFormData(transactionData);
+            await pause();
+            setAlertMsg({
+                ...alertMsg,
+                visible: false,
+            });
         }
     };
 
-    const handleUpdate = () => {
+    const handleUpdate = async () => {
         if (validateForm()) {
-            try {
-                console.log(formData);
-                updateTransaction({
-                    id: formData.id,
-                    walletCode: formData.walletCode,
-                    date: formData.date,
-                    cashType: isCashIn? "DEBIT" : "CREDIT",
-                    categoryCode: formData.categoryCode,
-                    paymentMode: formData.paymentMode,
-                    amount: formData.amount,
-                    remark: formData.remark,
-                    status: formData.status,
-                    isSalesPruchase: formData.isSalesPruchase,
-                    createdBy: formData.createdBy,
-                    createdAt: formData.createdDate,
-                    updatedBy: auth().username,
-                    updatedAt: moment().toISOString(),
-                    deletedBy: "",
-                }).then((res) => {
-                    if(res.error != null) {
-                        let message = '';
-                        if(res.error.data.statusCode == 409) {
-                            message = "Duplicate data found."
-                        }
-                        else {
-                            message = res.error.data.message
-                        }
-                        setAlert({
-                            isAlert: true,
-                            message: message
-                        })
-                        setTimeout(() => {
-                            setAlert({
-                                isAlert: false,
-                                message: ''
-                            })
-                        }, 2000);
-                    }
-                    
-                });
-                setFormData(transactionData);
-                setOpen(!open);
-                
-            }
-            catch(err) {
-                console.log(err.statusCode);
-                
-            }
+            updateTransaction({
+                id: formData.id,
+                walletCode: formData.walletCode,
+                date: formData.date,
+                cashType: isCashIn? "DEBIT" : "CREDIT",
+                categoryCode: formData.categoryCode,
+                paymentMode: formData.paymentMode,
+                amount: formData.amount,
+                remark: formData.remark,
+                status: formData.status,
+                isSalesPruchase: formData.isSalesPruchase,
+                createdBy: formData.createdBy,
+                createdAt: formData.createdDate,
+                updatedBy: auth().username,
+                updatedAt: moment().toISOString(),
+                deletedBy: "",
+            }).then((res) => {
+                if(res.data) {
+                    setAlertMsg({
+                        ...alertMsg,
+                        visible: true,
+                        title: "Success",
+                        message: "Wallet transition update successfully.",
+                    });
+                } else {
+                    setAlertMsg({
+                        ...alertMsg,
+                        visible: true,
+                        title: "Error",
+                        message: res.error.data.message,
+                        isError: true,
+                    });
+                }
+            });
             setFormData(transactionData);
             setOpen(!open);
+            await pause();
+            setAlertMsg({
+                ...alertMsg,
+                visible: false,
+            });
         }
     };
 
@@ -487,27 +428,7 @@ function Wallet() {
         },
     ];
 
-    const tbodyData = isFilter? filterData.map((el) => {
-        return {
-            id: el.id,
-            walletCode: el.walletCode,
-            walletName: el.wallet.walletName,
-            date: moment(el.date).format("YYYY-MM-DD hh:mm:ss"),
-            shareName: el.wallet.share.shareName,
-            cashType: el.cashType,
-            categoryCode: el.categoryCode,
-            categoryName: el.category.categoryDesc,
-            isSalesPruchase: el.isSalesPruchase,
-            paymentMode: el.paymentMode,
-            amount: el.amount.toLocaleString('en-US'),
-            remark: el.remark,
-            createdAt: moment(el.createdAt).format("YYYY-MM-DD hh:mm:ss a"),
-            createdBy: el.createdBy,
-            updatedAt: moment(el.updatedAt).format("YYYY-MM-DD hh:mm:ss a"),
-            updatedBy: el.updatedBy,
-            status: el.status,
-        }
-    }) : data?.map((wallet) => {
+    const tbodyData = data?.map((wallet) => {
         return {
             id: wallet.id,
             walletCode: wallet.walletCode,
@@ -535,11 +456,8 @@ function Wallet() {
             walletPermission != null && walletPermission != undefined ? (
                 <div className="flex flex-col gap-4 relative max-w-[85%] min-w-[85%]">
                     <div className="w-78 absolute top-0 right-0 z-[9999]">
-                        {/* {
-                            isAlert && <SuccessAlert title="Purchase" message="Delete successful." handleAlert={() => setIsAlert(false)} />
-                        } */}
                         {
-                            alert.isAlert? <SuccessAlert title={alert.title} message={alert.message} isWarning={alert.isWarning} /> : ""
+                            alertMsg.visible? <SuccessAlert title={alertMsg.title} message={alertMsg.message} isError={alertMsg.isError}  /> : ""
                         }
                     </div>
                     <div className="flex items-center py-3 bg-white gap-4 sticky top-0 z-10">
@@ -555,9 +473,8 @@ function Wallet() {
                                         color="green" 
                                         className="flex items-center gap-2 capitalize" 
                                         onClick={() => {
-                                            setIsCashIn(true)
-                                            setIsCashOut(false)
-                                            handleOpen()
+                                            setIsCashIn(true);
+                                            handleOpen();
                                         }}
                                     >
                                         <FaCirclePlus /> Cash In
@@ -568,9 +485,8 @@ function Wallet() {
                                         color="red" 
                                         className="flex items-center gap-2 capitalize" 
                                         onClick={() => {
-                                            setIsCashIn(false)
-                                            setIsCashOut(true)
-                                            handleOpen()
+                                            setIsCashIn(false);
+                                            handleOpen();
                                         }}
                                     >
                                         <FaCircleMinus /> Cash Out
@@ -869,10 +785,10 @@ function Wallet() {
                     <DeleteModal deleteId={deleteId} open={openDelete} handleDelete={handleRemove} closeModal={() => setOpenDelete(!openDelete)} />
                     <Dialog open={openDateModal}>
                         <DialogBody>
-                            <ModalTitle titleName="Date Range" handleClick={() => setOpenDateModal(!openDateModal)} />
                             {
-                                alert.isAlert? <SuccessAlert title={alert.title} message={alert.message} isWarning={alert.isWarning} /> : ""
+                                alertMsg.visible? <SuccessAlert title={alertMsg.title} message={alertMsg.message} isError={alertMsg.isError}  /> : ""
                             }
+                            <ModalTitle titleName="Date Range" handleClick={() => setOpenDateModal(!openDateModal)} />
                             <div className="grid grid-cols-2 gap-2 mt-3">
                                 {/* Start Date */}
                                 <div>
@@ -881,24 +797,20 @@ function Wallet() {
                                         type="date"
                                         value={dateRange.startDate}
                                         className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
-                                        onChange={(e) => {
+                                        onChange={async (e) => {
                                             if (dateRange.endDate !== "") {
                                                 if(moment(e.target.value) > moment(dateRange.endDate)) {
-                                                    console.log(e.target.value)
-                                                    setAlert({
-                                                        isAlert: true,
+                                                    setAlertMsg({
+                                                        visible: true,
                                                         message: "Start Date cannot be greater than End Date.",
                                                         isWarning: true,
                                                         title: "Warning"
                                                     });
-                                                    setTimeout(() => {
-                                                        setAlert({
-                                                            isAlert: false,
-                                                            message: '',
-                                                            isWarning: false,
-                                                            title: ''
-                                                        })
-                                                    }, 2000);
+                                                    await pause();
+                                                    setAlertMsg({
+                                                        ...alertMsg,
+                                                        visible: false
+                                                    })
                                                 } else {
                                                     setDateRange({
                                                         ...dateRange,
@@ -923,23 +835,19 @@ function Wallet() {
                                         type="date"
                                         value={dateRange.endDate}
                                         className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
-                                        onChange={(e) => {
+                                        onChange={async (e) => {
                                             if(dateRange.startDate === "" || moment(e.target.value) < moment(dateRange.startDate)) {
-                                                setAlert({
-                                                    isAlert: true,
+                                                setAlertMsg({
+                                                    visible: true,
                                                     message: "Start Date cannot be greater than End Date.",
                                                     isWarning: true,
                                                     title: "Warning"
                                                 });
-                                                setTimeout(() => {
-                                                    setAlert({
-                                                        isAlert: false,
-                                                        message: '',
-                                                        isWarning: false,
-                                                        title: ''
-                                                    })
-                                                }, 2000);
-                                                
+                                                await pause();
+                                                setAlertMsg({
+                                                    ...alertMsg,
+                                                    visible: false
+                                                })
                                                 return; 
                                             }
                                             setDateRange({
@@ -963,7 +871,9 @@ function Wallet() {
                     </Dialog>
                     <Dialog open={open} size="md">
                         <DialogBody>
-                            {/* <ModalTitle titleName={isCashIn? "Add Cash In" : "Add Cash Out"} handleClick={() => setOpen(!open)} /> */}
+                            {
+                                alertMsg.visible? <SuccessAlert title={alertMsg.title} message={alertMsg.message} isError={alertMsg.isError}  /> : ""
+                            }
                             <div className={`mb-3 flex items-center justify-between p-4 ${isCashIn? "bg-green-500" : "bg-red-500"} text-white rounded-md`} >
                                 <Typography variant="h5">
                                     {isCashIn? "Add Cash In" : "Add Cash Out"}
