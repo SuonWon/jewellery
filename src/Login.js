@@ -81,7 +81,6 @@ function Login() {
                 dispatch(setToken({token: res.data.access_token}));
                 const newErrors = {}
                 if(res.data !== '') {
-                    const permissionList = res.data.systemRole.permissions;
                     setPermissions(res.data.systemRole.permissions);
                     if(signIn(
                         {
@@ -94,97 +93,104 @@ function Login() {
                             expiresIn : 6400,
                         }
                     ));
-
-                    const moduleName = permissionList.find(rec => rec.view == true).moduleName;
-                    switch(moduleName) {
-                        case "Stone":
-                            navigate("/master/stone");
-                        break;
-
-                        case "Type":
-                            navigate("/master/type");
-                        break;
-
-                        case "Grade":
-                            navigate("/master/grade");
-                        break;
-
-                        case "Brightness":
-                            navigate("/master/brightness");
-                        break;
-
-                        case "Unit":
-                            navigate("/master/unit");
-                        break;
-
-                        case "WalletCategory":
-                            navigate("/master/walletCategory");
-                        break;
-
-                        case "Customer":
-                            navigate("/customer");
-                        break;
-
-                        case "Supplier":
-                            navigate("/supplier");
-                        break;
-
-                        case "Wallet":
-                            navigate("/wallet");
-                        break;
-
-                        case "StoneSelection":
-                            navigate("/stone_details");
-                        break;
-
-                        case "Share":
-                            navigate("/share");
-                        break;
-
-                        case "Purchase":
-                            navigate("/purchase");
-                        break;
-
-                        case "Sales":
-                            navigate("/sales");
-                        break;
-
-                        case "Issue":
-                            navigate("/issue");
-                        break;
-
-                        case "SalesReturn":
-                            navigate("/sales_return");
-                        break;
-
-                        case "PurchaseReturn":
-                            navigate("/purchase_return");
-                        break;
-
-                        case "IssueReturn":
-                            navigate("/issue_return");
-                        break;
-
-                        case "Adjustment":
-                            navigate("/adjustment");
-                        break;
-
-                        case "Damage":
-                            navigate("/damage");
-                        break;
-
-                        case "SystemUser":
-                            navigate("/system_user");
-                        break;
-
-                        case "SystemRole":
-                            navigate("/system_role");
-                        break;
-
-                        case "WalletTransaction":
-                            navigate("/wallet");
-                        break;
+                    console.log(res.data.systemRole.roleDesc);
+                    if(res.data.systemRole.roleDesc == 'Super Admin') {
+                        navigate('/dashboard');
                     }
+                    else {
+                        navigate('/');
+                    }
+
+                    // const moduleName = permissionList.find(rec => rec.view == true).moduleName;
+                    // switch(moduleName) {
+                    //     case "Stone":
+                    //         navigate("/master/stone");
+                    //     break;
+
+                    //     case "Type":
+                    //         navigate("/master/type");
+                    //     break;
+
+                    //     case "Grade":
+                    //         navigate("/master/grade");
+                    //     break;
+
+                    //     case "Brightness":
+                    //         navigate("/master/brightness");
+                    //     break;
+
+                    //     case "Unit":
+                    //         navigate("/master/unit");
+                    //     break;
+
+                    //     case "WalletCategory":
+                    //         navigate("/master/walletCategory");
+                    //     break;
+
+                    //     case "Customer":
+                    //         navigate("/customer");
+                    //     break;
+
+                    //     case "Supplier":
+                    //         navigate("/supplier");
+                    //     break;
+
+                    //     case "Wallet":
+                    //         navigate("/wallet");
+                    //     break;
+
+                    //     case "StoneSelection":
+                    //         navigate("/stone_details");
+                    //     break;
+
+                    //     case "Share":
+                    //         navigate("/share");
+                    //     break;
+
+                    //     case "Purchase":
+                    //         navigate("/purchase");
+                    //     break;
+
+                    //     case "Sales":
+                    //         navigate("/sales");
+                    //     break;
+
+                    //     case "Issue":
+                    //         navigate("/issue");
+                    //     break;
+
+                    //     case "SalesReturn":
+                    //         navigate("/sales_return");
+                    //     break;
+
+                    //     case "PurchaseReturn":
+                    //         navigate("/purchase_return");
+                    //     break;
+
+                    //     case "IssueReturn":
+                    //         navigate("/issue_return");
+                    //     break;
+
+                    //     case "Adjustment":
+                    //         navigate("/adjustment");
+                    //     break;
+
+                    //     case "Damage":
+                    //         navigate("/damage");
+                    //     break;
+
+                    //     case "SystemUser":
+                    //         navigate("/system_user");
+                    //     break;
+
+                    //     case "SystemRole":
+                    //         navigate("/system_role");
+                    //     break;
+
+                    //     case "WalletTransaction":
+                    //         navigate("/wallet");
+                    //     break;
+                    // }
                     // navigate("/master");
                     
                 }
