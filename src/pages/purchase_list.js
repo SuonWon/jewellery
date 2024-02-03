@@ -82,6 +82,8 @@ function PurchaseList() {
 
     const [open, setOpen] = useState(false);
 
+    const [isNew, setIsNew] = useState(false);
+
     const [payOpen, setPayOpen] = useState(false);
 
     const [payData, setPayData] = useState({
@@ -99,7 +101,7 @@ function PurchaseList() {
 
     const [addPurchase, addResult] = useAddPurchaseMutation();
 
-    const [updatePurchase] = useUpdatePurchaseMutation();
+    const [updatePurchase, updateResult] = useUpdatePurchaseMutation();
 
     const [currentPage, setCurrentPage] = useState(1);
 
@@ -366,7 +368,7 @@ function PurchaseList() {
                         amount: el.amount,
                     }
                 }),
-            }).then((res) => {
+            }).then(async (res) => {
                 if(res.data) {
                     setAlertMsg({
                         ...alertMsg,
@@ -374,6 +376,7 @@ function PurchaseList() {
                         title: "Success",
                         message: "Purchase invoice created successfully.",
                     });
+                    setOpen(!open);
                 } else {
                     setAlertMsg({
                         ...alertMsg,
@@ -382,23 +385,23 @@ function PurchaseList() {
                         message: res.error.data.message,
                         isError: true,
                     });
+                    setOpen(!open);
                 }
-            });
-            setFormData(purchaseData);
-            setTBodyData([]);
-            setDShare({
-                id: uuidv4(),
-                lineNo: 1,
-                shareCode: 0,
-                shareName: "",
-                sharePercentage: 100,
-                amount: 0,
-            });
-            setOpen(!open);
-            await pause();
-            setAlertMsg({
-                ...alertMsg,
-                visible: false,
+                setFormData(purchaseData);
+                setTBodyData([]);
+                setDShare({
+                    id: uuidv4(),
+                    lineNo: 1,
+                    shareCode: 0,
+                    shareName: "",
+                    sharePercentage: 100,
+                    amount: 0,
+                });
+                await pause();
+                setAlertMsg({
+                    ...alertMsg,
+                    visible: false,
+                });
             });
         }
     }
@@ -509,7 +512,7 @@ function PurchaseList() {
                         amount: el.amount,
                     }
                 }),
-            }).then((res) => {
+            }).then(async (res) => {
                 if(res.data) {
                     setAlertMsg({
                         ...alertMsg,
@@ -526,14 +529,15 @@ function PurchaseList() {
                         isError: true,
                     });
                 }
+                setFormData(purchaseData);
+                setOpen(!open);
+                await pause();
+                setAlertMsg({
+                    ...alertMsg,
+                    visible: false,
+                });
             });
-            setFormData(purchaseData);
-            setOpen(!open);
-            await pause();
-            setAlertMsg({
-                ...alertMsg,
-                visible: false,
-            });
+            
         }
     };
 
@@ -1570,7 +1574,9 @@ function PurchaseList() {
                                     isEdit? (
                                         purchasePermission?.update ? (
                                             <Button onClick={handleUpdate} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2">
-                                                <FaFloppyDisk className="text-base" />
+                                                {
+                                                    updateResult.isLoading? <ButtonLoader /> : <FaFloppyDisk className="text-base" />
+                                                }
                                                 <Typography variant="small" className="capitalize">
                                                     Update
                                                 </Typography>
@@ -1580,14 +1586,22 @@ function PurchaseList() {
                                     <>
                                         <Button onClick={handleSubmit} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2">
                                             {
-                                                addResult.isLoading? <ButtonLoader /> : <FaFloppyDisk className="text-base" />
+                                                addResult.isLoading && !isNew? <ButtonLoader /> : <FaFloppyDisk className="text-base" />
                                             }
                                             <Typography variant="small" className="capitalize">
                                                 Save
                                             </Typography>
                                         </Button>
-                                        <Button onClick={handleSave} color="deep-purple" size="sm" variant="outlined" className="flex items-center gap-2">
-                                            <FaCirclePlus className="text-base" />
+                                        <Button 
+                                            onClick={() => {
+                                                handleSave();
+                                                setIsNew(true);
+                                            }} 
+                                            color="deep-purple" size="sm" variant="outlined" 
+                                            className="flex items-center gap-2">
+                                            {
+                                                addResult.isLoading && isNew ? <ButtonLoader /> : <FaCirclePlus className="text-base" />
+                                            }
                                             <Typography variant="small" className="capitalize">
                                                 Save & New
                                             </Typography>

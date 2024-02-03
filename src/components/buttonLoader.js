@@ -1,16 +1,16 @@
-import { Triangle } from "react-loader-spinner";
+import { Grid } from "react-loader-spinner";
 
 function ButtonLoader() {
     return (
-        <Triangle
-            height="30"
-            width="30"
-            color="#fff"
-            ariaLabel="triangle-loading"
-            wrapperStyle={{}}
-            wrapperClassName=""
-            visible={true}
-        />
+        <Grid
+        height="25"
+        width="25"
+        color="#333"
+        ariaLabel="triangle-loading"
+        wrapperStyle={{}}
+        wrapperClassName=""
+        visible={true}
+    />
     );
 }
 
