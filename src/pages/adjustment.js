@@ -816,7 +816,7 @@ function Adjustment() {
                                             className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
                                             value={formData.weight}
                                             onChange={(e) => {
-                                                let weight = parseFloat(e.target.value);
+                                                let weight = parseFloat(e.target.value === "" ? 0 : e.target.value);
                                                 setFormData({
                                                     ...formData, 
                                                     weight: weight,

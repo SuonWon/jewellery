@@ -148,6 +148,8 @@ function StoneDetails() {
         gradeCode: 0,
         size: 0,
         sizeUnit: "လုံးစီး",
+        actualQty: 0,
+        actualWeight: 0,
         qty: 0,
         weight: 0,
         unitCode: "ct",
@@ -219,6 +221,8 @@ function StoneDetails() {
                 addStoneDetail({
                     ...formData,
                     stoneDesc: `${description.stoneDesc} ${description.size}${description.sizeUnit} ${description.gradeDesc} ${description.brightDesc}`,
+                    actualQty: formData.qty,
+                    actualWeight: formData.weight,
                 }).then((res) => {
                     if(res.data) {
                         setAlertMsg({
@@ -259,6 +263,8 @@ function StoneDetails() {
             addStoneDetail({
                 ...formData,
                 stoneDesc: `${description.stoneDesc} ${description.size}${description.sizeUnit} ${description.gradeDesc} ${description.brightDesc}`,
+                actualQty: formData.qty,
+                actualWeight: formData.weight,
             }).then((res) => {
                 if(res.data) {
                     setAlertMsg({
@@ -309,6 +315,8 @@ function StoneDetails() {
                 purDate: tempPurchase.purDate,
                 supplierCode: tempPurchase.supplierCode,
                 stoneCode: tempPurchase.stoneCode,
+                actualQty: tempPurchase.actualQty,
+                actualWeight: tempPurchase.actualWeight,
                 qty: tempPurchase.qty,
                 totalWeight: tempPurchase.totalWeight,
                 unitCode: tempPurchase.unitCode,
@@ -367,6 +375,8 @@ function StoneDetails() {
                 gradeCode: formData.gradeCode,
                 size: formData.size,
                 sizeUnit: formData.sizeUnit,
+                actualQty: formData.actualQty,
+                actualWeight: formData.actualWeight,
                 qty: formData.qty,
                 weight: formData.weight,
                 unitCode: formData.unitCode,
@@ -544,8 +554,11 @@ function StoneDetails() {
                 gradeCode: 0,
                 size: 0,
                 sizeUnit: "လုံးစီး",
+                actualQty: 0,
+                actualWeight: 0,
                 qty: 0,
                 weight: 0,
+                purchasePrice: 0,
                 unitCode: "ct",
                 remark: "",
                 isActive: true,
@@ -568,6 +581,8 @@ function StoneDetails() {
                     }
                 }
                 combinedStone.referenceNo += `${el.referenceNo}, `;
+                combinedStone.actualQty += el.qty;
+                combinedStone.actualWeight += el.weight;
                 combinedStone.qty += el.qty;
                 combinedStone.weight += el.weight;
             });
@@ -663,7 +678,7 @@ function StoneDetails() {
             name: 'Weight',
             width: "90px",
             center: "true",
-            selector: row => row.Weight,
+            selector: row => row.Weight.toFixed(2),
         },
         {
             name: 'Purchase Price',
@@ -758,8 +773,7 @@ function StoneDetails() {
                                         <label for={row.Code}></label>
                                     </div>
                                 </div>
-
-                                <Button variant="text" color="teal" className="p-2" onClick={() => openCombineModal(row.Code)} disabled={row.Status? false : true}><FaCirclePlus /></Button>
+                                {/* <Button variant="text" color="teal" className="p-2" onClick={() => openCombineModal(row.Code)} disabled={row.Status? false : true}><FaCirclePlus /></Button> */}
                             </>
                         ) : null
                     }
