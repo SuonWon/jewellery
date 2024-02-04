@@ -773,7 +773,7 @@ function StoneDetails() {
                                         <label for={row.Code}></label>
                                     </div>
                                 </div>
-                                {/* <Button variant="text" color="teal" className="p-2" onClick={() => openCombineModal(row.Code)} disabled={row.Status? false : true}><FaCirclePlus /></Button> */}
+                                <Button variant="text" color="teal" className="p-2" onClick={() => openCombineModal(row.Code)} disabled={row.Status? false : true}><FaCirclePlus /></Button>
                             </>
                         ) : null
                     }

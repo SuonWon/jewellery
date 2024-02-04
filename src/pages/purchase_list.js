@@ -354,7 +354,7 @@ function PurchaseList() {
             }).then((res) => {
                 purchaseInvoiceNo = res.data
             });
-            
+            console.log(purchaseInvoiceNo);
             addPurchase({
                 ...formData,
                 invoiceNo: purchaseInvoiceNo,
@@ -1363,7 +1363,7 @@ function PurchaseList() {
                                                                 let newTbody = tBodyData.map(el => {
                                                                     return {
                                                                         ...el,
-                                                                        amount: (el.sharePercentage / 100) * ((formData.subTotal + serviceCharge) - formData.discAmt),
+                                                                        amount: (el.sharePercentage / 100) * ((formData.subTotal - serviceCharge) - formData.discAmt),
                                                                     }
                                                                 });
                                                                 setTBodyData(newTbody);
@@ -1388,7 +1388,7 @@ function PurchaseList() {
                                                         value={formData.serviceCharge}
                                                         onChange={(e) => {
                                                             let charge = parseFloat(e.target.value);
-                                                            let totalA = charge + formData.subTotal;
+                                                            let totalA = formData.subTotal - charge;
                                                             setFormData({
                                                                 ...formData,
                                                                 serviceCharge: charge,
@@ -1418,12 +1418,12 @@ function PurchaseList() {
                                                             setFormData({
                                                                 ...formData,
                                                                 discAmt: discAmt,
-                                                                grandTotal: (formData.subTotal + formData.serviceCharge) - discAmt
+                                                                grandTotal: (formData.subTotal - formData.serviceCharge) - discAmt
                                                             });
                                                             let newTbody = tBodyData.map(el => {
                                                                 return {
                                                                     ...el,
-                                                                    amount: (el.sharePercentage / 100) * ((formData.subTotal + formData.serviceCharge) - discAmt),
+                                                                    amount: (el.sharePercentage / 100) * ((formData.subTotal - formData.serviceCharge) - discAmt),
                                                                 }
                                                             });
                                                             setTBodyData(newTbody);
