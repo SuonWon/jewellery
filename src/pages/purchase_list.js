@@ -354,7 +354,7 @@ function PurchaseList() {
             }).then((res) => {
                 purchaseInvoiceNo = res.data
             });
-            console.log(purchaseInvoiceNo);
+            
             addPurchase({
                 ...formData,
                 invoiceNo: purchaseInvoiceNo,
