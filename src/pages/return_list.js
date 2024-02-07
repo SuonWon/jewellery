@@ -754,8 +754,8 @@ function ReturnList({type = 'I'}) {
                                 </div>
                             </div>
                             <div className="grid grid-cols-4 gap-2 mb-3">
-                                <div className="col-span-2">
-                                    {/* Reference No */}
+                                {/* Reference No */}
+                                <div className="col-span-3">
                                     <label className="text-black text-sm mb-2">Reference No</label>
                                     <select 
                                         className="block w-full text-black border border-blue-gray-200 h-[35px] px-2.5 py-1.5 rounded-md focus:border-black"
@@ -783,12 +783,12 @@ function ReturnList({type = 'I'}) {
                                         {
                                             type === 'I' ?
                                             issueData?.map((issue) => {
-                                                return <option value={issue.issueNo} key={issue.issueNo}>({issue.stoneDetail.stoneDesc}, {issue.issueMember.map(el => {
-                                                        return el.customer.customerName + ",";
-                                                    })})
+                                                return <option value={issue.issueNo} key={issue.issueNo}>{issue.issueNo} ({issue.stoneDetail.stoneDesc}, {issue.issueMember.map(el => {
+                                                    return el.customer.customerName + ",";
+                                                })})
                                                 </option>
                                             }) : type === 'S' ? salesData?.map((sales) => {
-                                                return <option value={sales.invoiceNo} key={sales.invoiceNo}>({sales.stoneDetail.stoneDesc}, {sales.customer.customerName})
+                                                return <option value={sales.invoiceNo} key={sales.invoiceNo}>{sales.invoiceNo} ({sales.stoneDetail.stoneDesc}, {sales.customer.customerName})
                                                 </option>
                                             }) : purchaseData?.map((purchase) => {
                                                 return <option value={purchase.invoiceNo} key={purchase.invoiceNo}>{purchase.stone.stoneDesc}, {purchase.supplier.supplierName}

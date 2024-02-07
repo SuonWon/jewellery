@@ -537,6 +537,11 @@ function IssueList() {
             right: "true",
         },
         {
+            name: 'Agents',
+            width: "300px",
+            selector: row => row.issueMember,
+        },
+        {
             name: 'Remark',
             width: "300px",
             selector: row => row.remark,
@@ -614,6 +619,9 @@ function IssueList() {
             unitCode: issueData.unitCode,
             unitPrice: issueData.unitPrice.toLocaleString('en-US'),
             totalPrice: issueData.totalPrice.toLocaleString('en-US'),
+            issueMember: issueData.issueMember.map(el => {
+                return `${el.customer.customerName}, `
+            }),
             remark: issueData.remark,
             status: issueData.status,
             isComplete: issueData.isComplete,

@@ -156,6 +156,7 @@ function StoneDetails() {
         purchasePrice: 0,
         remark: "",
         isActive: true,
+        isIssued: false,
         createdBy: auth().username,
         updatedBy: "",
     };
@@ -382,6 +383,7 @@ function StoneDetails() {
                 unitCode: formData.unitCode,
                 remark: formData.remark,
                 isActive: formData.isActive,
+                isIssued: formData.isIssued,
                 purchasePrice: formData.purchasePrice,
                 createdBy: formData.createdBy,
                 updatedBy: auth().username,
@@ -440,6 +442,7 @@ function StoneDetails() {
             unitCode: stoneDetail.unitCode,
             remark: stoneDetail.remark,
             isActive: e.target.checked ? true: false,
+            isIssued: stoneDetail.isIssued,
             createdBy: stoneDetail.createdBy,
             updatedBy: auth().username,
         }).then((res) => {
@@ -562,6 +565,7 @@ function StoneDetails() {
                 unitCode: "ct",
                 remark: "",
                 isActive: true,
+                isIssued: false,
                 createdBy: auth().username,
                 updatedBy: "",
             };
@@ -604,6 +608,7 @@ function StoneDetails() {
                             size: el.size,
                             sizeUnit: el.sizeUnit,
                             qty: el.qty,
+                            isIssued: el.isIssued,
                             weight: el.weight,
                             unitCode: el.unitCode,
                             remark: el.remark,
@@ -660,12 +665,21 @@ function StoneDetails() {
         {
             name: 'Reference No',
             width: '130px',
-            selector: row => row.ReferenceNo,
+            selector: row => row.ReferenceNo
         },
         {
             name: 'Description',
-            width: '280px',
-            selector: row => row.Description,
+            width: '320px',
+            selector: row => (
+                <div className="flex items-start">
+                    {row.Description}
+                    {
+                        row.IsIssue? <div className="w-[60px] flex items-center justify-center text-white h-5 ml-2 rounded-xl px-4 bg-orange-500">
+                            Issued
+                        </div> : null
+                    }
+                </div> 
+            ),
         },
         {
             name: 'Quantity',
@@ -805,6 +819,7 @@ function StoneDetails() {
             UpdatedBy: stoneDetail.updatedBy,
             Remark: stoneDetail.remark,
             Status: stoneDetail.isActive,
+            IsIssue: stoneDetail.isIssued,
             PurchasePrice: stoneDetail.purchasePrice.toLocaleString('en-US'),
             SalesPrice: stoneDetail.salesPrice.toLocaleString('en-US'),
             Profit: stoneDetail.profit.toLocaleString('en-US'),
@@ -887,7 +902,7 @@ function StoneDetails() {
         {
             selectionPermission != null && selectionPermission != undefined ? (
                 <div className="flex flex-col gap-4 relative max-w-[85%] min-w-[85%]">
-                    <SectionTitle title="Stone Details" handleModal={openModal} permission={selectionPermission?.create}/>
+                    <SectionTitle title="Stone Selection" handleModal={openModal} permission={selectionPermission?.create}/>
                     <div className="w-78 absolute top-0 right-0 z-[9999]">
                         {
                             alertMsg.visible? <SuccessAlert title={alertMsg.title} message={alertMsg.message} isError={alertMsg.isError}  /> : ""
@@ -965,7 +980,7 @@ function StoneDetails() {
                     </Card>
                     <Dialog open={open} handler={openModal} size="lg">
                         <DialogBody>
-                            <ModalTitle titleName={isEdit ? "Edit Stone Detail" : "Create Stone Detail"} handleClick={openModal} />
+                            <ModalTitle titleName={isEdit ? "Edit Stone Selection" : "Create Stone Selection"} handleClick={openModal} />
                             {
                                 alertMsg.visible? <SuccessAlert title={alertMsg.title} message={alertMsg.message} isError={alertMsg.isError}  /> : ""
                             }
@@ -1046,7 +1061,7 @@ function StoneDetails() {
                                             }
                                         </div>
                                         <div className="">
-                                            <label className="text-black text-sm mb-2">Purchase Complete</label>
+                                            <label className="text-black text-sm mb-2">Selection Complete</label>
                                             <div className="w-full">
                                                 <input 
                                                     type="checkbox" 
