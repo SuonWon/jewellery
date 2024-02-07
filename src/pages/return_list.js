@@ -791,7 +791,7 @@ function ReturnList({type = 'I'}) {
                                                 return <option value={sales.invoiceNo} key={sales.invoiceNo}>{sales.invoiceNo} ({sales.stoneDetail.stoneDesc}, {sales.customer.customerName})
                                                 </option>
                                             }) : purchaseData?.map((purchase) => {
-                                                return <option value={purchase.invoiceNo} key={purchase.invoiceNo}>{purchase.stone.stoneDesc}, {purchase.supplier.supplierName}
+                                                return <option value={purchase.invoiceNo} key={purchase.invoiceNo}>{purchase.invoiceNo} ({purchase.stone.stoneDesc}, {purchase.supplier.supplierName})
                                                 </option>
                                             })
                                         }
