@@ -908,7 +908,7 @@ function IssueList() {
                                                     stoneDetails?.length === 0 ? <option value="" disabled>There is no Data</option> :
                                                     stoneDetails?.map((stoneDetail) => {
                                                         if(stoneDetail.isActive) {
-                                                            return <option value={stoneDetail.stoneDetailCode} key={stoneDetail.stoneDetailCode} >{stoneDetail.stoneDesc}</option>
+                                                            return <option value={stoneDetail.stoneDetailCode} key={stoneDetail.stoneDetailCode} >{stoneDetail.stoneDesc} ({stoneDetail.supplier.supplierName})</option>
                                                         }
                                                     })
                                                 }
