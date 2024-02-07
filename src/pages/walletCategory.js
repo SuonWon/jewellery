@@ -277,19 +277,23 @@ function WalletCategory() {
                         catePermission?.update ? (
                             <div className="border-r border-gray-400 pr-2">
                                 <div class="custom-checkbox">
-                                    <input class="input-checkbox" checked={row.status} id={row.categoryCode} type="checkbox" onChange={(e) => changeStatus(e.target.checked, row.categoryCode)} />
+                                    <input class="input-checkbox" checked={row.status} id={row.categoryCode} type="checkbox" onChange={(e) => changeStatus(e.target.checked, row.categoryCode)} disabled={row.isDefault}/>
                                     <label for={row.categoryCode}></label>
                                 </div>
                             </div>
                         ) : null
                     }
-                    <Button variant="text" color="deep-purple" className="p-2" onClick={() => handleEdit(row.categoryCode)}><FaPencil /></Button>
+                    <Button variant="text" color="deep-purple" className="p-2" onClick={() => handleEdit(row.categoryCode)} disabled={row.isDefault}><FaPencil /></Button>
                     {
                         catePermission?.delete ? (
-                            <Button variant="text" color="red" className="p-2" onClick={() => {
-                                setDeleteId(row.categoryCode);
-                                setOpenDelete(true);
-                            }}><FaTrashCan /></Button>
+                            <Button 
+                                variant="text" color="red" className="p-2" 
+                                disabled={row.isDefault}
+                                onClick={() => {
+                                    setDeleteId(row.categoryCode);
+                                    setOpenDelete(true);
+                                }}
+                            ><FaTrashCan /></Button>
                         ) : null
                     }
                 </div>
@@ -307,6 +311,7 @@ function WalletCategory() {
             updatedBy: category.updatedBy,
             remark: category.remark,
             status: category.status,
+            isDefault: category.isDefault,
         }
     });
 

@@ -262,7 +262,6 @@ function Stone() {
         },
         {
             name: 'Description',
-            width: "200px",
             selector: row => row.Description,
             
         },

@@ -3,7 +3,7 @@ import { Button, Card, CardBody, Dialog, DialogBody, IconButton, Typography } fr
 import { FaCircleMinus, FaCirclePlus, FaEquals, FaFilter, FaFloppyDisk, FaTrashCan, FaXmark, } from "react-icons/fa6";
 import { BiReset } from "react-icons/bi"
 import { useContext, useEffect, useState } from "react";
-import { focusSelect, pause } from "../const";
+import { apiUrl, focusSelect, pause } from "../const";
 import { useAddWalletTransactionMutation, useFetchTrueShareQuery, useFetchTrueWalletCategoryQuery, useFetchTrueWalletQuery, useFetchWalletNamesQuery, useFetchWalletTransactionBalanceQuery, useFetchWalletTransactionCountQuery, useFetchWalletTransactionQuery, useRemoveWalletTransactionMutation, useUpdateWalletTransactionMutation } from "../store";
 import Pagination from "../components/pagination";
 import DeleteModal from "../components/delete_modal";
@@ -15,8 +15,12 @@ import ModalTitle from "../components/modal_title";
 import { v4 as uuidv4 } from 'uuid';
 import { useNavigate } from "react-router-dom";
 import { AuthContent } from "../context/authContext";
+import axios from "axios";
+import Cookies from "js-cookie";
 
 const validator = require('validator');
+
+const token = 'Bearer ' + Cookies.get('_auth');
 
 function Wallet() {
 
@@ -26,14 +30,6 @@ function Wallet() {
 
     const navigate = useNavigate();
 
-    useEffect(() => {
-        setWalletPermission(permissions[21]);
-
-        if(walletPermission?.view == false) {
-            navigate('/403');
-        }
-    }, [permissions, walletPermission, navigate])
-
     const [filterForm, setFilterForm] = useState({
         skip: 0,
         take: 10,
@@ -41,7 +37,7 @@ function Wallet() {
         walletName: "",
         shareCode: 0,
         category: 0
-    })
+    });
 
     const { data: walletData, refetch: refetchShare } = useFetchTrueWalletQuery();
 
@@ -58,9 +54,15 @@ function Wallet() {
     const { data: shareData } = useFetchTrueShareQuery();
 
     useEffect(() => {
+        setWalletPermission(permissions[21]);
+
+        if(walletPermission?.view == false) {
+            navigate('/403');
+        }
+
         refetch();
         refetchShare();
-    }, [data]);
+    }, [permissions, walletPermission, navigate, data, shareData]);
 
     const auth = useAuthUser();
 
@@ -101,6 +103,7 @@ function Wallet() {
         date: moment().format("YYYY-MM-DD"),
         time: moment().format("HH:mm:ss"),
         categoryCode: 0,
+        referenceNo: "",
         paymentMode: "Cash",
         cashType: "",
         isSalesPruchase: false,
@@ -113,6 +116,8 @@ function Wallet() {
     };
 
     const [formData, setFormData] = useState(transactionData);
+
+    const [invoices, setInvoices] = useState([]);
 
     const [deleteId, setDeleteId] = useState('');
 
@@ -197,6 +202,7 @@ function Wallet() {
                 cashType: isCashIn? "DEBIT" : "CREDIT",
                 categoryCode: formData.categoryCode,
                 paymentMode: formData.paymentMode,
+                referenceNo: formData.referenceNo,
                 amount: formData.amount,
                 remark: formData.remark,
                 status: formData.status,
@@ -242,6 +248,7 @@ function Wallet() {
                 cashType: isCashIn? "DEBIT" : "CREDIT",
                 categoryCode: formData.categoryCode,
                 paymentMode: formData.paymentMode,
+                referenceNo: formData.referenceNo,
                 amount: formData.amount,
                 remark: formData.remark,
                 status: formData.status,
@@ -285,6 +292,7 @@ function Wallet() {
                 cashType: isCashIn? "DEBIT" : "CREDIT",
                 categoryCode: formData.categoryCode,
                 paymentMode: formData.paymentMode,
+                referenceNo: formData.referenceNo,
                 amount: formData.amount,
                 remark: formData.remark,
                 status: formData.status,
@@ -341,6 +349,16 @@ function Wallet() {
         setOpenDateModal(!openDateModal);
     }
 
+    const fetchInvoices = async () => {
+        axios.get(`${apiUrl}/purchase/get-all-purchases?skip=0&take=0&status=O&isComplete=A`, {
+            headers: {
+                "Authorization": token
+            }
+        }).then((res) => {
+            setInvoices(res.data);
+        });
+    };
+
     const column = [
         {
             name: 'Status',
@@ -370,6 +388,12 @@ function Wallet() {
             selector: row => row.shareName,
         },
         {
+            name: 'Reference No',
+            width: "120px",
+            selector: row => row.referenceNo,
+            center: true
+        },
+        {
             name: 'Category',
             width: "120px",
             selector: row => row.categoryName,
@@ -378,7 +402,11 @@ function Wallet() {
         {
             name: 'Cash Type',
             width: "150px",
-            selector: row => row.cashType == "DEBIT" ? "Cash In" : "Cash Out",
+            selector: row => row.cashType == "DEBIT" ? <div className="w-[90px] flex items-center justify-center text-white h-7 rounded-full bg-green-500">
+                Cash In
+            </div> : <div className="w-[90px] flex items-center justify-center text-white h-7 rounded-full bg-red-500">
+                Cash Out
+            </div>,
             center: true,
         },
         {
@@ -438,6 +466,7 @@ function Wallet() {
             categoryName: wallet.category.categoryDesc,
             cashType: wallet.cashType,
             categoryCode: wallet.categoryCode,
+            referenceNo: wallet.referenceNo,
             paymentMode: wallet.paymentMode,
             amount: wallet.amount.toLocaleString('en-US'),
             remark: wallet.remark,
@@ -783,6 +812,7 @@ function Wallet() {
                         </CardBody>
                     </Card>
                     <DeleteModal deleteId={deleteId} open={openDelete} handleDelete={handleRemove} closeModal={() => setOpenDelete(!openDelete)} />
+                    {/* Date Range Modal */}
                     <Dialog open={openDateModal}>
                         <DialogBody>
                             {
@@ -869,6 +899,7 @@ function Wallet() {
                             </div>
                         </DialogBody>
                     </Dialog>
+                    {/* Wallet Transition Form */}
                     <Dialog open={open} size="md">
                         <DialogBody>
                             {
@@ -906,7 +937,7 @@ function Wallet() {
                                     Cash Out
                                 </Button>
                             </div> */}
-                            <div className="grid grid-cols-3 gap-2 mt-3">
+                            <div className="grid grid-cols-3 gap-2 my-3">
                                 {/* Date */}
                                 <div className="">
                                     <label className="text-black mb-2 text-sm">Date</label>
@@ -940,7 +971,7 @@ function Wallet() {
                                     }
                                 </div>
                             </div>
-                            <div className="grid grid-cols-3 gap-2">
+                            <div className="grid grid-cols-3 gap-2 items-end my-3">
                                 {/* Wallet Code */}
                                 <div className="col-span-2">
                                     <label className="text-black text-sm mb-2">Share</label>
@@ -962,8 +993,38 @@ function Wallet() {
                                         validationText.walletCode && <p className="block text-[12px] text-red-500 font-sans">{validationText.walletCode}</p>
                                     }
                                 </div>
+                                <div>
+                                    {
+                                        invoices.length === 0 ? <Button variant="gradient" className="capitalize p-2" color="deep-purple" onClick={fetchInvoices}>
+                                            Choose Invoice
+                                        </Button> : 
+                                        <Button variant="gradient" className="capitalize p-2" color="deep-purple" onClick={() => {setInvoices([])}}>
+                                            Close Invoice
+                                        </Button>
+                                    }
+                                </div>
+                                <div className={`col-span-2 ${invoices.length === 0? "hidden": "block"}`}>
+                                    <label className="text-black text-sm mb-2">Purchase Invoice</label>
+                                    <select 
+                                        className="block w-full text-black border border-blue-gray-200 h-[35px] px-2.5 py-1.5 rounded-md focus:border-black"
+                                        value={formData.referenceNo}
+                                        onChange={(e) => {
+                                            setFormData({...formData, referenceNo: e.target.value});
+                                        }}
+                                    >
+                                        <option value="" disabled hidden>Select...</option>
+                                        {
+                                            invoices?.map((invoice) => {
+                                                return <option value={invoice.invoiceNo} key={invoice.invoiceNo}>{invoice.invoiceNo} ({invoice.stone.stoneDesc}, {invoice.supplier.supplierName})</option>
+                                            })
+                                        }
+                                    </select>
+                                    {
+                                        validationText.walletCode && <p className="block text-[12px] text-red-500 font-sans">{validationText.walletCode}</p>
+                                    }
+                                </div>
                             </div>
-                            <div className="grid grid-cols-3 gap-2">
+                            <div className="grid grid-cols-3 gap-2 my-3">
                                 {/* Payment method */}
                                 <div>
                                     <label className="text-black text-sm mb-2">Payment Method</label>
@@ -1041,7 +1102,7 @@ function Wallet() {
                                     />
                                 </div>
                             </div>
-                            <div className="flex items-center justify-end mt-6 gap-2">
+                            <div className="flex items-center justify-end mt-6 gap-2 my-3">
                                 {
                                     isEdit? (
                                         walletPermission?.update ? (
