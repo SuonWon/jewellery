@@ -164,6 +164,7 @@ function Wallet() {
         setFormData(transactionData);
         setValidationText({});
         setIsView(false);
+        setInvoices([]);
         setOpen(!open);
     };
 

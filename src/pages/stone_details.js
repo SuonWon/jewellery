@@ -104,11 +104,12 @@ function StoneDetails() {
     const [selectOption, setSelectOption] = useState({
         isSelectAll: false,
         isUnselect: false,
+        selectedShares: "",
     });
 
     useEffect(() => {
         refetch();
-    }, [refetch]);
+    }, [data]);
 
     const [description, setDescription] = useState({
         stoneDesc: "",
@@ -502,6 +503,8 @@ function StoneDetails() {
     //     setOpenDelete(!openDelete);
     // };
 
+    console.log(selectOption);
+
     const openCombineModal = (id) => {
         let temp = data.find(res => res.stoneDetailCode === id);
         axios.get(`${apiUrl}/stone-detail/get-same-stone-details?stoneCode=${temp.stoneCode}&typeCode=${temp.typeCode}&brightCode=${temp.brightCode}&gradeCode=${temp.gradeCode}&size=${temp.size}&sizeUnit=${temp.sizeUnit}`, {
@@ -509,8 +512,29 @@ function StoneDetails() {
                 "Authorization": token
             }
         }).then((res) => {
+            let selectedStone = res.data.find(el => el.stoneDetailCode === id);
+            let share = "";
+            selectedStone.purchase.purchaseShareDetails.map(el => {
+                if (share === "") {
+                    share += `${el.share.shareName}`;
+                } else {
+                    share += `,${el.share.shareName}`;
+                }
+            });
+            setSelectOption({
+                ...selectOption,
+                selectedShares: share
+            })
             setCombineData(
                 res.data.map(el => {
+                    let member = "";
+                    el.purchase.purchaseShareDetails.map(el => {
+                        if (member === "") {
+                            member += `${el.share.shareName}`;
+                        } else {
+                            member += `,${el.share.shareName}`;
+                        }
+                    });
                     return {
                         stoneDetailCode: el.stoneDetailCode,
                         referenceNo: el.referenceNo,
@@ -532,6 +556,7 @@ function StoneDetails() {
                         createdAt: el.createdAt,
                         selectedStone: el.stoneDetailCode === id ? true : false,
                         isSelected: el.stoneDetailCode === id ? true : false,
+                        shares: member
                     }
                 })
             );
@@ -582,9 +607,10 @@ function StoneDetails() {
                         gradeCode: el.gradeCode,
                         size: el.size,
                         sizeUnit: el.sizeUnit,
+                        referenceNo: el.referenceNo,
                     }
                 }
-                combinedStone.referenceNo += `${el.referenceNo}, `;
+                combinedStone.remark += `${el.referenceNo}, `;
                 combinedStone.actualQty += el.qty;
                 combinedStone.actualWeight += el.weight;
                 combinedStone.qty += el.qty;
@@ -621,6 +647,7 @@ function StoneDetails() {
                     });
                 }
             });
+            refetch();
             setOpenCombineStock(!openCombineStock)
         }else {
             setAlertMsg({
@@ -837,19 +864,36 @@ function StoneDetails() {
                     className="border border-blue-gray-200 w-[20px] h-[20px] py-1.5 rounded-md text-black"
                     checked={row.isSelected}
                     disabled={row.selectedStone}
-                    onChange={(e) => {
+                    onChange={async(e) => {
                         setSelectOption({
+                            ...selectOption,
                             isSelectAll: false,
                             isUnselect: false,
                         })
-                        setCombineData(combineData.map((el) => {
-                            if (el.stoneDetailCode === row.stoneDetailCode) {
-                                el.isSelected = e.target.checked;
-                                return el;
-                            } else {
-                                return el;
-                            }
-                        }))
+                        if (row.shares === selectOption.selectedShares) {
+                            setCombineData(combineData.map((el) => {
+                                if (el.stoneDetailCode === row.stoneDetailCode) {
+                                    el.isSelected = e.target.checked;
+                                    return el;
+                                } else {
+                                    return el;
+                                }
+                            }))
+                        } else {
+                            setCombineData(combineData);
+                            setAlertMsg({
+                                ...alertMsg,
+                                visible: true,
+                                isWarning: true,
+                                title: "Warning",
+                                message: "Shares are not same."
+                            });
+                            await pause();
+                            setAlertMsg({
+                                ...alertMsg,
+                                visible: false,
+                            })
+                        }
                     }}
                 />
             )
@@ -869,7 +913,7 @@ function StoneDetails() {
         },
         {
             name: 'Description',
-            width: '280px',
+            width: '250px',
             selector: row => row.description,
         },
         {
@@ -882,6 +926,10 @@ function StoneDetails() {
             width: '200px',
             selector: row => row.supplierName,
         },
+        {
+            name: 'Shares',
+            selector: row => row.shares,
+        },
     ];
 
     const tCombineData = combineData.map((stoneDetail) => {
@@ -893,6 +941,7 @@ function StoneDetails() {
             qty: stoneDetail.qty,
             weight: stoneDetail.weight,
             selectedStone: stoneDetail.selectedStone,
+            shares: stoneDetail.shares,
             isSelected: stoneDetail.isSelected,
         }
     });
@@ -1039,7 +1088,11 @@ function StoneDetails() {
                                                     className="block w-full text-black p-2.5 border border-blue-gray-200 max-h-[2.5rem] rounded-md focus:border-black"
                                                     value={formData.referenceNo}
                                                     onChange={(e) => {
-                                                        setFormData({...formData, referenceNo: e.target.value});
+                                                        setFormData({
+                                                            ...formData, 
+                                                            referenceNo: e.target.value,
+                                                            stoneCode: selectedPurchase.find(el => el.invoiceNo === e.target.value).stone.stoneCode,
+                                                        });
                                                     }}
                                                 >
                                                     <option value="" disabled>Select...</option>
@@ -1353,7 +1406,7 @@ function StoneDetails() {
                         <DialogBody>
                             <ModalTitle titleName="Stock Combination" handleClick={() => setOpenCombineStock(!openCombineStock)} />
                             {
-                                alert.isAlert? <SuccessAlert title={alert.title} message={alert.message} isWarning={alert.isWarning} /> : ""
+                                alertMsg.visible? <SuccessAlert title={alertMsg.title} message={alertMsg.message} isError={alertMsg.isError} isWarning={alertMsg.isWarning}  /> : ""
                             }
                             <Card className="max-h-[500px] max-w-screen-xxl shadow-none p-2 ">
                                 <CardBody className="overflow-auto p-0">
