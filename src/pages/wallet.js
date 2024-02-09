@@ -106,7 +106,7 @@ function Wallet() {
         referenceNo: "",
         paymentMode: "Cash",
         cashType: "",
-        isSalesPruchase: false,
+        isSalesPurchase: false,
         amount: 0,
         remark: "",
         status: true,
@@ -207,7 +207,7 @@ function Wallet() {
                 amount: formData.amount,
                 remark: formData.remark,
                 status: formData.status,
-                isSalesPruchase: formData.isSalesPruchase,
+                isSalesPurchase: formData.isSalesPurchase,
                 createdBy: formData.createdBy,
                 updatedBy: formData.updatedBy,
                 deletedBy: formData.deletedBy,
@@ -253,7 +253,7 @@ function Wallet() {
                 amount: formData.amount,
                 remark: formData.remark,
                 status: formData.status,
-                isSalesPruchase: formData.isSalesPruchase,
+                isSalesPurchase: formData.isSalesPurchase,
                 createdBy: formData.createdBy,
                 updatedBy: formData.updatedBy,
                 deletedBy: formData.deletedBy,
@@ -297,7 +297,7 @@ function Wallet() {
                 amount: formData.amount,
                 remark: formData.remark,
                 status: formData.status,
-                isSalesPruchase: formData.isSalesPruchase,
+                isSalesPurchase: formData.isSalesPurchase,
                 createdBy: formData.createdBy,
                 createdAt: formData.createdDate,
                 updatedBy: auth().username,
@@ -449,7 +449,7 @@ function Wallet() {
                     {/* <Button variant="text" color="deep-purple" className="p-2" onClick={() => handleView(row.id)}><FaPencil /></Button> */}
                     {
                         walletPermission?.delete ? (
-                            <Button variant="text" color="red" className="p-2" disabled={row.isSalesPruchase} onClick={() => handleDeleteBtn(row.id)}><FaTrashCan /></Button>
+                            <Button variant="text" color="red" className="p-2" disabled={row.isSalesPurchase} onClick={() => handleDeleteBtn(row.id)}><FaTrashCan /></Button>
                         ) : null
                     }
                 </div>
@@ -476,7 +476,7 @@ function Wallet() {
             updatedAt: moment(wallet.updatedAt).format("YYYY-MM-DD hh:mm:ss a"),
             updatedBy: wallet.updatedBy,
             status: wallet.status,
-            isSalesPruchase: wallet.isSalesPruchase,
+            isSalesPurchase: wallet.isSalesPurchase,
         }
     });
 
