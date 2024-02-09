@@ -16,7 +16,7 @@ import { v4 as uuidv4 } from 'uuid';
 import axios from "axios";
 import DataTable from "react-data-table-component";
 import Receivable from "./receivable";
-import { useFetchTrueIssueQuery } from "../apis/issueApi";
+import { useFetchIssueQuery, useFetchTrueIssueQuery } from "../apis/issueApi";
 import Cookies from "js-cookie";
 import { AuthContent } from "../context/authContext";
 
@@ -57,7 +57,15 @@ function SalesList() {
 
     const { data: dataCount } = useFetchSalesCountQuery(filterData);
 
-    const { data: issueData } = useFetchTrueIssueQuery();
+    const { data: issueData } = useFetchIssueQuery({
+        skip: 0,
+        take: 0,
+        status: 'O',
+        isComplete: 'A',
+        search_word: '',
+        start_date: null,
+        end_date: null
+    });
 
     const { data: customerData } = useFetchTrueCustomerQuery();
 
@@ -983,10 +991,16 @@ function SalesList() {
                                                         setTBodyData([]);
                                                     }
                                                 }}
+                                                disabled={issueStatus}
                                             >
-                                                <option value="" >Select...</option>
+                                                <option value="" disabled hidden>Select...</option>
                                                 {
-                                                    issueData?.map((issue) => {
+                                                    isEdit? issueData?.map((issue) => {
+                                                        return <option value={issue.issueNo} key={issue.issueNo}>({issue.stoneDetail.stoneDesc}, {issue.issueMember.map(el => {
+                                                                return el.customer.customerName + ",";
+                                                            })})
+                                                        </option>
+                                                    }) : issueData?.map((issue) => {
                                                         if (!issue.isComplete) {
                                                             return <option value={issue.issueNo} key={issue.issueNo}>({issue.stoneDetail.stoneDesc}, {issue.issueMember.map(el => {
                                                                     return el.customer.customerName + ",";

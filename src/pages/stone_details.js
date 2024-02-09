@@ -51,7 +51,7 @@ function StoneDetails() {
         skip: 0,
         take: 0,
         status: 'O',
-        isComplete: 'F',
+        isComplete: 'A',
         paidStatus: 'A',
         search_word: ''
     }
@@ -158,6 +158,7 @@ function StoneDetails() {
         remark: "",
         isActive: true,
         isIssued: false,
+        isCombined: false,
         createdBy: auth().username,
         updatedBy: "",
     };
@@ -310,7 +311,9 @@ function StoneDetails() {
 
     const handleEdit = async (id) => {
         let eData = data.find((stoneDetail) => stoneDetail.stoneDetailCode === id);
+        setIsCombined(eData.isCombined);
         let tempPurchase = purchaseData.find(res => res.invoiceNo === eData.referenceNo);
+        console.log(tempPurchase.isComplete)
         if(tempPurchase) {
             setPurchase({
                 invoiceNo: tempPurchase.invoiceNo,
@@ -348,9 +351,6 @@ function StoneDetails() {
                 }),
             });
             setPurchaseStatus(tempPurchase.isComplete);
-            setIsCombined(false);
-        } else {
-            setIsCombined(true);
         }
         setIsEdit(true);
         setFormData(eData);
@@ -385,6 +385,7 @@ function StoneDetails() {
                 remark: formData.remark,
                 isActive: formData.isActive,
                 isIssued: formData.isIssued,
+                isCombined: formData.isCombined,
                 purchasePrice: formData.purchasePrice,
                 createdBy: formData.createdBy,
                 updatedBy: auth().username,
@@ -591,6 +592,7 @@ function StoneDetails() {
                 remark: "",
                 isActive: true,
                 isIssued: false,
+                isCombined: true,
                 createdBy: auth().username,
                 updatedBy: "",
             };
@@ -1089,14 +1091,24 @@ function StoneDetails() {
                                                     value={formData.referenceNo}
                                                     onChange={(e) => {
                                                         setFormData({
-                                                            ...formData, 
+                                                            ...formData,
                                                             referenceNo: e.target.value,
                                                             stoneCode: selectedPurchase.find(el => el.invoiceNo === e.target.value).stone.stoneCode,
                                                         });
+                                                        setDescription({...description, stoneDesc: selectedPurchase.find(el => el.invoiceNo === e.target.value).stone.stoneDesc});
                                                     }}
+                                                    disabled={purchaseStatus}
                                                 >
                                                     <option value="" disabled>Select...</option>
                                                     {
+                                                        isEdit? 
+                                                        isSupplier?
+                                                        selectedPurchase?.map((purchase) => {
+                                                            return <option value={purchase.invoiceNo} key={purchase.invoiceNo}>{purchase.invoiceNo} ({purchase.supplier.supplierName}, {purchase.stone.stoneDesc})</option>
+                                                        }) :
+                                                        truePurchaseData?.map((purchase) => {
+                                                            return <option value={purchase.invoiceNo} key={purchase.invoiceNo}>{purchase.invoiceNo} ({purchase.supplier.supplierName}, {purchase.stone.stoneDesc})</option>
+                                                        }) :
                                                         isSupplier?
                                                         selectedPurchase?.map((purchase) => {
                                                             if(!purchase.isComplete) {

@@ -55,11 +55,9 @@ function Wallet() {
 
     useEffect(() => {
         setWalletPermission(permissions[21]);
-
         if(walletPermission?.view == false) {
             navigate('/403');
         }
-
         refetch();
         refetchShare();
     }, [permissions, walletPermission, navigate, data, shareData]);
