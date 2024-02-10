@@ -14,6 +14,7 @@ import { AuthContent } from "../context/authContext";
 import { useNavigate } from "react-router-dom";
 import SuccessAlert from "../components/success_alert";
 import { pause } from "../const";
+import ButtonLoader from "../components/buttonLoader";
 
 const validator = require('validator');
 
@@ -53,6 +54,7 @@ function StoneType() {
         message: '',
         isError: false,
         isWarning: false,
+        isNew: false,
     });
 
     const {data, isLoading: dataLoad} = useFetchTypeQuery(filterData);
@@ -67,11 +69,11 @@ function StoneType() {
         createdBy: auth().username,
     })
 
-    const [addType] = useAddTypeMutation();
+    const [addType, addResult] = useAddTypeMutation();
 
-    const [editType] = useUpdateTypeMutation();
+    const [editType, updateResult] = useUpdateTypeMutation();
 
-    const [removeType] = useRemoveTypeMutation();
+    const [removeType, removeResult] = useRemoveTypeMutation();
 
     const [deleteId, setDeleteId] = useState('');
 
@@ -119,7 +121,7 @@ function StoneType() {
                 saveData.typeCode= stoneType.typeCode
             }
 
-            isEdit ? await editType(saveData).then((res) => {
+            isEdit ? await editType(saveData).then(async(res) => {
                 if(res.data) {
                     setAlertMsg({
                         ...alertMsg,
@@ -136,7 +138,20 @@ function StoneType() {
                         isError: true,
                     });
                 }
-            }) : await addType(saveData).then((res) => {
+                setOpen(isNew);
+                setStoneType({
+                    typeCode: 0,
+                    typeDesc: '',
+                    status: true,
+                    createdAt: moment().toISOString(),
+                    createdBy: auth().username,
+                });
+                await pause();
+                setAlertMsg({
+                    ...alertMsg,
+                    visible: false,
+                });
+            }) : await addType(saveData).then(async(res) => {
                 if(res.data) {
                     setAlertMsg({
                         ...alertMsg,
@@ -153,19 +168,19 @@ function StoneType() {
                         isError: true,
                     });
                 }
-            });
-            setOpen(isNew);
-            setStoneType({
-                typeCode: 0,
-                typeDesc: '',
-                status: true,
-                createdAt: moment().toISOString(),
-                createdBy: auth().username,
-            });
-            await pause();
-            setAlertMsg({
-                ...alertMsg,
-                visible: false,
+                setOpen(isNew);
+                setStoneType({
+                    typeCode: 0,
+                    typeDesc: '',
+                    status: true,
+                    createdAt: moment().toISOString(),
+                    createdBy: auth().username,
+                });
+                await pause();
+                setAlertMsg({
+                    ...alertMsg,
+                    visible: false,
+                });
             });
         }
     }
@@ -211,7 +226,7 @@ function StoneType() {
     }
 
     async function handleDelete() {
-        await removeType(deleteId).then((res) => {
+        await removeType(deleteId).then(async(res) => {
             if(res.data) {
                 setAlertMsg({
                     ...alertMsg,
@@ -228,12 +243,12 @@ function StoneType() {
                     isError: true,
                 });
             }
-        });
-        setOpenDelete(!openDelete);
-        await pause();
-        setAlertMsg({
-            ...alertMsg,
-            visible: false,
+            setOpenDelete(!openDelete);
+            await pause();
+            setAlertMsg({
+                ...alertMsg,
+                visible: false,
+            });
         });
     }
 
@@ -417,14 +432,42 @@ function StoneType() {
                                         {
                                             !isEdit ? (
                                                 <>
-                                                    <Button onClick={() => handleSubmit(false)} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2">
-                                                        <FaFloppyDisk className="text-base" /> 
+                                                    <Button 
+                                                        onClick={() => {
+                                                            handleSubmit(false);
+                                                            setAlertMsg({
+                                                                ...alertMsg,
+                                                                isNew: false
+                                                            });
+                                                        }} 
+                                                        color="deep-purple" 
+                                                        size="sm" 
+                                                        variant="gradient" 
+                                                        className="flex items-center gap-2"
+                                                        disabled={addResult.isLoading}
+                                                    >
+                                                        {
+                                                            addResult.isLoading && !alertMsg.isNew ? <ButtonLoader /> : <FaFloppyDisk className="text-base" /> 
+                                                        }
                                                         <Typography variant="small" className="capitalize">
-                                                        Save
+                                                            Save
                                                         </Typography>
                                                     </Button>
-                                                    <Button onClick={handleSubmit} color="deep-purple" size="sm" variant="outlined" className="flex items-center gap-2">
-                                                        <FaCirclePlus className="text-base" /> 
+                                                    <Button 
+                                                        onClick={() => {
+                                                            handleSubmit();
+                                                            setAlertMsg({
+                                                                ...alertMsg,
+                                                                isNew: true
+                                                            });
+                                                        }} 
+                                                        color="deep-purple" size="sm" variant="outlined" 
+                                                        className="flex items-center gap-2"
+                                                        disabled={addResult.isLoading}
+                                                    >
+                                                        {
+                                                            addResult.isLoading && alertMsg.isNew ? <ButtonLoader isNew={true} /> : <FaCirclePlus className="text-base" />
+                                                        }
                                                         <Typography variant="small" className="capitalize">
                                                             Save & New
                                                         </Typography>
@@ -432,8 +475,10 @@ function StoneType() {
                                                 </>
                                             ) : (
                                                 typePermission?.update ? (
-                                                    <Button onClick={() => handleSubmit(false)} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2">
-                                                        <FaFloppyDisk className="text-base" /> 
+                                                    <Button onClick={() => handleSubmit(false)} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2" disabled={updateResult.isLoading}>
+                                                        {
+                                                            updateResult.isLoading? <ButtonLoader /> : <FaFloppyDisk className="text-base" /> 
+                                                        }
                                                         <Typography variant="small" className="capitalize">
                                                             Update
                                                         </Typography>
@@ -445,7 +490,7 @@ function StoneType() {
                                 </div>
                             </DialogBody>                      
                         </Dialog>
-                        <DeleteModal deleteId={deleteId} open={openDelete} handleDelete={handleDelete} closeModal={() => setOpenDelete(!openDelete)} />
+                        <DeleteModal deleteId={deleteId} open={openDelete} handleDelete={handleDelete} isLoading={removeResult.isLoading} closeModal={() => setOpenDelete(!openDelete)} />
                     </div>
                 ) : (
                     <div>Loading...</div>

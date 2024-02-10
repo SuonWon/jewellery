@@ -14,6 +14,7 @@ import { useNavigate } from "react-router-dom";
 import { AuthContent } from "../context/authContext";
 import { pause } from "../const";
 import SuccessAlert from "../components/success_alert";
+import ButtonLoader from "../components/buttonLoader";
 const validator = require("validator");
 
 function Supplier() {
@@ -50,17 +51,18 @@ function Supplier() {
         message: '',
         isError: false,
         isWarning: false,
+        isNew: false,
     });
 
     const {data, isLoading: dataLoad} = useFetchSupplierQuery(filterData);
 
     const {data:dataCount} = useFetchSupplierCountQuery(filterData);
 
-    const [addSupplier] = useAddSupplierMutation();
+    const [addSupplier, addResult] = useAddSupplierMutation();
 
-    const [editSupplier] = useUpdateSupplierMutation();
+    const [editSupplier, updateResult] = useUpdateSupplierMutation();
 
-    const [removeSupplier] = useRemoveSupplierMutation();
+    const [removeSupplier, removeResult] = useRemoveSupplierMutation();
 
     const [deleteId, setDeleteId] = useState('');
 
@@ -170,7 +172,7 @@ function Supplier() {
 
     const onSubmit = async () => {
         if(validateForm()) {
-            addSupplier(formData).then((res) => {
+            addSupplier(formData).then(async(res) => {
                 if(res.data) {
                     setAlertMsg({
                         ...alertMsg,
@@ -187,20 +189,20 @@ function Supplier() {
                         isError: true,
                     });
                 }
-            });
-            resetData();
-            setOpen(!open);
-            await pause();
-            setAlertMsg({
-                ...alertMsg,
-                visible: false,
+                resetData();
+                setOpen(!open);
+                await pause();
+                setAlertMsg({
+                    ...alertMsg,
+                    visible: false,
+                });
             });
         }
     };
 
     const onSaveSubmit = async () => {
         if (validateForm()) {
-            addSupplier(formData).then((res) => {
+            addSupplier(formData).then(async(res) => {
                 if(res.data) {
                     setAlertMsg({
                         ...alertMsg,
@@ -217,12 +219,12 @@ function Supplier() {
                         isError: true,
                     });
                 }
-            });
-            resetData();
-            await pause();
-            setAlertMsg({
-                ...alertMsg,
-                visible: false,
+                resetData();
+                await pause();
+                setAlertMsg({
+                    ...alertMsg,
+                    visible: false,
+                });
             });
         }
     };
@@ -240,7 +242,7 @@ function Supplier() {
             ...formData,
             updatedAt: moment().toISOString(),
             updatedBy: auth().username,
-        }).then((res) => {
+        }).then(async(res) => {
             if(res.data) {
                 setAlertMsg({
                     ...alertMsg,
@@ -257,17 +259,17 @@ function Supplier() {
                     isError: true,
                 });
             }
-        });
-        setOpen(!open);
-        await pause();
-        setAlertMsg({
-            ...alertMsg,
-            visible: false,
+            setOpen(!open);
+            await pause();
+            setAlertMsg({
+                ...alertMsg,
+                visible: false,
+            });
         });
     };
 
     const handleRemove = async (id) => {
-        removeSupplier(id).then((res) => {
+        removeSupplier(id).then(async(res) => {
             if(res.data) {
                 setAlertMsg({
                     ...alertMsg,
@@ -284,12 +286,12 @@ function Supplier() {
                     isError: true,
                 });
             }
-        });
-        setOpenDelete(!openDelete);
-        await pause();
-        setAlertMsg({
-            ...alertMsg,
-            visible: false,
+            setOpenDelete(!openDelete);
+            await pause();
+            setAlertMsg({
+                ...alertMsg,
+                visible: false,
+            });
         });
     };
 
@@ -659,8 +661,10 @@ function Supplier() {
                                     {
                                         isEdit ? (
                                             supPermission?.update ? (
-                                                <Button onClick={submitEdit} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2">
-                                                    <FaFloppyDisk className="text-base" /> 
+                                                <Button onClick={submitEdit} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2" disabled={updateResult.isLoading}>
+                                                    {
+                                                        updateResult.isLoading? <ButtonLoader /> : <FaFloppyDisk className="text-base" /> 
+                                                    }
                                                     <Typography variant="small" className="capitalize">
                                                         Update
                                                     </Typography>
@@ -668,14 +672,40 @@ function Supplier() {
                                             ) : null
                                         ) : 
                                         <>
-                                            <Button onClick={onSubmit} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2">
-                                                <FaFloppyDisk className="text-base" /> 
+                                            <Button 
+                                                onClick={() => {
+                                                    onSubmit();
+                                                    setAlertMsg({
+                                                        ...alertMsg,
+                                                        isNew: false,
+                                                    });
+                                                }} 
+                                                color="deep-purple" size="sm" variant="gradient" 
+                                                className="flex items-center gap-2"
+                                                disabled={addResult.isLoading}
+                                            >
+                                                {
+                                                    addResult.isLoading && !alertMsg.isNew ? <ButtonLoader /> : <FaFloppyDisk className="text-base" /> 
+                                                } 
                                                 <Typography variant="small" className="capitalize">
                                                     Save
                                                 </Typography>
                                             </Button>
-                                            <Button onClick={onSaveSubmit} color="deep-purple" size="sm" variant="outlined" className="flex items-center gap-2">
-                                                <FaCirclePlus className="text-base" /> 
+                                            <Button 
+                                                onClick={() => {
+                                                    onSaveSubmit();
+                                                    setAlertMsg({
+                                                        ...alertMsg,
+                                                        isNew: true
+                                                    })
+                                                }} 
+                                                color="deep-purple" size="sm" variant="outlined" 
+                                                className="flex items-center gap-2"
+                                                disabled={addResult.isLoading}
+                                            >
+                                                {
+                                                    addResult.isLoading && alertMsg.isNew ? <ButtonLoader isNew={true} /> : <FaCirclePlus className="text-base" />
+                                                }
                                                 <Typography variant="small" className="capitalize">
                                                     Save & New
                                                 </Typography>
@@ -687,7 +717,7 @@ function Supplier() {
                              
                         </DialogBody>                      
                     </Dialog>
-                    <DeleteModal deleteId={deleteId} open={openDelete} handleDelete={handleRemove} closeModal={() => setOpenDelete(!openDelete)} />
+                    <DeleteModal deleteId={deleteId} open={openDelete} handleDelete={handleRemove} isLoading={removeResult.isLoading} closeModal={() => setOpenDelete(!openDelete)} />
                 </div>
             ) : null
         }

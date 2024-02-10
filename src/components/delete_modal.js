@@ -1,7 +1,8 @@
 import { Button, Dialog, DialogBody, Typography } from "@material-tailwind/react";
 import { FaCheck, FaXmark } from "react-icons/fa6";
+import ButtonLoader from "./buttonLoader";
 
-function DeleteModal({ deleteId, open, handleDelete, closeModal}) {
+function DeleteModal({ deleteId, open, handleDelete, isLoading, closeModal}) {
 
     return(
         <Dialog open={open} size="xs">
@@ -10,7 +11,12 @@ function DeleteModal({ deleteId, open, handleDelete, closeModal}) {
                     Are you sure?
                 </Typography>
                 <div className="flex items-center gap-4 mt-4">
-                    <Button className="flex items-center gap-2" color="red" onClick={() => handleDelete(deleteId)}><FaCheck/> <span>Delete</span></Button>
+                    <Button className="flex items-center gap-2" color="red" onClick={() => handleDelete(deleteId)} disabled={isLoading}>
+                        {
+                            isLoading? <ButtonLoader /> : <FaCheck/> 
+                        }
+                        <span>Delete</span>
+                    </Button>
                     <Button className="flex items-center gap-2" onClick={closeModal}><FaXmark/> <span>Cancel</span></Button>
                 </div>
             </DialogBody>

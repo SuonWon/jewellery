@@ -1,11 +1,11 @@
 import { Grid } from "react-loader-spinner";
 
-function ButtonLoader() {
+function ButtonLoader({isNew = false}) {
     return (
         <Grid
         height="25"
         width="25"
-        color="#333"
+        color={isNew? "#6e46b9" : "#fff"}
         ariaLabel="triangle-loading"
         wrapperStyle={{}}
         wrapperClassName=""
