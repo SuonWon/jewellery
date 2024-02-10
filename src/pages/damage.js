@@ -46,7 +46,7 @@ function Damage() {
         end_date: null
     });
 
-    const { data, isLoading: dataLoad } = useFetchDamageQuery(filterData);
+    const { data, isLoading: dataLoad, refetch } = useFetchDamageQuery(filterData);
 
     const { data: dataCount } = useFetchDamageCountQuery(filterData);
 
@@ -75,6 +75,10 @@ function Damage() {
     const [updateDamage] = useUpdateDamageMutation();
 
     const [currentPage, setCurrentPage] = useState(1);
+
+    useEffect(() => {
+        refetch();
+    }, [data]);
 
     const [alertMsg, setAlertMsg] = useState({
         visible: false,

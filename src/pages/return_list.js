@@ -55,7 +55,7 @@ function ReturnList({type = 'I'}) {
         end_date: null
     });
 
-    const { data, isLoading: dataLoad } = useFetchReturnQuery({
+    const { data, isLoading: dataLoad, refetch } = useFetchReturnQuery({
         ...filterData,
         return_type: type,
     });
@@ -99,6 +99,10 @@ function ReturnList({type = 'I'}) {
     const [purchaseStoneD, setPurchaseStoneD] = useState([]);
 
     const [currentPage, setCurrentPage] = useState(1);
+
+    useEffect(() => {
+        refetch();
+    }, [data]);
 
     const [alertMsg, setAlertMsg] = useState({
         visible: false,

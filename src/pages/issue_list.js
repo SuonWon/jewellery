@@ -56,7 +56,7 @@ function IssueList() {
         isWarning: false,
     });
 
-    const { data, isLoading: dataLoad } = useFetchIssueQuery(filterData);
+    const { data, isLoading: dataLoad, refetch } = useFetchIssueQuery(filterData);
 
     const { data: dataCount } = useFetchIssueCountQuery(filterData);
 
@@ -96,6 +96,10 @@ function IssueList() {
     const [updateIssue] = useUpdateIssueMutation();
 
     const [currentPage, setCurrentPage] = useState(1);
+
+    useEffect(() => {
+        refetch();
+    }, [data]);
 
     const issueData = {
         issueNo: "",

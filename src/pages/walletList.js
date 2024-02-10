@@ -85,6 +85,10 @@ function WalletList() {
 
     const [validationText, setValidationText] = useState({});
 
+    useEffect(() => {
+        refetch();
+    }, [data]);
+
     const openModal = () => {
         setIsEdit(false);
         setFormData(resetData)

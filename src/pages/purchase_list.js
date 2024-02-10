@@ -115,6 +115,10 @@ function PurchaseList() {
 
     const [removePurchase] = useRemovePurchaseMutation();
 
+    useEffect(() => {
+        refetch();
+    }, [data]);
+
     const purchaseData = {
         invoiceNo: "",
         purDate: moment().format("YYYY-MM-DD"),

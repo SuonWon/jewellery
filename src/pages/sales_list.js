@@ -128,6 +128,10 @@ function SalesList() {
 
     const [selectedIssue, setSelectedIssue] = useState({});
 
+    useEffect(() => {
+        refetch();
+    }, [data]);
+
     const salesData = {
         invoiceNo: "",
         salesDate: moment().format("YYYY-MM-DD"),

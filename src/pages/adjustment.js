@@ -45,7 +45,7 @@ function Adjustment() {
         end_date: null
     });
 
-    const { data, isLoading: dataLoad } = useFetchAdjustmentQuery(filterData);
+    const { data, isLoading: dataLoad, refetch } = useFetchAdjustmentQuery(filterData);
 
     const { data: dataCount } = useFetchAdjustmentCountQuery(filterData);
 
@@ -74,6 +74,10 @@ function Adjustment() {
     const [updateAdjust] = useUpdateAdjustmentMutation();
 
     const [currentPage, setCurrentPage] = useState(1);
+
+    useEffect(() => {
+        refetch();
+    }, [data]);
 
     const [alertMsg, setAlertMsg] = useState({
         visible: false,
