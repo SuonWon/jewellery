@@ -74,6 +74,8 @@ function Wallet() {
 
     const [openDateModal, setOpenDateModal] = useState(false);
 
+    const [closingOpen, setClosingOpen] = useState(false);
+
     const [removeTransaction] = useRemoveWalletTransactionMutation();
 
     const [addTransaction] = useAddWalletTransactionMutation();
@@ -81,6 +83,8 @@ function Wallet() {
     const [updateTransaction] = useUpdateWalletTransactionMutation();
 
     const [currentPage, setCurrentPage] = useState(1);
+
+    const [closing, setClosing] = useState(null);
 
     const [dateRange, setDateRange] = useState({
         startDate: "",
@@ -358,6 +362,16 @@ function Wallet() {
         });
     };
 
+    const fetchClosing = async () => {
+        axios.get(`${apiUrl}/transaction/get-closing-transaction?startDate=2024-02-01&endDate=2024-02-29`, {
+            headers: {
+                "Authorization": token
+            }
+        }).then((res) => {
+            setClosing(res.data);
+        });
+    }
+
     const column = [
         {
             name: 'Status',
@@ -522,6 +536,16 @@ function Wallet() {
                                 </div>
                             ) : null
                         }
+                        <Button 
+                            size="sm" 
+                            className="flex items-center gap-2 bg-main capitalize py-2 px-3" 
+                            onClick={() => {
+                                setClosingOpen(true);
+                                fetchClosing();
+                            }}
+                        >
+                            <FaCirclePlus /> Cash Closing
+                        </Button>
                     </div>
                     <Card className="h-auto shadow-none max-w-screen-xxl rounded-sm p-2 border">
                         <CardBody className="grid grid-cols-3 gap-2 rounded-sm overflow-auto p-2">
@@ -1130,6 +1154,53 @@ function Wallet() {
                                 }
                             </div>
                         </DialogBody>
+                    </Dialog>
+
+                    <Dialog open={closingOpen} className="px-10 py-10">
+                        {
+                            closing != null && closing != undefined ? (
+                                <div>
+                                    <div className="flex">
+                                        <p className="w-[150px]">Purchase</p>:<p className="text-right w-[100px]">{closing.purchase.grand.toLocaleString()}</p>
+                                    </div>
+                                    <div className="flex">
+                                        <p className="w-[150px]">Sales</p>:<p className="text-right w-[100px]">{closing.sales.grand.toLocaleString()}</p>
+                                    </div>
+                                    {
+                                        closing.wallet.map(rec => {
+                                            if(rec.cashType == 'DEBIT') {
+                                                return(
+                                                    <div className="flex">
+                                                        <p className="w-[150px]">{rec.category}</p>:<p className="text-right w-[100px]">{rec.amount.toLocaleString()}</p>
+                                                    </div>
+                                                )
+                                            }
+                                        })
+                                    }
+                                    {
+                                        closing.wallet.map(rec => {
+                                            if(rec.cashType == 'CREDIT') {
+                                                return(
+                                                    <div className="flex">
+                                                        <p className="w-[150px]">{rec.category}</p>:<p className="text-right w-[100px]">{rec.amount.toLocaleString()}</p>
+                                                    </div>
+                                                )
+                                            }
+                                        })
+                                    }
+                                </div>
+                            ) : null
+                        }
+                        <div className="flex justify-end">
+                            <Button 
+                                className="flex items-center gap-2 bg-main capitalize mt-5" 
+                                onClick={() => {
+                                    setClosingOpen(false);
+                                }}
+                            >
+                                <span>Close</span>
+                            </Button>
+                        </div>
                     </Dialog>
                 </div>
             ) : <div>Loading...</div>

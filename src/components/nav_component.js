@@ -6,6 +6,7 @@ import { useAuthUser, useSignOut } from "react-auth-kit";
 import { useContext, useState } from "react";
 import { AuthContent } from "../context/authContext";
 
+const pjson = require('../../package.json');
 
 function Nav() {
 
@@ -41,13 +42,18 @@ function Nav() {
     return(
         <div className='flex flex-col sticky top-0 z-[9999]'>
             <nav className="grid grid-cols-2 gap-2 items-center text-neutral-50 py-2 px-4 bg-main xl:grid-cols-6">
-                <div className="block xl:hidden col-start-1">
-                    <IconButton variant="text" color="white" onClick={() => setOpen(!open)}>
-                        <FaBars className="text-xl" />
-                    </IconButton>
-                </div>
-                <div className="hidden xl:block">
-                    <Typography as="a" href='/' variant='h5' className='text-white font-bold'>Jewellery Sales</Typography>
+                <div className="flex">
+                    <div className="me-3">
+                        <div className="inline xl:hidden col-start-1">
+                            <IconButton variant="text" color="white" onClick={() => setOpen(!open)}>
+                                <FaBars className="text-xl" />
+                            </IconButton>
+                        </div>
+                        <div className="hidden xl:block ">
+                            <Typography as="a" href='/' variant='h5' className='text-white font-bold'>Jewellery Sales</Typography>
+                        </div>
+                    </div>
+                    <p className="text-white text-xs mt-4 lg:mt-4 xl:mt-2">v {pjson.version}</p>
                 </div>
                 <div className="flex flex-row col-span-4 justify-center text-sm items-center font-medium space-x-2 hidden xl:flex">
                     {/* Dashboard */}

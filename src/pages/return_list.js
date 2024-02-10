@@ -41,7 +41,7 @@ function ReturnList({type = 'I'}) {
         })
 
         if(returnPermission.purchase?.view == false && returnPermission.sales?.view == false && returnPermission.issue?.view == false) {
-            navigate('/suppleir')
+            navigate('/supplier')
         }
     }, [permissions, returnPermission.purchase, returnPermission.sales, returnPermission.issue, navigate])
 
@@ -439,7 +439,7 @@ function ReturnList({type = 'I'}) {
             returnNo: returnData.returnNo,
             returnDate: moment(returnData.returnDate).format("YYYY-MM-DD"),
             referenceNo: returnData.referenceNo,
-            stoneDetail: returnData.stoneDetailCode,
+            stoneDetail: returnData.stoneDetail.stoneDesc,
             qty: returnData.qty.toLocaleString('en-US'),
             weight: returnData.weight.toLocaleString('en-US'),
             unitCode: returnData.unitCode,
