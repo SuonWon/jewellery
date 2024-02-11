@@ -17,6 +17,7 @@ import axios from "axios";
 import Cookies from "js-cookie";
 import { useNavigate } from "react-router-dom";
 import { AuthContent } from "../context/authContext";
+import ButtonLoader from "../components/buttonLoader";
 
 const token = 'Bearer ' + Cookies.get('_auth');
 
@@ -99,6 +100,7 @@ function StoneDetails() {
         message: '',
         isError: false,
         isWarning: false,
+        isNew: false,
     });
 
     const [selectOption, setSelectOption] = useState({
@@ -119,11 +121,11 @@ function StoneDetails() {
         sizeUnit: "လုံးစီး",
     });
 
-    const [addStoneDetail] = useAddStoneDetailsMutation();
+    const [addStoneDetail, addResult] = useAddStoneDetailsMutation();
 
-    const [editStoneDetail] = useUpdateStoneDetailsMutation();
+    const [editStoneDetail, updateResult] = useUpdateStoneDetailsMutation();
 
-    const [removeStoneDetail] = useRemoveStoneDetailsMutation();
+    const [removeStoneDetail, removeResult] = useRemoveStoneDetailsMutation();
 
     const [updateStatus] = useUpdatePurchaseMutation();
 
@@ -220,55 +222,12 @@ function StoneDetails() {
 
     const onSubmit = async () => {
         if(validateForm()) {
-                console.log("Ji");
-                addStoneDetail({
-                    ...formData,
-                    stoneDesc: `${description.stoneDesc} ${description.size}${description.sizeUnit} ${description.gradeDesc} ${description.brightDesc}`,
-                    actualQty: formData.qty,
-                    actualWeight: formData.weight,
-                }).then((res) => {
-                    if(res.data) {
-                        setAlertMsg({
-                            ...alertMsg,
-                            visible: true,
-                            title: "Success",
-                            message: "Stone selection created successfully.",
-                        });
-                    } else {
-                        setAlertMsg({
-                            ...alertMsg,
-                            visible: true,
-                            title: "Error",
-                            message: res.error.data.message,
-                            isError: true,
-                        });
-                    }
-                });
-                if (purchaseStatus) {
-                    updatePStatus({
-                        id: formData.referenceNo,
-                        updatedBy: auth().username,
-                    });
-                }
-                setPurchaseStatus(false);
-                setFormData(stoneDetail);
-                setOpen(!open);
-                await pause();
-                setAlertMsg({
-                    ...alertMsg,
-                    visible: false,
-                });
-        }
-    };
-
-    const onSaveSubmit = async () => {
-        if (validateForm()) {
             addStoneDetail({
                 ...formData,
                 stoneDesc: `${description.stoneDesc} ${description.size}${description.sizeUnit} ${description.gradeDesc} ${description.brightDesc}`,
                 actualQty: formData.qty,
                 actualWeight: formData.weight,
-            }).then((res) => {
+            }).then(async(res) => {
                 if(res.data) {
                     setAlertMsg({
                         ...alertMsg,
@@ -285,26 +244,68 @@ function StoneDetails() {
                         isError: true,
                     });
                 }
-            });
-            if (purchaseStatus) {
-                updatePStatus({
-                    id: formData.referenceNo,
-                    updatedBy: auth().username,
+                if (purchaseStatus) {
+                    updatePStatus({
+                        id: formData.referenceNo,
+                        updatedBy: auth().username,
+                    });
+                }
+                setPurchaseStatus(false);
+                setFormData(stoneDetail);
+                setOpen(!open);
+                await pause();
+                setAlertMsg({
+                    ...alertMsg,
+                    visible: false,
                 });
-            }
-            setPurchaseStatus(false);
-            setFormData(stoneDetail);
-            setDescription({
-                stoneDesc: "",
-                brightDesc: "",
-                gradeDesc: "",
-                size: "",
-                sizeUnit: "လုံးစီး",
             });
-            await pause();
-            setAlertMsg({
-                ...alertMsg,
-                visible: false,
+        }
+    };
+
+    const onSaveSubmit = async () => {
+        if (validateForm()) {
+            addStoneDetail({
+                ...formData,
+                stoneDesc: `${description.stoneDesc} ${description.size}${description.sizeUnit} ${description.gradeDesc} ${description.brightDesc}`,
+                actualQty: formData.qty,
+                actualWeight: formData.weight,
+            }).then(async(res) => {
+                if(res.data) {
+                    setAlertMsg({
+                        ...alertMsg,
+                        visible: true,
+                        title: "Success",
+                        message: "Stone selection created successfully.",
+                    });
+                } else {
+                    setAlertMsg({
+                        ...alertMsg,
+                        visible: true,
+                        title: "Error",
+                        message: res.error.data.message,
+                        isError: true,
+                    });
+                }
+                if (purchaseStatus) {
+                    updatePStatus({
+                        id: formData.referenceNo,
+                        updatedBy: auth().username,
+                    });
+                }
+                setPurchaseStatus(false);
+                setFormData(stoneDetail);
+                setDescription({
+                    stoneDesc: "",
+                    brightDesc: "",
+                    gradeDesc: "",
+                    size: "",
+                    sizeUnit: "လုံးစီး",
+                });
+                await pause();
+                setAlertMsg({
+                    ...alertMsg,
+                    visible: false,
+                });
             });
         }
     };
@@ -389,7 +390,7 @@ function StoneDetails() {
                 purchasePrice: formData.purchasePrice,
                 createdBy: formData.createdBy,
                 updatedBy: auth().username,
-            }).then((res) => {
+            }).then(async(res) => {
                 if(res.data) {
                     setAlertMsg({
                         ...alertMsg,
@@ -406,22 +407,22 @@ function StoneDetails() {
                         isError: true,
                     });
                 }
-            });
-            if(purchaseStatus !== purchase.isComplete && formData.referenceNo !== "") {
-                console.log(purchaseStatus);
-                updateStatus({
-                    ...purchase,
-                    isComplete: purchaseStatus,
-                    updatedBy: auth().username,
-                }).then((res) => {
-                    console.log(res);
+                if(purchaseStatus !== purchase.isComplete && formData.referenceNo !== "") {
+                    console.log(purchaseStatus);
+                    updateStatus({
+                        ...purchase,
+                        isComplete: purchaseStatus,
+                        updatedBy: auth().username,
+                    }).then((res) => {
+                        console.log(res);
+                    });
+                }
+                setOpen(!open);
+                await pause();
+                setAlertMsg({
+                    ...alertMsg,
+                    visible: false,
                 });
-            }
-            setOpen(!open);
-            await pause();
-            setAlertMsg({
-                ...alertMsg,
-                visible: false,
             });
         }
     };
@@ -473,7 +474,7 @@ function StoneDetails() {
     };
 
     const handleRemove = async (id) => {
-        removeStoneDetail(id).then((res) => {
+        removeStoneDetail(id).then(async(res) => {
             if(res.data) {
                 setAlertMsg({
                     ...alertMsg,
@@ -490,12 +491,12 @@ function StoneDetails() {
                     isError: true,
                 });
             }
-        });
-        setOpenDelete(!openDelete);
-        await pause();
-        setAlertMsg({
-            ...alertMsg,
-            visible: false,
+            setOpenDelete(!openDelete);
+            await pause();
+            setAlertMsg({
+                ...alertMsg,
+                visible: false,
+            });
         });
     };
 
@@ -1385,8 +1386,10 @@ function StoneDetails() {
                                     {
                                         isEdit ? (
                                             selectionPermission?.update ? (
-                                                <Button onClick={submitEdit} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2">
-                                                    <FaFloppyDisk className="text-base" />
+                                                <Button onClick={submitEdit} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2" disabled={updateResult.isLoading}>
+                                                    {
+                                                        updateResult.isLoading? <ButtonLoader /> : <FaFloppyDisk className="text-base" /> 
+                                                    }
                                                     <Typography variant="small" className="capitalize">
                                                         Update
                                                     </Typography>
@@ -1394,14 +1397,40 @@ function StoneDetails() {
                                             ) : null
                                         ) : 
                                         <>
-                                            <Button onClick={onSubmit} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2">
-                                                <FaFloppyDisk className="text-base" />
+                                            <Button 
+                                                onClick={() => {
+                                                    onSubmit();
+                                                    setAlertMsg({
+                                                        ...alertMsg,
+                                                        isNew: false
+                                                    });
+                                                }} 
+                                                color="deep-purple" size="sm" variant="gradient" 
+                                                className="flex items-center gap-2"
+                                                disabled={addResult.isLoading}
+                                            >
+                                                {
+                                                    addResult.isLoading && !alertMsg.isNew ? <ButtonLoader /> : <FaFloppyDisk className="text-base" /> 
+                                                } 
                                                 <Typography variant="small" className="capitalize">
                                                     Save
                                                 </Typography>
                                             </Button>
-                                            <Button onClick={onSaveSubmit} color="deep-purple" size="sm" variant="outlined" className="flex items-center gap-2">
-                                                <FaCirclePlus className="text-base" />
+                                            <Button 
+                                                onClick={() => {
+                                                    onSaveSubmit();
+                                                    setAlertMsg({
+                                                        ...alertMsg,
+                                                        isNew: true
+                                                    })
+                                                }} 
+                                                color="deep-purple" size="sm" variant="outlined" 
+                                                className="flex items-center gap-2"
+                                                disabled={addResult.isLoading}
+                                            >
+                                                {
+                                                    addResult.isLoading && alertMsg.isNew ? <ButtonLoader isNew={true} /> : <FaCirclePlus className="text-base" />
+                                                }
                                                 <Typography variant="small" className="capitalize">
                                                     Save & New
                                                 </Typography>
@@ -1413,7 +1442,7 @@ function StoneDetails() {
                             </form>
                         </DialogBody>
                     </Dialog>
-                    <DeleteModal deleteId={deleteId} open={openDelete} handleDelete={handleRemove} closeModal={() => setOpenDelete(!openDelete)} />
+                    <DeleteModal deleteId={deleteId} open={openDelete} handleDelete={handleRemove} isLoading={removeResult.isLoading} closeModal={() => setOpenDelete(!openDelete)} />
                     <Dialog open={openCombineStock} handler={openCombineModal} size="lg">
                         <DialogBody>
                             <ModalTitle titleName="Stock Combination" handleClick={() => setOpenCombineStock(!openCombineStock)} />

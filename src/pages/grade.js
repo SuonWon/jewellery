@@ -14,6 +14,7 @@ import { useAuthUser } from "react-auth-kit";
 import { useNavigate } from "react-router-dom";
 import SuccessAlert from "../components/success_alert";
 import { pause } from "../const";
+import ButtonLoader from "../components/buttonLoader";
 
 const validator = require('validator');
 
@@ -54,6 +55,7 @@ function Grade() {
         message: '',
         isError: false,
         isWarning: false,
+        isNew: false,
     });
 
     const {data, isLoading: dataLoad} = useFetchGradeQuery(filterData);
@@ -68,11 +70,11 @@ function Grade() {
         createdBy: auth().username
     })
 
-    const [addGrade] = useAddGradeMutation();
+    const [addGrade, addResult] = useAddGradeMutation();
 
-    const [editGrade] = useUpdateGradeMutation();
+    const [editGrade, updateResult] = useUpdateGradeMutation();
 
-    const [removeGrade] = useRemoveGradeMutation();
+    const [removeGrade, removeResult] = useRemoveGradeMutation();
 
     const [deleteId, setDeleteId] = useState('');
 
@@ -118,7 +120,7 @@ function Grade() {
             if(isEdit) {
                 saveData.gradeCode = grade.gradeCode
             }
-            isEdit ? await editGrade(saveData).then((res) => {
+            isEdit ? await editGrade(saveData).then(async(res) => {
                 if(res.data) {
                     setAlertMsg({
                         ...alertMsg,
@@ -135,7 +137,20 @@ function Grade() {
                         isError: true,
                     });
                 }
-            }) : await addGrade(saveData).then((res) => {
+                setOpen(isNew);
+                setGrade({ 
+                    gradeCode: 0,
+                    gradeDesc: '',
+                    status: true,
+                    createdAt: moment().toISOString(),
+                    createdBy: auth().username
+                });
+                await pause();
+                setAlertMsg({
+                    ...alertMsg,
+                    visible: false,
+                });
+            }) : await addGrade(saveData).then(async(res) => {
                 if(res.data) {
                     setAlertMsg({
                         ...alertMsg,
@@ -152,20 +167,20 @@ function Grade() {
                         isError: true,
                     });
                 }
-            });
-            setOpen(isNew);
-            setGrade({ 
-                gradeCode: 0,
-                gradeDesc: '',
-                status: true,
-                createdAt: moment().toISOString(),
-                createdBy: auth().username
-            });
-            await pause();
-            setAlertMsg({
-                ...alertMsg,
-                visible: false,
-            });
+                setOpen(isNew);
+                setGrade({ 
+                    gradeCode: 0,
+                    gradeDesc: '',
+                    status: true,
+                    createdAt: moment().toISOString(),
+                    createdBy: auth().username
+                });
+                await pause();
+                setAlertMsg({
+                    ...alertMsg,
+                    visible: false,
+                });
+            });  
         }
     }
 
@@ -362,7 +377,6 @@ function Grade() {
                                     
                                     <p className="ml-2 mt-[6px]">entries</p>
                                 </div>
-                                
                                 <div className="flex justify-end">
                                     {
                                         dataCount != undefined ? (
@@ -383,7 +397,6 @@ function Grade() {
                                         ) : (<></>)
                                     }
                                 </div>
-                                
                             </div>
                             
                         </CardBody>
@@ -418,14 +431,44 @@ function Grade() {
                                     {
                                         !isEdit ? (
                                             <>
-                                                <Button onClick={() => handleSubmit(false)} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2">
-                                                    <FaFloppyDisk className="text-base" /> 
+                                                <Button 
+                                                    onClick={() => {
+                                                        handleSubmit(false);
+                                                        setAlertMsg({
+                                                            ...alertMsg,
+                                                            isNew: false,
+                                                        });
+                                                    }} 
+                                                    color="deep-purple" 
+                                                    size="sm" 
+                                                    variant="gradient" 
+                                                    className="flex items-center gap-2"
+                                                    disabled={addResult.isLoading}
+                                                >
+                                                    {
+                                                        addResult.isLoading && !alertMsg.isNew ? <ButtonLoader /> : <FaFloppyDisk className="text-base" /> 
+                                                    }
                                                     <Typography variant="small" className="capitalize">
                                                         Save
                                                     </Typography>
                                                 </Button>
-                                                <Button onClick={handleSubmit} color="deep-purple" size="sm" variant="outlined" className="flex items-center gap-2">
-                                                    <FaCirclePlus className="text-base" /> 
+                                                <Button 
+                                                    onClick={() => {
+                                                        handleSubmit();
+                                                        setAlertMsg({
+                                                            ...alertMsg,
+                                                            isNew: true,
+                                                        });
+                                                    }} 
+                                                    color="deep-purple" 
+                                                    size="sm" 
+                                                    variant="outlined" 
+                                                    className="flex items-center gap-2"
+                                                    disabled={addResult.isLoading}
+                                                >
+                                                    {
+                                                        addResult.isLoading && alertMsg.isNew ? <ButtonLoader isNew={true} /> : <FaCirclePlus className="text-base" />
+                                                    }
                                                     <Typography variant="small" className="capitalize">
                                                         Save & New
                                                     </Typography>
@@ -433,8 +476,10 @@ function Grade() {
                                             </>
                                         ) : (
                                             gradePermission?.update ? (
-                                                <Button onClick={() => handleSubmit(false)} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2">
-                                                    <FaFloppyDisk className="text-base" /> 
+                                                <Button onClick={() => handleSubmit(false)} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2" disabled={updateResult.isLoading}>
+                                                    {
+                                                        updateResult.isLoading? <ButtonLoader /> : <FaFloppyDisk className="text-base" /> 
+                                                    }
                                                     <Typography variant="small" className="capitalize">
                                                         Update
                                                     </Typography>
@@ -446,7 +491,7 @@ function Grade() {
                             </div>
                         </DialogBody>                      
                     </Dialog>
-                    <DeleteModal deleteId={deleteId} open={openDelete} handleDelete={handleDelete} closeModal={() => setOpenDelete(!openDelete)} />
+                    <DeleteModal deleteId={deleteId} open={openDelete} handleDelete={handleDelete} isLoading={removeResult.isLoading} closeModal={() => setOpenDelete(!openDelete)} />
                 </div>
             ) : (
                 <div>Loading....</div>

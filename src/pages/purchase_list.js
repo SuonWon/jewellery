@@ -56,7 +56,7 @@ function PurchaseList() {
 
     const { data, isLoading : dataLoad, refetch} = useFetchPurchaseQuery(filterData);
     
-    const { data:dataCount} = useFetchPurchaseCountQuery(filterData);
+    const { data:dataCount } = useFetchPurchaseCountQuery(filterData);
 
     const { data: supplierData } = useFetchTrueSupplierQuery();
 
@@ -113,7 +113,7 @@ function PurchaseList() {
         isWarning: false,
     });
 
-    const [removePurchase] = useRemovePurchaseMutation();
+    const [removePurchase, removeResult] = useRemovePurchaseMutation();
 
     useEffect(() => {
         refetch();
@@ -1577,7 +1577,7 @@ function PurchaseList() {
                                 {
                                     isEdit? (
                                         purchasePermission?.update ? (
-                                            <Button onClick={handleUpdate} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2">
+                                            <Button onClick={handleUpdate} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2" disabled={updateResult.isLoading}>
                                                 {
                                                     updateResult.isLoading? <ButtonLoader /> : <FaFloppyDisk className="text-base" />
                                                 }
@@ -1588,7 +1588,15 @@ function PurchaseList() {
                                         ) : null
                                     ) :
                                     <>
-                                        <Button onClick={handleSubmit} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2">
+                                        <Button 
+                                            onClick={() => {
+                                                handleSubmit();
+                                                setIsNew(false);
+                                            }} 
+                                            color="deep-purple" size="sm" variant="gradient" 
+                                            className="flex items-center gap-2"
+                                            disabled={addResult.isLoading}
+                                        >
                                             {
                                                 addResult.isLoading && !isNew? <ButtonLoader /> : <FaFloppyDisk className="text-base" />
                                             }
@@ -1602,7 +1610,9 @@ function PurchaseList() {
                                                 setIsNew(true);
                                             }} 
                                             color="deep-purple" size="sm" variant="outlined" 
-                                            className="flex items-center gap-2">
+                                            className="flex items-center gap-2"
+                                            disabled={addResult.isLoading}
+                                        >
                                             {
                                                 addResult.isLoading && isNew ? <ButtonLoader /> : <FaCirclePlus className="text-base" />
                                             }

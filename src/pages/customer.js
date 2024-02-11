@@ -14,6 +14,7 @@ import { useNavigate } from "react-router-dom";
 import { AuthContent } from "../context/authContext";
 import { pause } from "../const";
 import SuccessAlert from "../components/success_alert";
+import ButtonLoader from "../components/buttonLoader";
 
 const validator = require("validator");
 
@@ -53,17 +54,18 @@ function Customer() {
         message: '',
         isError: false,
         isWarning: false,
+        isNew: false,
     });
 
     const {data, isLoading: dataLoad} = useFetchCustomerQuery(filterData);
 
     const {data:dataCount} = useFetchCustomerCountQuery(filterData); 
 
-    const [addCustomer] = useAddCustomerMutation();
+    const [addCustomer, addResult] = useAddCustomerMutation();
 
-    const [editCustomer] = useUpdateCustomerMutation();
+    const [editCustomer, updateResult] = useUpdateCustomerMutation();
 
-    const [removeCustomer] = useRemoveCustomerMutation();
+    const [removeCustomer, removeResult] = useRemoveCustomerMutation();
 
     const [deleteId, setDeleteId] = useState('');
 
@@ -174,7 +176,7 @@ function Customer() {
 
     const onSubmit = async () => {
         if(validateForm()) {
-            addCustomer(formData).then((res) => {
+            addCustomer(formData).then(async(res) => {
                 if(res.data) {
                     setAlertMsg({
                         ...alertMsg,
@@ -191,20 +193,20 @@ function Customer() {
                         isError: true,
                     });
                 }
-            });
-            resetData();
-            setOpen(!open);
-            await pause();
-            setAlertMsg({
-                ...alertMsg,
-                visible: false,
+                resetData();
+                setOpen(!open);
+                await pause();
+                setAlertMsg({
+                    ...alertMsg,
+                    visible: false,
+                });
             });
         }
     };
 
     const onSaveSubmit = async () => {
         if (validateForm()) {
-            addCustomer(formData).then((res) => {
+            addCustomer(formData).then(async(res) => {
                 if(res.data) {
                     setAlertMsg({
                         ...alertMsg,
@@ -221,12 +223,12 @@ function Customer() {
                         isError: true,
                     });
                 }
-            });
-            resetData();
-            await pause();
-            setAlertMsg({
-                ...alertMsg,
-                visible: false,
+                resetData();
+                await pause();
+                setAlertMsg({
+                    ...alertMsg,
+                    visible: false,
+                });
             });
         }
     };
@@ -244,7 +246,7 @@ function Customer() {
             ...formData,
             updatedAt: moment().toISOString(),
             updatedBy: auth().username,
-        }).then((res) => {
+        }).then(async(res) => {
             if(res.data) {
                 setAlertMsg({
                     ...alertMsg,
@@ -261,17 +263,17 @@ function Customer() {
                     isError: true,
                 });
             }
-        });
-        setOpen(!open);
-        await pause();
-        setAlertMsg({
-            ...alertMsg,
-            visible: false,
+            setOpen(!open);
+            await pause();
+            setAlertMsg({
+                ...alertMsg,
+                visible: false,
+            });
         });
     };
 
     const handleRemove = async (id) => {
-        removeCustomer(id).then((res) => {
+        removeCustomer(id).then(async(res) => {
             if(res.data) {
                 setAlertMsg({
                     ...alertMsg,
@@ -288,12 +290,12 @@ function Customer() {
                     isError: true,
                 });
             }
-        });
-        setOpenDelete(!openDelete);
-        await pause();
-        setAlertMsg({
-            ...alertMsg,
-            visible: false,
+            setOpenDelete(!openDelete);
+            await pause();
+            setAlertMsg({
+                ...alertMsg,
+                visible: false,
+            });
         });
     };
 
@@ -673,8 +675,10 @@ function Customer() {
                                     {
                                         isEdit ? (
                                             customerPermission?.update ? (
-                                                <Button onClick={submitEdit} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2">
-                                                    <FaFloppyDisk className="text-base" /> 
+                                                <Button onClick={submitEdit} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2" disabled={updateResult.isLoading}>
+                                                    {
+                                                        updateResult.isLoading? <ButtonLoader /> : <FaFloppyDisk className="text-base" /> 
+                                                    } 
                                                     <Typography variant="small" className="capitalize">
                                                         Update
                                                     </Typography>
@@ -682,14 +686,40 @@ function Customer() {
                                             ) : null
                                         ) : 
                                         <>
-                                            <Button onClick={onSubmit} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2">
-                                                <FaFloppyDisk className="text-base" /> 
+                                            <Button 
+                                                onClick={() => {
+                                                    onSubmit();
+                                                    setAlertMsg({
+                                                        ...alertMsg,
+                                                        isNew: false
+                                                    });
+                                                }} 
+                                                color="deep-purple" size="sm" variant="gradient" 
+                                                className="flex items-center gap-2"
+                                                disabled={addResult.isLoading}
+                                            >
+                                                {
+                                                    addResult.isLoading && !alertMsg.isNew ? <ButtonLoader /> : <FaFloppyDisk className="text-base" /> 
+                                                }
                                                 <Typography variant="small" className="capitalize">
                                                     Save
                                                 </Typography>
                                             </Button>
-                                            <Button onClick={onSaveSubmit} color="deep-purple" size="sm" variant="outlined" className="flex items-center gap-2">
-                                                <FaCirclePlus className="text-base" /> 
+                                            <Button 
+                                                onClick={() => {
+                                                    onSaveSubmit();
+                                                    setAlertMsg({
+                                                        ...alertMsg,
+                                                        isNew: true
+                                                    });
+                                                }} 
+                                                color="deep-purple" size="sm" variant="outlined" 
+                                                className="flex items-center gap-2"
+                                                disabled={addResult.isLoading}
+                                            >
+                                                {
+                                                    addResult.isLoading && alertMsg.isNew ? <ButtonLoader isNew={true} /> : <FaCirclePlus className="text-base" />
+                                                }
                                                 <Typography variant="small" className="capitalize">
                                                     Save & New
                                                 </Typography>
@@ -701,7 +731,7 @@ function Customer() {
                             </form>
                         </DialogBody>                      
                     </Dialog>
-                    <DeleteModal deleteId={deleteId} open={openDelete} handleDelete={handleRemove} closeModal={() => setOpenDelete(!openDelete)} />
+                    <DeleteModal deleteId={deleteId} open={openDelete} handleDelete={handleRemove} isLoading={removeResult.isLoading} closeModal={() => setOpenDelete(!openDelete)} />
                 </div>
 
             ) : null

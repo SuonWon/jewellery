@@ -14,16 +14,17 @@ import { AuthContent } from "../context/authContext";
 import { useNavigate } from "react-router-dom";
 import { pause } from "../const";
 import SuccessAlert from "../components/success_alert";
+import ButtonLoader from "../components/buttonLoader";
 
 const validator = require('validator');
 
 function WalletCategory() {
 
-    const [addCategory] = useAddWalletCategoryMutation();
+    const [addCategory, addResult] = useAddWalletCategoryMutation();
 
-    const [editCategory] = useUpdateWalletCategoryMutation();
+    const [editCategory, updateResult] = useUpdateWalletCategoryMutation();
 
-    const [removeCategory] = useRemoveWalletCategoryMutation();
+    const [removeCategory, removeResult] = useRemoveWalletCategoryMutation();
 
     const auth = useAuthUser();
 
@@ -59,6 +60,7 @@ function WalletCategory() {
         message: '',
         isError: false,
         isWarning: false,
+        isNew: false,
     });
 
     const {data, isLoading: dataLoad} = useFetchWalletCategoryQuery(filterData);
@@ -119,7 +121,7 @@ function WalletCategory() {
                 saveData.categoryCode = formData.categoryCode
             }
 
-            isEdit ? await editCategory(saveData).then((res) => {
+            isEdit ? await editCategory(saveData).then(async(res) => {
                 if(res.data) {
                     setAlertMsg({
                         ...alertMsg,
@@ -136,7 +138,14 @@ function WalletCategory() {
                         isError: true,
                     });
                 }
-            }) : await addCategory(saveData).then((res) => {
+                setOpen(isNew);
+                setFormData(resetData);
+                await pause();
+                setAlertMsg({
+                    ...alertMsg,
+                    visible: false,
+                });
+            }) : await addCategory(saveData).then(async(res) => {
                 if(res.data) {
                     setAlertMsg({
                         ...alertMsg,
@@ -153,13 +162,13 @@ function WalletCategory() {
                         isError: true,
                     });
                 }
-            });
-            setOpen(isNew);
-            setFormData(resetData);
-            await pause();
-            setAlertMsg({
-                ...alertMsg,
-                visible: false,
+                setOpen(isNew);
+                setFormData(resetData);
+                await pause();
+                setAlertMsg({
+                    ...alertMsg,
+                    visible: false,
+                });
             });
         }
     }
@@ -247,7 +256,6 @@ function WalletCategory() {
         },
         {
             name: 'Description',
-            width: "200px",
             selector: row => row.categoryDesc,
             
         },
@@ -422,14 +430,40 @@ function WalletCategory() {
                             {
                                 !isEdit ? (
                                     <>
-                                        <Button onClick={() => handleSubmit(false)} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2">
-                                            <FaFloppyDisk className="text-base" /> 
+                                        <Button 
+                                            onClick={() => {
+                                                handleSubmit(false);
+                                                setAlertMsg({
+                                                    ...alertMsg,
+                                                    isNew: false
+                                                });
+                                            }} 
+                                            color="deep-purple" size="sm" variant="gradient" 
+                                            className="flex items-center gap-2"
+                                            disabled={addResult.isLoading}
+                                        >
+                                            {
+                                                addResult.isLoading && !alertMsg.isNew ? <ButtonLoader /> : <FaCirclePlus className="text-base" />
+                                            }
                                             <Typography variant="small" className="capitalize">
                                                 Save
                                             </Typography>
                                         </Button>
-                                        <Button onClick={handleSubmit} color="deep-purple" size="sm" variant="outlined" className="flex items-center gap-2">
-                                            <FaCirclePlus className="text-base" /> 
+                                        <Button 
+                                            onClick={() => {
+                                                handleSubmit();
+                                                setAlertMsg({
+                                                    ...alertMsg,
+                                                    isNew: true
+                                                });
+                                            }} 
+                                            color="deep-purple" size="sm" variant="outlined" 
+                                            className="flex items-center gap-2"
+                                            disabled={addResult.isLoading}
+                                        >
+                                            {
+                                                addResult.isLoading && alertMsg.isNew ? <ButtonLoader isNew={true} /> : <FaCirclePlus className="text-base" />
+                                            }
                                             <Typography variant="small" className="capitalize">
                                                 Save & New
                                             </Typography>
@@ -437,8 +471,10 @@ function WalletCategory() {
                                     </>
                                 ) : (
                                     catePermission?.update ? (
-                                        <Button onClick={() => handleSubmit(false)} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2">
-                                            <FaFloppyDisk className="text-base" /> 
+                                        <Button onClick={() => handleSubmit(false)} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2" disabled={updateResult.isLoading}>
+                                            {
+                                                updateResult.isLoading? <ButtonLoader /> : <FaFloppyDisk className="text-base" /> 
+                                            }
                                             <Typography variant="small" className="capitalize">
                                                 Update
                                             </Typography>
@@ -450,7 +486,7 @@ function WalletCategory() {
                     </div>     
                 </DialogBody>                      
             </Dialog>
-            <DeleteModal deleteId={deleteId} open={openDelete} handleDelete={handleDelete} closeModal={() => setOpenDelete(!openDelete)} />
+            <DeleteModal deleteId={deleteId} open={openDelete} handleDelete={handleDelete} isLoading={removeResult.isLoading} closeModal={() => setOpenDelete(!openDelete)} />
         </div>
     );
 

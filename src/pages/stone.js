@@ -14,6 +14,7 @@ import { AuthContent } from "../context/authContext";
 import { useNavigate } from "react-router-dom";
 import SuccessAlert from "../components/success_alert";
 import { pause } from "../const";
+import ButtonLoader from "../components/buttonLoader";
 
 const validator = require('validator');
 
@@ -54,6 +55,7 @@ function Stone() {
         message: '',
         isError: false,
         isWarning: false,
+        isNew: false,
     });
 
     const {data, isLoading: dataLoad} = useFetchStoneQuery(filterData);
@@ -69,11 +71,11 @@ function Stone() {
         createdBy: auth().username,
     })
 
-    const [addStone] = useAddStoneMutation();
+    const [addStone, addResult] = useAddStoneMutation();
 
-    const [editStone] = useUpdateStoneMutation();
+    const [editStone, updateResult] = useUpdateStoneMutation();
 
-    const [removeStone] = useRemoveStoneMutation();
+    const [removeStone, removeResult] = useRemoveStoneMutation();
 
     const [deleteId, setDeleteId] = useState('');
 
@@ -125,7 +127,7 @@ function Stone() {
                 saveData.stoneCode = stone.stoneCode
             }
 
-            isEdit ? await editStone(saveData).then((res) => {
+            isEdit ? await editStone(saveData).then(async(res) => {
                 if(res.data) {
                     setAlertMsg({
                         ...alertMsg,
@@ -142,7 +144,21 @@ function Stone() {
                         isError: true,
                     });
                 }
-            }) : await addStone(saveData).then((res) => {
+                setOpen(isNew);
+                setStone({
+                    stoneCode: 0,
+                    stoneDesc: "",
+                    remark: "",
+                    status: true,
+                    createdAt: moment().toISOString(),
+                    createdBy: auth().username,
+                });
+                await pause();
+                setAlertMsg({
+                    ...alertMsg,
+                    visible: false,
+                });
+            }) : await addStone(saveData).then(async(res) => {
                 if(res.data) {
                     setAlertMsg({
                         ...alertMsg,
@@ -159,24 +175,21 @@ function Stone() {
                         isError: true,
                     });
                 }
+                setOpen(isNew);
+                setStone({
+                    stoneCode: 0,
+                    stoneDesc: "",
+                    remark: "",
+                    status: true,
+                    createdAt: moment().toISOString(),
+                    createdBy: auth().username,
+                });
+                await pause();
+                setAlertMsg({
+                    ...alertMsg,
+                    visible: false,
+                });
             });
-
-            setOpen(isNew);
-
-            setStone({
-                stoneCode: 0,
-                stoneDesc: "",
-                remark: "",
-                status: true,
-                createdAt: moment().toISOString(),
-                createdBy: auth().username,
-            });
-            await pause();
-            setAlertMsg({
-                ...alertMsg,
-                visible: false,
-            });
-
         }
     }
 
@@ -450,14 +463,40 @@ function Stone() {
                                         {
                                             !isEdit ? (
                                                 <>
-                                                    <Button onClick={() => handleSubmit(false)} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2">
-                                                        <FaFloppyDisk className="text-base" /> 
+                                                    <Button 
+                                                        onClick={() => {
+                                                            handleSubmit(false);
+                                                            setAlertMsg({
+                                                                ...alertMsg,
+                                                                isNew: false,
+                                                            });
+                                                        }} 
+                                                        color="deep-purple" size="sm" variant="gradient" 
+                                                        className="flex items-center gap-2"
+                                                        disabled={addResult.isLoading}
+                                                    >
+                                                        {
+                                                            addResult.isLoading && !alertMsg.isNew ? <ButtonLoader /> : <FaFloppyDisk className="text-base" /> 
+                                                        }
                                                         <Typography variant="small" className="capitalize">
                                                             Save
                                                         </Typography>
                                                     </Button>
-                                                    <Button onClick={handleSubmit} color="deep-purple" size="sm" variant="outlined" className="flex items-center gap-2">
-                                                        <FaCirclePlus className="text-base" /> 
+                                                    <Button 
+                                                        onClick={() => {
+                                                            handleSubmit();
+                                                            setAlertMsg({
+                                                                ...alertMsg,
+                                                                isNew: true,
+                                                            });
+                                                        }} 
+                                                        color="deep-purple" size="sm" variant="outlined" 
+                                                        className="flex items-center gap-2"
+                                                        disabled={addResult.isLoading}
+                                                    >
+                                                        {
+                                                            addResult.isLoading && alertMsg.isNew ? <ButtonLoader isNew={true} /> : <FaCirclePlus className="text-base" />
+                                                        }
                                                         <Typography variant="small" className="capitalize">
                                                             Save & New
                                                         </Typography>
@@ -465,8 +504,10 @@ function Stone() {
                                                 </>
                                             ) : (
                                                 stonePermission?.update ? (
-                                                    <Button onClick={() => handleSubmit(false)} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2">
-                                                        <FaFloppyDisk className="text-base" /> 
+                                                    <Button onClick={() => handleSubmit(false)} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2" disabled={updateResult.isLoading}>
+                                                        {
+                                                            updateResult.isLoading? <ButtonLoader /> : <FaFloppyDisk className="text-base" /> 
+                                                        }
                                                         <Typography variant="small" className="capitalize">
                                                             Update
                                                         </Typography>
@@ -478,7 +519,7 @@ function Stone() {
                                 </div>
                             </DialogBody>                      
                         </Dialog>
-                        <DeleteModal deleteId={deleteId} open={openDelete} handleDelete={handleDelete} closeModal={() => setOpenDelete(!openDelete)} />
+                        <DeleteModal deleteId={deleteId} open={openDelete} handleDelete={handleDelete} isLoading={removeResult.isLoading} closeModal={() => setOpenDelete(!openDelete)} />
                     </div>
                 ) : null
             }

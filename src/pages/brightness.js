@@ -14,6 +14,7 @@ import { AuthContent } from "../context/authContext";
 import { useNavigate } from "react-router-dom";
 import SuccessAlert from "../components/success_alert";
 import { pause } from "../const";
+import ButtonLoader from "../components/buttonLoader";
 
 const validator = require("validator");
 
@@ -63,11 +64,11 @@ function Brightness() {
         updatedBy: "",
     }, []);
 
-    const [addBrightness] = useAddBrightnessMutation();
+    const [addBrightness, addResult] = useAddBrightnessMutation();
 
-    const [editBrightness] = useUpdateBrightnessMutation();
+    const [editBrightness, updateResult] = useUpdateBrightnessMutation();
 
-    const [removeBrightness] = useRemoveBrightnessMutation();
+    const [removeBrightness, removeResult] = useRemoveBrightnessMutation();
 
     const [ currentPage, setCurrentPage] = useState(1);
 
@@ -79,6 +80,7 @@ function Brightness() {
         message: '',
         isError: false,
         isWarning: false,
+        isNew: false
     });
 
     const resetData = () => {
@@ -147,7 +149,7 @@ function Brightness() {
 
     const onSubmit = async () => {
         if(validateForm()) {
-            await addBrightness(formData).then((res) => {
+            await addBrightness(formData).then(async(res) => {
                 if(res.data) {
                     setAlertMsg({
                         ...alertMsg,
@@ -164,13 +166,13 @@ function Brightness() {
                         isError: true,
                     });
                 }
-            });
-            setOpen(!open);
-            resetData();
-            await pause();
-            setAlertMsg({
-                ...alertMsg,
-                visible: false,
+                setOpen(!open);
+                resetData();
+                await pause();
+                setAlertMsg({
+                    ...alertMsg,
+                    visible: false,
+                });
             });
         }
     };
@@ -216,7 +218,7 @@ function Brightness() {
             ...formData,
             updatedAt: moment().toISOString(),
             updatedBy: auth().username,
-        }).then((res) => {
+        }).then(async(res) => {
             if(res.data) {
                 setAlertMsg({
                     ...alertMsg,
@@ -233,17 +235,17 @@ function Brightness() {
                     isError: true,
                 });
             }
-        });
-        setOpen(!open);
-        await pause();
-        setAlertMsg({
-            ...alertMsg,
-            visible: false,
+            setOpen(!open);
+            await pause();
+            setAlertMsg({
+                ...alertMsg,
+                visible: false,
+            });
         });
     };
 
     const handleRemove = async (id) => {
-        removeBrightness(id).then((res) => {
+        removeBrightness(id).then(async(res) => {
             if(res.data) {
                 setAlertMsg({
                     ...alertMsg,
@@ -260,12 +262,12 @@ function Brightness() {
                     isError: true,
                 });
             }
-        });
-        setOpenDelete(!openDelete);
-        await pause();
-        setAlertMsg({
-            ...alertMsg,
-            visible: false,
+            setOpenDelete(!openDelete);
+            await pause();
+            setAlertMsg({
+                ...alertMsg,
+                visible: false,
+            });
         });
     };
 
@@ -320,7 +322,9 @@ function Brightness() {
                     <Button variant="text" color="deep-purple" className="p-2" onClick={() => handleEdit(row.Code)}><FaPencil /></Button>  
                     {
                         brightness?.delete ? (
-                            <Button variant="text" color="red" className="p-2" onClick={() => handleDeleteBtn(row.Code)}><FaTrashCan /></Button>
+                            <Button variant="text" color="red" className="p-2" onClick={() => handleDeleteBtn(row.Code)}>
+                                <FaTrashCan /> 
+                            </Button>
                         ) : null
                     }
                 </div>
@@ -452,8 +456,10 @@ function Brightness() {
                                         {
                                             isEdit ? (
                                                 brightness?.update ? (
-                                                    <Button onClick={submitEdit} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2">
-                                                        <FaFloppyDisk className="text-base" /> 
+                                                    <Button onClick={submitEdit} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2" disabled={updateResult.isLoading}>
+                                                        {
+                                                            updateResult.isLoading? <ButtonLoader /> : <FaFloppyDisk className="text-base" /> 
+                                                        }
                                                         <Typography variant="small" className="capitalize">
                                                             Update
                                                         </Typography>
@@ -461,14 +467,44 @@ function Brightness() {
                                                 ) : null
                                             ) : 
                                             <>
-                                                <Button onClick={onSubmit} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2">
-                                                    <FaFloppyDisk className="text-base" /> 
+                                                <Button 
+                                                    onClick={() => {
+                                                        onSubmit();
+                                                        setAlertMsg({
+                                                            ...alertMsg,
+                                                            isNew: false,
+                                                        });
+                                                    }} 
+                                                    color="deep-purple" 
+                                                    size="sm" 
+                                                    variant="gradient" 
+                                                    className="flex items-center gap-2"
+                                                    disabled={addResult.isLoading}
+                                                >
+                                                    {
+                                                        addResult.isLoading && !alertMsg.isNew ? <ButtonLoader /> : <FaFloppyDisk className="text-base" /> 
+                                                    }
                                                     <Typography variant="small" className="capitalize">
                                                         Save
                                                     </Typography>
                                                 </Button>
-                                                <Button onClick={onSaveSubmit} color="deep-purple" size="sm" variant="outlined" className="flex items-center gap-2">
-                                                    <FaCirclePlus className="text-base" /> 
+                                                <Button 
+                                                    onClick={() => {
+                                                        onSaveSubmit();
+                                                        setAlertMsg({
+                                                            ...alertMsg,
+                                                            isNew: true,
+                                                        });
+                                                    }} 
+                                                    color="deep-purple" 
+                                                    size="sm" 
+                                                    variant="outlined" 
+                                                    className="flex items-center gap-2"
+                                                    disabled={addResult.isLoading}
+                                                >
+                                                    {
+                                                        addResult.isLoading && alertMsg.isNew ? <ButtonLoader isNew={true} /> : <FaCirclePlus className="text-base" />
+                                                    }
                                                     <Typography variant="small" className="capitalize">
                                                         Save & New
                                                     </Typography>
@@ -479,7 +515,7 @@ function Brightness() {
                                 </div>
                             </DialogBody>                      
                         </Dialog>
-                        <DeleteModal deleteId={deleteId} open={openDelete} handleDelete={handleRemove} closeModal={() => setOpenDelete(!openDelete)} />
+                        <DeleteModal deleteId={deleteId} open={openDelete} handleDelete={handleRemove} isLoading={removeResult.isLoading} closeModal={() => setOpenDelete(!openDelete)} />
                     </div>
                 ) : null
             }
