@@ -996,16 +996,26 @@ function IssueList() {
                                                 });
                                             }}
                                             onFocus={(e) => focusSelect(e)}
+                                            readOnly
                                         />
                                     </div>
                                     {/* Total Price */}
                                     <div>
                                         <label className="text-black text-sm mb-2">Total Price</label>
                                         <input
-                                            type="number"
-                                            className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
-                                            value={formData.totalPrice}
-                                            readOnly
+                                            type="text"
+                                            className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black text-end"
+                                            value={formData.totalPrice.toLocaleString('en')}
+                                            onChange={(e) => {
+                                                let totalP = Number(e.target.value === "" ? 0 : e.target.value.replace(/[^0-9]/g, ""));
+                                                let price = totalP / formData.weight;
+                                                setFormData({
+                                                    ...formData,
+                                                    unitPrice: price.toFixed(2),
+                                                    totalPrice: totalP
+                                                });
+                                            }}
+                                            onFocus={(e) => focusSelect(e)}
                                         />
                                     </div>
                                     {/* Remark */}

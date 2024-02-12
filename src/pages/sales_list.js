@@ -1216,6 +1216,7 @@ function SalesList() {
                                                         setTBodyData(newTbody);
                                                     }}
                                                     onFocus={(e) => focusSelect(e)}
+                                                    readOnly
                                                 />
                                             </div>
                                             {/* Sub Total */}
@@ -1225,7 +1226,26 @@ function SalesList() {
                                                     type="text"
                                                     className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black text-right"
                                                     value={formData.subTotal.toLocaleString('en-US')}
-                                                    readOnly
+                                                    onChange={(e) => {
+                                                        let totalP = Number(e.target.value === "" ? 0 : e.target.value.replace(/[^0-9]/g, ""));
+                                                        let price = (totalP / formData.weight).toFixed(2);
+                                                        let totalA = (totalP + formData.serviceCharge) - formData.discAmt;
+                                                        setFormData({
+                                                            ...formData,
+                                                            unitPrice: price,
+                                                            subTotal: totalP,
+                                                            grandTotal: totalA,
+                                                            serviceCharge: formData.servicePer > 0 ? (formData.servicePer / 100) * totalP : formData.serviceCharge,
+                                                        });
+                                                        let newTbody = tBodyData.map(el => {
+                                                            return {
+                                                                ...el,
+                                                                amount: (el.sharePercentage / 100) * totalA,
+                                                            }
+                                                        });
+                                                        setTBodyData(newTbody);
+                                                    }}
+                                                    onFocus={(e) => focusSelect(e)}
                                                 />
                                             </div>
                                         </div>
@@ -1288,11 +1308,11 @@ function SalesList() {
                                                 <div>
                                                     <label className="text-black text-sm mb-2">Service Charge</label>
                                                     <input
-                                                        type="number"
-                                                        className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
-                                                        value={formData.serviceCharge}
+                                                        type="text"
+                                                        className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black text-end"
+                                                        value={formData.serviceCharge.toLocaleString('en')}
                                                         onChange={(e) => {
-                                                            let charge = parseFloat(e.target.value);
+                                                            let charge = Number(e.target.value === "" ? 0 : e.target.value.replace(/[^0-9]/g, ""));
                                                             let totalA = formData.subTotal - charge;
                                                             setFormData({
                                                                 ...formData,
@@ -1315,11 +1335,11 @@ function SalesList() {
                                                 <div>
                                                     <label className="text-black text-sm mb-2">Discount Amount</label>
                                                     <input
-                                                        type="number"
-                                                        className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
-                                                        value={formData.discAmt}
+                                                        type="text"
+                                                        className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black text-end"
+                                                        value={formData.discAmt.toLocaleString('en')}
                                                         onChange={(e) => {
-                                                            let discAmt = parseFloat(e.target.value);
+                                                            let discAmt = Number(e.target.value === "" ? 0 : e.target.value.replace(/[^0-9]/g, ""));
                                                             setFormData({
                                                                 ...formData,
                                                                 discAmt: discAmt,
