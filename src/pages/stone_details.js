@@ -1359,7 +1359,15 @@ function StoneDetails() {
                                             {/* Purchase Price */}
                                             <div>
                                                 <label className="text-black text-sm mb-2">Purchase Price</label>
-                                                <input type="number" className="border border-blue-gray-200 w-full h-[40px] p-2.5 rounded-md text-black" value={formData.purchasePrice} onChange={(e) => setFormData({...formData, purchasePrice: parseFloat(e.target.value)})} onFocus={(e) => focusSelect(e)}/>
+                                                <input type="text" 
+                                                    className="border border-blue-gray-200 w-full h-[40px] p-2.5 rounded-md text-black text-end" value={formData.purchasePrice.toLocaleString('en')} 
+                                                    onChange={(e) => 
+                                                        setFormData({
+                                                            ...formData, 
+                                                            purchasePrice: Number(e.target.value === "" ? 0 : e.target.value.replace(/[^0-9]/g, ""))
+                                                        })
+                                                    } 
+                                                    onFocus={(e) => focusSelect(e)}/>
                                             </div>
                                             {/* Sales Price */}
                                             <div>

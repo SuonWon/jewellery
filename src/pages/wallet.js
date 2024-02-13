@@ -1066,13 +1066,13 @@ function Wallet() {
                                 <div>
                                     <label className="text-black text-sm mb-2">Amount</label>
                                     <input
-                                        type="number"
-                                        className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
-                                        value={formData.amount}
+                                        type="text"
+                                        className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black text-end"
+                                        value={formData.amount.toLocaleString('en')}
                                         onChange={(e) => {
                                             setFormData({
                                                 ...formData, 
-                                                amount: parseFloat(e.target.value),
+                                                amount: Number(e.target.value === "" ? 0 : e.target.value.replace(/[^0-9]/g, "")),
                                             });
                                         }}
                                         onFocus={(e) => focusSelect(e)}

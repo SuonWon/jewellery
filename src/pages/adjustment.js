@@ -873,6 +873,7 @@ function Adjustment() {
                                                 });
                                             }}
                                             onFocus={(e) => focusSelect(e)}
+                                            readOnly
                                         />
                                     </div>
                                     {/* Total Price */}
@@ -882,7 +883,16 @@ function Adjustment() {
                                             type="text"
                                             className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black text-right"
                                             value={formData.totalPrice.toLocaleString()}
-                                            readOnly
+                                            onChange={(e) => {
+                                                let totalP = Number(e.target.value === "" ? 0 : e.target.value.replace(/[^0-9]/g, ""));
+                                                let price = totalP / formData.weight;
+                                                setFormData({
+                                                    ...formData,
+                                                    unitPrice: price.toFixed(2),
+                                                    totalPrice: totalP
+                                                });
+                                            }}
+                                            onFocus={(e) => focusSelect(e)}
                                         />
                                     </div>
                                 </div>

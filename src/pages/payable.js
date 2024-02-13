@@ -414,14 +414,15 @@ function Payable(props) {
                                     <div>
                                         <label className="text-black text-sm mb-2">Pay Amount</label>
                                         <input
-                                            type="number"
-                                            className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
-                                            value={payForm.amount}
+                                            type="text"
+                                            className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black text-end"
+                                            value={payForm.amount.toLocaleString('en')}
                                             onChange={(e) => {
-                                                if (Number(e.target.value <= (props.balance - paidAmt))) {
+                                                let payAmt = Number(e.target.value === "" ? 0 : e.target.value.replace(/[^0-9]/g, ""))
+                                                if (payAmt <= (props.balance - paidAmt)) {
                                                     setPayForm({
                                                         ...payForm,
-                                                        amount: parseFloat(e.target.value),
+                                                        amount: payAmt,
                                                         balance: isEdit? payForm.balance : props.balance,
                                                         remainBalance: isEdit? payForm.balance - e.target.value : (props.balance -paidAmt) - e.target.value
                                                     });
