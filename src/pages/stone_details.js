@@ -45,6 +45,7 @@ function StoneDetails() {
         skip: 0,
         take: 10,
         search: '',
+        status: 'A'
         //refetchOnMountOrArgChange: true
     });
 
@@ -962,7 +963,26 @@ function StoneDetails() {
                     </div>
                     <Card className="h-[auto] shadow-md max-w-screen-xxl rounded-sm p-2 border-t">
                         <CardBody className="rounded-sm overflow-auto p-0">
-                            <div className="flex justify-end py-2">
+                            <div className="flex justify-between py-2">
+                                <div className="w-72">
+                                    <select 
+                                        className="block w-full text-black border border-blue-gray-200 h-[35px] px-2.5 py-1.5 rounded-md focus:border-black"
+                                        value={filterData.status}
+                                        onChange={(e) => {
+                                            setFilterData({
+                                                ...filterData,
+                                                skip: 0,
+                                                take: 10,
+                                                status: e.target.value
+                                            })
+                                            setCurrentPage(1);
+                                        }}
+                                    >
+                                        <option value="A">Active</option>
+                                        <option value="I">Inactive</option>
+                                        <option value="B">All</option>
+                                    </select>
+                                </div>
                                 <div className="w-72">
                                     <Input label="Search" value={filterData.search} onChange={(e) => {
                                             setFilterData({

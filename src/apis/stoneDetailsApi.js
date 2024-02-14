@@ -38,7 +38,8 @@ const stoneDetailsApi = createApi({
                 },
                 query: (filterData) => {
                     const data = {
-                        search: filterData.search
+                        search: filterData.search,
+                        status: filterData.status
                     }
                     return {
                         url: '/stone-detail/get-count',
