@@ -157,6 +157,7 @@ function StoneDetails() {
         weight: 0,
         unitCode: "ct",
         purchasePrice: 0,
+        estimateSalesPrice: 0,
         remark: "",
         isActive: true,
         isIssued: false,
@@ -388,6 +389,7 @@ function StoneDetails() {
                 isIssued: formData.isIssued,
                 isCombined: formData.isCombined,
                 purchasePrice: formData.purchasePrice,
+                estimateSalesPrice: formData.estimateSalesPrice,
                 createdBy: formData.createdBy,
                 updatedBy: auth().username,
             }).then(async(res) => {
@@ -509,11 +511,13 @@ function StoneDetails() {
 
     const openCombineModal = (id) => {
         let temp = data.find(res => res.stoneDetailCode === id);
+        console.log(temp.size)
         axios.get(`${apiUrl}/stone-detail/get-same-stone-details?stoneCode=${temp.stoneCode}&typeCode=${temp.typeCode}&brightCode=${temp.brightCode}&gradeCode=${temp.gradeCode}&size=${temp.size}&sizeUnit=${temp.sizeUnit}`, {
             headers: {
                 "Authorization": token
             }
         }).then((res) => {
+            console.log(res.data);
             let selectedStone = res.data.find(el => el.stoneDetailCode === id);
             let share = "";
             selectedStone.purchase.purchaseShareDetails.map(el => {
@@ -725,6 +729,12 @@ function StoneDetails() {
             selector: row => row.Weight.toFixed(2),
         },
         {
+            name: 'Estimate Sales Price',
+            width: '130px',
+            selector: row => row.EstimateSalesPrice,
+            right: true,
+        },
+        {
             name: 'Purchase Price',
             width: '130px',
             selector: row => row.PurchasePrice,
@@ -853,6 +863,7 @@ function StoneDetails() {
             PurchasePrice: stoneDetail.purchasePrice.toLocaleString('en-US'),
             SalesPrice: stoneDetail.salesPrice.toLocaleString('en-US'),
             Profit: stoneDetail.profit.toLocaleString('en-US'),
+            EstimateSalesPrice: stoneDetail.estimateSalesPrice.toLocaleString('en-US'),
         }
     });
 
@@ -1355,7 +1366,20 @@ function StoneDetails() {
                                         }
                                     </div>
                                     <div className="col-span-2">
-                                        <div className="grid grid-cols-3 gap-2">
+                                        <div className="grid grid-cols-4 gap-2">
+                                            {/* Estimate Sales Price */}
+                                            <div>
+                                                <label className="text-black text-sm mb-2">Estimate Sales Price</label>
+                                                <input type="text" 
+                                                    className="border border-blue-gray-200 w-full h-[40px] p-2.5 rounded-md text-black text-end" value={formData.estimateSalesPrice.toLocaleString('en')} 
+                                                    onChange={(e) => 
+                                                        setFormData({
+                                                            ...formData, 
+                                                            estimateSalesPrice: Number(e.target.value === "" ? 0 : e.target.value.replace(/[^0-9]/g, ""))
+                                                        })
+                                                    } 
+                                                    onFocus={(e) => focusSelect(e)}/>
+                                            </div>
                                             {/* Purchase Price */}
                                             <div>
                                                 <label className="text-black text-sm mb-2">Purchase Price</label>
@@ -1385,7 +1409,7 @@ function StoneDetails() {
                                         <label className="text-black text-sm mb-2">Remark</label>
                                         <textarea
                                             className="border border-blue-gray-200 w-full px-2.5 py-1.5 rounded-md text-black"
-                                            rows={1} 
+                                            rows={3} 
                                             value={formData.remark} onChange={(e) => setFormData({...formData, remark: e.target.value})}
                                         />
                                     </div>
