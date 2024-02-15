@@ -1327,7 +1327,7 @@ function PurchaseList() {
                                                     value={formData.subTotal.toLocaleString('en')}
                                                     onChange={(e) => {
                                                         let totalP = Number(e.target.value === "" ? 0 : e.target.value.replace(/[^0-9]/g, ""));
-                                                        let price = (totalP / formData.totalWeight).toFixed(2);
+                                                        let price = Number((totalP / formData.totalWeight).toFixed(2));
                                                         let totalA = (totalP + formData.serviceCharge) - formData.discAmt;
                                                         setFormData({
                                                             ...formData,

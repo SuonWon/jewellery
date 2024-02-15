@@ -865,7 +865,7 @@ function Damage() {
                                                 let price = totalP / formData.weight;
                                                 setFormData({
                                                     ...formData,
-                                                    unitPrice: price.toFixed(2),
+                                                    unitPrice: Number(price.toFixed(2)),
                                                     totalPrice: totalP
                                                 });
                                             }}
