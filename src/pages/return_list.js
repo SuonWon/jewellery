@@ -16,6 +16,7 @@ import { useFetchTrueIssueQuery } from "../apis/issueApi";
 import Cookies from "js-cookie";
 import { AuthContent } from "../context/authContext";
 import { useNavigate } from "react-router-dom";
+import ButtonLoader from "../components/buttonLoader";
 
 const token = 'Bearer ' + Cookies.get('_auth');
 
@@ -80,11 +81,11 @@ function ReturnList({type = 'I'}) {
         setReturnId(res.data);
     });
 
-    const [removeReturn] = useRemoveReturnMutation();
+    const [removeReturn, removeResult] = useRemoveReturnMutation();
 
-    const [addReturn] = useAddReturnMutation();
+    const [addReturn, addResult] = useAddReturnMutation();
 
-    const [updateReturn] = useUpdateReturnMutation();
+    const [updateReturn, updateResult] = useUpdateReturnMutation();
 
     const auth = useAuthUser();
 
@@ -110,6 +111,7 @@ function ReturnList({type = 'I'}) {
         message: '',
         isError: false,
         isWarning: false,
+        isNew: false,
     });
 
     const returnData = {
@@ -142,7 +144,7 @@ function ReturnList({type = 'I'}) {
             id: removeData.returnNo,
             deletedAt: moment().toISOString(),
             deletedBy: auth().username
-        }).then((res) => { 
+        }).then(async(res) => { 
             if(res.data) {
                 setAlertMsg({
                     ...alertMsg,
@@ -159,13 +161,13 @@ function ReturnList({type = 'I'}) {
                     isError: true,
                 });
             }
+            setOpenDelete(!openDelete);
+            await pause();
+            setAlertMsg({
+                ...alertMsg,
+                visible: false,
+            });
          });
-        setOpenDelete(!openDelete);
-        await pause();
-        setAlertMsg({
-            ...alertMsg,
-            visible: false,
-        });
     };
 
     const handleDeleteBtn = (id) => {
@@ -218,7 +220,7 @@ function ReturnList({type = 'I'}) {
                 ...formData,
                 returnNo: returnId,
                 returnDate: moment(formData.returnDate).toISOString(),
-            }).then((res) => {
+            }).then(async(res) => {
                 if(res.data) {
                     setAlertMsg({
                         ...alertMsg,
@@ -235,13 +237,13 @@ function ReturnList({type = 'I'}) {
                         isError: true,
                     });
                 }
-            });
-            setFormData(returnData);
-            setOpen(!open);
-            await pause();
-            setAlertMsg({
-                ...alertMsg,
-                visible: false,
+                setFormData(returnData);
+                setOpen(!open);
+                await pause();
+                setAlertMsg({
+                    ...alertMsg,
+                    visible: false,
+                });
             });
         }
     }
@@ -252,7 +254,7 @@ function ReturnList({type = 'I'}) {
                 ...formData,
                 returnNo: returnId,
                 returnDate: moment(formData.returnDate).toISOString(),
-            }).then((res) => {
+            }).then(async(res) => {
                 if(res.data) {
                     setAlertMsg({
                         ...alertMsg,
@@ -269,12 +271,12 @@ function ReturnList({type = 'I'}) {
                         isError: true,
                     });
                 }
-            });
-            setFormData(returnData);
-            await pause();
-            setAlertMsg({
-                ...alertMsg,
-                visible: false,
+                setFormData(returnData);
+                await pause();
+                setAlertMsg({
+                    ...alertMsg,
+                    visible: false,
+                });
             });
         }
     }
@@ -299,7 +301,7 @@ function ReturnList({type = 'I'}) {
                 updatedBy: auth().username,
                 updatedAt: moment().toISOString(),
                 deletedBy: "",
-            }).then((res) => {
+            }).then(async(res) => {
                 if(res.data) {
                     setAlertMsg({
                         ...alertMsg,
@@ -316,13 +318,13 @@ function ReturnList({type = 'I'}) {
                         isError: true,
                     });
                 }
-            });
-            setFormData(returnData);
-            setOpen(!open);
-            await pause();
-            setAlertMsg({
-                ...alertMsg,
-                visible: false,
+                setFormData(returnData);
+                setOpen(!open);
+                await pause();
+                setAlertMsg({
+                    ...alertMsg,
+                    visible: false,
+                });
             });
         }
     };
@@ -656,7 +658,7 @@ function ReturnList({type = 'I'}) {
                             
                         </CardBody>
                     </Card>
-                    <DeleteModal deleteId={deleteId} open={openDelete} handleDelete={handleRemove} closeModal={() => setOpenDelete(!openDelete)} />
+                    <DeleteModal deleteId={deleteId} open={openDelete} handleDelete={handleRemove} isLoading={removeResult.isLoading} closeModal={() => setOpenDelete(!openDelete)} />
                     <Dialog open={open} size="lg">
                         <DialogBody>
                             <ModalTitle
@@ -958,8 +960,10 @@ function ReturnList({type = 'I'}) {
                                 {
                                     isEdit? (
                                         returnPermission.purchase?.update || returnPermission.sales?.update || returnPermission.issue?.update ? (
-                                            <Button onClick={handleUpdate} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2">
-                                                <FaFloppyDisk className="text-base" />
+                                            <Button onClick={handleUpdate} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2" disabled={updateResult.isLoading}>
+                                                {
+                                                    updateResult.isLoading? <ButtonLoader /> : <FaFloppyDisk className="text-base" />
+                                                }
                                                 <Typography variant="small" className="capitalize">
                                                     Update
                                                 </Typography>
@@ -967,14 +971,40 @@ function ReturnList({type = 'I'}) {
                                         ) : null
                                     ) :
                                     <>
-                                        <Button onClick={handleSubmit} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2">
-                                            <FaFloppyDisk className="text-base" />
+                                        <Button 
+                                            onClick={() => {
+                                                handleSubmit();
+                                                setAlertMsg({
+                                                    ...alertMsg,
+                                                    isNew: false
+                                                });
+                                            }} 
+                                            color="deep-purple" size="sm" variant="gradient" 
+                                            className="flex items-center gap-2"
+                                            disabled={addResult.isLoading}
+                                        >
+                                            {
+                                                addResult.isLoading && !alertMsg.isNew ? <ButtonLoader /> : <FaFloppyDisk className="text-base" /> 
+                                            } 
                                             <Typography variant="small" className="capitalize">
                                                 Save
                                             </Typography>
                                         </Button>
-                                        <Button onClick={handleSave}  color="deep-purple" size="sm" variant="outlined" className="flex items-center gap-2">
-                                            <FaCirclePlus className="text-base" />
+                                        <Button 
+                                            onClick={() => {
+                                                handleSave();
+                                                setAlertMsg({
+                                                    ...alertMsg,
+                                                    isNew: true
+                                                })
+                                            }} 
+                                            color="deep-purple" size="sm" variant="outlined" 
+                                            className="flex items-center gap-2"
+                                            disabled={addResult.isLoading}
+                                        >
+                                            {
+                                                addResult.isLoading && alertMsg.isNew ? <ButtonLoader isNew={true} /> : <FaCirclePlus className="text-base" />
+                                            }
                                             <Typography variant="small" className="capitalize">
                                                 Save & New
                                             </Typography>

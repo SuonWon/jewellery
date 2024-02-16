@@ -16,6 +16,7 @@ import axios from "axios";
 import Cookies from "js-cookie";
 import { useNavigate } from "react-router-dom";
 import { AuthContent } from "../context/authContext";
+import ButtonLoader from "../components/buttonLoader";
 
 const token = 'Bearer ' + Cookies.get('_auth');
 
@@ -54,6 +55,7 @@ function IssueList() {
         message: '',
         isError: false,
         isWarning: false,
+        isNew: false,
     });
 
     const { data, isLoading: dataLoad, refetch } = useFetchIssueQuery(filterData);
@@ -89,11 +91,11 @@ function IssueList() {
 
     const auth = useAuthUser();
 
-    const [addIssue] = useAddIssueMutation();
+    const [addIssue, addResult] = useAddIssueMutation();
 
-    const [removeIssue] = useRemoveIssueMutation();
+    const [removeIssue, removeResult] = useRemoveIssueMutation();
 
-    const [updateIssue] = useUpdateIssueMutation();
+    const [updateIssue, updateResult] = useUpdateIssueMutation();
 
     const [currentPage, setCurrentPage] = useState(1);
 
@@ -197,7 +199,7 @@ function IssueList() {
             id: removeData[0].issueNo,
             deletedAt: moment().toISOString(),
             deletedBy: auth().username
-        }).then((res) => { 
+        }).then(async(res) => { 
             if(res.data) {
                 setAlertMsg({
                     ...alertMsg,
@@ -214,12 +216,12 @@ function IssueList() {
                     isError: true,
                 });
             }
-         });
-        setOpenDelete(!openDelete);
-        await pause();
-        setAlertMsg({
-            ...alertMsg,
-            visible: false,
+            setOpenDelete(!openDelete);
+            await pause();
+            setAlertMsg({
+                ...alertMsg,
+                visible: false,
+            });
         });
     };
 
@@ -275,7 +277,7 @@ function IssueList() {
                 ...formData,
                 issueNo: issueId,
                 issueDate: moment(formData.issueDate).toISOString(),
-            }).then((res) => {
+            }).then(async(res) => {
                 if(res.data) {
                     setAlertMsg({
                         ...alertMsg,
@@ -292,13 +294,13 @@ function IssueList() {
                         isError: true,
                     });
                 }
-            });
-            setFormData(issueData);
-            setOpen(!open);
-            await pause();
-            setAlertMsg({
-                ...alertMsg,
-                visible: false,
+                setFormData(issueData);
+                setOpen(!open);
+                await pause();
+                setAlertMsg({
+                    ...alertMsg,
+                    visible: false,
+                });
             });
         }
     };
@@ -319,7 +321,7 @@ function IssueList() {
                 ...formData,
                 issueNo: issueId,
                 issueDate: moment(formData.issueDate).toISOString(),
-            }).then((res) => {
+            }).then(async(res) => {
                 if(res.data) {
                     setAlertMsg({
                         ...alertMsg,
@@ -336,12 +338,12 @@ function IssueList() {
                         isError: true,
                     });
                 }
-            });
-            setFormData(issueData);
-            await pause();
-            setAlertMsg({
-                ...alertMsg,
-                visible: false,
+                setFormData(issueData);
+                await pause();
+                setAlertMsg({
+                    ...alertMsg,
+                    visible: false,
+                });
             });
         }
     };
@@ -365,7 +367,7 @@ function IssueList() {
                 updatedAt: moment().toISOString(),
                 deletedBy: "",
                 issueMember: formData.issueMember,
-            }).then((res) => {
+            }).then(async(res) => {
                 if(res.data) {
                     setAlertMsg({
                         ...alertMsg,
@@ -382,13 +384,13 @@ function IssueList() {
                         isError: true,
                     });
                 }
-            });
-            setFormData(issueData);
-            setOpen(!open);
-            await pause();
-            setAlertMsg({
-                ...alertMsg,
-                visible: false,
+                setFormData(issueData);
+                setOpen(!open);
+                await pause();
+                setAlertMsg({
+                    ...alertMsg,
+                    visible: false,
+                });
             });
         }
     };
@@ -856,7 +858,7 @@ function IssueList() {
                         
                         </CardBody>
                     </Card>
-                    <DeleteModal deleteId={deleteId} open={openDelete} handleDelete={handleRemove} closeModal={() => setOpenDelete(!openDelete)} />
+                    <DeleteModal deleteId={deleteId} open={openDelete} handleDelete={handleRemove} isLoading={removeResult.isLoading} closeModal={() => setOpenDelete(!openDelete)} />
                     <Dialog open={open} size="lg">
                         <DialogBody>
                             <ModalTitle titleName={isEdit ? "Edit Issue" : "Create Issue"} handleClick={() => setOpen(!open)} />
@@ -1133,8 +1135,10 @@ function IssueList() {
                                 {
                                     isEdit? (
                                         issuePermission?.update ? (
-                                            <Button onClick={handleUpdate} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2">
-                                                <FaFloppyDisk className="text-base" />
+                                            <Button onClick={handleUpdate} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2" disabled={updateResult.isLoading}>
+                                                {
+                                                    updateResult.isLoading? <ButtonLoader /> : <FaFloppyDisk className="text-base" /> 
+                                                }
                                                 <Typography variant="small" className="capitalize">
                                                     Update
                                                 </Typography>
@@ -1142,14 +1146,40 @@ function IssueList() {
                                         ) : null
                                     ) :
                                     <>
-                                        <Button onClick={handleSubmit} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2">
-                                            <FaFloppyDisk className="text-base" />
+                                        <Button 
+                                            onClick={() => {
+                                                handleSubmit();
+                                                setAlertMsg({
+                                                    ...alertMsg,
+                                                    isNew: false
+                                                });
+                                            }} 
+                                            color="deep-purple" size="sm" variant="gradient" 
+                                            className="flex items-center gap-2"
+                                            disabled={addResult.isLoading}
+                                        >
+                                            {
+                                                addResult.isLoading && !alertMsg.isNew ? <ButtonLoader /> : <FaFloppyDisk className="text-base" /> 
+                                            } 
                                             <Typography variant="small" className="capitalize">
                                                 Save
                                             </Typography>
                                         </Button>
-                                        <Button onClick={handleSave} color="deep-purple" size="sm" variant="outlined" className="flex items-center gap-2">
-                                            <FaCirclePlus className="text-base" />
+                                        <Button 
+                                            onClick={() => {
+                                                handleSave();
+                                                setAlertMsg({
+                                                    ...alertMsg,
+                                                    isNew: true
+                                                });
+                                            }}
+                                            color="deep-purple" size="sm" variant="outlined" 
+                                            className="flex items-center gap-2"
+                                            disabled={addResult.isLoading}
+                                        >
+                                            {
+                                                addResult.isLoading && alertMsg.isNew ? <ButtonLoader isNew={true} /> : <FaCirclePlus className="text-base" />
+                                            }
                                             <Typography variant="small" className="capitalize">
                                                 Save & New
                                             </Typography>

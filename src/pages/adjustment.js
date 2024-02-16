@@ -15,6 +15,7 @@ import axios from "axios";
 import Cookies from "js-cookie";
 import { useNavigate } from "react-router-dom";
 import { AuthContent } from "../context/authContext";
+import ButtonLoader from "../components/buttonLoader";
 
 const token = 'Bearer ' + Cookies.get('_auth');
 
@@ -67,11 +68,11 @@ function Adjustment() {
 
     // const [adjustId, setAdjustId] = useState("");
 
-    const [removeAdjust] = useRemoveAdjustMutation();
+    const [removeAdjust, removeResult] = useRemoveAdjustMutation();
 
-    const [addAdjust] = useAddAdjustmentMutation();
+    const [addAdjust, addResult] = useAddAdjustmentMutation();
 
-    const [updateAdjust] = useUpdateAdjustmentMutation();
+    const [updateAdjust, updateResult] = useUpdateAdjustmentMutation();
 
     const [currentPage, setCurrentPage] = useState(1);
 
@@ -85,6 +86,7 @@ function Adjustment() {
         message: '',
         isError: false,
         isWarning: false,
+        isNew: false,
     });
 
     const adjustData = {
@@ -117,7 +119,7 @@ function Adjustment() {
             id: removeData.adjustmentNo,
             deletedAt: moment().toISOString(),
             deletedBy: auth().username
-        }).then((res) => { 
+        }).then(async(res) => { 
             if(res.data) {
                 setAlertMsg({
                     ...alertMsg,
@@ -134,13 +136,13 @@ function Adjustment() {
                     isError: true,
                 });
             }
+            setOpenDelete(!openDelete);
+            await pause();
+            setAlertMsg({
+                ...alertMsg,
+                visible: false,
+            });
          });
-        setOpenDelete(!openDelete);
-        await pause();
-        setAlertMsg({
-            ...alertMsg,
-            visible: false,
-        });
     };
 
     const handleDeleteBtn = (id) => {
@@ -202,7 +204,7 @@ function Adjustment() {
                 ...formData,
                 adjustmentNo: adjustId,
                 adjustmentDate: moment(formData.damageDate).toISOString(),
-            }).then((res) => {
+            }).then(async(res) => {
                 if(res.data) {
                     setAlertMsg({
                         ...alertMsg,
@@ -219,13 +221,13 @@ function Adjustment() {
                         isError: true,
                     });
                 }
-            });
-            setFormData(adjustData);
-            setOpen(!open);
-            await pause();
-            setAlertMsg({
-                ...alertMsg,
-                visible: false,
+                setFormData(adjustData);
+                setOpen(!open);
+                await pause();
+                setAlertMsg({
+                    ...alertMsg,
+                    visible: false,
+                });
             });
         }
     };
@@ -246,7 +248,7 @@ function Adjustment() {
                 ...formData,
                 adjustmentNo: adjustId,
                 adjustmentDate: moment(formData.damageDate).toISOString(),
-            }).then((res) => {
+            }).then(async(res) => {
                 if(res.data) {
                     setAlertMsg({
                         ...alertMsg,
@@ -263,12 +265,12 @@ function Adjustment() {
                         isError: true,
                     });
                 }
-            });
-            setFormData(adjustData);
-            await pause();
-            setAlertMsg({
-                ...alertMsg,
-                visible: false,
+                setFormData(adjustData);
+                await pause();
+                setAlertMsg({
+                    ...alertMsg,
+                    visible: false,
+                });
             });
         }
     };
@@ -294,7 +296,7 @@ function Adjustment() {
                 updatedBy: auth().username,
                 updatedAt: moment().toISOString(),
                 deletedBy: "",
-            }).then((res) => {
+            }).then(async(res) => {
                 if(res.data) {
                     setAlertMsg({
                         ...alertMsg,
@@ -311,13 +313,13 @@ function Adjustment() {
                         isError: true,
                     });
                 }
-            });
-            setFormData(adjustData);
-            setOpen(!open);
-            await pause();
-            setAlertMsg({
-                ...alertMsg,
-                visible: false,
+                setFormData(adjustData);
+                setOpen(!open);
+                await pause();
+                setAlertMsg({
+                    ...alertMsg,
+                    visible: false,
+                });
             });
         }
     };
@@ -651,7 +653,7 @@ function Adjustment() {
                         
                         </CardBody>
                     </Card>
-                    <DeleteModal deleteId={deleteId} open={openDelete} handleDelete={handleRemove} closeModal={() => setOpenDelete(!openDelete)} />
+                    <DeleteModal deleteId={deleteId} open={openDelete} handleDelete={handleRemove} isLoading={removeResult.isLoading} closeModal={() => setOpenDelete(!openDelete)} />
                     <Dialog open={open} size="lg">
                         <DialogBody>
                             <ModalTitle titleName={isEdit ? "Edit Adjustment" : "Create Adjustment"} handleClick={() => setOpen(!open)} />
@@ -918,8 +920,15 @@ function Adjustment() {
                                 {
                                     isEdit? (
                                         adjPermission?.update ? (
-                                            <Button onClick={handleUpdate} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2">
-                                                <FaFloppyDisk className="text-base" />
+                                            <Button 
+                                                onClick={handleUpdate} 
+                                                color="deep-purple" size="sm" variant="gradient" 
+                                                className="flex items-center gap-2"
+                                                disabled={updateResult.isLoading}
+                                            >
+                                                {
+                                                    updateResult.isLoading? <ButtonLoader /> : <FaFloppyDisk className="text-base" /> 
+                                                }
                                                 <Typography variant="small" className="capitalize">
                                                     Update
                                                 </Typography>
@@ -927,14 +936,40 @@ function Adjustment() {
                                         ) : null
                                     ) : 
                                     <>
-                                        <Button onClick={handleSubmit} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2">
-                                            <FaFloppyDisk className="text-base" />
+                                        <Button 
+                                            onClick={() => {
+                                                handleSubmit();
+                                                setAlertMsg({
+                                                    ...alertMsg,
+                                                    isNew: false
+                                                });
+                                            }}
+                                            color="deep-purple" size="sm" variant="gradient" 
+                                            className="flex items-center gap-2"
+                                            disabled={addResult.isLoading}
+                                        >
+                                            {
+                                                addResult.isLoading && !alertMsg.isNew ? <ButtonLoader /> : <FaFloppyDisk className="text-base" /> 
+                                            } 
                                             <Typography variant="small" className="capitalize">
                                                 Save
                                             </Typography>
                                         </Button>
-                                        <Button onClick={handleSave} color="deep-purple" size="sm" variant="outlined" className="flex items-center gap-2">
-                                            <FaCirclePlus className="text-base" />
+                                        <Button 
+                                            onClick={() => {
+                                                handleSave();
+                                                setAlertMsg({
+                                                    ...alertMsg,
+                                                    isNew: true
+                                                });
+                                            }}
+                                            color="deep-purple" size="sm" variant="outlined" 
+                                            className="flex items-center gap-2"
+                                            disabled={addResult.isLoading}
+                                        >
+                                            {
+                                                addResult.isLoading && alertMsg.isNew ? <ButtonLoader isNew={true} /> : <FaCirclePlus className="text-base" />
+                                            }
                                             <Typography variant="small" className="capitalize">
                                                 Save & New
                                             </Typography>
