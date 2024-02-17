@@ -19,6 +19,7 @@ import Receivable from "./receivable";
 import { useFetchIssueQuery, useFetchTrueIssueQuery } from "../apis/issueApi";
 import Cookies from "js-cookie";
 import { AuthContent } from "../context/authContext";
+import ButtonLoader from "../components/buttonLoader";
 
 const token = 'Bearer ' + Cookies.get('_auth');
 
@@ -83,11 +84,11 @@ function SalesList() {
         end_date: null
     });
 
-    const [removeSales] = useRemoveSalesMutation();
+    const [removeSales, removeResult] = useRemoveSalesMutation();
 
-    const [addSales] = useAddSalesMutation();
+    const [addSales, addResult] = useAddSalesMutation();
 
-    const [updateSales] = useUpdateSalesMutation();
+    const [updateSales, updateResult] = useUpdateSalesMutation();
 
     const [updateStatus] = useUpdateIssueMutation();
 
@@ -124,6 +125,7 @@ function SalesList() {
         message: '',
         isError: false,
         isWarning: false,
+        isNew: false,
     });
 
     const [selectedIssue, setSelectedIssue] = useState({});
@@ -193,12 +195,12 @@ function SalesList() {
                     isError: true,
                 });
             }
-        });
-        setOpenDelete(!openDelete);
-        await pause();
-        setAlertMsg({
-            ...alertMsg,
-            visible: false,
+            setOpenDelete(!openDelete);
+            await pause();
+            setAlertMsg({
+                ...alertMsg,
+                visible: false,
+            });
         });
     };
 
@@ -345,7 +347,7 @@ function SalesList() {
                         amount: el.amount,
                     };
                 }),
-            }).then((res) => {
+            }).then(async (res) => {
                 if(res.data) {
                     setAlertMsg({
                         ...alertMsg,
@@ -362,21 +364,22 @@ function SalesList() {
                         isError: true,
                     });
                 }
-            });
-            if (issueStatus) {
-                updateIssueStatus({
-                    id: formData.issueNo,
-                    updatedBy: auth().username,
+                if (issueStatus) {
+                    updateIssueStatus({
+                        id: formData.issueNo,
+                        updatedBy: auth().username,
+                    });
+                }
+                setIssueStatus(false);
+                setFormData(salesData);
+                setOpen(!open);
+                await pause();
+                setAlertMsg({
+                    ...alertMsg,
+                    visible: false,
                 });
-            }
-            setIssueStatus(false);
-            setFormData(salesData);
-            setOpen(!open);
-            await pause();
-            setAlertMsg({
-                ...alertMsg,
-                visible: false,
             });
+            
         }
     };
 
@@ -406,7 +409,7 @@ function SalesList() {
                         amount: el.amount,
                     };
                 }),
-            }).then((res) => {
+            }).then(async(res) => {
                 if(res.data) {
                     setAlertMsg({
                         ...alertMsg,
@@ -423,21 +426,22 @@ function SalesList() {
                         isError: true,
                     });
                 }
-            });
-            if (issueStatus) {
-                updateIssueStatus({
-                    id: formData.issueNo,
-                    updatedBy: auth().username,
+                if (issueStatus) {
+                    updateIssueStatus({
+                        id: formData.issueNo,
+                        updatedBy: auth().username,
+                    });
+                }
+                setIssueStatus(false);
+                setFormData(salesData);
+                setTBodyData([]);
+                await pause();
+                setAlertMsg({
+                    ...alertMsg,
+                    visible: false,
                 });
-            }
-            setIssueStatus(false);
-            setFormData(salesData);
-            setTBodyData([]);
-            await pause();
-            setAlertMsg({
-                ...alertMsg,
-                visible: false,
             });
+            
         }
     };
 
@@ -474,7 +478,7 @@ function SalesList() {
                         amount: el.amount,
                     }
                 }),
-            }).then((res) => {
+            }).then(async(res) => {
                 if(res.data) {
                     setAlertMsg({
                         ...alertMsg,
@@ -491,23 +495,23 @@ function SalesList() {
                         isError: true,
                     });
                 }
-            });
-            if (issueStatus !== selectedIssue.isComplete && formData.issueNo !== "") {
-                updateStatus({
-                    ...selectedIssue,
-                    isComplete: issueStatus,
-                    updatedBy: auth().username,
-                }).then((res) => {
-                    console.log(res);
+                if (issueStatus !== selectedIssue.isComplete && formData.issueNo !== "") {
+                    updateStatus({
+                        ...selectedIssue,
+                        isComplete: issueStatus,
+                        updatedBy: auth().username,
+                    }).then((res) => {
+                        console.log(res);
+                    });
+                    setSelectedIssue({});
+                }
+                setFormData(salesData);
+                setOpen(!open);
+                await pause();
+                setAlertMsg({
+                    ...alertMsg,
+                    visible: false,
                 });
-                setSelectedIssue({});
-            }
-            setFormData(salesData);
-            setOpen(!open);
-            await pause();
-            setAlertMsg({
-                ...alertMsg,
-                visible: false,
             });
         }
     };
@@ -924,7 +928,7 @@ function SalesList() {
                         
                         </CardBody>
                     </Card>
-                    <DeleteModal deleteId={deleteId} open={openDelete} handleDelete={handleRemove} closeModal={() => setOpenDelete(!openDelete)} />
+                    <DeleteModal deleteId={deleteId} open={openDelete} handleDelete={handleRemove} isLoading={removeResult.isLoading} closeModal={() => setOpenDelete(!openDelete)} />
                     <Dialog open={open} size="xl">
                         <DialogBody>
                             <ModalTitle titleName="Sales" handleClick={() => setOpen(!open)} />
@@ -1435,8 +1439,10 @@ function SalesList() {
                                 {
                                     isEdit? (
                                         salesPermission?.update ? (
-                                            <Button onClick={handleUpdate} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2">
-                                                <FaFloppyDisk className="text-base" />
+                                            <Button onClick={handleUpdate} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2" disabled={updateResult.isLoading}>
+                                                {
+                                                    updateResult.isLoading? <ButtonLoader /> : <FaFloppyDisk className="text-base" /> 
+                                                }
                                                 <Typography variant="small" className="capitalize">
                                                     Update
                                                 </Typography>
@@ -1444,14 +1450,40 @@ function SalesList() {
                                         ) : null
                                     ) :
                                     <>
-                                        <Button onClick={handleSubmit} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2">
-                                            <FaFloppyDisk className="text-base" />
+                                        <Button 
+                                            onClick={() => {
+                                                handleSubmit();
+                                                setAlertMsg({
+                                                    ...alertMsg,
+                                                    isNew: false
+                                                });
+                                            }}
+                                            color="deep-purple" size="sm" variant="gradient" 
+                                            className="flex items-center gap-2"
+                                            disabled={addResult.isLoading}
+                                        >
+                                            {
+                                                addResult.isLoading && !alertMsg.isNew ? <ButtonLoader /> : <FaFloppyDisk className="text-base" /> 
+                                            } 
                                             <Typography variant="small" className="capitalize">
                                                 Save
                                             </Typography>
                                         </Button>
-                                        <Button onClick={handleSave} color="deep-purple" size="sm" variant="outlined" className="flex items-center gap-2">
-                                            <FaCirclePlus className="text-base" />
+                                        <Button 
+                                            onClick={() => {
+                                                handleSave();
+                                                setAlertMsg({
+                                                    ...alertMsg,
+                                                    isNew: true
+                                                });
+                                            }}
+                                            color="deep-purple" size="sm" variant="outlined" 
+                                            className="flex items-center gap-2"
+                                            disabled={addResult.isLoading}
+                                        >
+                                            {
+                                                addResult.isLoading && alertMsg.isNew ? <ButtonLoader isNew={true} /> : <FaCirclePlus className="text-base" />
+                                            }
                                             <Typography variant="small" className="capitalize">
                                                 Save & New
                                             </Typography>

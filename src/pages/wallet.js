@@ -17,6 +17,7 @@ import { useNavigate } from "react-router-dom";
 import { AuthContent } from "../context/authContext";
 import axios from "axios";
 import Cookies from "js-cookie";
+import ButtonLoader from "../components/buttonLoader";
 
 const validator = require('validator');
 
@@ -76,11 +77,11 @@ function Wallet() {
 
     const [closingOpen, setClosingOpen] = useState(false);
 
-    const [removeTransaction] = useRemoveWalletTransactionMutation();
+    const [removeTransaction, removeResult] = useRemoveWalletTransactionMutation();
 
-    const [addTransaction] = useAddWalletTransactionMutation();
+    const [addTransaction, addResult] = useAddWalletTransactionMutation();
 
-    const [updateTransaction] = useUpdateWalletTransactionMutation();
+    const [updateTransaction, updateResult] = useUpdateWalletTransactionMutation();
 
     const [currentPage, setCurrentPage] = useState(1);
 
@@ -97,6 +98,7 @@ function Wallet() {
         message: '',
         isError: false,
         isWarning: false,
+        isNew: false,
     });
 
     const transactionData = {
@@ -131,7 +133,7 @@ function Wallet() {
             id: removeData.id,
             deletedAt: moment().toISOString(),
             deletedBy: auth().username
-        }).then((res) => { 
+        }).then(async(res) => { 
             if(res.data) {
                 setAlertMsg({
                     ...alertMsg,
@@ -148,13 +150,13 @@ function Wallet() {
                     isError: true,
                 });
             }
+            setOpenDelete(!openDelete);
+            await pause();
+            setAlertMsg({
+                ...alertMsg,
+                visible: false,
+            });
          });
-        setOpenDelete(!openDelete);
-        await pause();
-        setAlertMsg({
-            ...alertMsg,
-            visible: false,
-        });
     };
 
     const handleDeleteBtn = (id) => {
@@ -213,7 +215,7 @@ function Wallet() {
                 createdBy: formData.createdBy,
                 updatedBy: formData.updatedBy,
                 deletedBy: formData.deletedBy,
-            }).then((res) => {
+            }).then(async(res) => {
                 if(res.data) {
                     setAlertMsg({
                         ...alertMsg,
@@ -230,13 +232,13 @@ function Wallet() {
                         isError: true,
                     });
                 }
-            });
-            setFormData(transactionData);
-            setOpen(!open);
-            await pause();
-            setAlertMsg({
-                ...alertMsg,
-                visible: false,
+                setFormData(transactionData);
+                setOpen(!open);
+                await pause();
+                setAlertMsg({
+                    ...alertMsg,
+                    visible: false,
+                });
             });
         }
     };
@@ -259,7 +261,7 @@ function Wallet() {
                 createdBy: formData.createdBy,
                 updatedBy: formData.updatedBy,
                 deletedBy: formData.deletedBy,
-            }).then((res) => {
+            }).then(async(res) => {
                 if(res.data) {
                     setAlertMsg({
                         ...alertMsg,
@@ -276,12 +278,12 @@ function Wallet() {
                         isError: true,
                     });
                 }
-            });
-            setFormData(transactionData);
-            await pause();
-            setAlertMsg({
-                ...alertMsg,
-                visible: false,
+                setFormData(transactionData);
+                await pause();
+                setAlertMsg({
+                    ...alertMsg,
+                    visible: false,
+                });
             });
         }
     };
@@ -305,7 +307,7 @@ function Wallet() {
                 updatedBy: auth().username,
                 updatedAt: moment().toISOString(),
                 deletedBy: "",
-            }).then((res) => {
+            }).then(async(res) => {
                 if(res.data) {
                     setAlertMsg({
                         ...alertMsg,
@@ -322,13 +324,13 @@ function Wallet() {
                         isError: true,
                     });
                 }
-            });
-            setFormData(transactionData);
-            setOpen(!open);
-            await pause();
-            setAlertMsg({
-                ...alertMsg,
-                visible: false,
+                setFormData(transactionData);
+                setOpen(!open);
+                await pause();
+                setAlertMsg({
+                    ...alertMsg,
+                    visible: false,
+                });
             });
         }
     };
@@ -834,7 +836,7 @@ function Wallet() {
                         
                         </CardBody>
                     </Card>
-                    <DeleteModal deleteId={deleteId} open={openDelete} handleDelete={handleRemove} closeModal={() => setOpenDelete(!openDelete)} />
+                    <DeleteModal deleteId={deleteId} open={openDelete} handleDelete={handleRemove} isLoading={removeResult.isLoading} closeModal={() => setOpenDelete(!openDelete)} />
                     {/* Date Range Modal */}
                     <Dialog open={openDateModal}>
                         <DialogBody>
@@ -1129,8 +1131,10 @@ function Wallet() {
                                 {
                                     isEdit? (
                                         walletPermission?.update ? (
-                                            <Button onClick={handleUpdate} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2">
-                                                <FaFloppyDisk className="text-base" />
+                                            <Button onClick={handleUpdate} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2" disabled={updateResult.isLoading}>
+                                                {
+                                                    updateResult.isLoading? <ButtonLoader /> : <FaFloppyDisk className="text-base" /> 
+                                                }
                                                 <Typography variant="small" className="capitalize">
                                                     Update
                                                 </Typography>
@@ -1138,14 +1142,40 @@ function Wallet() {
                                         ) : null
                                     ) : 
                                     <>
-                                        <Button onClick={handleSubmit} color="deep-purple" size="sm" variant="gradient" className="flex items-center gap-2">
-                                            <FaFloppyDisk className="text-base" />
+                                        <Button 
+                                            onClick={() => {
+                                                handleSubmit();
+                                                setAlertMsg({
+                                                    ...alertMsg,
+                                                    isNew: false
+                                                })
+                                            }} 
+                                            color="deep-purple" size="sm" variant="gradient" 
+                                            className="flex items-center gap-2"
+                                            disabled={addResult.isLoading}
+                                        >
+                                            {
+                                                addResult.isLoading && !alertMsg.isNew ? <ButtonLoader /> : <FaFloppyDisk className="text-base" /> 
+                                            } 
                                             <Typography variant="small" className="capitalize">
                                                 Save
                                             </Typography>
                                         </Button>
-                                        <Button onClick={handleSave} color="deep-purple" size="sm" variant="outlined" className="flex items-center gap-2">
-                                            <FaCirclePlus className="text-base" />
+                                        <Button 
+                                            onClick={() => {
+                                                handleSave();
+                                                setAlertMsg({
+                                                    ...alertMsg,
+                                                    isNew: true
+                                                })
+                                            }} 
+                                            color="deep-purple" size="sm" variant="outlined" 
+                                            className="flex items-center gap-2"
+                                            disabled={addResult.isLoading}
+                                        >
+                                            {
+                                                addResult.isLoading && alertMsg.isNew ? <ButtonLoader isNew={true} /> : <FaCirclePlus className="text-base" />
+                                            }
                                             <Typography variant="small" className="capitalize">
                                                 Save & New
                                             </Typography>
