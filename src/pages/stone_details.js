@@ -754,6 +754,11 @@ function StoneDetails() {
             right: true,
         },
         {
+            name: 'Remark',
+            width: "200px",
+            selector: row => row.Remark,
+        },
+        {
             name: 'Supplier Name',
             width: '200px',
             selector: row => row.SupplierName,
@@ -798,11 +803,6 @@ function StoneDetails() {
         //     width: "150px",
         //     selector: row => row.UnitDesc,
         // },
-        {
-            name: 'Remark',
-            width: "200px",
-            selector: row => row.Remark,
-        },
         {
             name: 'Created At',
             width: "200px",
