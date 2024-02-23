@@ -181,6 +181,7 @@ function StoneDetails() {
         });
         setPurchaseStatus(false);
         setOpen(!open);
+        setIsSupplier(false);
     };
 
     function validateForm() {
