@@ -3,7 +3,7 @@ import { Button, Card, CardBody, Dialog, DialogBody, Typography } from "@materia
 import { FaCirclePlus, FaFloppyDisk, FaMoneyBillTrendUp, FaPencil, FaPlus, FaTrashCan } from "react-icons/fa6";
 import { useContext, useState, useEffect } from "react";
 import { apiUrl, focusSelect, pause } from "../const";
-import { useAddPurchaseMutation, useFetchPurchaseCountQuery, useFetchPurchaseQuery, useFetchTrueShareQuery, useFetchTrueStoneQuery, useFetchTrueSupplierQuery, useFetchUOMQuery, useFetchReturnQuery, useRemovePurchaseMutation, useUpdatePurchaseMutation } from "../store";
+import { useAddPurchaseMutation, useFetchPurchaseCountQuery, useFetchPurchaseQuery, useFetchTrueShareQuery, useFetchTrueStoneQuery, useFetchTrueSupplierQuery, useFetchUOMQuery, useFetchReturnQuery, useRemovePurchaseMutation, useUpdatePurchaseMutation, useFetchTrueTypeQuery } from "../store";
 import Pagination from "../components/pagination";
 import DeleteModal from "../components/delete_modal";
 import SuccessAlert from "../components/success_alert";
@@ -66,6 +66,8 @@ function PurchaseList() {
 
     const { data: stoneData } = useFetchTrueStoneQuery();
 
+    const { data: stoneTypeData } = useFetchTrueTypeQuery();
+
     const { data: returnData } = useFetchReturnQuery({
         skip: 0,
         take: 10,
@@ -124,6 +126,7 @@ function PurchaseList() {
         purDate: moment().format("YYYY-MM-DD"),
         supplierCode: 0,
         stoneCode: 0,
+        typeCode: 0,
         qty: 0,
         totalWeight: 0,
         unitCode: 'ct',
@@ -252,6 +255,7 @@ function PurchaseList() {
             purDate: tempData.purDate,
             supplierCode: tempData.supplierCode,
             stoneCode: tempData.stoneCode,
+            typeCode: tempData.typeCode,
             qty: tempData.qty,
             totalWeight: tempData.totalWeight,
             unitCode: tempData.unitCode,
@@ -319,6 +323,10 @@ function PurchaseList() {
 
         if (formData.stoneCode === 0) {
             newErrors.stoneCode = "Stone Detail is required."
+        }
+
+        if (formData.typeCode === 0) {
+            newErrors.typeCode = "Stone Type is required."
         }
 
         if (validator.isEmpty(formData.unitCode)) {
@@ -490,6 +498,7 @@ function PurchaseList() {
                 purDate: formData.purDate,
                 supplierCode: formData.supplierCode,
                 stoneCode: formData.stoneCode,
+                typeCode: formData.typeCode,
                 qty: formData.qty,
                 totalWeight: formData.totalWeight,
                 unitCode: formData.unitCode,
@@ -756,6 +765,11 @@ function PurchaseList() {
             selector: row => row.Stone
         },
         {
+            name: "Stone Type",
+            width: "100px",
+            selector: row => row.StoneType
+        },
+        {
             name: "Quantity",
             width: "80px",
             selector: row => row.Qty,
@@ -875,6 +889,7 @@ function PurchaseList() {
             Code: purchaseData.invoiceNo,
             PurDate: moment(purchaseData.purDate).format("YYYY-MM-DD"),
             Stone: purchaseData.stone.stoneDesc,
+            StoneType: purchaseData.stoneType.typeDesc,
             Supplier: purchaseData.supplier.supplierName,
             Qty: purchaseData.qty.toLocaleString('en-US'),
             Weight: purchaseData.totalWeight,
@@ -917,6 +932,7 @@ function PurchaseList() {
                             ) : null
                         }
                     </div>
+                    {/* Filter form */}
                     <Card className="h-auto shadow-md max-w-screen-xxl rounded-sm p-2 border-t">
                         <CardBody className="rounded-sm overflow-auto p-0">
                             <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-2 py-2">
@@ -1133,11 +1149,10 @@ function PurchaseList() {
                         
                         </CardBody>
                     </Card>
+                    {/* Delete Modal */}
                     <DeleteModal deleteId={deleteId} open={openDelete} handleDelete={handleRemove} closeModal={() => setOpenDelete(!openDelete)} />
-                    <Dialog 
-                        open={open} size="xl"
-                    
-                    >
+                    {/* Purchase form */}
+                    <Dialog open={open} size="xl" >
                         <DialogBody>
                             <ModalTitle titleName="Purchase" handleClick={() => setOpen(!open)} />
                             {
@@ -1212,6 +1227,31 @@ function PurchaseList() {
                                             </select>
                                             {
                                                 validationText.stoneCode && <p className="block text-[12px] text-red-500 font-sans mb-2">{validationText.stoneCode}</p>
+                                            }
+                                        </div>
+                                        {/* Stone Type */}
+                                        <div className="">
+                                            <label className="text-black mb-2 text-sm">Stone Type</label>
+                                            <select
+                                                className="block w-full px-2.5 py-1.5 border border-blue-gray-200 h-[35px] rounded-md focus:border-black text-black"
+                                                value={formData.typeCode}
+                                                onChange={(e) =>
+                                                    setFormData({
+                                                        ...formData,
+                                                        typeCode: Number(e.target.value),
+                                                    })
+                                                }
+                                            >
+                                                <option value="0" disabled>Select Stone Type</option>
+                                                {
+                                                    stoneTypeData?.length === 0 ? <option value="" disabled>There is no Data</option> :
+                                                    stoneTypeData?.map((type) => {
+                                                            return <option value={type.typeCode} key={type.typeCode} >{type.typeDesc}</option>
+                                                        })
+                                                }
+                                            </select>
+                                            {
+                                                validationText.typeCode && <p className="block text-[12px] text-red-500 font-sans mb-2">{validationText.typeCode}</p>
                                             }
                                         </div>
                                     </div>

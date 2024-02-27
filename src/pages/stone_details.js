@@ -181,6 +181,7 @@ function StoneDetails() {
         });
         setPurchaseStatus(false);
         setOpen(!open);
+        setIsSupplier(false);
     };
 
     function validateForm() {
@@ -1122,12 +1123,15 @@ function StoneDetails() {
                                                     className="block w-full text-black p-2.5 border border-blue-gray-200 max-h-[2.5rem] rounded-md focus:border-black"
                                                     value={formData.referenceNo}
                                                     onChange={(e) => {
+                                                        let purchase = isSupplier? selectedPurchase.find(el => el.invoiceNo === e.target.value) : truePurchaseData.find(el => el.invoiceNo === e.target.value);
+                                                        console.log(purchase.stoneType.typeCode);
                                                         setFormData({
                                                             ...formData,
                                                             referenceNo: e.target.value,
-                                                            stoneCode: selectedPurchase.find(el => el.invoiceNo === e.target.value).stone.stoneCode,
+                                                            stoneCode: purchase.stone.stoneCode,
+                                                            typeCode: purchase.stoneType.typeCode,
                                                         });
-                                                        setDescription({...description, stoneDesc: selectedPurchase.find(el => el.invoiceNo === e.target.value).stone.stoneDesc});
+                                                        setDescription({...description, stoneDesc: purchase.stone.stoneDesc});
                                                     }}
                                                     disabled={purchaseStatus}
                                                 >
