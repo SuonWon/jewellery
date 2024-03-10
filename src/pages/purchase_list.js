@@ -761,7 +761,7 @@ function PurchaseList() {
         },
         {
             name: "Stone",
-            width: "200px",
+            width: "140px",
             selector: row => row.Stone
         },
         {
