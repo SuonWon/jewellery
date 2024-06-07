@@ -310,6 +310,8 @@ function Payable(props) {
         },
     ];
 
+    console.log(payForm);
+
     return (
         <> 
         {
@@ -419,12 +421,14 @@ function Payable(props) {
                                             value={payForm.amount.toLocaleString('en')}
                                             onChange={(e) => {
                                                 let payAmt = Number(e.target.value === "" ? 0 : e.target.value.replace(/[^0-9]/g, ""))
+                                                console.log(props.balance)
+                                                console.log(payAmt);
                                                 if (payAmt <= (props.balance - paidAmt)) {
                                                     setPayForm({
                                                         ...payForm,
-                                                        amount: payAmt,
-                                                        balance: isEdit? payForm.balance : props.balance,
-                                                        remainBalance: isEdit? payForm.balance - e.target.value : (props.balance -paidAmt) - e.target.value
+                                                        amount: Number(payAmt),
+                                                        balance: isEdit? payForm.balance : Number(props.balance),
+                                                        remainBalance: isEdit? payForm.balance - Number(e.target.value) : (Number(props.balance) - Number(paidAmt)) - Number(e.target.value.replace(/[^0-9]/g, ""))
                                                     });
                                                 } else {
                                                     setPayForm({

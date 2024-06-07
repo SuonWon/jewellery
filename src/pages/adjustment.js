@@ -17,11 +17,11 @@ import { useNavigate } from "react-router-dom";
 import { AuthContent } from "../context/authContext";
 import ButtonLoader from "../components/buttonLoader";
 
-const token = 'Bearer ' + Cookies.get('_auth');
-
 const validator = require('validator');
 
 function Adjustment() {
+
+    const token = 'Bearer ' + Cookies.get('_auth');
 
     const {permissions} = useContext(AuthContent);
 

@@ -26,6 +26,8 @@ import { apiUrl } from "./const";
 import Cookies from "js-cookie";
 import NoPermission from "./pages/noPermission";
 import Home from "./pages/home";
+import CashClosing from "./pages/cash_closing";
+import Closing from "./pages/closing";
 
 
 function App() {
@@ -150,6 +152,16 @@ function App() {
                 <Wallet 
                   // walletId={walletData?.find(el => el.share.isOwner === true).id}
                 />
+              </RequireAuth>
+            }></Route>
+            <Route path="cash_closing" element={
+              <RequireAuth loginPath="/login">
+                <CashClosing />
+              </RequireAuth>
+            }></Route>
+            <Route path="closing" element={
+              <RequireAuth loginPath="/login">
+                <Closing />
               </RequireAuth>
             }></Route>
             <Route path="wallet_list" element={

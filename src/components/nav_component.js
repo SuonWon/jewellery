@@ -1,5 +1,5 @@
 import { Button, Drawer, IconButton, List, ListItem, ListItemPrefix, Menu, MenuHandler, MenuItem, MenuList, Typography } from "@material-tailwind/react";
-import { FaArrowRightFromBracket, FaBoxesPacking, FaCartShopping, FaChartPie, FaChevronDown, FaDatabase, FaBoxOpen, FaListUl, FaMoneyBill1, FaSliders, FaUsers, FaWallet, FaArrowRotateLeft, FaPlusMinus, FaUser, FaLayerGroup, FaBars, FaXmark } from "react-icons/fa6";
+import { FaArrowRightFromBracket, FaBoxesPacking, FaCartShopping, FaFolderClosed, FaChevronDown, FaDatabase, FaBoxOpen, FaListUl, FaMoneyBill1, FaSliders, FaUsers, FaWallet, FaArrowRotateLeft, FaPlusMinus, FaUser, FaLayerGroup, FaBars, FaXmark } from "react-icons/fa6";
 import { GiDiamondTrophy } from "react-icons/gi";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useAuthUser, useSignOut } from "react-auth-kit";
@@ -285,11 +285,32 @@ function Nav() {
                     {/* Wallet */}
                     {
                         permissions[21]?.view ? (
-                            <NavLink className="nav-link" to='/wallet'>
-                                <Typography variant='small' className="flex justify-center items-center text-white p-2 space-x-2 hover:bg-white hover:text-black rounded-lg ">
-                                    <FaWallet className='text-base' /> <span className=''>Wallet Transaction</span>
-                                </Typography>
-                            </NavLink> 
+                            <Menu>
+                                <MenuHandler>
+                                    <Typography variant='small' className="flex justify-center items-center p-2 text-white space-x-2 hover:bg-white hover:text-black rounded-lg cursor-pointer">
+                                        <FaWallet className='text-base' /> 
+                                        <span className=''>Transaction</span>
+                                        <FaChevronDown className='text-xs' />
+                                    </Typography>
+                                </MenuHandler>
+                                <MenuList className="z-[99999] bg-main text-white">
+                                    <NavLink className="nav-link" to="/wallet">
+                                        <MenuItem className="flex items-center gap-2">
+                                            <FaPlusMinus /> <span>Cash In/Out</span>
+                                        </MenuItem>
+                                    </NavLink>
+                                    <NavLink className="nav-link" to="/cash_closing">
+                                        <MenuItem className="flex items-center gap-2">
+                                            <FaFolderClosed /> <span>Cash Closing</span>
+                                        </MenuItem>
+                                    </NavLink>
+                                </MenuList>
+                            </Menu>
+                            // <NavLink className="nav-link" to='/wallet'>
+                            //     <Typography variant='small' className="flex justify-center items-center text-white p-2 space-x-2 hover:bg-white hover:text-black rounded-lg ">
+                            //         <FaWallet className='text-base' /> <span className=''>Wallet Transaction</span>
+                            //     </Typography>
+                            // </NavLink> 
                         ) : null
                     }
                 </div>

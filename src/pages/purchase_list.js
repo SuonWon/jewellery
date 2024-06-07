@@ -20,8 +20,6 @@ import Cookies from "js-cookie";
 import { useNavigate } from "react-router-dom";
 import { AuthContent } from "../context/authContext";
 
-const token = 'Bearer ' + Cookies.get('_auth');
-
 const validator = require('validator');
 
 function PurchaseList() {
@@ -33,6 +31,10 @@ function PurchaseList() {
     const [payablePermission, setPayablePermission] = useState(null);
 
     const navigate = useNavigate();
+
+    const token = 'Bearer ' + Cookies.get('_auth');
+
+    console.log(token);
 
     useEffect(() => {
         setPurchasePermission(permissions[11]);
@@ -56,7 +58,7 @@ function PurchaseList() {
 
     const { data, isLoading : dataLoad, refetch} = useFetchPurchaseQuery(filterData);
     
-    const { data:dataCount } = useFetchPurchaseCountQuery(filterData);
+    const { data: dataCount } = useFetchPurchaseCountQuery(filterData);
 
     const { data: supplierData } = useFetchTrueSupplierQuery();
 
@@ -212,7 +214,7 @@ function PurchaseList() {
     // };
 
     const handleOpen = () => {
-        axios.get(`${apiUrl}/share/get-owner`, {
+        axios.get(`${apiUrl}/share/get-owner/`, {
             headers: {
                 "Authorization": token
             }

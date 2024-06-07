@@ -21,19 +21,21 @@ import Cookies from "js-cookie";
 import { AuthContent } from "../context/authContext";
 import ButtonLoader from "../components/buttonLoader";
 
-const token = 'Bearer ' + Cookies.get('_auth');
-
 const validator = require('validator');
 
 function SalesList() {
 
     const {permissions} = useContext(AuthContent);
+
+    const token = 'Bearer ' + Cookies.get('_auth');
     
     const [salesPermission, setSalesPermission] = useState(null);
 
     const [receivablePermission, setReceivablePermission] = useState(null);
 
     const navigate = useNavigate();
+
+    console.log(token);
 
     useEffect(() => {
         setSalesPermission(permissions[12]);

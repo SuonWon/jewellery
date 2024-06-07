@@ -21,11 +21,11 @@ import ButtonLoader from "../components/buttonLoader";
 
 const validator = require('validator');
 
-const token = 'Bearer ' + Cookies.get('_auth');
-
 function Wallet() {
 
     const { permissions } = useContext(AuthContent);
+
+    const token = 'Bearer ' + Cookies.get('_auth');
 
     const [walletPermission, setWalletPermission] = useState(null);
 

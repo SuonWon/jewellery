@@ -19,13 +19,13 @@ import { useNavigate } from "react-router-dom";
 import { AuthContent } from "../context/authContext";
 import ButtonLoader from "../components/buttonLoader";
 
-const token = 'Bearer ' + Cookies.get('_auth');
-
 const validator = require("validator");
 
 function StoneDetails() {
 
     const auth = useAuthUser();
+
+    const token = 'Bearer ' + Cookies.get('_auth');
 
     const { permissions } = useContext(AuthContent);
 

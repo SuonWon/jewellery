@@ -18,13 +18,15 @@ import { AuthContent } from "../context/authContext";
 import { useFetchDamageCountQuery } from "../apis/damageApi";
 import ButtonLoader from "../components/buttonLoader";
 
-const token = 'Bearer ' + Cookies.get('_auth');
+
 
 const validator = require('validator');
 
 function Damage() {
 
     const {permissions} = useContext(AuthContent);
+
+    const token = 'Bearer ' + Cookies.get('_auth');
 
     const [damagePermission, setDamagePermission] = useState(null);
 

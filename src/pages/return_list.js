@@ -18,13 +18,13 @@ import { AuthContent } from "../context/authContext";
 import { useNavigate } from "react-router-dom";
 import ButtonLoader from "../components/buttonLoader";
 
-const token = 'Bearer ' + Cookies.get('_auth');
-
 const validator = require('validator');
 
 function ReturnList({type = 'I'}) {
 
     const { permissions } = useContext(AuthContent);
+
+    const token = 'Bearer ' + Cookies.get('_auth');
 
     const [returnPermission, setReturnPermission] = useState({
         purchase: null,
@@ -73,7 +73,7 @@ function ReturnList({type = 'I'}) {
 
     const {data: purchaseData} = useFetchTruePurchaseQuery();
 
-    axios.get(apiUrl + '/return/get-id', {
+    axios.get(apiUrl + '/return/get-id/', {
         headers: {
             "Authorization": token
         }
