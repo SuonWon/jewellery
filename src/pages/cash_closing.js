@@ -42,22 +42,23 @@ function CashClosing() {
         {
             name: 'Stone',
             selector: row => row.stoneDesc,
-            width: '300px'
+            width: '250px'
         },
         {
             name: 'Count',
             selector: row => row.count.toLocaleString('en-us'),
-            width: '100px'
         },
         {
             name: 'Amount',
             selector: row => row.grandTotal.toLocaleString('en-us'),
-            right: true
+            right: true,
+            width: "160px"
         },
         {
             name: 'Paid Amount',
             selector: row => row.paidAmount === null ? 0 : row.paidAmount.toLocaleString('en-us'),
-            right: true
+            right: true,
+            width: "160px"
         },
     ];
 
@@ -65,22 +66,23 @@ function CashClosing() {
         {
             name: 'Stone',
             selector: row => row.stoneDesc,
-            width: '300px'
+            width: '250px'
         },
         {
             name: 'Count',
             selector: row => row.count.toLocaleString('en-us'),
-            width: '100px'
         },
         {
             name: 'Amount',
             selector: row => row.grandTotal.toLocaleString('en-us'),
-            right: true
+            right: true,
+            width: "160px"
         },
         {
             name: 'Paid Amount',
             selector: row => row.receivedAmount === null ? 0 : row.receivedAmount.toLocaleString('en-us'),
-            right: true
+            right: true,
+            width: "160px"
         },
     ];
 
@@ -126,7 +128,7 @@ function CashClosing() {
             {/* Cash Closing */}
             <div className="flex items-center justify-between py-3 bg-white gap-4 sticky top-0 z-10">
                 <Typography variant="h5">
-                    Cash Closing
+                    Cash Balance
                 </Typography>
                 <div className="flex items-end gap-3">
                     <div className="">

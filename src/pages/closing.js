@@ -1,8 +1,8 @@
 import { Button, Card, CardBody, Tab, TabPanel, Tabs, TabsBody, TabsHeader, Typography } from "@material-tailwind/react";
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import DataTable from "react-data-table-component";
 import { useLocation } from "react-router-dom";
-import { useAddClosingMutation, useFetchCashInOutDetailsQuery, useFetchOpeningQuery, useFetchPurchaseDetailsQuery, useFetchSalesDetailsQuery } from "../store";
+import { useAddClosingMutation, useFetchCashInOutDetailsQuery, useFetchOpeningQuery, useFetchPayableDetailsQuery, useFetchPurchaseDetailsQuery, useFetchReceivableDetailsQuery, useFetchSalesDetailsQuery } from "../store";
 import moment from "moment";
 import { useAuthUser } from "react-auth-kit";
 import SuccessAlert from "../components/success_alert";
@@ -41,6 +41,16 @@ function Closing() {
         end_date: endDate
     });
 
+    const { data: payableDetails } = useFetchPayableDetailsQuery({
+        start_date: startDate,
+        end_date: endDate
+    });
+
+    const { data: receivableDetails } = useFetchReceivableDetailsQuery({
+        start_date: startDate,
+        end_date: endDate
+    });
+
     const purchaseAmt = purchaseDetails?.reduce((res, {grandTotal}) => res + grandTotal, 0);
 
     const salesAmt = salesDetails?.reduce((res, {grandTotal}) => res + grandTotal, 0);
@@ -48,11 +58,8 @@ function Closing() {
     // const purchaseAmt = 0
     // const salesAmt = 0
 
-    // console.log(purchaseDetails)
-    // console.log(salesDetails)
-
-
-    console.log(`Purchase: ${purchaseAmt}, Sales: ${salesAmt}`)
+    console.log(payableDetails)
+    console.log(receivableDetails)
 
     const balance = (((openingData?.opening + openingData?.stock + salesAmt + openingData?.cashIn) - purchaseAmt) - openingData?.cashOut);
 
@@ -417,6 +424,46 @@ function Closing() {
         },
     ];
 
+    const payableColumn = [
+        {
+            name: 'Wallet Name',
+            selector: row => row.walletName,
+        },
+        {
+            name: 'Paid Date',
+            selector: row => moment(row.paidDate).format('DD-MMM-YYYY hh:mm a').split(' ')[0],
+        },
+        {
+            name: 'Method',
+            selector: row => row.type,
+        },
+        {
+            name: 'Amount',
+            selector: row => row.amount,
+            right: true
+        },
+    ];
+
+    const receivableColumn = [
+        {
+            name: 'Wallet Name',
+            selector: row => row.walletName,
+        },
+        {
+            name: 'Received Date',
+            selector: row => moment(row.receivedDate).format('DD-MMM-YYYY hh:mm a').split(' ')[0],
+        },
+        {
+            name: 'Method',
+            selector: row => row.type,
+        },
+        {
+            name: 'Amount',
+            selector: row => row.amount,
+            right: true
+        },
+    ];
+
     const handleSubmit = () => {
         addClosing({
             balanceAmt: Number(balance),
@@ -443,6 +490,67 @@ function Closing() {
         })
     }
 
+    // Blatant "inspiration" from https://codepen.io/Jacqueline34/pen/pyVoWr
+    function convertArrayOfObjectsToCSV(array) {
+        let result;
+
+        console.log(array);
+
+        const columnDelimiter = ',';
+        const lineDelimiter = '\n';
+        const keys = Object.keys(array[0]);
+
+        result = '';
+        result += keys.join(columnDelimiter);
+        result += lineDelimiter;
+
+        array.forEach(item => {
+            let ctr = 0;
+            keys.forEach(key => {
+                if (ctr > 0) result += columnDelimiter;
+
+                result += item[key];
+                
+                ctr++;
+            });
+            result += lineDelimiter;
+        });
+
+        return result;
+    }
+
+    // Blatant "inspiration" from https://codepen.io/Jacqueline34/pen/pyVoWr
+    function downloadCSV(array, fName) {
+        const link = document.createElement('a');
+        let csv = convertArrayOfObjectsToCSV(array);
+        if (csv == null) return;
+
+        const filename = fName;
+
+        if (!csv.match(/^data:text\/csv/i)) {
+            csv = `data:text/csv;charset=utf-8,${csv}`;
+        }
+
+        link.setAttribute('href', encodeURI(csv));
+        link.setAttribute('download', filename);
+        link.click();
+    }
+
+
+    const Export = ({ onExport }) => <Button onClick={e => {
+        onExport(e.target.value)
+    }}>Export</Button>;
+
+    const exportPurchase = useMemo(() => <Export onExport={() => downloadCSV(purchaseDetails, "Purchase List")} />, [purchaseDetails]);
+
+    const exportSales = useMemo(() => <Export onExport={() => downloadCSV(salesDetails, "Sales List")} />, [salesDetails]);
+
+    const exportCashInOut = useMemo(() => <Export onExport={() => downloadCSV(cashInOutDetails, "Cash In/Out List")} />, [cashInOutDetails])
+
+    const exportPayable = useMemo(() => <Export onExport={() => downloadCSV(payableDetails, "Payable List")} />, [payableDetails])
+
+    const exportReceivable = useMemo(() => <Export onExport={() => downloadCSV(receivableDetails, "Receivable List")} />, [receivableDetails])
+
     // const handlePurchaseSelectAll = (isSelect) => {
     //     setPurchaseSelectAll(isSelect)
     //     if (isSelect) {
@@ -466,6 +574,22 @@ function Closing() {
                 {
                     alertMsg.visible? <SuccessAlert title={alertMsg.title} message={alertMsg.message} isError={alertMsg.isError}  /> : ""
                 }
+            </div>
+            <div className="flex items-center justify-between py-3 bg-white gap-4 sticky top-0 z-10">
+                <Typography variant="h5">
+                    Cash Closing
+                </Typography>
+                <div className="flex gap-4">
+                    <Button 
+                        variant="gradient" 
+                        size="sm" 
+                        color="deep-purple" 
+                        className="flex items-center gap-2 capitalize h-[40px]" 
+                        onClick={handleSubmit}
+                    >
+                        Confirm & Close Transaction
+                    </Button>
+                </div> 
             </div>
             <Card className="h-auto shadow-none max-w-screen-xxl rounded-sm p-2 mb-2 border">
                 <CardBody className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-2 rounded-sm overflow-auto p-2">
@@ -566,18 +690,23 @@ function Closing() {
                         >
                             Cash In/Out
                         </Tab>
-                    </TabsHeader>
-                    <div className="flex justify-end">
-                        <Button 
-                            variant="gradient" 
-                            size="sm" 
-                            color="deep-purple" 
-                            className="flex items-center gap-2 capitalize h-[40px]" 
-                            onClick={handleSubmit}
+                        <Tab
+                            key="payable"
+                            value="payable"
+                            onClick={() => setActiveTab("payable")}
+                            className={activeTab === "payable" ? "text-white" : "bg-gray-500/50 rounded-md"}
                         >
-                            Confirm & Close Transaction
-                        </Button>
-                    </div>
+                            Payable
+                        </Tab>
+                        <Tab
+                            key="receivable"
+                            value="receivable"
+                            onClick={() => setActiveTab("receivable")}
+                            className={activeTab === "receivable" ? "text-white" : "bg-gray-500/50 rounded-md"}
+                        >
+                            Receivable
+                        </Tab>
+                    </TabsHeader>
                 </div>
                 <TabsBody>
                     <TabPanel className="px-0 py-2" key="purchase" value="purchase">
@@ -655,6 +784,7 @@ function Closing() {
                                     }
                                 }
                             }}
+                            actions={exportPurchase}
                             // subHeader
                             // subHeaderComponent={props.isSearch? "" : searchBox}
                             // subHeaderAlign="right"
@@ -663,7 +793,7 @@ function Closing() {
                             // progressComponent={<ListLoader />}
                         />
                     </TabPanel>
-                    <TabPanel key="sales" value="sales">
+                    <TabPanel className="px-0 py-2" key="sales" value="sales">
                         <DataTable 
                             columns={salesColumn} 
                             data={salesDetails} 
@@ -678,6 +808,7 @@ function Closing() {
                                     }
                                 }
                             }}
+                            actions={exportSales}
                             // subHeader
                             // subHeaderComponent={props.isSearch? "" : searchBox}
                             // subHeaderAlign="right"
@@ -686,7 +817,7 @@ function Closing() {
                             // progressComponent={<ListLoader />}
                         />
                     </TabPanel>
-                    <TabPanel key="cashInOut" value="cashInOut">
+                    <TabPanel className="px-0 py-2" key="cashInOut" value="cashInOut">
                         <DataTable 
                             columns={cashInOutColumn} 
                             data={cashInOutDetails?.filter((res) => res.categoryDesc !== "Payable" && res.categoryDesc !== "Receivable")} 
@@ -701,6 +832,55 @@ function Closing() {
                                     }
                                 }
                             }}
+                            actions={exportCashInOut}
+                            // subHeader
+                            // subHeaderComponent={props.isSearch? "" : searchBox}
+                            // subHeaderAlign="right"
+                            // subHeaderWrap
+                            // progressPending={props.pending}
+                            // progressComponent={<ListLoader />}
+                        />
+                    </TabPanel>
+                    <TabPanel className="px-0 py-2" key="payable" value="payable">
+                        <DataTable 
+                            columns={payableColumn} 
+                            data={payableDetails} 
+                            striped={true}
+                            fixedHeader={true}
+                            fixedHeaderScrollHeight="650px"
+                            customStyles={{
+                                headCells: {
+                                    style: {
+                                        background: "#6b7280",
+                                        color: "white"
+                                    }
+                                }
+                            }}
+                            actions={exportPayable}
+                            // subHeader
+                            // subHeaderComponent={props.isSearch? "" : searchBox}
+                            // subHeaderAlign="right"
+                            // subHeaderWrap
+                            // progressPending={props.pending}
+                            // progressComponent={<ListLoader />}
+                        />
+                    </TabPanel>
+                    <TabPanel className="px-0 py-2" key="receivable" value="receivable">
+                        <DataTable 
+                            columns={receivableColumn} 
+                            data={receivableDetails} 
+                            striped={true}
+                            fixedHeader={true}
+                            fixedHeaderScrollHeight="650px"
+                            customStyles={{
+                                headCells: {
+                                    style: {
+                                        background: "#6b7280",
+                                        color: "white"
+                                    }
+                                }
+                            }}
+                            actions={exportReceivable}
                             // subHeader
                             // subHeaderComponent={props.isSearch? "" : searchBox}
                             // subHeaderAlign="right"
