@@ -1,7 +1,7 @@
-import { Button, Card, CardBody, Tab, TabPanel, Tabs, TabsBody, TabsHeader, Typography } from "@material-tailwind/react";
+import { Button, Card, CardBody, Dialog, DialogBody, DialogFooter, Tab, TabPanel, Tabs, TabsBody, TabsHeader, Typography } from "@material-tailwind/react";
 import { useCallback, useMemo, useState } from "react";
 import DataTable from "react-data-table-component";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useAddClosingMutation, useFetchCashInOutDetailsQuery, useFetchOpeningQuery, useFetchPayableDetailsQuery, useFetchPurchaseDetailsQuery, useFetchReceivableDetailsQuery, useFetchSalesDetailsQuery } from "../store";
 import moment from "moment";
 import { useAuthUser } from "react-auth-kit";
@@ -12,6 +12,8 @@ import { GiDiamondTrophy } from "react-icons/gi";
 function Closing() {
 
     const location = useLocation();
+
+    const navigate = useNavigate();
 
     const params = new URLSearchParams(location.search);
 
@@ -51,15 +53,9 @@ function Closing() {
         end_date: endDate
     });
 
-    const purchaseAmt = purchaseDetails?.reduce((res, {grandTotal}) => res + grandTotal, 0);
+    const purchaseAmt = payableDetails?.reduce((res, {amount}) => res + amount, 0);
 
-    const salesAmt = salesDetails?.reduce((res, {grandTotal}) => res + grandTotal, 0);
-
-    // const purchaseAmt = 0
-    // const salesAmt = 0
-
-    console.log(payableDetails)
-    console.log(receivableDetails)
+    const salesAmt = receivableDetails?.reduce((res, {amount}) => res + amount, 0);
 
     const balance = (((openingData?.opening + openingData?.stock + salesAmt + openingData?.cashIn) - purchaseAmt) - openingData?.cashOut);
 
@@ -73,58 +69,9 @@ function Closing() {
 
     const [addClosing] = useAddClosingMutation();
 
-    // console.log(`Start: ${startDate}, End: ${endDate}, Balance: ${balance}`);
-
     const [activeTab, setActiveTab] = useState("purchase");
 
-    // const [selectedData, setSelectedData] = useState([]);
-
-    // const [purchaseSelectAll, setPurchaseSelectAll] = useState(false);
-
-    // const [isPurchaseSelected, setIsPurchaseSelected] = useState(false);
-
-    // const [purchaseData, setPurchaseData] = useState([
-    //     {
-    //         id: 1,
-    //         stone: "Stone 1",
-    //         count: 50,
-    //         amount: 2000000,
-    //         paidAmount: 1500000,
-    //         isSelect: false,
-    //     },
-    //     {
-    //         id: 2,
-    //         stone: "Stone 2",
-    //         count: 100,
-    //         amount: 3000000,
-    //         paidAmount: 2000000,
-    //         isSelect: false,
-    //     },
-    //     {
-    //         id: 3,
-    //         stone: "Stone 3",
-    //         count: 150,
-    //         amount: 2500000,
-    //         paidAmount: 2000000,
-    //         isSelect: false,
-    //     },
-    //     {
-    //         id: 4,
-    //         stone: "Stone 4",
-    //         count: 150,
-    //         amount: 2500000,
-    //         paidAmount: 2000000,
-    //         isSelect: false,
-    //     },
-    //     {
-    //         id: 5,
-    //         stone: "Stone 5",
-    //         count: 150,
-    //         amount: 2500000,
-    //         paidAmount: 2000000,
-    //         isSelect: false,
-    //     },
-    // ]);
+    const [open, setOpen] = useState(false);
 
     const purchaseColumn = [
         {
@@ -434,12 +381,28 @@ function Closing() {
             selector: row => moment(row.paidDate).format('DD-MMM-YYYY hh:mm a').split(' ')[0],
         },
         {
+            name: 'Invoice No',
+            selector: row => row.invoiceNo,
+        },
+        {
+            name: 'Supplier Name',
+            selector: row => row.supplierName,
+        },
+        {
+            name: 'Stone',
+            selector: row => row.stoneDesc
+        },
+        {
+            name: 'Type',
+            selector: row => row.typeDesc
+        },
+        {
             name: 'Method',
             selector: row => row.type,
         },
         {
             name: 'Amount',
-            selector: row => row.amount,
+            selector: row => row.amount.toLocaleString('en-us'),
             right: true
         },
     ];
@@ -454,17 +417,34 @@ function Closing() {
             selector: row => moment(row.receivedDate).format('DD-MMM-YYYY hh:mm a').split(' ')[0],
         },
         {
+            name: 'Invoice No',
+            selector: row => row.invoiceNo,
+        },
+        {
+            name: 'Customer Name',
+            selector: row => row.customerName
+        },
+        {
+            name: 'Stone Desc',
+            selector: row => row.stoneDesc
+        },
+        {
             name: 'Method',
             selector: row => row.type,
         },
         {
             name: 'Amount',
-            selector: row => row.amount,
+            selector: row => row.amount.toLocaleString('en-us'),
             right: true
         },
     ];
 
+    const handleOpen = () => {
+        setOpen(!open);
+    }
+
     const handleSubmit = () => {
+        navigate(`/closing_preview?startDate=${startDate}&endDate=${endDate}`);
         addClosing({
             balanceAmt: Number(balance),
             transactionStartDate: startDate,
@@ -472,6 +452,7 @@ function Closing() {
             updatedBy : auth().username
         }).then((res) => {
             if(res) {
+                setOpen(false);
                 setAlertMsg({
                     ...alertMsg,
                     visible: true,
@@ -490,7 +471,6 @@ function Closing() {
         })
     }
 
-    // Blatant "inspiration" from https://codepen.io/Jacqueline34/pen/pyVoWr
     function convertArrayOfObjectsToCSV(array) {
         let result;
 
@@ -519,7 +499,6 @@ function Closing() {
         return result;
     }
 
-    // Blatant "inspiration" from https://codepen.io/Jacqueline34/pen/pyVoWr
     function downloadCSV(array, fName) {
         const link = document.createElement('a');
         let csv = convertArrayOfObjectsToCSV(array);
@@ -536,7 +515,6 @@ function Closing() {
         link.click();
     }
 
-
     const Export = ({ onExport }) => <Button onClick={e => {
         onExport(e.target.value)
     }}>Export</Button>;
@@ -550,23 +528,6 @@ function Closing() {
     const exportPayable = useMemo(() => <Export onExport={() => downloadCSV(payableDetails, "Payable List")} />, [payableDetails])
 
     const exportReceivable = useMemo(() => <Export onExport={() => downloadCSV(receivableDetails, "Receivable List")} />, [receivableDetails])
-
-    // const handlePurchaseSelectAll = (isSelect) => {
-    //     setPurchaseSelectAll(isSelect)
-    //     if (isSelect) {
-    //         setPurchaseData(purchaseData.map((data) => {
-    //             return {...data, isSelect: true}
-    //         }));
-    //     } else {
-    //         setPurchaseData(purchaseData.map((data) => {
-    //             return {...data, isSelect: false}
-    //         }));
-    //     }
-    // }
-
-    // const handlePurchaseSelect = (isSelect) => {
-    //     setIsPurchaseSelected(!isPurchaseSelected)
-    // }
 
     return (
         <div className="text-start w-full p-4">
@@ -585,7 +546,7 @@ function Closing() {
                         size="sm" 
                         color="deep-purple" 
                         className="flex items-center gap-2 capitalize h-[40px]" 
-                        onClick={handleSubmit}
+                        onClick={handleOpen}
                     >
                         Confirm & Close Transaction
                     </Button>
@@ -710,66 +671,6 @@ function Closing() {
                 </div>
                 <TabsBody>
                     <TabPanel className="px-0 py-2" key="purchase" value="purchase">
-                        {/* <div>
-                            <table className="mt-4 w-full min-w-max table-auto text-left">
-                                <thead>
-                                    <tr className="border-y border-blue-gray-100 bg-blue-gray-50/50">
-                                        <th className="p-2 text-center w-[50px]">
-                                            <input 
-                                                type="checkbox" 
-                                                id="selectAll" 
-                                                checked={purchaseSelectAll} 
-                                                onChange={(e) => {
-                                                    handlePurchaseSelectAll(e.target.checked)
-                                                }}
-                                            />
-                                        </th>
-                                        <th className="p-2">
-                                            Stone Name
-                                        </th>
-                                        <th className="p-2">
-                                            Count
-                                        </th>
-                                        <th className="p-2 text-end">
-                                            Amount
-                                        </th>
-                                        <th className="p-2 text-end">
-                                            Paid Amount
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {
-                                        purchaseData?.map((data) => {
-                                            return (
-                                                <tr className="border-y border-blue-gray-100" key={data.id}>
-                                                    <td className="text-center w-[50px] p-2">
-                                                        <input type="checkbox" 
-                                                            checked={data.isSelect} 
-                                                            onChange={(e) => {
-                                                                handlePurchaseSelect()
-                                                            }} 
-                                                        />
-                                                    </td>
-                                                    <td className="p-2">
-                                                        {data.stone}
-                                                    </td>
-                                                    <td className="p-2">
-                                                        {data.count}
-                                                    </td>
-                                                    <td className="p-2 text-end">
-                                                        {data.amount.toLocaleString('en-us')}
-                                                    </td>
-                                                    <td className="p-2 text-end">
-                                                        {data.paidAmount.toLocaleString('en-us')}
-                                                    </td>
-                                                </tr>
-                                            );
-                                        })
-                                    }
-                                </tbody>
-                            </table>
-                        </div> */}
                         <DataTable 
                             columns={purchaseColumn} 
                             data={purchaseDetails} 
@@ -785,12 +686,6 @@ function Closing() {
                                 }
                             }}
                             actions={exportPurchase}
-                            // subHeader
-                            // subHeaderComponent={props.isSearch? "" : searchBox}
-                            // subHeaderAlign="right"
-                            // subHeaderWrap
-                            // progressPending={props.pending}
-                            // progressComponent={<ListLoader />}
                         />
                     </TabPanel>
                     <TabPanel className="px-0 py-2" key="sales" value="sales">
@@ -809,12 +704,6 @@ function Closing() {
                                 }
                             }}
                             actions={exportSales}
-                            // subHeader
-                            // subHeaderComponent={props.isSearch? "" : searchBox}
-                            // subHeaderAlign="right"
-                            // subHeaderWrap
-                            // progressPending={props.pending}
-                            // progressComponent={<ListLoader />}
                         />
                     </TabPanel>
                     <TabPanel className="px-0 py-2" key="cashInOut" value="cashInOut">
@@ -833,12 +722,6 @@ function Closing() {
                                 }
                             }}
                             actions={exportCashInOut}
-                            // subHeader
-                            // subHeaderComponent={props.isSearch? "" : searchBox}
-                            // subHeaderAlign="right"
-                            // subHeaderWrap
-                            // progressPending={props.pending}
-                            // progressComponent={<ListLoader />}
                         />
                     </TabPanel>
                     <TabPanel className="px-0 py-2" key="payable" value="payable">
@@ -857,12 +740,6 @@ function Closing() {
                                 }
                             }}
                             actions={exportPayable}
-                            // subHeader
-                            // subHeaderComponent={props.isSearch? "" : searchBox}
-                            // subHeaderAlign="right"
-                            // subHeaderWrap
-                            // progressPending={props.pending}
-                            // progressComponent={<ListLoader />}
                         />
                     </TabPanel>
                     <TabPanel className="px-0 py-2" key="receivable" value="receivable">
@@ -881,16 +758,38 @@ function Closing() {
                                 }
                             }}
                             actions={exportReceivable}
-                            // subHeader
-                            // subHeaderComponent={props.isSearch? "" : searchBox}
-                            // subHeaderAlign="right"
-                            // subHeaderWrap
-                            // progressPending={props.pending}
-                            // progressComponent={<ListLoader />}
                         />
                     </TabPanel>
                 </TabsBody>
             </Tabs>
+            <Dialog
+                open={open}
+                size="xs"
+                handler={handleOpen}
+            >
+                <DialogBody>
+                    <Typography className="text-center" variant="h5">
+                        Are you sure?
+                    </Typography>
+                </DialogBody>
+                <DialogFooter className="pt-0 flex justify-center">
+                    <Button
+                        variant="text"
+                        color="red"
+                        onClick={handleOpen}
+                        className="mr-2"
+                    >
+                        <span>No</span>
+                    </Button>
+                    <Button
+                        variant="gradient"
+                        color="green"
+                        onClick={handleSubmit}
+                    >
+                        <span>Yes</span>
+                    </Button>
+                </DialogFooter>
+            </Dialog>
         </div>
     );
 };

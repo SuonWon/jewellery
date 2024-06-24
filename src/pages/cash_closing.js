@@ -1,9 +1,8 @@
 import { Button, Card, CardBody, Typography } from "@material-tailwind/react";
-import SuccessAlert from "../components/success_alert";
 import { FaCartShopping, FaCircleMinus, FaCirclePlus, FaEquals, FaFolderClosed, FaMoneyBill1 } from "react-icons/fa6";
 import { GiDiamondTrophy } from "react-icons/gi";
 import DataTable from "react-data-table-component";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import moment from "moment/moment";
 import { useFetchCashInOutDataQuery, useFetchCloseDateQuery, useFetchOpeningQuery, useFetchPurchaseDataQuery, useFetchSalesDataQuery } from "../store";
 import { useState } from "react";
@@ -13,6 +12,8 @@ function CashClosing() {
     const startDateOfYear = moment().startOf('year').format('YYYY-MM-DD');
 
     const [endDate, setEndDate] = useState(moment().format('YYYY-MM-DD'));
+
+    const navigate = useNavigate();
 
     const { data : startDate } = useFetchCloseDateQuery();
 
@@ -118,13 +119,12 @@ function CashClosing() {
         },
     ];
 
+    const handleClosing = () => {
+        navigate(`/closing?startDate=${startDate}&endDate=${endDate}`)
+    }
+
     return (
         <div className="flex flex-col gap-2 relative max-w-[85%] min-w-[85%]">
-            <div className="w-78 absolute top-0 right-0 z-[9999]">
-                {/* {
-                    alertMsg.visible? <SuccessAlert title={alertMsg.title} message={alertMsg.message} isError={alertMsg.isError}  /> : ""
-                } */}
-            </div>
             {/* Cash Closing */}
             <div className="flex items-center justify-between py-3 bg-white gap-4 sticky top-0 z-10">
                 <Typography variant="h5">
@@ -153,17 +153,15 @@ function CashClosing() {
                         />
                     </div>
                     <div className="flex gap-4">
-                        <Link to={`/closing?startDate=${startDate}&endDate=${endDate}`}>
-                            <Button 
-                                variant="gradient" 
-                                size="sm" 
-                                color="deep-purple" 
-                                className="flex items-center gap-2 capitalize h-[40px]" 
-                                onClick={() => {}}
-                            >
-                                <FaFolderClosed /> Closing
-                            </Button>
-                        </Link>
+                        <Button 
+                            variant="gradient" 
+                            size="sm" 
+                            color="deep-purple" 
+                            className="flex items-center gap-2 capitalize h-[40px]" 
+                            onClick={handleClosing}
+                        >
+                            <FaFolderClosed /> Closing
+                        </Button>
                     </div>
                 </div>   
             </div>
@@ -380,63 +378,7 @@ function CashClosing() {
                                     }
                                 }
                             }}
-                            // subHeader
-                            // subHeaderComponent={props.isSearch? "" : searchBox}
-                            // subHeaderAlign="right"
-                            // subHeaderWrap
-                            //progressPending={props.pending}
-                            //progressComponent={<ListLoader />}
                         />
-                        {/* <div className="border-r-2 grid grid-rows gap-2 justify-center items-center">
-                            <Typography variant="paragraph" className="flex items-center gap-2">
-                                <GiDiamondTrophy className="text-purple-500" />
-                                Category
-                            </Typography>
-                            <Typography variant="h6" className="text-end">
-                                500
-                                {walletBalance?.cashIn.toLocaleString("en-us")}
-                            </Typography>
-                        </div>
-                        <div className="border-r-2 grid grid-rows gap-2 justify-center items-center">
-                            <Typography variant="paragraph" className="flex items-center gap-2">
-                                <FaCirclePlus className="text-green-700" />
-                                Cash In
-                            </Typography>
-                            <Typography variant="h6" className="text-end">
-                                3,000,000,000
-                                {walletBalance?.cashOut.toLocaleString("en-us")}
-                            </Typography>
-                        </div>
-                        <div className="border-r-2 grid grid-rows gap-2 justify-center items-center">
-                            <Typography variant="paragraph" className="flex items-center gap-2">
-                                <FaCircleMinus className="text-red-700" />
-                                Cash Out
-                            </Typography>
-                            <Typography variant="h6" className="text-end">
-                                1,500,000
-                                {walletBalance?.cashIn.toLocaleString("en-us")}
-                            </Typography>
-                        </div>
-                        <div className="border-r-2 grid grid-rows gap-2 justify-center items-center">
-                            <Typography variant="paragraph" className="flex items-center gap-2">
-                                <FaCopyright className="text-blue-700" />
-                                Count
-                            </Typography>
-                            <Typography variant="h6" className="text-end">
-                                500
-                                {walletBalance?.cashIn.toLocaleString("en-us")}
-                            </Typography>
-                        </div>
-                        <div className="grid grid-rows gap-2 justify-center items-center">
-                            <Typography variant="paragraph" className="flex items-center gap-2">
-                                <FaEquals className="text-red-700" />
-                                Amount
-                            </Typography>
-                            <Typography variant="h6" className="text-end">
-                                999,500,000,000
-                                {walletBalance?.cashIn.toLocaleString("en-us")}
-                            </Typography>
-                        </div> */}
                     </CardBody>
                 </Card>
                 <Card className="h-auto shadow-none max-w-screen-xxl rounded-sm p-2 border mb-3">
@@ -455,12 +397,6 @@ function CashClosing() {
                                     }
                                 }
                             }}
-                            // subHeader
-                            // subHeaderComponent={props.isSearch? "" : searchBox}
-                            // subHeaderAlign="right"
-                            // subHeaderWrap
-                            //progressPending={props.pending}
-                            //progressComponent={<ListLoader />}
                         />
                     </CardBody>
                 </Card>
