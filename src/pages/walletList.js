@@ -154,7 +154,6 @@ function WalletList() {
                     visible: false,
                 });
             }) : await addWallet(saveData).then(async(res) => {
-                console.log(res);
                 if(res.error.data === "Success") {
                     setAlertMsg({
                         ...alertMsg,

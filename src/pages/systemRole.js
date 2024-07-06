@@ -192,7 +192,6 @@ function SystemRole() {
 
     const handleEdit = async (code) => {
         let eData = data.find((role) => role.roleCode === code);
-        console.log(eData);
         setIsEdit(true);
         setFormData(eData);
         setPermissionData(eData.permissions.map((el) => {
@@ -528,7 +527,6 @@ function SystemRole() {
                                                                 setPermissionData(
                                                                     permissionData.map((permission) => {
                                                                         if (permission.moduleName === el.moduleName) {
-                                                                            console.log(permission)
                                                                             return {
                                                                                 ...permission,
                                                                                 moduleCheck: e.target.checked,
@@ -557,7 +555,6 @@ function SystemRole() {
                                                                     setPermissionData(
                                                                         permissionData.map((permission) => {
                                                                             if (permission.moduleName === el.moduleName) {
-                                                                                console.log(permission)
                                                                                 return {
                                                                                     ...permission,
                                                                                     moduleCheck: permission.create && permission.update && permission.delete && e.target.checked ? true: false,
@@ -582,7 +579,6 @@ function SystemRole() {
                                                                     setPermissionData(
                                                                         permissionData.map((permission) => {
                                                                             if (permission.moduleName === el.moduleName) {
-                                                                                console.log(permission)
                                                                                 return {
                                                                                     ...permission,
                                                                                     moduleCheck: permission.view && permission.update && permission.delete && e.target.checked ? true: false,
@@ -607,7 +603,6 @@ function SystemRole() {
                                                                     setPermissionData(
                                                                         permissionData.map((permission) => {
                                                                             if (permission.moduleName === el.moduleName) {
-                                                                                console.log(permission)
                                                                                 return {
                                                                                     ...permission,
                                                                                     moduleCheck: permission.create && permission.view && permission.delete && e.target.checked ? true: false,
@@ -632,7 +627,6 @@ function SystemRole() {
                                                                     setPermissionData(
                                                                         permissionData.map((permission) => {
                                                                             if (permission.moduleName === el.moduleName) {
-                                                                                console.log(permission)
                                                                                 return {
                                                                                     ...permission,
                                                                                     moduleCheck: permission.create && permission.update && permission.view && e.target.checked ? true: false,

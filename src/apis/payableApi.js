@@ -65,7 +65,6 @@ const payableApi = createApi({
                     return [{type: "Payable", id: "All"}];
                 },
                 query: (payData) => {
-                    console.log(payData);
                     return {
                         url: "/payable/create-payable",
                         method: "POST",

@@ -72,7 +72,7 @@ function StoneSelection() {
             id: removeData[0].invoiceNo,
             deletedAt: moment().toISOString(),
             deletedBy: auth().username
-        }).then((res) => { console.log(res) });
+        }).then((res) => {  });
         setIsAlert(true);
         setOpenDelete(!openDelete);
         await pause(2000);
@@ -92,7 +92,6 @@ function StoneSelection() {
 
     const handleView = (id) => {
         let tempData = data.find(res => res.id === id);
-        console.log(tempData);
         setFormData(tempData);
         setIsView(true);
         setOpen(!open);
@@ -121,9 +120,7 @@ function StoneSelection() {
 
     const handleSubmit = () => {
         if(validateForm()) {
-            console.log(formData);
             try {
-                console.log("Ji");
                 addSelection({
                     ...formData,
                     lineNo: 1,
@@ -155,7 +152,6 @@ function StoneSelection() {
             }
             catch(err) {
                 console.log(err.statusCode);
-                
             }
             setFormData(selectionData);
             setOpen(!open);
@@ -163,7 +159,6 @@ function StoneSelection() {
     }
 
     const handleSave = () => {
-        console.log(formData);
         setFormData(selectionData);
     }
 

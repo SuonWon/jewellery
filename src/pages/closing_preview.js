@@ -15,7 +15,7 @@ function ClosingPreview() {
 
     const endDate = params.get('endDate');
 
-    const printDate = moment().format('DD, MMM YYYY');
+    const printDate = moment().format('DD MMM YYYY');
 
     const { data: openingData } = useFetchOpeningQuery({
         start_date: startDate,
@@ -48,6 +48,8 @@ function ClosingPreview() {
         printBtn.style.display='none'
         window.print();
         printBtn.style.display=''
+
+        window.location.href = "/cash_closing";
     }
 
     return (
@@ -82,7 +84,7 @@ function ClosingPreview() {
                             Opening
                         </p>
                         <p className="text-end font-bold">
-                            {openingData?.opening.toLocaleString("en-us")}
+                            {(openingData?.opening + openingData?.stock).toLocaleString("en-us")}
                         </p>
                     </div>
                     {/* <div className="border-r-2 grid grid-rows gap-2 px-4 items-center">

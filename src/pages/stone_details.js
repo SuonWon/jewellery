@@ -317,7 +317,6 @@ function StoneDetails() {
         let eData = data.find((stoneDetail) => stoneDetail.stoneDetailCode === id);
         setIsCombined(eData.isCombined);
         let tempPurchase = purchaseData.find(res => res.invoiceNo === eData.referenceNo);
-        console.log(tempPurchase.isComplete)
         if(tempPurchase) {
             setPurchase({
                 invoiceNo: tempPurchase.invoiceNo,
@@ -412,13 +411,11 @@ function StoneDetails() {
                     });
                 }
                 if(purchaseStatus !== purchase.isComplete && formData.referenceNo !== "") {
-                    console.log(purchaseStatus);
                     updateStatus({
                         ...purchase,
                         isComplete: purchaseStatus,
                         updatedBy: auth().username,
                     }).then((res) => {
-                        console.log(res);
                     });
                 }
                 setOpen(!open);
@@ -509,17 +506,13 @@ function StoneDetails() {
     //     setOpenDelete(!openDelete);
     // };
 
-    console.log(selectOption);
-
     const openCombineModal = (id) => {
         let temp = data.find(res => res.stoneDetailCode === id);
-        console.log(temp.size)
         axios.get(`${apiUrl}/stone-detail/get-same-stone-details?stoneCode=${temp.stoneCode}&typeCode=${temp.typeCode}&brightCode=${temp.brightCode}&gradeCode=${temp.gradeCode}&size=${temp.size}&sizeUnit=${temp.sizeUnit}`, {
             headers: {
                 "Authorization": token
             }
         }).then((res) => {
-            console.log(res.data);
             let selectedStone = res.data.find(el => el.stoneDetailCode === id);
             let share = "";
             selectedStone.purchase.purchaseShareDetails.map(el => {
@@ -627,10 +620,8 @@ function StoneDetails() {
             });
             await addStoneDetail(combinedStone)
             .then((res) => {
-                console.log(res.data);
                 if(res.error == null) {
                     saveData.map(el => {
-                        console.log(el);
                         editStoneDetail({
                             stoneDetailCode: el.stoneDetailCode,
                             referenceNo: el.referenceNo,
@@ -1124,7 +1115,6 @@ function StoneDetails() {
                                                     value={formData.referenceNo}
                                                     onChange={(e) => {
                                                         let purchase = isSupplier? selectedPurchase.find(el => el.invoiceNo === e.target.value) : truePurchaseData.find(el => el.invoiceNo === e.target.value);
-                                                        console.log(purchase.stoneType.typeCode);
                                                         setFormData({
                                                             ...formData,
                                                             referenceNo: e.target.value,

@@ -297,7 +297,6 @@ function SystemUser() {
     };
 
     const handleDeleteBtn = (id) => {
-        console.log(id);
         setDeleteId(id);
         setOpenDelete(!openDelete);
     };

@@ -49,7 +49,6 @@ const walletTransitionApi = createApi({
                     return [{type: "WalletTransaction", id: "All"}]
                 },
                 query: (filterData) => {
-                    console.log(filterData);
                     const query = `?status=true${filterData.shareCode === 0 ? '' : `&shareCode=${filterData.shareCode}`}${filterData.walletName === '' ? '' : `&walletName=${filterData.walletName}`}${filterData.category === 0 ? '' : `&category=${filterData.category}`}${filterData.start_date == null ? '' : `&start_date=${filterData.start_date}`}${filterData.end_date == null ? '' : `&end_date=${filterData.end_date}`}`;
                     return {
                         url: `/transaction/get-count${query}`,
@@ -69,7 +68,6 @@ const walletTransitionApi = createApi({
                     return [{type: "WalletTransaction", id: "All"}]
                 },
                 query: (filterData) => {
-                    console.log(filterData);
                     const query = `?status=true${filterData.shareCode === 0 ? '' : `&shareCode=${filterData.shareCode}`}${filterData.walletName === '' ? '' : `&walletName=${filterData.walletName}`}${filterData.category === 0 ? '' : `&category=${filterData.category}`}${filterData.start_date == null ? '' : `&start_date=${filterData.start_date}`}${filterData.end_date == null ? '' : `&end_date=${filterData.end_date}`}`;
                     return {
                         url: `/transaction/get-balance${query}`,

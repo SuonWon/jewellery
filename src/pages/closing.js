@@ -19,7 +19,7 @@ function Closing() {
 
     const startDate = params.get('startDate');
 
-    const endDate = moment(params.get('endDate')).toISOString();
+    const endDate = params.get('endDate');
 
     const auth = useAuthUser();
 
@@ -246,7 +246,7 @@ function Closing() {
         },
         {
             name: 'Stone Detail',
-            width: "250px",
+            width: "300px",
             selector: row => row.stoneDesc,
         },
         {
@@ -306,13 +306,13 @@ function Closing() {
     const cashInOutColumn = [
         {
             name: 'Status',
-            width: '200px',
+            width: '150px',
             selector: row => row.status,
             omit: true
         },
         {
             name: 'Id',
-            width: '200px',
+            width: '150px',
             selector: row => row.id,
             omit: true
         },
@@ -333,13 +333,13 @@ function Closing() {
         },
         {
             name: 'Reference No',
-            width: "150px",
+            width: "120px",
             selector: row => row.referenceNo,
             center: true
         },
         {
             name: 'Category',
-            width: "120px",
+            width: "180px",
             selector: row => row.categoryDesc,
             center: true
         },
@@ -410,30 +410,37 @@ function Closing() {
     const receivableColumn = [
         {
             name: 'Wallet Name',
+            width: '14%',
             selector: row => row.walletName,
         },
         {
             name: 'Received Date',
+            width: '10%',
             selector: row => moment(row.receivedDate).format('DD-MMM-YYYY hh:mm a').split(' ')[0],
         },
         {
             name: 'Invoice No',
+            width: '10%',
             selector: row => row.invoiceNo,
         },
         {
             name: 'Customer Name',
+            width: '15%',
             selector: row => row.customerName
         },
         {
             name: 'Stone Desc',
+            width: "28%",
             selector: row => row.stoneDesc
         },
         {
             name: 'Method',
+            width: "8%",
             selector: row => row.type,
         },
         {
             name: 'Amount',
+            width: '15%',
             selector: row => row.amount.toLocaleString('en-us'),
             right: true
         },
@@ -676,7 +683,7 @@ function Closing() {
                             data={purchaseDetails} 
                             striped={true}
                             fixedHeader={true}
-                            fixedHeaderScrollHeight="650px"
+                            fixedHeaderScrollHeight="450px"
                             customStyles={{
                                 headCells: {
                                     style: {
@@ -685,7 +692,7 @@ function Closing() {
                                     }
                                 }
                             }}
-                            actions={exportPurchase}
+                            actions={purchaseDetails?.length > 0 ? exportPurchase : null}
                         />
                     </TabPanel>
                     <TabPanel className="px-0 py-2" key="sales" value="sales">
@@ -694,7 +701,7 @@ function Closing() {
                             data={salesDetails} 
                             striped={true}
                             fixedHeader={true}
-                            fixedHeaderScrollHeight="650px"
+                            fixedHeaderScrollHeight="450px"
                             customStyles={{
                                 headCells: {
                                     style: {
@@ -703,7 +710,7 @@ function Closing() {
                                     }
                                 }
                             }}
-                            actions={exportSales}
+                            actions={salesDetails?.length > 0 ? exportSales : null}
                         />
                     </TabPanel>
                     <TabPanel className="px-0 py-2" key="cashInOut" value="cashInOut">
@@ -712,7 +719,7 @@ function Closing() {
                             data={cashInOutDetails?.filter((res) => res.categoryDesc !== "Payable" && res.categoryDesc !== "Receivable")} 
                             striped={true}
                             fixedHeader={true}
-                            fixedHeaderScrollHeight="650px"
+                            fixedHeaderScrollHeight="450px"
                             customStyles={{
                                 headCells: {
                                     style: {
@@ -721,7 +728,7 @@ function Closing() {
                                     }
                                 }
                             }}
-                            actions={exportCashInOut}
+                            actions={cashInOutDetails?.length > 0 ? exportCashInOut : null}
                         />
                     </TabPanel>
                     <TabPanel className="px-0 py-2" key="payable" value="payable">
@@ -730,7 +737,7 @@ function Closing() {
                             data={payableDetails} 
                             striped={true}
                             fixedHeader={true}
-                            fixedHeaderScrollHeight="650px"
+                            fixedHeaderScrollHeight="450px"
                             customStyles={{
                                 headCells: {
                                     style: {
@@ -739,7 +746,7 @@ function Closing() {
                                     }
                                 }
                             }}
-                            actions={exportPayable}
+                            actions={payableDetails?.length > 0 ? exportPayable : null}
                         />
                     </TabPanel>
                     <TabPanel className="px-0 py-2" key="receivable" value="receivable">
@@ -748,7 +755,7 @@ function Closing() {
                             data={receivableDetails} 
                             striped={true}
                             fixedHeader={true}
-                            fixedHeaderScrollHeight="650px"
+                            fixedHeaderScrollHeight="450px"
                             customStyles={{
                                 headCells: {
                                     style: {
@@ -757,7 +764,7 @@ function Closing() {
                                     }
                                 }
                             }}
-                            actions={exportReceivable}
+                            actions={receivableDetails?.length > 0 ? exportReceivable : null}
                         />
                     </TabPanel>
                 </TabsBody>
@@ -769,7 +776,7 @@ function Closing() {
             >
                 <DialogBody>
                     <Typography className="text-center" variant="h5">
-                        Are you sure?
+                        Are you sure want to close all transactions?
                     </Typography>
                 </DialogBody>
                 <DialogFooter className="pt-0 flex justify-center">

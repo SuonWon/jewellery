@@ -6,35 +6,36 @@ import { useNavigate } from "react-router-dom";
 import moment from "moment/moment";
 import { useFetchCashInOutDataQuery, useFetchCloseDateQuery, useFetchOpeningQuery, useFetchPurchaseDataQuery, useFetchSalesDataQuery } from "../store";
 import { useState } from "react";
+import { useAuthUser } from "react-auth-kit";
 
 function CashClosing() {
-
-    const startDateOfYear = moment().startOf('year').format('YYYY-MM-DD');
 
     const [endDate, setEndDate] = useState(moment().format('YYYY-MM-DD'));
 
     const navigate = useNavigate();
 
-    const { data : startDate } = useFetchCloseDateQuery();
+    // const { data : startDate } = useFetchCloseDateQuery();
+    const auth = useAuthUser();
+    const startDate = auth().account_start_date;
 
     const { data: openingData } = useFetchOpeningQuery({
-        start_date: startDate? startDate : startDateOfYear,
-        end_date: endDate
+        start_date: startDate,
+        end_date: endDate + "T23:59:59.999Z"
     });
 
     const { data: purchaseData } = useFetchPurchaseDataQuery({
-        start_date: startDate? startDate : startDateOfYear,
-        end_date: endDate
+        start_date: startDate,
+        end_date: endDate + "T23:59:59.999Z"
     });
 
     const { data: salesData } = useFetchSalesDataQuery({
-        start_date: startDate? startDate : startDateOfYear,
-        end_date: endDate
+        start_date: startDate,
+        end_date: endDate + "T23:59:59.999Z"
     });
 
     const { data: cashInOutData } = useFetchCashInOutDataQuery({
-        start_date: startDate? startDate : startDateOfYear,
-        end_date: endDate
+        start_date: startDate,
+        end_date: endDate + "T23:59:59.999Z"
     });
 
     const balance = (((openingData?.opening + openingData?.stock + openingData?.sales + openingData?.cashIn) - openingData?.purchase) - openingData?.cashOut);
@@ -43,23 +44,25 @@ function CashClosing() {
         {
             name: 'Stone',
             selector: row => row.stoneDesc,
-            width: '250px'
+            width: '28%'
         },
         {
             name: 'Count',
             selector: row => row.count.toLocaleString('en-us'),
+            center: true,
+            width: '12%'
         },
         {
             name: 'Amount',
             selector: row => row.grandTotal.toLocaleString('en-us'),
             right: true,
-            width: "160px"
+            width: '30%'
         },
         {
             name: 'Paid Amount',
             selector: row => row.paidAmount === null ? 0 : row.paidAmount.toLocaleString('en-us'),
             right: true,
-            width: "160px"
+            width: '30%'
         },
     ];
 
@@ -67,23 +70,25 @@ function CashClosing() {
         {
             name: 'Stone',
             selector: row => row.stoneDesc,
-            width: '250px'
+            width: '28%'
         },
         {
             name: 'Count',
             selector: row => row.count.toLocaleString('en-us'),
+            center: true,
+            width: '12%'
         },
         {
             name: 'Amount',
             selector: row => row.grandTotal.toLocaleString('en-us'),
             right: true,
-            width: "160px"
+            width: '30%'
         },
         {
             name: 'Paid Amount',
             selector: row => row.receivedAmount === null ? 0 : row.receivedAmount.toLocaleString('en-us'),
             right: true,
-            width: "160px"
+            width: '30%'
         },
     ];
 
@@ -91,15 +96,19 @@ function CashClosing() {
         {
             name: 'Category',
             selector: row => row.categoryDesc,
+            width: '40%'
         },
         {
             name: 'Count',
             selector: row => row.count,
+            center: true,
+            width: '20%'
         },
         {
             name: 'Cash In Amount',
             selector: row => row.amount,
-            right: true
+            right: true,
+            width: '40%'
         },
     ];
 
@@ -107,20 +116,24 @@ function CashClosing() {
         {
             name: 'Category',
             selector: row => row.categoryDesc,
+            width: '40%'
         },
         {
             name: 'Count',
             selector: row => row.count,
+            center: true,
+            width: '20%'
         },
         {
             name: 'Cash In Amount',
             selector: row => row.amount,
-            right: true
+            right: true,
+            width: '40%'
         },
     ];
 
     const handleClosing = () => {
-        navigate(`/closing?startDate=${startDate}&endDate=${endDate}`)
+        navigate(`/closing?startDate=${startDate}&endDate=${endDate}T23:59:59`)
     }
 
     return (
@@ -138,6 +151,7 @@ function CashClosing() {
                             value={moment(startDate).format('YYYY-MM-DD')}
                             className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
                             onChange={(e) => {}}
+                            disabled
                         />
                     </div>
                     <div className="">
@@ -148,7 +162,6 @@ function CashClosing() {
                             className="border border-blue-gray-200 w-full h-[35px] px-2.5 py-1.5 rounded-md text-black"
                             onChange={(e) => {
                                 setEndDate(moment(e.target.value).format('YYYY-MM-DD'))
-                                console.log(e.target.value);
                             }}
                         />
                     </div>

@@ -81,11 +81,18 @@ function Login() {
         if(validateForm()) {
             setIsLoading(true);
             axios.post(apiUrl + '/auth/login', formData)
-            .then((res) => {
+            .then(async (res) => {
                 dispatch(setToken({token: res.data.access_token}));
                 const newErrors = {}
                 if(res.data !== '') {
                     setPermissions(res.data.systemRole.permissions);
+
+                    const closingDate = await axios.get(apiUrl + '/cash-closing/close-date', {
+                        headers: {
+                            'Authorization': `Bearer ${res.data.access_token}`
+                        }
+                    })
+
                     if(signIn(
                         {
                             token : res.data.access_token,
@@ -93,12 +100,12 @@ function Login() {
                             authState : {
                                 username: res.data.username,
                                 fullName: res.data.fullName,
+                                account_start_date: closingDate.data,
                             },
                             expiresIn : 6400,
                         }
                     ));
                     setIsLoading(false);
-                    console.log(res.data.systemRole.roleDesc);
                     // if(res.data.systemRole.roleDesc == 'Super Admin') {
                     //     navigate('/dashboard');
                     // }

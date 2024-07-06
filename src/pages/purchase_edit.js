@@ -85,9 +85,7 @@ function PurchaseEdit() {
             updatedAt: moment().toISOString(),
             purchaseDetails: purchaseDetail
         };
-        console.log(subData);
         editPurchase(subData).then((res) => {
-            console.log(res);
         });
     };
 
@@ -157,14 +155,12 @@ function PurchaseEdit() {
         tempData.forEach(e => {
             subTotal += e.totalAmt;
         });
-        console.log(subTotal);
         setPurchase({
             ...purchase,
             subTotal: subTotal,
             grandTotal: subTotal - purchase.discAmt
         });
         setPurchaseDetail(tempData);
-        console.log(submitData);
         setIsEditDetail(false);
         reset({
             details: purchaseData,
@@ -177,7 +173,6 @@ function PurchaseEdit() {
         let totalP = parseFloat(getValues("details.unitPrice")) * parseFloat(e.target.value);
         let totalA = parseFloat(getValues("details.serviceCharge")) + totalP;
 
-        console.log(totalP);
         setValue("details.totalPrice", totalP)
         setValue("details.totalAmt", totalA);
 

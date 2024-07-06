@@ -214,7 +214,6 @@ function WalletCategory() {
     }
 
     async function handleDelete() {
-        console.log(deleteId);
         await removeCategory(deleteId).then((res) => {
             if(res.data) {
                 setAlertMsg({

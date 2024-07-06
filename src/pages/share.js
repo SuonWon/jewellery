@@ -273,7 +273,6 @@ function Share() {
     };
 
     const handleDeleteBtn = (id) => {
-        console.log(id);
         setDeleteId(id);
         setOpenDelete(!openDelete);
     };

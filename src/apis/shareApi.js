@@ -69,7 +69,6 @@ const shareApi = createApi({
                     return [{type: "Share", id:"All"}]
                 },
                 query: (shareId) => {
-                    console.log(shareId);
                     return {
                         url: `/share/get-share/${shareId}`,
                         method: "GET",

@@ -34,8 +34,6 @@ function PurchaseList() {
 
     const token = 'Bearer ' + Cookies.get('_auth');
 
-    console.log(token);
-
     useEffect(() => {
         setPurchasePermission(permissions[11]);
         setPayablePermission(permissions[22]);
@@ -57,6 +55,7 @@ function PurchaseList() {
     });
 
     const { data, isLoading : dataLoad, refetch} = useFetchPurchaseQuery(filterData);
+    console.log(data);
     
     const { data: dataCount } = useFetchPurchaseCountQuery(filterData);
 
@@ -297,7 +296,6 @@ function PurchaseList() {
         }));
         tempData.purchaseShareDetails.map(el => {
             if (el.share.isOwner) {
-                console.log(el)
                 setDShare({
                     ...dShare,
                     sharePercentage: el.sharePercentage,
@@ -368,7 +366,6 @@ function PurchaseList() {
             }).then((res) => {
                 purchaseInvoiceNo = res.data
             });
-            console.log(purchaseInvoiceNo);
             addPurchase({
                 ...formData,
                 invoiceNo: purchaseInvoiceNo,
@@ -922,17 +919,30 @@ function PurchaseList() {
                             alertMsg.visible? <SuccessAlert title={alertMsg.title} message={alertMsg.message} isError={alertMsg.isError} isWarning={alertMsg.isWarning}  /> : ""
                         }
                     </div>
-                    <div className="flex items-center py-3 bg-white gap-4 sticky top-0 z-10">
-                        <Typography variant="h5">
-                            Purchase List
-                        </Typography>
-                        {
-                            purchasePermission?.create ? (
-                                <Button variant="gradient" size="sm" color="deep-purple" className="flex items-center gap-2" onClick={handleOpen}>
-                                    <FaPlus /> Create New
-                                </Button>
-                            ) : null
-                        }
+                    <div className="flex justify-between py-3 bg-white gap-4 sticky top-0 z-10">
+                        <div className="flex items-center gap-2">
+                            <Typography variant="h5">
+                                Purchase List
+                            </Typography>
+                            {
+                                purchasePermission?.create ? (
+                                    <Button variant="gradient" size="sm" color="deep-purple" className="flex items-center gap-2" onClick={handleOpen}>
+                                        <FaPlus /> Create New
+                                    </Button>
+                                ) : null
+                            }
+                        </div>
+                        <div className="flex items-center gap-3">
+                            <p className="text-black text-xs">Invoice No: </p>
+                            <div className="flex items-center gap-1">
+                                <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                                <label className="text-black text-xs">In Progress</label>
+                            </div>
+                            <div className="flex items-center gap-1">
+                                <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                                <label className="text-black text-xs">Complete Selection</label>
+                            </div>
+                        </div>
                     </div>
                     {/* Filter form */}
                     <Card className="h-auto shadow-md max-w-screen-xxl rounded-sm p-2 border-t">
@@ -1170,7 +1180,6 @@ function PurchaseList() {
                                                 className="block w-full px-2.5 py-1.5 border border-blue-gray-200 h-[35px] rounded-md focus:border-black text-black"
                                                 value={formData.supplierCode}
                                                 onChange={(e) => {
-                                                    console.log(e.target.value)
                                                     setFormData({
                                                         ...formData,
                                                         supplierCode: Number(e.target.value)

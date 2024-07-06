@@ -92,7 +92,6 @@ const stoneDetailsApi = createApi({
                     return[{type: 'StoneDetails', id: 'All'}]
                 },
                 query: (stoneDetailsData) => {
-                    console.log(stoneDetailsData);
                     return {
                         url: '/stone-detail/create-stone-detail',
                         method: 'POST',

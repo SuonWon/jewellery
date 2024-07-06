@@ -91,8 +91,6 @@ function UOM() {
             newErrors.desc = 'Unit description is required.'
         }
 
-        console.log(newErrors);
-
         setValidationText(newErrors);
 
         return Object.keys(newErrors).length === 0;

@@ -162,7 +162,6 @@ function Damage() {
         let tempData = data.find(res => res.damageNo === id);
         let selectedStoneD = stoneDetails.filter(el => el.referenceNo === tempData.referenceNo);
         setSelectedStoneDetails(selectedStoneD);
-        console.log(tempData);
         setFormData(tempData);
         setIsView(true);
         setOpen(!open);

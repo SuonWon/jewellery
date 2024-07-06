@@ -198,7 +198,6 @@ function Wallet() {
     }
 
     const handleSubmit = async () => {
-        console.log(formData)
         if (validateForm()) {
             addTransaction({
                 id: uuidv4(),
@@ -244,7 +243,6 @@ function Wallet() {
     };
 
     const handleSave = async () => {
-        console.log(formData)
         if (validateForm()) {
             addTransaction({
                 id: uuidv4(),
@@ -336,7 +334,6 @@ function Wallet() {
     };
 
     const confirmDateRange = () => {
-        console.log(dateRange);
         if (dateRange.startDate !== "" && dateRange.endDate === "") {
             setFilterForm({
                 ...filterForm,
@@ -721,7 +718,6 @@ function Wallet() {
                                         className="block w-full text-black border border-blue-gray-200 h-[35px] px-2.5 py-1.5 rounded-md focus:border-black"
                                         value={filterForm.category}
                                         onChange={(e) => {
-                                            console.log(e.target.value)
                                             setFilterForm({...filterForm, category: Number(e.target.value)});
                                             setCurrentPage(1);
                                         }}
@@ -793,7 +789,6 @@ function Wallet() {
                                             className="block w-full px-2.5 py-1.5 border border-blue-gray-200 h-[35px] rounded-md focus:border-black text-black"
                                             value={filterForm.take} 
                                             onChange={(e) => {
-                                                console.log(e.target.value)
                                                 setFilterForm({
                                                     ...filterForm,
                                                     skip: 0,

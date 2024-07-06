@@ -47,7 +47,6 @@ const uomApi = createApi({
                     return[{type: 'UOM', id: 'All'}]
                 },
                 query: (unitData) => {
-                    console.log(unitData);
                     return {
                         url: '/unit/create-unit',
                         method: 'POST',

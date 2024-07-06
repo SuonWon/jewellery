@@ -35,8 +35,6 @@ function SalesList() {
 
     const navigate = useNavigate();
 
-    console.log(token);
-
     useEffect(() => {
         setSalesPermission(permissions[12]);
         setReceivablePermission(permissions[23]);
@@ -293,7 +291,6 @@ function SalesList() {
                 amount: el.amount,
             }
         }));
-        console.log(returnData)
         setTBodyReturnData(returnData.filter(el => el.referenceNo === id));
         setIsEdit(true);
         setOpen(!open);
@@ -503,7 +500,6 @@ function SalesList() {
                         isComplete: issueStatus,
                         updatedBy: auth().username,
                     }).then((res) => {
-                        console.log(res);
                     });
                     setSelectedIssue({});
                 }
@@ -1079,7 +1075,6 @@ function SalesList() {
                                                 className="block w-full px-2.5 py-1.5 border border-blue-gray-200 h-[35px] rounded-md focus:border-black text-black"
                                                 value={formData.stoneDetailCode}
                                                 onChange={(e) => {
-                                                    console.log(e.target.value);
                                                     setFormData({
                                                         ...formData,
                                                         stoneDetailCode: e.target.value,

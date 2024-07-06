@@ -117,10 +117,8 @@ function Startup(props) {
     const createCompany = () => {
         if(validateCompanyForm()) {
             addCompany(companyData).then((res) => {
-                console.log(res.data);
             });
             addDefaultRole(roleData).then((res) => {
-                console.log(res.data);
                 setRoleCode(res.data.roleCode);
             });
             setActiveStep(2);
@@ -129,7 +127,6 @@ function Startup(props) {
 
     const createUser = () => {
         if (validateUserForm()) {
-            console.log(userData);
             var hash = bcrypt.hashSync(userData.password, salt);
             addDefaultUser({
                 username: userData.username,
@@ -141,7 +138,6 @@ function Startup(props) {
                 createdBy: "",
                 updatedBy: "",
             }).then((res) => {
-                console.log(res.data);
             });
             addDefaultCategory({
                 categoryDesc: "Stone",

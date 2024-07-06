@@ -43,7 +43,6 @@ const closingApi = createApi({
                     return [{type: 'Closing', id: 'All'}]
                 },
                 query: (filterData) => {
-                    console.log(filterData);
                     return {
                         url: `/cash-closing/get-purchase?start_date=${filterData.start_date}&end_date=${filterData.end_date}`,
                         method: 'GET',

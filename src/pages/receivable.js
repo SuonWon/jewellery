@@ -16,8 +16,6 @@ function Receivable(props) {
 
     const [receivablePermission] = useState(props.receivablePermission);
 
-    console.log(receivablePermission);
-
     const {data, isLoading: dataLoad} = useFetchReceivableQuery(props.invoiceNo);
 
     const { data: walletData } = useFetchOwnerWalletQuery();
@@ -124,6 +122,36 @@ function Receivable(props) {
     };
 
     const handleSubmit = async () => {
+        
+        //   console.log("Inserting data start.....");
+
+        //   for (var i=0;i<dummy.length;i++) {
+        //     (function(ind) {
+        //         setTimeout(async function(){
+        //             await addReceivable({
+        //                 // id: payForm.id,
+        //                 walletCode: dummy[ind].walletCode,
+        //                 // walletName: payForm.walletName,
+        //                 receivedDate: dummy[ind].receivedDate,
+        //                 invoiceNo: dummy[ind].invoiceNo,
+        //                 amount: dummy[ind].amount,
+        //                 balance: dummy[ind].balance,
+        //                 type: dummy[ind].type,
+        //                 status: dummy[ind].status,
+        //                 remark: dummy[ind].remark,
+        //                 createdBy: dummy[ind].createdBy,
+        //                 updatedBy: "",
+        //                 deletedBy: "",
+        //             });
+        //             console.log(ind + " - " + dummy[ind].amount + " is added successfully.");
+        //         }, 1000 * ind);
+        //     })(i);
+        //  }
+
+        //   console.log("Inserting data end.....");
+
+        //   return;
+
         if (validatePayable()) {
             addReceivable({
                 id: payForm.id,
@@ -168,7 +196,6 @@ function Receivable(props) {
 
     const handleRemove = async (id) => {
         let removeData = data.find((el) => el.id === id);
-        console.log(removeData);
         removeReceivable({
             id: removeData.id,
             walletName: removeData.wallet.walletName,
@@ -254,7 +281,9 @@ function Receivable(props) {
         },
         {
             name: 'Wallet Name',
-            selector: row => row.wallet.walletName,
+            selector:  row => <div className={`${row.status == 'O' ? 'bg-green-500' : (row.status == 'V' ? 'bg-red-500' : 'bg-orange-500')} px-3 py-[5px] text-white rounded-xl`}>
+                {row.wallet.walletName}
+            </div>
         },
         {
             name: 'Received Date',
@@ -486,6 +515,21 @@ function Receivable(props) {
                             </div>
                             {/* Receivable table list */}
                             <div className="col-span-5">
+                                <div className="flex justify-end items-center gap-3 mb-2">
+                                    <p className="text-black text-xs">Voucher Close Status: </p>
+                                    <div className="flex items-center gap-1">
+                                        <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                                        <label className="text-black text-xs">Open</label>
+                                    </div>
+                                    <div className="flex items-center gap-1">
+                                        <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
+                                        <label className="text-black text-xs">Close</label>
+                                    </div>
+                                    <div className="flex items-center gap-1">
+                                        <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                                        <label className="text-black text-xs">Void</label>
+                                    </div>
+                                </div>
                                 <Card className="w-full shadow-sm border border-blue-gray-200 rounded-md">
                                     <CardBody className="overflow-auto rounded-md p-0">
                                         <DataTable 

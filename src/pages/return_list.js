@@ -183,7 +183,6 @@ function ReturnList({type = 'I'}) {
 
     const handleView = (id) => {
         let tempData = data.find(res => res.returnNo === id);
-        console.log(tempData);
         setFormData(tempData);
         setIsEdit(true);
         setOpen(!open);

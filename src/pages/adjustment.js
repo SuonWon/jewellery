@@ -160,7 +160,6 @@ function Adjustment() {
         let tempData = data.find(res => res.adjustmentNo === id);
         let selectedStoneD = stoneDetails.filter(el => el.referenceNo === tempData.referenceNo);
         setSelectedStoneDetails(selectedStoneD);
-        console.log(tempData);
         setFormData(tempData);
         setIsView(true);
         setOpen(!open);
@@ -199,7 +198,6 @@ function Adjustment() {
                 adjustId = res.data;
             });
     
-            console.log(formData);
             addAdjust({
                 ...formData,
                 adjustmentNo: adjustId,

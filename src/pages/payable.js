@@ -15,8 +15,6 @@ const validator = require('validator');
 
 function Payable(props) {
 
-    console.log(props.invoiceNo)
-
     const [payablePermission] = useState(props.payablePermission);
 
     const {data, isLoading: dataLoad} = useFetchPayableQuery(props.invoiceNo);
@@ -160,13 +158,44 @@ function Payable(props) {
     };
 
     const handleSubmit = async () => {
+
+        console.log("Inserting data start.....");
+
+        // for (var i=0;i<dummy.length;i++) {
+        //     (function(ind) {
+        //         setTimeout(async function(){
+        //             await addPayable({
+        //                 // id: payForm.id,
+        //                 walletCode: dummy[ind].walletCode,
+        //                 // walletName: payForm.walletName,
+        //                 paidDate: dummy[ind].paidDate,
+        //                 invoiceNo: dummy[ind].invoiceNo,
+        //                 amount: dummy[ind].amount,
+        //                 balance: dummy[ind].balance,
+        //                 type: dummy[ind].type,
+        //                 status: dummy[ind].status,
+        //                 remark: dummy[ind].remark,
+        //                 createdBy: dummy[ind].createdBy,
+        //                 updatedBy: "",
+        //                 deletedBy: "",
+        //             });
+        //             console.log(ind + " - " + dummy[ind].amount + " is added successfully.");
+        //         }, 1000 * ind);
+        //     })(i);
+        //  }
+
+        //   console.log("Inserting data end.....");
+
+        //   return;
+
+        // console.log(moment(payForm.paidDate).format('YYYY-MM-DD') + moment().format('THH:mm:ss'));
+        // return;
         if (validatePayable()) {
-            console.log(payForm)
             addPayable({
                 id: payForm.id,
                 walletCode: payForm.walletCode,
                 walletName: payForm.walletName,
-                paidDate: moment(payForm.paidDate).toISOString(),
+                paidDate: moment(payForm.paidDate).format('YYYY-MM-DD') + moment().format('THH:mm:ss'),
                 invoiceNo: props.invoiceNo,
                 amount: payForm.amount,
                 balance: payForm.remainBalance,
@@ -209,7 +238,7 @@ function Payable(props) {
                 id: payForm.id,
                 walletCode: payForm.walletCode,
                 walletName: payForm.walletName,
-                paidDate: moment(payForm.paidDate).toISOString(),
+                paidDate: moment(payForm.paidDate).format('YYYY-MM-DD') + moment().format('THH:mm:ss'),
                 invoiceNo: payForm.invoiceNo,
                 amount: payForm.amount,
                 balance: payForm.remainBalance,
@@ -257,7 +286,9 @@ function Payable(props) {
         },
         {
             name: 'Wallet Name',
-            selector: row => row.wallet.walletName,
+            selector: row => <div className={`${row.status == 'O' ? 'bg-green-500' : (row.status == 'V' ? 'bg-red-500' : 'bg-orange-500')} px-3 py-[5px] text-white rounded-xl`}>
+                {row.wallet.walletName}
+            </div>
         },
         {
             name: 'Paid Date',
@@ -309,8 +340,6 @@ function Payable(props) {
             )
         },
     ];
-
-    console.log(payForm);
 
     return (
         <> 
@@ -421,8 +450,6 @@ function Payable(props) {
                                             value={payForm.amount.toLocaleString('en')}
                                             onChange={(e) => {
                                                 let payAmt = Number(e.target.value === "" ? 0 : e.target.value.replace(/[^0-9]/g, ""))
-                                                console.log(props.balance)
-                                                console.log(payAmt);
                                                 if (payAmt <= (props.balance - paidAmt)) {
                                                     setPayForm({
                                                         ...payForm,
@@ -496,6 +523,21 @@ function Payable(props) {
                                 </div>
                                 {/* Payable table list */}
                                 <div className="col-span-5">
+                                    <div className="flex justify-end items-center gap-3 mb-2">
+                                        <p className="text-black text-xs">Voucher Close Status: </p>
+                                        <div className="flex items-center gap-1">
+                                            <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                                            <label className="text-black text-xs">Open</label>
+                                        </div>
+                                        <div className="flex items-center gap-1">
+                                            <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
+                                            <label className="text-black text-xs">Close</label>
+                                        </div>
+                                        <div className="flex items-center gap-1">
+                                            <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                                            <label className="text-black text-xs">Void</label>
+                                        </div>
+                                    </div>
                                     <Card className="w-full shadow-sm border border-blue-gray-200 rounded-md">
                                         <CardBody className="overflow-auto rounded-md p-0">
                                             <DataTable 

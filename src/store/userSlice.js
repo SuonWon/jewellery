@@ -8,7 +8,6 @@ const useSlice = createSlice({
     },
     reducers: {
         setToken: (state, action) => {
-            console.log(action.payload.token);
             state.token = action.payload.token
         }
     }
