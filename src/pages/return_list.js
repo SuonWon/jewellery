@@ -49,7 +49,7 @@ function ReturnList({type = 'I'}) {
     const [filterData, setFilterData] = useState({
         skip: 0,
         take: 10,
-        status: 'A',
+        status: 'O',
         return_type: type,
         search_word: '',
         start_date: null,

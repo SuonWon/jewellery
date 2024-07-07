@@ -535,7 +535,7 @@ function Wallet() {
                                 </div>
                             ) : null
                         }
-                        <Button 
+                        {/* <Button 
                             size="sm" 
                             className="flex items-center gap-2 bg-main capitalize py-2 px-3" 
                             onClick={() => {
@@ -544,7 +544,7 @@ function Wallet() {
                             }}
                         >
                             <FaCirclePlus /> Cash Closing
-                        </Button>
+                        </Button> */}
                     </div>
                     <Card className="h-auto shadow-none max-w-screen-xxl rounded-sm p-2 border">
                         <CardBody className="grid grid-cols-3 gap-2 rounded-sm overflow-auto p-2">
@@ -758,6 +758,10 @@ function Wallet() {
                                                 walletName: "",
                                                 shareCode: 0,
                                                 category: 0
+                                            });
+                                            setDateRange({
+                                                startDate: "",
+                                                endDate: "",
                                             });
                                         }}
                                     >

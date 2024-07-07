@@ -46,7 +46,7 @@ function PurchaseList() {
     const [filterData, setFilterData] = useState({
         skip: 0,
         take: 10,
-        status: 'A',
+        status: 'O',
         isComplete: 'A',
         search_word: '',
         paidStatus: 'A',
@@ -936,7 +936,7 @@ function PurchaseList() {
                             <p className="text-black text-xs">Invoice No: </p>
                             <div className="flex items-center gap-1">
                                 <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-                                <label className="text-black text-xs">In Progress</label>
+                                <label className="text-black text-xs">Pending / In Progress</label>
                             </div>
                             <div className="flex items-center gap-1">
                                 <div className="w-3 h-3 bg-blue-500 rounded-full"></div>

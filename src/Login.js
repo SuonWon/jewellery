@@ -12,7 +12,7 @@ import { FaRegImages } from "react-icons/fa6";
 import Startup from "./pages/startup";
 import { useCheckUserQuery } from "./store";
 import ButtonLoader from "./components/buttonLoader";
-
+import moment from "moment";
 
 const validator = require('validator');
 
@@ -100,7 +100,7 @@ function Login() {
                             authState : {
                                 username: res.data.username,
                                 fullName: res.data.fullName,
-                                account_start_date: closingDate.data,
+                                account_start_date: moment(closingDate.data).add(1, 'days').format('YYYY-MM-DD')+'T00:00:00.000Z',
                             },
                             expiresIn : 6400,
                         }

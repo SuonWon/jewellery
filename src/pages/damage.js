@@ -43,7 +43,7 @@ function Damage() {
     const [filterData, setFilterData] = useState({
         skip: 0,
         take: 10,
-        status: 'A',
+        status: 'O',
         search_word: '',
         start_date: null,
         end_date: null

@@ -42,7 +42,7 @@ function IssueList() {
     const [filterData, setFilterData] = useState({
         skip: 0,
         take: 10,
-        status: 'A',
+        status: 'O',
         isComplete: 'A',
         search_word: '',
         start_date: null,
