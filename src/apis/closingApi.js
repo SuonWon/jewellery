@@ -133,6 +133,30 @@ const closingApi = createApi({
                     };
                 },
             }),
+            fetchLastPayable: builder.query({
+                providesTags: () => {
+                    return [{type: 'Closing', id: 'All'}]
+                },
+                query: (filterData) => {
+                    return {
+                        url: `/cash-closing/get-last-payable`,
+                        method: 'GET',
+                        params: filterData,
+                    };
+                },
+            }),
+            fetchLastReceivable: builder.query({
+                providesTags: () => {
+                    return [{type: 'Closing', id: 'All'}]
+                },
+                query: (filterData) => {
+                    return {
+                        url: `/cash-closing/get-last-receivable`,
+                        method: 'GET',
+                        params: filterData,
+                    };
+                },
+            }),
             addClosing: builder.mutation({
                 query: (data) => {
                     return {
@@ -151,5 +175,5 @@ const closingApi = createApi({
     },
 });
 
-export const { useFetchCashInOutDetailsQuery, useFetchCashInOutDataQuery, useFetchOpeningQuery, useFetchPurchaseDataQuery, useFetchPurchaseDetailsQuery, useFetchSalesDataQuery, useFetchSalesDetailsQuery, useFetchCloseDateQuery, useFetchPayableDetailsQuery, useFetchReceivableDetailsQuery, useAddClosingMutation } = closingApi;
+export const { useFetchCashInOutDetailsQuery, useFetchCashInOutDataQuery, useFetchOpeningQuery, useFetchPurchaseDataQuery, useFetchPurchaseDetailsQuery, useFetchSalesDataQuery, useFetchSalesDetailsQuery, useFetchCloseDateQuery, useFetchPayableDetailsQuery, useFetchReceivableDetailsQuery, useFetchLastPayableQuery, useFetchLastReceivableQuery, useAddClosingMutation } = closingApi;
 export { closingApi };

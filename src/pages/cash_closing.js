@@ -4,7 +4,7 @@ import { GiDiamondTrophy } from "react-icons/gi";
 import DataTable from "react-data-table-component";
 import { useNavigate } from "react-router-dom";
 import moment from "moment/moment";
-import { useFetchCashInOutDataQuery, useFetchCloseDateQuery, useFetchOpeningQuery, useFetchPurchaseDataQuery, useFetchSalesDataQuery } from "../store";
+import { useFetchCashInOutDataQuery, useFetchCloseDateQuery, useFetchLastPayableQuery, useFetchLastReceivableQuery, useFetchOpeningQuery, useFetchPurchaseDataQuery, useFetchSalesDataQuery } from "../store";
 import { useState } from "react";
 import { useAuthUser } from "react-auth-kit";
 
@@ -28,7 +28,17 @@ function CashClosing() {
         end_date: endDate + "T23:59:59.999Z"
     });
 
+    const { data: payableData } = useFetchLastPayableQuery({
+        start_date: startDate,
+        end_date: endDate + "T23:59:59.999Z"
+    });
+
     const { data: salesData } = useFetchSalesDataQuery({
+        start_date: startDate,
+        end_date: endDate + "T23:59:59.999Z"
+    });
+
+    const { data: receivableData } = useFetchLastReceivableQuery({
         start_date: startDate,
         end_date: endDate + "T23:59:59.999Z"
     });
@@ -66,6 +76,25 @@ function CashClosing() {
         },
     ];
 
+    const payableColumn = [
+        {
+            name: 'Stone',
+            selector: row => row.stoneDesc,
+            width: '28%'
+        },
+        {
+            name: 'Count',
+            selector: row => row.count.toLocaleString('en-us'),
+            center: true,
+            width: '12%'
+        },
+        {
+            name: 'Amount',
+            selector: row => row.totalAmount.toLocaleString('en-us'),
+            right: true,
+        },
+    ];
+
     const salesColumn = [
         {
             name: 'Stone',
@@ -89,6 +118,25 @@ function CashClosing() {
             selector: row => row.receivedAmount === null ? 0 : row.receivedAmount.toLocaleString('en-us'),
             right: true,
             width: '30%'
+        },
+    ];
+
+    const receivableColumn = [
+        {
+            name: 'Stone',
+            selector: row => row.stoneDesc,
+            width: '28%'
+        },
+        {
+            name: 'Count',
+            selector: row => row.count.toLocaleString('en-us'),
+            center: true,
+            width: '12%'
+        },
+        {
+            name: 'Amount',
+            selector: row => row.totalAmount.toLocaleString('en-us'),
+            right: true,
         },
     ];
 
@@ -309,6 +357,30 @@ function CashClosing() {
                 </div>
                 <div className="flex flex-col pt-3 bg-white gap-4 sticky top-0 z-10">
                     <Typography variant="h6">
+                        Last Payable
+                    </Typography>
+                    <Card className="h-auto shadow-none w-full rounded-sm p-2 border">
+                        <CardBody className="rounded-sm overflow-auto p-2">
+                            <DataTable 
+                                columns={payableColumn} 
+                                data={payableData} 
+                                striped={true}
+                                fixedHeader={true}
+                                fixedHeaderScrollHeight="400px"
+                                customStyles={{
+                                    headCells: {
+                                        style: {
+                                            background: "#6e46b9",
+                                            color: "white"
+                                        }
+                                    }
+                                }}
+                            />
+                        </CardBody>
+                    </Card>
+                </div>
+                <div className="flex flex-col pt-3 bg-white gap-4 sticky top-0 z-10">
+                    <Typography variant="h6">
                         Sales
                     </Typography>
                     <Card className="h-auto shadow-none rounded-sm p-2 border">
@@ -364,6 +436,30 @@ function CashClosing() {
                                     {walletBalance?.cashIn.toLocaleString("en-us")}
                                 </Typography>
                             </div> */}
+                        </CardBody>
+                    </Card>
+                </div>
+                <div className="flex flex-col pt-3 bg-white gap-4 sticky top-0 z-10">
+                    <Typography variant="h6">
+                        Last Receivable
+                    </Typography>
+                    <Card className="h-auto shadow-none w-full rounded-sm p-2 border">
+                        <CardBody className="rounded-sm overflow-auto p-2">
+                            <DataTable 
+                                columns={receivableColumn} 
+                                data={receivableData} 
+                                striped={true}
+                                fixedHeader={true}
+                                fixedHeaderScrollHeight="400px"
+                                customStyles={{
+                                    headCells: {
+                                        style: {
+                                            background: "#6e46b9",
+                                            color: "white"
+                                        }
+                                    }
+                                }}
+                            />
                         </CardBody>
                     </Card>
                 </div>

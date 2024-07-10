@@ -195,7 +195,7 @@ function Payable(props) {
                 id: payForm.id,
                 walletCode: payForm.walletCode,
                 walletName: payForm.walletName,
-                paidDate: moment(payForm.paidDate).format('YYYY-MM-DD') + moment().format('THH:mm:ss'),
+                paidDate: moment(payForm.paidDate).toISOString(),
                 invoiceNo: props.invoiceNo,
                 amount: payForm.amount,
                 balance: payForm.remainBalance,
