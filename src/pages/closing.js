@@ -729,13 +729,11 @@ function Closing() {
             selector: row => row.totalPrice.toLocaleString('en-us'),
             right: "true",
         },
-        // {
-        //     name: 'Agents',
-        //     width: "300px",
-        //     selector: row => row.issueMember?.map(el => {
-        //         return `${el.customer.customerName}, `
-        //     })
-        // },
+        {
+            name: 'Agents',
+            width: "300px",
+            selector: row => row.customer
+        },
         {
             name: 'Remark',
             selector: row => row.remark,
