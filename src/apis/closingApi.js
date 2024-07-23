@@ -157,6 +157,65 @@ const closingApi = createApi({
                     };
                 },
             }),
+            fetchIssueDetails: builder.query({
+                providesTags: () => {
+                    return [{type: 'Closing', id: 'All'}]
+                },
+                query: (filterData) => {
+                    return {
+                        url: `/cash-closing/get-issue-details`,
+                        method: 'GET',
+                        params: filterData,
+                    };
+                },
+            }),
+            fetchReturnDetails: builder.query({
+                providesTags: () => {
+                    return [{type: 'Closing', id: 'All'}]
+                },
+                query: (filterData) => {
+                    return {
+                        url: `/cash-closing/get-return-details`,
+                        method: 'GET',
+                        params: filterData,
+                    };
+                },
+            }),
+            fetchAdjustmentDetails: builder.query({
+                providesTags: () => {
+                    return [{type: 'Closing', id: 'All'}]
+                },
+                query: (filterData) => {
+                    return {
+                        url: `/cash-closing/get-adjustment-details`,
+                        method: 'GET',
+                        params: filterData,
+                    };
+                },
+            }),
+            fetchDamageDetails: builder.query({
+                providesTags: () => {
+                    return [{type: 'Closing', id: 'All'}]
+                },
+                query: (filterData) => {
+                    return {
+                        url: `/cash-closing/get-damage-details`,
+                        method: 'GET',
+                        params: filterData,
+                    };
+                },
+            }),
+            fetchStock: builder.query({
+                providesTags: () => {
+                    return [{type: 'Closing', id: 'All'}]
+                },
+                query: () => {
+                    return {
+                        url: `/cash-closing/get-stock`,
+                        method: 'GET',
+                    };
+                },
+            }),
             addClosing: builder.mutation({
                 query: (data) => {
                     return {
@@ -175,5 +234,5 @@ const closingApi = createApi({
     },
 });
 
-export const { useFetchCashInOutDetailsQuery, useFetchCashInOutDataQuery, useFetchOpeningQuery, useFetchPurchaseDataQuery, useFetchPurchaseDetailsQuery, useFetchSalesDataQuery, useFetchSalesDetailsQuery, useFetchCloseDateQuery, useFetchPayableDetailsQuery, useFetchReceivableDetailsQuery, useFetchLastPayableQuery, useFetchLastReceivableQuery, useAddClosingMutation } = closingApi;
+export const { useFetchCashInOutDetailsQuery, useFetchCashInOutDataQuery, useFetchOpeningQuery, useFetchPurchaseDataQuery, useFetchPurchaseDetailsQuery, useFetchSalesDataQuery, useFetchSalesDetailsQuery, useFetchCloseDateQuery, useFetchPayableDetailsQuery, useFetchReceivableDetailsQuery, useFetchLastPayableQuery, useFetchLastReceivableQuery, useFetchAdjustmentDetailsQuery, useFetchDamageDetailsQuery, useFetchIssueDetailsQuery, useFetchReturnDetailsQuery, useFetchStockQuery, useAddClosingMutation } = closingApi;
 export { closingApi };

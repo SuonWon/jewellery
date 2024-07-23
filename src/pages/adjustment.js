@@ -344,7 +344,7 @@ function Adjustment() {
             center: 'true'
         },
         {
-            name: 'Damage No',
+            name: 'Adjustment No',
             width: '200px',
             selector: row => row.adjustmentNo,
         },

@@ -4,7 +4,7 @@ import { GiDiamondTrophy } from "react-icons/gi";
 import DataTable from "react-data-table-component";
 import { useNavigate } from "react-router-dom";
 import moment from "moment/moment";
-import { useFetchCashInOutDataQuery, useFetchCloseDateQuery, useFetchLastPayableQuery, useFetchLastReceivableQuery, useFetchOpeningQuery, useFetchPurchaseDataQuery, useFetchSalesDataQuery } from "../store";
+import { useFetchCashInOutDataQuery, useFetchCloseDateQuery, useFetchLastPayableQuery, useFetchLastReceivableQuery, useFetchOpeningQuery, useFetchPurchaseDataQuery, useFetchSalesDataQuery, useFetchStockQuery } from "../store";
 import { useState } from "react";
 import { useAuthUser } from "react-auth-kit";
 
@@ -47,6 +47,8 @@ function CashClosing() {
         start_date: startDate,
         end_date: endDate + "T23:59:59.999Z"
     });
+
+    const { data: stockData } = useFetchStockQuery();
 
     const balance = (((openingData?.opening + openingData?.stock + openingData?.sales + openingData?.cashIn) - openingData?.purchase) - openingData?.cashOut);
 
@@ -510,7 +512,77 @@ function CashClosing() {
                     </CardBody>
                 </Card>
             </div>
-            
+            <div className="flex flex-col pt-3 bg-white gap-4 sticky top-0 z-10">
+                <Typography variant="h6">
+                    Stock
+                </Typography>
+                <Card className="h-auto shadow-none w-full rounded-sm p-2 border">
+                    <CardBody className="rounded-sm overflow-x-scroll p-2">
+                        <table className="w-full">
+                            <thead className="bg-blue-gray-500 text-sm text-white">
+                                <tr>
+                                    <th className="p-2 border border-gray-200"></th>
+                                    <th className="p-2 border border-gray-200" colSpan={2}>Total</th>
+                                    <th className="p-2 border border-gray-200" colSpan={2}>Sales</th>
+                                    <th className="p-2 border border-gray-200" colSpan={2}>Issue</th>
+                                    <th className="p-2 border border-gray-200" colSpan={2}>Adjustment</th>
+                                    <th className="p-2 border border-gray-200" colSpan={2}>Damage</th>
+                                    <th className="p-2 border border-gray-200" colSpan={2}>Sales Return</th>
+                                    <th className="p-2 border border-gray-200" colSpan={2}>Purchase Return</th>
+                                    <th className="p-2 border border-gray-200" colSpan={2}>Issue Return</th>
+                                </tr>
+                                <tr>
+                                    <th className="p-2 border border-gray-200 w-[250px]">Stone Details</th>
+                                    <th className="p-2 border border-gray-200 text-end">Qty</th>
+                                    <th className="p-2 border border-gray-200 text-end">Weight</th>
+                                    <th className="p-2 border border-gray-200 text-end">Qty</th>
+                                    <th className="p-2 border border-gray-200 text-end">Weight</th>
+                                    <th className="p-2 border border-gray-200 text-end">Qty</th>
+                                    <th className="p-2 border border-gray-200 text-end">Weight</th>
+                                    <th className="p-2 border border-gray-200 text-end">Qty</th>
+                                    <th className="p-2 border border-gray-200 text-end">Weight</th>
+                                    <th className="p-2 border border-gray-200 text-end">Qty</th>
+                                    <th className="p-2 border border-gray-200 text-end">Weight</th>
+                                    <th className="p-2 border border-gray-200 text-end">Qty</th>
+                                    <th className="p-2 border border-gray-200 text-end">Weight</th>
+                                    <th className="p-2 border border-gray-200 text-end">Qty</th>
+                                    <th className="p-2 border border-gray-200 text-end">Weight</th>
+                                    <th className="p-2 border border-gray-200 text-end">Qty</th>
+                                    <th className="p-2 border border-gray-200 text-end">Weight</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {
+                                    stockData?.map((res) => {
+                                        return (
+                                            <tr className="text-xs">
+                                                <td className="p-2 border border-gray-200">{res.stoneDesc}</td>
+                                                <td className="p-2 border border-gray-200 text-end">{res.qty}</td>
+                                                <td className="p-2 border border-gray-200 text-end">{res.weight}</td>
+                                                <td className="p-2 border border-gray-200 text-end">{res.totalSalesQty? res.totalSalesQty: '0'}</td>
+                                                <td className="p-2 border border-gray-200 text-end">{res.totalSalesWeight? res.totalSalesWeight: '0'}</td>
+                                                <td className="p-2 border border-gray-200 text-end">{res.totalIssuesQty? res.totalIssuesQty: '0'}</td>
+                                                <td className="p-2 border border-gray-200 text-end">{res.totalIssuesWeight? res.totalIssuesWeight : '0'}</td>
+                                                <td className="p-2 border border-gray-200 text-end">{res.totalAdjustmentsQty? res.totalAdjustmentsQty : '0'}</td>
+                                                <td className="p-2 border border-gray-200 text-end">{res.totalAdjustmentsWeight? res.totalAdjustmentsWeight : '0'}</td>
+                                                <td className="p-2 border border-gray-200 text-end">{res.totalDamageQty? res.totalDamageQty : '0'}</td>
+                                                <td className="p-2 border border-gray-200 text-end">{res.totalDamageWeight? res.totalDamageWeight : '0'}</td>
+                                                <td className="p-2 border border-gray-200 text-end">{res.totalSalesReturnQty? res.totalSalesReturnQty : '0'}</td>
+                                                <td className="p-2 border border-gray-200 text-end">{res.totalSalesReturnWeight? res.totalSalesReturnWeight : '0'}</td>
+                                                <td className="p-2 border border-gray-200 text-end">{res.totalPurchaseReturnQty? res.totalPurchaseReturnQty : '0'}</td>
+                                                <td className="p-2 border border-gray-200 text-end">{res.totalPurchaseReturnWeight? res.totalPurchaseReturnWeight : '0'}</td>
+                                                <td className="p-2 border border-gray-200 text-end">{res.totalIssueReturnQty? res.totalIssueReturnQty : '0'}</td>
+                                                <td className="p-2 border border-gray-200 text-end">{res.totalIssueReturnWeight? res.totalIssueReturnWeight : '0'}</td>
+                                            </tr>
+                                        )
+                                    })
+                                }
+                                
+                            </tbody>
+                        </table>
+                    </CardBody>
+                </Card>
+            </div>
         </div>
     );
 }

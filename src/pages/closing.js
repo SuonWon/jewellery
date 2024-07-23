@@ -1,8 +1,8 @@
 import { Button, Card, CardBody, Dialog, DialogBody, DialogFooter, Tab, TabPanel, Tabs, TabsBody, TabsHeader, Typography } from "@material-tailwind/react";
-import { useCallback, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import DataTable from "react-data-table-component";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useAddClosingMutation, useFetchCashInOutDetailsQuery, useFetchOpeningQuery, useFetchPayableDetailsQuery, useFetchPurchaseDetailsQuery, useFetchReceivableDetailsQuery, useFetchSalesDetailsQuery } from "../store";
+import { useAddClosingMutation, useFetchAdjustmentDetailsQuery, useFetchCashInOutDetailsQuery, useFetchDamageDetailsQuery, useFetchIssueDetailsQuery, useFetchOpeningQuery, useFetchPayableDetailsQuery, useFetchPurchaseDetailsQuery, useFetchReceivableDetailsQuery, useFetchReturnDetailsQuery, useFetchSalesDetailsQuery } from "../store";
 import moment from "moment";
 import { useAuthUser } from "react-auth-kit";
 import SuccessAlert from "../components/success_alert";
@@ -22,6 +22,12 @@ function Closing() {
     const endDate = params.get('endDate');
 
     const auth = useAuthUser();
+
+    const [purchaseReturn, setPurchaseReturn] = useState([]);
+
+    const [salesReturn, setSalesReturn] = useState([]);
+
+    const [issueReturn, setIssueReturn] = useState([]);
 
     const { data: openingData } = useFetchOpeningQuery({
         start_date: startDate,
@@ -52,6 +58,34 @@ function Closing() {
         start_date: startDate,
         end_date: endDate
     });
+
+    const { data: adjustmentDetails } = useFetchAdjustmentDetailsQuery({
+        start_date: startDate,
+        end_date: endDate
+    });
+
+    const { data: damageDetails } = useFetchDamageDetailsQuery({
+        start_date: startDate,
+        end_date: endDate
+    });
+
+    const { data: returnDetails } = useFetchReturnDetailsQuery({
+        start_date: startDate,
+        end_date: endDate
+    });
+
+    const { data: issueDetails } = useFetchIssueDetailsQuery({
+        start_date: startDate,
+        end_date: endDate
+    });
+
+    useEffect(() => {
+        if (returnDetails) {
+            setPurchaseReturn(returnDetails.filter((item) => item.returnType === "P"));
+            setSalesReturn(returnDetails.filter((item) => item.returnType === "S"));
+            setIssueReturn(returnDetails.filter((item) => item.returnType === "I"));
+        }
+    },[returnDetails]);
 
     const purchaseAmt = payableDetails?.reduce((res, {amount}) => res + amount, 0);
 
@@ -446,6 +480,358 @@ function Closing() {
         },
     ];
 
+    const adjustmentColumn = [
+        {
+            name: 'Status',
+            width: '120px',
+            selector: row => row.status === 'O' ? 
+                <div className="bg-green-500 px-3 py-[5px] text-white rounded-xl">
+                    Open
+                </div>
+                : row.status === 'V' ? 
+                    <div className="bg-red-500 px-3 py-[5px] text-white rounded-xl">
+                        Void
+                    </div> 
+                : row.status === 'F' ? 
+                    <div className="bg-blue-500 px-3 py-[5px] text-white rounded-xl">
+                        Complete
+                    </div> :
+                    <div className="bg-orange-500 px-3 py-[5px] text-white rounded-xl">
+                        Closed
+                    </div>,
+            center: 'true'
+        },
+        {
+            name: 'Adjustment No',
+            width: '150px',
+            selector: row => row.adjustmentNo,
+        },
+        {
+            name: 'Date',
+            width: "150px",
+            selector: row => moment(row.timezone).format('YYYY-MM-YY'),
+        },
+        {
+            name: "Adjustment Type",
+            width: "120px",
+            selector: row => row.adjustmentType === "+" ? "Gain" : "Loss"
+        },
+        {
+            name: 'Reference No',
+            width: "150px",
+            selector: row => row.referenceNo,
+        },
+        {
+            name: 'Stone Detail',
+            width: "300px",
+            selector: row => row.stoneDesc,
+        },
+        {
+            name: 'Qty',
+            width: "120px",
+            selector: row => row.qty,
+            center: "true"
+        },
+        {
+            name: 'Weight',
+            width: "120px",
+            selector: row => row.weight,
+            center: "true"
+        },
+        {
+            name: 'Unit',
+            width: "120px",
+            selector: row => row.unitCode,
+            center: "true"
+        },
+        {
+            name: 'Unit Price',
+            width: "150px",
+            selector: row => row.unitPrice,
+            right: "true"
+        },
+        {
+            name: 'Total Price',
+            width: "150px",
+            selector: row => row.totalPrice,
+            right: "true"
+        },
+        {
+            name: 'Remark',
+            width: "300px",
+            selector: row => row.remark,
+        },
+        // {
+        //     name: 'Created At',
+        //     width: "200px",
+        //     selector: row => row.createdAt,
+        // },
+        // {
+        //     name: 'Updated At',
+        //     width: "200px",
+        //     selector: row => row.updatedAt,
+        // },
+    ];
+
+    const damageColumn = [
+        {
+            name: 'Status',
+            width: '120px',
+            selector: row => row.status === 'O' ? 
+                <div className="bg-green-500 px-3 py-[5px] text-white rounded-xl">
+                    Open
+                </div>
+                : row.status === 'V' ? 
+                    <div className="bg-red-500 px-3 py-[5px] text-white rounded-xl">
+                        Void
+                    </div> 
+                : row.status === 'F' ? 
+                    <div className="bg-blue-500 px-3 py-[5px] text-white rounded-xl">
+                        Complete
+                    </div> :
+                    <div className="bg-orange-500 px-3 py-[5px] text-white rounded-xl">
+                        Closed
+                    </div>,
+            center: 'true'
+        },
+        {
+            name: 'Damage No',
+            width: '150px',
+            selector: row => row.damageNo,
+        },
+        {
+            name: 'Date',
+            width: "150px",
+            selector: row => moment(row.timezone).format('YYYY-MM-YY'),
+        },
+        {
+            name: 'Reference No',
+            width: "150px",
+            selector: row => row.referenceNo,
+        },
+        {
+            name: 'Stone Detail',
+            width: "300px",
+            selector: row => row.stoneDesc,
+        },
+        {
+            name: 'Qty',
+            width: "120px",
+            selector: row => row.qty,
+            center: "true"
+        },
+        {
+            name: 'Weight',
+            width: "120px",
+            selector: row => row.weight,
+            center: "true"
+        },
+        {
+            name: 'Unit',
+            width: "120px",
+            selector: row => row.unitCode,
+            center: "true"
+        },
+        {
+            name: 'Unit Price',
+            width: "150px",
+            selector: row => row.unitPrice,
+            right: "true"
+        },
+        {
+            name: 'Total Price',
+            width: "150px",
+            selector: row => row.totalPrice,
+            right: "true"
+        },
+        {
+            name: 'Remark',
+            width: "300px",
+            selector: row => row.remark,
+        },
+        // {
+        //     name: 'Created At',
+        //     width: "200px",
+        //     selector: row => row.createdAt,
+        // },
+        // {
+        //     name: 'Updated At',
+        //     width: "200px",
+        //     selector: row => row.updatedAt,
+        // },
+    ];
+
+    const issueColumn = [
+        {
+            name: 'Status',
+            width: '120px',
+            selector: row => row.status === 'O' ? 
+                <div className="bg-green-500 px-3 py-[5px] text-white rounded-xl">
+                    Open
+                </div>
+                : row.status === 'V' ? 
+                    <div className="bg-red-500 px-3 py-[5px] text-white rounded-xl">
+                        Void
+                    </div> 
+                : <div className="bg-orange-500 px-3 py-[5px] text-white rounded-xl">
+                        Closed
+                    </div>,
+            center: 'true'
+        },
+        {
+            name: 'Issue No',
+            width: '130px',
+            selector: row => row.isComplete? <div className="bg-blue-500 px-3 py-[5px] text-white rounded-xl">
+                {row.issueNo}
+            </div> : <div className="bg-red-500 px-3 py-[5px] text-white rounded-xl">
+                {row.issueNo}
+            </div>,
+            center: true,
+        },
+        {
+            name: 'Date',
+            width: "130px",
+            selector: row => moment(row.timezone).format('YYYY-MM-DD'),
+        },
+        {
+            name: 'Stone Detail',
+            width: "250px",
+            selector: row => row.stoneDesc,
+        },
+        {
+            name: 'Quantity',
+            width: "100px",
+            selector: row => row.qty,
+            center: "true"
+        },
+        {
+            name: 'Weight',
+            width: "100px",
+            selector: row => row.weight,
+            center: "true"
+
+        },
+        {
+            name: 'Unit',
+            width: "100px",
+            selector: row => row.unitCode,
+            center: "true"
+        },
+        {
+            name: 'Unit Price',
+            width: "130px",
+            selector: row => row.unitPrice.toLocaleString('en-us'),
+            right: "true",
+        },
+        {
+            name: 'Total Price',
+            width: "130px",
+            selector: row => row.totalPrice.toLocaleString('en-us'),
+            right: "true",
+        },
+        // {
+        //     name: 'Agents',
+        //     width: "300px",
+        //     selector: row => row.issueMember?.map(el => {
+        //         return `${el.customer.customerName}, `
+        //     })
+        // },
+        {
+            name: 'Remark',
+            selector: row => row.remark,
+        },
+    ];
+
+    const returnColumn = [
+        {
+            name: 'Status',
+            width: '150px',
+            selector: row => row.status === 'O' ? 
+                <div className="bg-green-500 px-3 py-[5px] text-white rounded-xl">
+                    Open
+                </div>
+                : row.status === 'V' ? 
+                    <div className="bg-red-500 px-3 py-[5px] text-white rounded-xl">
+                        Void
+                    </div> 
+                : row.status === 'F' ? 
+                    <div className="bg-blue-500 px-3 py-[5px] text-white rounded-xl">
+                        Complete
+                    </div> :
+                    <div className="bg-orange-500 px-3 py-[5px] text-white rounded-xl">
+                        Closed
+                    </div>,
+            center: 'true'
+        },
+        {
+            name: 'Return No',
+            selector: row => row.returnNo,
+        },
+        {
+            name: 'Date',
+            selector: row => moment(row.timezone).format('YYYY-MM-DD'),
+        },
+        {
+            name: 'Reference No',
+            selector: row => row.referenceNo,
+        },
+        {
+            name: 'Type',
+            width: "100px",
+            selector: row => row.returnType === 'I' ? "Issue" : row.returnType === 'S' ? "Sales" : "Purchase",
+        },
+        {
+            name: 'Stone Detail',
+            width: "300px",
+            selector: row => row.stoneDesc,
+        },
+        {
+            name: 'Qty',
+            width: "100px",
+            selector: row => row.qty,
+            center: "true"
+        },
+        {
+            name: 'Weight',
+            width: "100px",
+            selector: row => row.weight,
+            center: "true"
+        },
+        {
+            name: 'Unit',
+            width: "100px",
+            selector: row => row.unitCode,
+            center: "true"
+        },
+        {
+            name: 'Unit Price',
+            width: "180px",
+            selector: row => row.unitPrice.toLocaleString('en-us'),
+            right: "true"
+        },
+        {
+            name: 'Total Price',
+            width: "180px",
+            selector: row => row.totalPrice.toLocaleString('en-us'),
+            right: "true"
+        },
+        {
+            name: 'Remark',
+            width: "300px",
+            selector: row => row.remark,
+        },
+        // {
+        //     name: 'Created At',
+        //     width: "200px",
+        //     selector: row => row.createdAt,
+        // },
+        // {
+        //     name: 'Updated At',
+        //     width: "200px",
+        //     selector: row => row.updatedAt,
+        // },
+    ];
+
     const handleOpen = () => {
         setOpen(!open);
     }
@@ -480,8 +866,6 @@ function Closing() {
 
     function convertArrayOfObjectsToCSV(array) {
         let result;
-
-        console.log(array);
 
         const columnDelimiter = ',';
         const lineDelimiter = '\n';
@@ -530,11 +914,23 @@ function Closing() {
 
     const exportSales = useMemo(() => <Export onExport={() => downloadCSV(salesDetails, "Sales List")} />, [salesDetails]);
 
-    const exportCashInOut = useMemo(() => <Export onExport={() => downloadCSV(cashInOutDetails, "Cash In/Out List")} />, [cashInOutDetails])
+    const exportCashInOut = useMemo(() => <Export onExport={() => downloadCSV(cashInOutDetails, "Cash In/Out List")} />, [cashInOutDetails]);
 
-    const exportPayable = useMemo(() => <Export onExport={() => downloadCSV(payableDetails, "Payable List")} />, [payableDetails])
+    const exportPayable = useMemo(() => <Export onExport={() => downloadCSV(payableDetails, "Payable List")} />, [payableDetails]);
 
-    const exportReceivable = useMemo(() => <Export onExport={() => downloadCSV(receivableDetails, "Receivable List")} />, [receivableDetails])
+    const exportReceivable = useMemo(() => <Export onExport={() => downloadCSV(receivableDetails, "Receivable List")} />, [receivableDetails]);
+
+    const exportDamage = useMemo(() => <Export onExport={() => downloadCSV(damageDetails, "Receivable List")} />, [damageDetails]);
+
+    const exportAdjustment = useMemo(() => <Export onExport={() => downloadCSV(adjustmentDetails, "Receivable List")} />, [adjustmentDetails]);
+
+    const exportIssue = useMemo(() => <Export onExport={() => downloadCSV(issueDetails, "Receivable List")} />, [issueDetails]);
+
+    const exportPurchaseReturn = useMemo(() => <Export onExport={() => downloadCSV(purchaseReturn, "Receivable List")} />, [purchaseReturn]);
+
+    const exportSalesReturn = useMemo(() => <Export onExport={() => downloadCSV(salesReturn, "Receivable List")} />, [salesReturn]);
+
+    const exportIssueReturn = useMemo(() => <Export onExport={() => downloadCSV(issueReturn, "Receivable List")} />, [issueReturn]);
 
     return (
         <div className="text-start w-full p-4">
@@ -556,6 +952,17 @@ function Closing() {
                         onClick={handleOpen}
                     >
                         Confirm & Close Transaction
+                    </Button>
+                    <Button 
+                        variant="gradient" 
+                        size="sm" 
+                        color="light-blue" 
+                        className="flex items-center gap-2 capitalize h-[40px]" 
+                        onClick={() => {
+                            navigate(`/stock_closing_preview?startDate=${startDate}&endDate=${endDate}`);
+                        }}
+                    >
+                        Stock Closing Preview
                     </Button>
                 </div> 
             </div>
@@ -627,13 +1034,14 @@ function Closing() {
                 </CardBody>
             </Card>
             <Tabs value={activeTab}>
-                <div className="flex flex-row grid grid-cols-2 gap-2 justify-between">
+                <div className="flex flex-row grid grid-cols-1 gap-2 justify-between">
                     <TabsHeader
-                        className="bg-transparent w-min-fit gap-4 px-0 py-2"
+                        className="bg-transparent w-min-fit gap-2 px-0 py-2"
                         indicatorProps={{
                         className: "bg-main/80",
                         }}
                     >
+                        {/* Purchase */}
                         <Tab
                             key="purchase"
                             value="purchase"
@@ -642,6 +1050,7 @@ function Closing() {
                         >
                             Purchase
                         </Tab>
+                        {/* Sales */}
                         <Tab
                             key="sales"
                             value="sales"
@@ -650,6 +1059,7 @@ function Closing() {
                         >
                             Sales
                         </Tab>
+                        {/* Cash In/Out */}
                         <Tab
                             key="cashInOut"
                             value="cashInOut"
@@ -658,6 +1068,7 @@ function Closing() {
                         >
                             Cash In/Out
                         </Tab>
+                        {/* Payable */}
                         <Tab
                             key="payable"
                             value="payable"
@@ -666,6 +1077,7 @@ function Closing() {
                         >
                             Payable
                         </Tab>
+                        {/* Receivable */}
                         <Tab
                             key="receivable"
                             value="receivable"
@@ -674,9 +1086,64 @@ function Closing() {
                         >
                             Receivable
                         </Tab>
+                        {/* Adjustment */}
+                        <Tab
+                            key="adjustment"
+                            value="adjustment"
+                            onClick={() => setActiveTab("adjustment")}
+                            className={activeTab === "adjustment" ? "text-white" : "bg-gray-500/50 rounded-md"}
+                        >
+                            Adjustment
+                        </Tab>
+                        {/* Damage */}
+                        <Tab
+                            key="damage"
+                            value="damage"
+                            onClick={() => setActiveTab("damage")}
+                            className={activeTab === "damage" ? "text-white" : "bg-gray-500/50 rounded-md"}
+                        >
+                            Damage
+                        </Tab>
+                        {/* Issue */}
+                        <Tab
+                            key="issue"
+                            value="issue"
+                            onClick={() => setActiveTab("issue")}
+                            className={activeTab === "issue" ? "text-white" : "bg-gray-500/50 rounded-md"}
+                        >
+                            Issue
+                        </Tab>
+                        {/* Purchase Return */}
+                        <Tab
+                            key="purchaseReturn"
+                            value="purchaseReturn"
+                            onClick={() => setActiveTab("purchaseReturn")}
+                            className={activeTab === "purchaseReturn" ? "text-white" : "bg-gray-500/50 rounded-md"}
+                        >
+                            Purchase Return
+                        </Tab>
+                        {/* Sales Return */}
+                        <Tab
+                            key="salesReturn"
+                            value="salesReturn"
+                            onClick={() => setActiveTab("salesReturn")}
+                            className={activeTab === "salesReturn" ? "text-white" : "bg-gray-500/50 rounded-md"}
+                        >
+                            Sales Return
+                        </Tab>
+                        {/* Issue Return */}
+                        <Tab
+                            key="issueReturn"
+                            value="issueReturn"
+                            onClick={() => setActiveTab("issueReturn")}
+                            className={activeTab === "issueReturn" ? "text-white" : "bg-gray-500/50 rounded-md"}
+                        >
+                            Issue Return
+                        </Tab>
                     </TabsHeader>
                 </div>
                 <TabsBody>
+                    {/* Purchase */}
                     <TabPanel className="px-0 py-2" key="purchase" value="purchase">
                         <DataTable 
                             columns={purchaseColumn} 
@@ -695,6 +1162,7 @@ function Closing() {
                             actions={purchaseDetails?.length > 0 ? exportPurchase : null}
                         />
                     </TabPanel>
+                    {/* Sales */}
                     <TabPanel className="px-0 py-2" key="sales" value="sales">
                         <DataTable 
                             columns={salesColumn} 
@@ -713,6 +1181,7 @@ function Closing() {
                             actions={salesDetails?.length > 0 ? exportSales : null}
                         />
                     </TabPanel>
+                    {/* Cash In/Out */}
                     <TabPanel className="px-0 py-2" key="cashInOut" value="cashInOut">
                         <DataTable 
                             columns={cashInOutColumn} 
@@ -731,6 +1200,7 @@ function Closing() {
                             actions={cashInOutDetails?.length > 0 ? exportCashInOut : null}
                         />
                     </TabPanel>
+                    {/* Payable */}
                     <TabPanel className="px-0 py-2" key="payable" value="payable">
                         <DataTable 
                             columns={payableColumn} 
@@ -749,6 +1219,7 @@ function Closing() {
                             actions={payableDetails?.length > 0 ? exportPayable : null}
                         />
                     </TabPanel>
+                    {/* Receivable */}
                     <TabPanel className="px-0 py-2" key="receivable" value="receivable">
                         <DataTable 
                             columns={receivableColumn} 
@@ -765,6 +1236,120 @@ function Closing() {
                                 }
                             }}
                             actions={receivableDetails?.length > 0 ? exportReceivable : null}
+                        />
+                    </TabPanel>
+                    {/* Adjustment */}
+                    <TabPanel className="px-0 py-2" key="adjustment" value="adjustment">
+                        <DataTable 
+                            columns={adjustmentColumn} 
+                            data={adjustmentDetails} 
+                            striped={true}
+                            fixedHeader={true}
+                            fixedHeaderScrollHeight="450px"
+                            customStyles={{
+                                headCells: {
+                                    style: {
+                                        background: "#6b7280",
+                                        color: "white"
+                                    }
+                                }
+                            }}
+                            actions={adjustmentDetails?.length > 0 ? exportAdjustment : null}
+                        />
+                    </TabPanel>
+                    {/* Damage */}
+                    <TabPanel className="px-0 py-2" key="damage" value="damage">
+                        <DataTable 
+                            columns={damageColumn} 
+                            data={damageDetails} 
+                            striped={true}
+                            fixedHeader={true}
+                            fixedHeaderScrollHeight="450px"
+                            customStyles={{
+                                headCells: {
+                                    style: {
+                                        background: "#6b7280",
+                                        color: "white"
+                                    }
+                                }
+                            }}
+                            actions={damageDetails?.length > 0 ? exportDamage : null}
+                        />
+                    </TabPanel>
+                    {/* Issue */}
+                    <TabPanel className="px-0 py-2" key="issue" value="issue">
+                        <DataTable 
+                            columns={issueColumn} 
+                            data={issueDetails} 
+                            striped={true}
+                            fixedHeader={true}
+                            fixedHeaderScrollHeight="450px"
+                            customStyles={{
+                                headCells: {
+                                    style: {
+                                        background: "#6b7280",
+                                        color: "white"
+                                    }
+                                }
+                            }}
+                            actions={issueDetails?.length > 0 ? exportIssue : null}
+                        />
+                    </TabPanel>
+                    {/* Purchase Return */}
+                    <TabPanel className="px-0 py-2" key="purchaseReturn" value="purchaseReturn">
+                        <DataTable 
+                            columns={returnColumn} 
+                            data={purchaseReturn} 
+                            striped={true}
+                            fixedHeader={true}
+                            fixedHeaderScrollHeight="450px"
+                            customStyles={{
+                                headCells: {
+                                    style: {
+                                        background: "#6b7280",
+                                        color: "white"
+                                    }
+                                }
+                            }}
+                            actions={purchaseReturn?.length > 0 ? exportPurchaseReturn : null}
+                        />
+                    </TabPanel>
+                    {/* Sales Return */}
+                    <TabPanel className="px-0 py-2" key="salesReturn" value="salesReturn">
+                        <DataTable 
+                            columns={returnColumn} 
+                            data={salesReturn} 
+                            striped={true}
+                            fixedHeader={true}
+                            fixedHeaderScrollHeight="450px"
+                            customStyles={{
+                                headCells: {
+                                    style: {
+                                        background: "#6b7280",
+                                        color: "white"
+                                    }
+                                }
+                            }}
+                            actions={salesReturn?.length > 0 ? exportSalesReturn : null}
+                        />
+                    </TabPanel>
+                    {/* Issue Return */}
+                    <TabPanel className="px-0 py-2" key="issueReturn" value="issueReturn">
+                        <DataTable 
+                            columns={returnColumn} 
+                            data={issueReturn} 
+                            striped={true}
+                            fixedHeader={true}
+                            fixedHeaderScrollHeight="450px"
+                            customStyles={{
+                                headCells: {
+                                    style: {
+                                        background: "#6b7280",
+                                        color: "white"
+                                    }
+                                }
+                            }}
+                            actions={issueReturn?.length > 0 ? exportIssueReturn : null}
                         />
                     </TabPanel>
                 </TabsBody>
