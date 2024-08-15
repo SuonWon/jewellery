@@ -512,14 +512,14 @@ function CashClosing() {
                     </CardBody>
                 </Card>
             </div>
-            <div className="flex flex-col pt-3 bg-white gap-4 sticky top-0 z-10">
+            <div className="flex flex-col py-4 bg-white gap-4 sticky top-0 z-10">
                 <Typography variant="h6">
                     Stock
                 </Typography>
                 <Card className="h-auto shadow-none w-full rounded-sm p-2 border">
-                    <CardBody className="rounded-sm overflow-x-scroll p-2">
+                    <CardBody className="rounded-sm overflow-auto h-[300px] p-2">
                         <table className="w-full">
-                            <thead className="bg-blue-gray-500 text-sm text-white">
+                            <thead className="bg-blue-gray-500 text-sm text-white sticky">
                                 <tr>
                                     <th className="p-2 border border-gray-200"></th>
                                     <th className="p-2 border border-gray-200" colSpan={2}>Total</th>

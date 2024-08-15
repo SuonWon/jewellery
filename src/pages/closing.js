@@ -29,6 +29,8 @@ function Closing() {
 
     const [issueReturn, setIssueReturn] = useState([]);
 
+    const [cashInOut, setCashInOut] = useState([]);
+
     const { data: openingData } = useFetchOpeningQuery({
         start_date: startDate,
         end_date: endDate
@@ -85,11 +87,18 @@ function Closing() {
             setSalesReturn(returnDetails.filter((item) => item.returnType === "S"));
             setIssueReturn(returnDetails.filter((item) => item.returnType === "I"));
         }
-    },[returnDetails]);
+        if (cashInOutDetails) {
+            setCashInOut(cashInOutDetails?.filter((res) => res.categoryDesc !== "Payable" && res.categoryDesc !== "Receivable"))
+        }
+    },[returnDetails, cashInOutDetails]);
 
     const purchaseAmt = payableDetails?.reduce((res, {amount}) => res + amount, 0);
 
     const salesAmt = receivableDetails?.reduce((res, {amount}) => res + amount, 0);
+
+    const cashInAmt = cashInOut?.filter((res) => res.cashType === 'DEBIT')?.reduce((res, {amount}) => res + amount, 0);
+
+    const cashOutAmt = cashInOut?.filter((res) => res.cashType === 'CREDIT')?.reduce((res, {amount}) => res + amount, 0)
 
     const balance = (((openingData?.opening + openingData?.stock + salesAmt + openingData?.cashIn) - purchaseAmt) - openingData?.cashOut);
 
@@ -904,7 +913,7 @@ function Closing() {
         link.click();
     }
 
-    const Export = ({ onExport }) => <Button onClick={e => {
+    const Export = ({ onExport }) => <Button variant="outlined" color="deep-purple" className="py-2 px-4 capitalize" onClick={e => {
         onExport(e.target.value)
     }}>Export</Button>;
 
@@ -912,7 +921,7 @@ function Closing() {
 
     const exportSales = useMemo(() => <Export onExport={() => downloadCSV(salesDetails, "Sales List")} />, [salesDetails]);
 
-    const exportCashInOut = useMemo(() => <Export onExport={() => downloadCSV(cashInOutDetails, "Cash In/Out List")} />, [cashInOutDetails]);
+    const exportCashInOut = useMemo(() => <Export onExport={() => downloadCSV(cashInOut, "Cash In/Out List")} />, [cashInOut]);
 
     const exportPayable = useMemo(() => <Export onExport={() => downloadCSV(payableDetails, "Payable List")} />, [payableDetails]);
 
@@ -952,9 +961,9 @@ function Closing() {
                         Confirm & Close Transaction
                     </Button>
                     <Button 
-                        variant="gradient" 
+                        variant="outlined" 
                         size="sm" 
-                        color="light-blue" 
+                        color="deep-purple" 
                         className="flex items-center gap-2 capitalize h-[40px]" 
                         onClick={() => {
                             navigate(`/stock_closing_preview?startDate=${startDate}&endDate=${endDate}`);
@@ -1008,7 +1017,7 @@ function Closing() {
                             Cash In
                         </Typography>
                         <Typography variant="h6" className="text-end">
-                            {openingData?.cashIn.toLocaleString("en-us")}
+                            {cashInAmt.toLocaleString("en-us")}
                         </Typography>
                     </div>
                     <div className="border-r-2 grid grid-rows gap-2 px-4 items-center">
@@ -1017,7 +1026,7 @@ function Closing() {
                             Cash Out
                         </Typography>
                         <Typography variant="h6" className="text-end">
-                            {openingData?.cashOut.toLocaleString("en-us")}
+                            {cashOutAmt.toLocaleString("en-us")}
                         </Typography>
                     </div>
                     <div className=" grid grid-rows gap-2 px-4 items-center">
@@ -1044,7 +1053,7 @@ function Closing() {
                             key="purchase"
                             value="purchase"
                             onClick={() => setActiveTab("purchase")}
-                            className={activeTab === "purchase" ? "text-white" : "bg-gray-500/50 rounded-md"}
+                            className={`text-sm ${activeTab === "purchase" ? "text-white" : "bg-gray-500/50 rounded-md"}`}
                         >
                             Purchase
                         </Tab>
@@ -1053,7 +1062,7 @@ function Closing() {
                             key="sales"
                             value="sales"
                             onClick={() => setActiveTab("sales")}
-                            className={activeTab === "sales" ? "text-white" : "bg-gray-500/50 rounded-md"}
+                            className={`text-sm ${activeTab === "sales" ? "text-white" : "bg-gray-500/50 rounded-md"}`}
                         >
                             Sales
                         </Tab>
@@ -1062,7 +1071,7 @@ function Closing() {
                             key="cashInOut"
                             value="cashInOut"
                             onClick={() => setActiveTab("cashInOut")}
-                            className={activeTab === "cashInOut" ? "text-white" : "bg-gray-500/50 rounded-md"}
+                            className={`text-sm ${activeTab === "cashInOut" ? "text-white" : "bg-gray-500/50 rounded-md"}`}
                         >
                             Cash In/Out
                         </Tab>
@@ -1071,7 +1080,7 @@ function Closing() {
                             key="payable"
                             value="payable"
                             onClick={() => setActiveTab("payable")}
-                            className={activeTab === "payable" ? "text-white" : "bg-gray-500/50 rounded-md"}
+                            className={`text-sm ${activeTab === "payable" ? "text-white" : "bg-gray-500/50 rounded-md"}`}
                         >
                             Payable
                         </Tab>
@@ -1080,7 +1089,7 @@ function Closing() {
                             key="receivable"
                             value="receivable"
                             onClick={() => setActiveTab("receivable")}
-                            className={activeTab === "receivable" ? "text-white" : "bg-gray-500/50 rounded-md"}
+                            className={`text-sm ${activeTab === "receivable" ? "text-white" : "bg-gray-500/50 rounded-md"}`}
                         >
                             Receivable
                         </Tab>
@@ -1089,7 +1098,7 @@ function Closing() {
                             key="adjustment"
                             value="adjustment"
                             onClick={() => setActiveTab("adjustment")}
-                            className={activeTab === "adjustment" ? "text-white" : "bg-gray-500/50 rounded-md"}
+                            className={`text-sm ${activeTab === "adjustment" ? "text-white" : "bg-gray-500/50 rounded-md"}`}
                         >
                             Adjustment
                         </Tab>
@@ -1098,7 +1107,7 @@ function Closing() {
                             key="damage"
                             value="damage"
                             onClick={() => setActiveTab("damage")}
-                            className={activeTab === "damage" ? "text-white" : "bg-gray-500/50 rounded-md"}
+                            className={`text-sm ${activeTab === "damage" ? "text-white" : "bg-gray-500/50 rounded-md"}`}
                         >
                             Damage
                         </Tab>
@@ -1107,7 +1116,7 @@ function Closing() {
                             key="issue"
                             value="issue"
                             onClick={() => setActiveTab("issue")}
-                            className={activeTab === "issue" ? "text-white" : "bg-gray-500/50 rounded-md"}
+                            className={`text-sm ${activeTab === "issue" ? "text-white" : "bg-gray-500/50 rounded-md"}`}
                         >
                             Issue
                         </Tab>
@@ -1116,7 +1125,7 @@ function Closing() {
                             key="purchaseReturn"
                             value="purchaseReturn"
                             onClick={() => setActiveTab("purchaseReturn")}
-                            className={activeTab === "purchaseReturn" ? "text-white" : "bg-gray-500/50 rounded-md"}
+                            className={`text-sm ${activeTab === "purchaseReturn" ? "text-white" : "bg-gray-500/50 rounded-md"}`}
                         >
                             Purchase Return
                         </Tab>
@@ -1125,7 +1134,7 @@ function Closing() {
                             key="salesReturn"
                             value="salesReturn"
                             onClick={() => setActiveTab("salesReturn")}
-                            className={activeTab === "salesReturn" ? "text-white" : "bg-gray-500/50 rounded-md"}
+                            className={`text-sm ${activeTab === "salesReturn" ? "text-white" : "bg-gray-500/50 rounded-md"}`}
                         >
                             Sales Return
                         </Tab>
@@ -1134,7 +1143,7 @@ function Closing() {
                             key="issueReturn"
                             value="issueReturn"
                             onClick={() => setActiveTab("issueReturn")}
-                            className={activeTab === "issueReturn" ? "text-white" : "bg-gray-500/50 rounded-md"}
+                            className={`text-sm ${activeTab === "issueReturn" ? "text-white" : "bg-gray-500/50 rounded-md"}`}
                         >
                             Issue Return
                         </Tab>
@@ -1195,7 +1204,7 @@ function Closing() {
                                     }
                                 }
                             }}
-                            actions={cashInOutDetails?.length > 0 ? exportCashInOut : null}
+                            actions={cashInOut?.length > 0 ? exportCashInOut : null}
                         />
                     </TabPanel>
                     {/* Payable */}

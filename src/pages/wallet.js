@@ -468,6 +468,8 @@ function Wallet() {
         },
     ];
 
+    console.log(data);
+
     const tbodyData = data?.map((wallet) => {
         return {
             id: wallet.id,
