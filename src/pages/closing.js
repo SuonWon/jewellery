@@ -96,9 +96,9 @@ function Closing() {
 
     const salesAmt = receivableDetails?.reduce((res, {amount}) => res + amount, 0);
 
-    const cashInAmt = cashInOut?.filter((res) => res.cashType === 'DEBIT')?.reduce((res, {amount}) => res + amount, 0);
+    // const cashInAmt = cashInOut?.filter((res) => res.cashType === 'DEBIT')?.reduce((res, {amount}) => res + amount, 0);
 
-    const cashOutAmt = cashInOut?.filter((res) => res.cashType === 'CREDIT')?.reduce((res, {amount}) => res + amount, 0)
+    // const cashOutAmt = cashInOut?.filter((res) => res.cashType === 'CREDIT')?.reduce((res, {amount}) => res + amount, 0)
 
     const balance = (((openingData?.opening + openingData?.stock + salesAmt + openingData?.cashIn) - purchaseAmt) - openingData?.cashOut);
 
@@ -939,6 +939,8 @@ function Closing() {
 
     const exportIssueReturn = useMemo(() => <Export onExport={() => downloadCSV(issueReturn, "Receivable List")} />, [issueReturn]);
 
+    console.log(openingData)
+
     return (
         <div className="text-start w-full p-4">
             <div className="w-78 absolute top-0 right-0 z-[9999]">
@@ -1017,7 +1019,7 @@ function Closing() {
                             Cash In
                         </Typography>
                         <Typography variant="h6" className="text-end">
-                            {cashInAmt.toLocaleString("en-us")}
+                            {openingData?.cashIn.toLocaleString("en-us")}
                         </Typography>
                     </div>
                     <div className="border-r-2 grid grid-rows gap-2 px-4 items-center">
@@ -1026,7 +1028,7 @@ function Closing() {
                             Cash Out
                         </Typography>
                         <Typography variant="h6" className="text-end">
-                            {cashOutAmt.toLocaleString("en-us")}
+                            {openingData?.cashOut.toLocaleString("en-us")}
                         </Typography>
                     </div>
                     <div className=" grid grid-rows gap-2 px-4 items-center">
