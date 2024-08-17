@@ -1045,9 +1045,9 @@ function Closing() {
             <Tabs value={activeTab}>
                 <div className="flex flex-row grid grid-cols-1 gap-2 justify-between">
                     <TabsHeader
-                        className="bg-transparent w-min-fit gap-2 px-0 py-2"
+                        className="bg-transparent w-min-fit gap-2 px-0 py-2 grid grid-cols-3 md:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-11"
                         indicatorProps={{
-                        className: "bg-main/80",
+                            className: "bg-main/80",
                         }}
                     >
                         {/* Purchase */}
