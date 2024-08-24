@@ -957,7 +957,7 @@ function Closing() {
                         variant="gradient" 
                         size="sm" 
                         color="deep-purple" 
-                        className="flex items-center gap-2 capitalize h-[40px]" 
+                        className="flex items-center gap-2 capitalize h-[40px] py-2 px-3" 
                         onClick={handleOpen}
                     >
                         Confirm & Close Transaction
@@ -966,7 +966,7 @@ function Closing() {
                         variant="outlined" 
                         size="sm" 
                         color="deep-purple" 
-                        className="flex items-center gap-2 capitalize h-[40px]" 
+                        className="flex items-center gap-2 capitalize h-[40px] py-2 px-3" 
                         onClick={() => {
                             navigate(`/stock_closing_preview?startDate=${startDate}&endDate=${endDate}`);
                         }}
