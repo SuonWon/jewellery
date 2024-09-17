@@ -4,7 +4,7 @@ import { GiDiamondTrophy } from "react-icons/gi";
 import DataTable from "react-data-table-component";
 import { useNavigate } from "react-router-dom";
 import moment from "moment/moment";
-import { useFetchCashInOutDataQuery, useFetchCloseDateQuery, useFetchLastPayableQuery, useFetchLastReceivableQuery, useFetchOpeningQuery, useFetchPurchaseDataQuery, useFetchSalesDataQuery, useFetchStockQuery } from "../store";
+import { useFetchCashInOutDataQuery, useFetchLastPayableQuery, useFetchLastReceivableQuery, useFetchOpeningQuery, useFetchPurchaseDataQuery, useFetchSalesDataQuery, useFetchStockQuery } from "../store";
 import { useState } from "react";
 import { useAuthUser } from "react-auth-kit";
 

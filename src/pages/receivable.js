@@ -281,7 +281,7 @@ function Receivable(props) {
         },
         {
             name: 'Wallet Name',
-            selector:  row => <div className={`${row.status == 'O' ? 'bg-green-500' : (row.status == 'V' ? 'bg-red-500' : 'bg-orange-500')} px-3 py-[5px] text-white rounded-xl`}>
+            selector:  row => <div className={`${row.status === 'O' ? 'bg-green-500' : (row.status === 'V' ? 'bg-red-500' : 'bg-orange-500')} px-3 py-[5px] text-white rounded-xl`}>
                 {row.wallet.walletName}
             </div>
         },

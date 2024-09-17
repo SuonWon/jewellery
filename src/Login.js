@@ -1,14 +1,13 @@
-import { GoPerson, GoLock, GoEyeClosed, GoEye } from "react-icons/go";
+import { GoPerson, GoLock } from "react-icons/go";
 import { useSignIn } from 'react-auth-kit';
 import { useContext, useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { apiUrl, moduleName } from "./const";
+import { apiUrl } from "./const";
 import { setToken } from "./store/userSlice";
 import { useDispatch } from "react-redux";
 import { AuthContent } from "./context/authContext";
-import { Button, Card, CardHeader, Checkbox, Dialog, DialogBody, Input, Step, Stepper, Typography } from "@material-tailwind/react";
-import { FaRegImages } from "react-icons/fa6";
+import { Dialog, DialogBody } from "@material-tailwind/react";
 import Startup from "./pages/startup";
 import { useCheckUserQuery } from "./store";
 import ButtonLoader from "./components/buttonLoader";
@@ -38,7 +37,7 @@ function Login() {
     const {data:checkUser} = useCheckUserQuery();
 
     useEffect(() => {
-        if(checkUser?.length == 0) {
+        if(checkUser?.length === 0) {
             setOpen(true);
         }
     }, [checkUser])
@@ -134,7 +133,7 @@ function Login() {
                     <h3 className="text-2xl font-bold mt-6 text-white">Jewellery POS</h3>
                 </div>
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320">
-                    <path fill="#51448a" fill-opacity="1" d="M0,160L480,224L960,288L1440,64L1440,0L960,0L480,0L0,0Z"></path>
+                    <path fill="#51448a" fillOpacity="1" d="M0,160L480,224L960,288L1440,64L1440,0L960,0L480,0L0,0Z"></path>
                 </svg>
                 <form className="flex flex-col px-7 pt-3 pb-8" onSubmit={handleSubmit}>
                     <h3 className="text-2xl font-bold" style={{color: '#51448a'}}>Login</h3>

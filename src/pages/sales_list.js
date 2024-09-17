@@ -16,7 +16,7 @@ import { v4 as uuidv4 } from 'uuid';
 import axios from "axios";
 import DataTable from "react-data-table-component";
 import Receivable from "./receivable";
-import { useFetchIssueQuery, useFetchTrueIssueQuery } from "../apis/issueApi";
+import { useFetchIssueQuery } from "../apis/issueApi";
 import Cookies from "js-cookie";
 import { AuthContent } from "../context/authContext";
 import ButtonLoader from "../components/buttonLoader";

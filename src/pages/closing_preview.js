@@ -1,9 +1,7 @@
 import { Button, Card, CardBody, Typography } from "@material-tailwind/react"
 import moment from "moment";
-import { useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import { useFetchCashInOutDataQuery, useFetchLastPayableQuery, useFetchLastReceivableQuery, useFetchOpeningQuery, useFetchPurchaseDataQuery, useFetchSalesDataQuery, useFetchStockQuery } from "../store";
-import DataTable from "react-data-table-component";
+import { useLocation } from "react-router-dom";
+import { useFetchCashInOutDataQuery, useFetchLastPayableQuery, useFetchLastReceivableQuery, useFetchOpeningQuery, useFetchPurchaseDataQuery, useFetchSalesDataQuery } from "../store";
 
 function ClosingPreview() {
 
