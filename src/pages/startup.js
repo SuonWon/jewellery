@@ -6,7 +6,7 @@ import { GoEye, GoEyeClosed } from "react-icons/go";
 import { useAddCompanyMutation, useAddDefaultCategoryMutation, useAddDefaultRoleMutation, useAddDefaultShareMutation, useAddDefaultUserMutation } from "../store";
 import { moduleName } from "../const";
 
-var bcrypt = require('bcryptjs');
+// var bcrypt = require('bcryptjs');
 const validator = require('validator');
 
 function Startup(props) {
@@ -23,7 +23,7 @@ function Startup(props) {
 
     const [roleCode, setRoleCode] = useState(0);
 
-    var salt = bcrypt.genSaltSync(10);
+    // var salt = bcrypt.genSaltSync(10);
 
     const [roleData, setRoleData] = useState({
         roleDesc: "Super Admin",
@@ -127,11 +127,11 @@ function Startup(props) {
 
     const createUser = () => {
         if (validateUserForm()) {
-            var hash = bcrypt.hashSync(userData.password, salt);
+            // var hash = bcrypt.hashSync(userData.password, salt);
             addDefaultUser({
                 username: userData.username,
                 fullName: userData.fullName,
-                password: hash,
+                password: userData.password,
                 isActive: true,
                 roleCode: roleCode,
                 remark: userData.remark,

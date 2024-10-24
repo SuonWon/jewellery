@@ -16,7 +16,7 @@ import { AuthContent } from "../context/authContext";
 import { pause } from "../const";
 import SuccessAlert from "../components/success_alert";
 
-var bcrypt = require('bcryptjs');
+// var bcrypt = require('bcryptjs');
 const validator = require("validator");
 
 function SystemUser() {
@@ -94,7 +94,7 @@ function SystemUser() {
 
     const [formData, setFormData] = useState(userInfo);
 
-    var salt = bcrypt.genSaltSync(10);
+    // var salt = bcrypt.genSaltSync(10);
 
     const handleChange = async (e) => {
         let user = data.find((user) => user.username == e.target.id);
@@ -158,11 +158,11 @@ function SystemUser() {
     };
 
     const onSubmit = async () => {
-        var hash = bcrypt.hashSync(formData.password, salt);
+        // var hash = bcrypt.hashSync(formData.password, salt);
         if(validateForm()) {
             addUser({
                 ...formData,
-                password: hash
+                password: formData.password
             }).then((res) => {
                 if(res.data) {
                     setAlertMsg({
@@ -192,11 +192,11 @@ function SystemUser() {
     };
 
     const onSaveSubmit = async () => {
-        var hash = bcrypt.hashSync(formData.password, salt);
+        // var hash = bcrypt.hashSync(formData.password, salt);
         if (validateForm()) {
             addUser({
                 ...formData,
-                password: hash
+                password: formData.passwordformData.passwordpg
             }).then((res) => {
                 if(res.data) {
                     setAlertMsg({
